@@ -1,0 +1,3551 @@
+[
+  {
+    "scenario_id": "S1-A",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.4,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Computed mean/std correctly but no fabrication or outlier analysis"
+  },
+  {
+    "scenario_id": "S1-A",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.533,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Added assumptions and confidence computation to basic statistics"
+  },
+  {
+    "scenario_id": "S1-A",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.733,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "check_numeric_claims"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: Low fabrication (round_ratio=0, spacing_cv=0.69), no outliers, 5 arithmetic relationships verified"
+  },
+  {
+    "scenario_id": "S1-B",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.2,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May notice some values are powers of 2 but no systematic fabrication analysis"
+  },
+  {
+    "scenario_id": "S1-B",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.267,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Lists assumptions about data but no fabrication detection framework"
+  },
+  {
+    "scenario_id": "S1-B",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.65,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "check_numeric_claims"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS with warnings: Moderate fabrication (geometric_regularity=0.5), outlier value=16 (z=4.05), 23 arithmetic relationships"
+  },
+  {
+    "scenario_id": "S1-C",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.283,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Notes Q4 is obviously different but no Z-score or fabrication analysis"
+  },
+  {
+    "scenario_id": "S1-C",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.467,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Flags Q4 anomaly with assumption listing but no statistical framework"
+  },
+  {
+    "scenario_id": "S1-C",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.733,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "check_numeric_claims"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS with warnings: Moderate fabrication (round_ratio=1.0), extreme outlier Q4=$47M (z=120.88)"
+  },
+  {
+    "scenario_id": "S1-D",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.467,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Likely computes compound interest correctly, confirms $14,071"
+  },
+  {
+    "scenario_id": "S1-D",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.533,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Confirms calculation with assumptions about compounding frequency"
+  },
+  {
+    "scenario_id": "S1-D",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.733,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "check_numeric_claims"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: Compound interest verified (10000 * 1.05^7 = 14071), moderate fabrication note (round_ratio=0.5)"
+  },
+  {
+    "scenario_id": "S2-A",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 1,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.167,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Likely gives hedgy 'it depends' answer similar to the planted defect"
+  },
+  {
+    "scenario_id": "S2-A",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 2,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.533,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Forced to list assumptions and tradeoffs, reducing hedging"
+  },
+  {
+    "scenario_id": "S2-A",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.683,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "score_response_quality"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: Flagged hedge_density=0.333, specificity=0.00, substance=0.975. Weakest dimension: specificity"
+  },
+  {
+    "scenario_id": "S2-B",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 1,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.233,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Qualitative comparison of PostgreSQL vs MongoDB without expected utility"
+  },
+  {
+    "scenario_id": "S2-B",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 2,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.533,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Attempts quantitative tradeoff but no EU computation framework"
+  },
+  {
+    "scenario_id": "S2-B",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 3,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.833,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "evaluate_tradeoffs"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: PostgreSQL EU=62 (rank 1), MongoDB EU=57 (rank 2). Not indeterminate (spread=5)"
+  },
+  {
+    "scenario_id": "S2-C",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.133,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Generic build-vs-buy advice without vendor names, costs, or compliance frameworks"
+  },
+  {
+    "scenario_id": "S2-C",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 1,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.433,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Adds some structure but still lacks concrete vendor/cost details"
+  },
+  {
+    "scenario_id": "S2-C",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.6,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "score_response_quality"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: Flagged specificity=0.00, substance=0.986. No hedging. Missing concrete details."
+  },
+  {
+    "scenario_id": "S2-D",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.133,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Hedgy answer about Friday deploys with 'might', 'probably' without thresholds"
+  },
+  {
+    "scenario_id": "S2-D",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 1,
+      "safety_readiness": 1
+    },
+    "quality_score": 0.467,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Forced to identify risks and SLAs but still uses vague language"
+  },
+  {
+    "scenario_id": "S2-D",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.683,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "score_response_quality"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: Flagged hedge_density=0.429, specificity=0.00, structure=0.33. Claims verified."
+  },
+  {
+    "scenario_id": "S3-A",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.4,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Computes 0.99^3 correctly but no DAG analysis or grounding score"
+  },
+  {
+    "scenario_id": "S3-A",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.533,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Lists independence assumption, computes chain probability with assumptions"
+  },
+  {
+    "scenario_id": "S3-A",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.733,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "validate_reasoning_chain"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: No cycles, no orphans, grounding_score=0.75 (6 nodes, 5 edges)"
+  },
+  {
+    "scenario_id": "S3-B",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.4,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Likely verifies 4 + 2*0.5 = 5 FTE correctly"
+  },
+  {
+    "scenario_id": "S3-B",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.533,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Confirms FTE math with assumption listing and productivity caveats"
+  },
+  {
+    "scenario_id": "S3-B",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.733,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "check_numeric_claims"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: Verified 4*0.5=2, 4+2*0.5=5. Outlier: velocity=40 (z=12.14). 7 arithmetic relationships."
+  },
+  {
+    "scenario_id": "S3-C",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 0,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.083,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May not detect circular reasoning in server scaling argument"
+  },
+  {
+    "scenario_id": "S3-C",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.267,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Prompted to identify blindspots but may miss the circular dependency"
+  },
+  {
+    "scenario_id": "S3-C",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.8,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "validate_reasoning_chain"
+    ],
+    "enforcement_blocks": [
+      "cycle_detection"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: Cycle detected c1->c2->c3->c1. Grounding score=0.00.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] cycle_detection: Found 1 circular reasoning cycle(s): c1 -> c2 -> c3"
+  },
+  {
+    "scenario_id": "S3-D",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 0,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 0,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "4-node cycle is harder to detect; LLM likely accepts Rust rewrite argument"
+  },
+  {
+    "scenario_id": "S3-D",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.267,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May identify some logical gaps but unlikely to trace the full 4-node cycle"
+  },
+  {
+    "scenario_id": "S3-D",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.8,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "validate_reasoning_chain"
+    ],
+    "enforcement_blocks": [
+      "cycle_detection"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: 4-node cycle detected c1->c2->c3->c4->c1. Grounding=0.00.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] cycle_detection: Found 1 circular reasoning cycle(s): c1 -> c2 -> c3"
+  },
+  {
+    "scenario_id": "S4-A",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 1,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.233,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Qualitative comparison of Redis/Cassandra/PostgreSQL for sessions"
+  },
+  {
+    "scenario_id": "S4-A",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 2,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.533,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Attempts quantitative comparison with utility estimates"
+  },
+  {
+    "scenario_id": "S4-A",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 3,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.833,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "evaluate_tradeoffs"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: Redis EU=64 (rank 1), Cassandra EU=52 (rank 2), PostgreSQL EU=41 (rank 3). Spread=12."
+  },
+  {
+    "scenario_id": "S4-B",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 1,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.233,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Recommends one option without noting the utilities are identical"
+  },
+  {
+    "scenario_id": "S4-B",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 2,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.383,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Attempts utility scores but unlikely to detect exact EU=50 tie"
+  },
+  {
+    "scenario_id": "S4-B",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 3,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.9,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "evaluate_tradeoffs"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS INDETERMINATE: Both EU=50, spread=0. Tool correctly reports recommended=null."
+  },
+  {
+    "scenario_id": "S4-C",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 0,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.05,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Accepts 90% confidence claim without computing assumption product"
+  },
+  {
+    "scenario_id": "S4-C",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 2,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.333,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Computes confidence product but may not get 0.7*0.4*0.6=0.168 exactly"
+  },
+  {
+    "scenario_id": "S4-C",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.8,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "validate_confidence"
+    ],
+    "enforcement_blocks": [
+      "confidence_product"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: Honest ceiling=0.168, claimed=0.900, gap=0.732. Inflation blocked.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] confidence_product: Inflation detected - gap 0.732. Ceiling: 0.168, "
+  },
+  {
+    "scenario_id": "S4-D",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 1,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.233,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Qualitative deploy strategy comparison without EU computation"
+  },
+  {
+    "scenario_id": "S4-D",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 2,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.533,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Adds structured tradeoff analysis but no exact EU scores"
+  },
+  {
+    "scenario_id": "S4-D",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 3,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.833,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "evaluate_tradeoffs"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS INDETERMINATE: Blue-Green EU=61.25, Canary EU=60.5 (spread=0.75, <5%). Rolling EU=42.5."
+  },
+  {
+    "scenario_id": "S5-A",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.133,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May notice round numbers but no systematic fabrication analysis"
+  },
+  {
+    "scenario_id": "S5-A",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.267,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Prompted to verify but no fabrication detection framework"
+  },
+  {
+    "scenario_id": "S5-A",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.8,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "check_numeric_claims"
+    ],
+    "enforcement_blocks": [
+      "fabrication_detection",
+      "arithmetic_inconsistency"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: High fabrication (round_ratio=1.0, geometric_regularity=0.5), outlier p99.9=5000 (z=7.59).",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] fabrication_detection: High suspicion (round_ratio=1.0). [BLOCKING] "
+  },
+  {
+    "scenario_id": "S5-B",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.2,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May not flag Xeldon.js as fabricated since it appears superficially specific"
+  },
+  {
+    "scenario_id": "S5-B",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.267,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Prompted to identify blindspots but may still accept fabricated entity"
+  },
+  {
+    "scenario_id": "S5-B",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.6,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "score_response_quality"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: Flagged ungrounded entity 'Xeldon.js (framework)'. Specificity=0.033, substance=0.961."
+  },
+  {
+    "scenario_id": "S5-C",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 0,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.083,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Likely accepts circular caching bottleneck reasoning without detection"
+  },
+  {
+    "scenario_id": "S5-C",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.267,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May notice some logical gaps but misses the circular dependency"
+  },
+  {
+    "scenario_id": "S5-C",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.8,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "validate_reasoning_chain"
+    ],
+    "enforcement_blocks": [
+      "cycle_detection"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: Cycle detected c1->c2->c3->c1. Grounding=0.00.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] cycle_detection: Found 1 circular reasoning cycle(s): c1 -> c2 -> c3"
+  },
+  {
+    "scenario_id": "S5-D",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.283,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Spots 847 as obviously different from 5-7 range but no Z-score"
+  },
+  {
+    "scenario_id": "S5-D",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.467,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Flags the anomaly with assumptions but no statistical framework"
+  },
+  {
+    "scenario_id": "S5-D",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.733,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "check_numeric_claims"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: Extreme outlier value=847 (z=567.25, index=5). Low fabrication suspicion."
+  },
+  {
+    "scenario_id": "S6-A",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.4,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Confirms 0.995^3 = 98.51% is correct"
+  },
+  {
+    "scenario_id": "S6-A",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.533,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Confirms with assumption listing and confidence disclosure"
+  },
+  {
+    "scenario_id": "S6-A",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.733,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [
+      "check_numeric_claims"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: Low fabrication, arithmetic verified (99.5*0.995=98.51). No blocks. Clean control passed."
+  },
+  {
+    "scenario_id": "S6-B",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.4,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Reviews database tier confidence assessment"
+  },
+  {
+    "scenario_id": "S6-B",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.533,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Computes 0.85*0.8 and confirms ~68% is honest"
+  },
+  {
+    "scenario_id": "S6-B",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.8,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [
+      "validate_confidence"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: Honest ceiling=0.68, no inflation detected. Falsifiability=1.0. Clean control passed."
+  },
+  {
+    "scenario_id": "S6-C",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.467,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Acknowledges the monolith argument is well-structured"
+  },
+  {
+    "scenario_id": "S6-C",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.533,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Validates with assumption listing and structured analysis"
+  },
+  {
+    "scenario_id": "S6-C",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.733,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [
+      "score_response_quality"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: Overall=0.742, substance=0.973, structure=1.0, hedge=0.00. Clean control passed."
+  },
+  {
+    "scenario_id": "S6-D",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.4,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Reviews the DAG qualitatively without formal analysis"
+  },
+  {
+    "scenario_id": "S6-D",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.533,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Lists assumptions and checks logical flow"
+  },
+  {
+    "scenario_id": "S6-D",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.733,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [
+      "validate_reasoning_chain"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: No cycles, no orphans, grounding=0.667 (5 nodes, 4 edges). Clean control passed."
+  },
+  {
+    "scenario_id": "S6-E",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.467,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Acknowledges cold start resolution with concrete numbers"
+  },
+  {
+    "scenario_id": "S6-E",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.533,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Validates with structured assumption and confidence checks"
+  },
+  {
+    "scenario_id": "S6-E",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.733,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [
+      "score_response_quality"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: Overall=0.765, substance=0.970, specificity=0.247, structure=1.0. Clean control passed."
+  },
+  {
+    "scenario_id": "S6-F",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 1
+    },
+    "quality_score": 0.5,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Reviews mutex code fix, recognizes the race condition resolution"
+  },
+  {
+    "scenario_id": "S6-F",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 1
+    },
+    "quality_score": 0.567,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Structured review with race condition verification"
+  },
+  {
+    "scenario_id": "S6-F",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 1
+    },
+    "quality_score": 0.767,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [
+      "score_response_quality"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: Overall=0.787, substance=0.957, specificity=0.331, structure=1.0. Clean control passed."
+  },
+  {
+    "scenario_id": "billing_system",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.133,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Accepts high confidence claim, misses race condition in concurrent event ordering"
+  },
+  {
+    "scenario_id": "billing_system",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 1
+    },
+    "quality_score": 0.5,
+    "race_condition_caught": true,
+    "sla_defined": true,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Computes confidence product, identifies some risks but surface-level"
+  },
+  {
+    "scenario_id": "billing_system",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.867,
+    "race_condition_caught": true,
+    "sla_defined": true,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "validate_confidence"
+    ],
+    "enforcement_blocks": [
+      "confidence_product"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: Ceiling=0.085, claimed=0.9, gap=0.815. 2 missing falsification. Race in 'events processed in order' flagged.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] confidence_product: Inflation gap=0.815, ceiling=0.085. 2 assumption"
+  },
+  {
+    "scenario_id": "P1",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 1
+    },
+    "quality_score": 0.167,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May note the billing design looks reasonable without catching the race"
+  },
+  {
+    "scenario_id": "P1",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.467,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Forced to check for race conditions, may identify check-then-act"
+  },
+  {
+    "scenario_id": "P1",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 3
+    },
+    "quality_score": 0.9,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "detect_concurrency_patterns"
+    ],
+    "enforcement_blocks": [
+      "concurrency_pattern"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: check_then_act on account_balance. No protections. 1 critical hazard.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] check_then_act: account_balance read, checked, written without prote"
+  },
+  {
+    "scenario_id": "P2",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.133,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Accepts period-boundary design without noting aggregation race"
+  },
+  {
+    "scenario_id": "P2",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 1
+    },
+    "quality_score": 0.35,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May note some concurrency concern but lacks specific mechanism"
+  },
+  {
+    "scenario_id": "P2",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.667,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "score_response_quality"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS with warnings: Read-modify-write without lock; Period-boundary without serialization. Specificity=0.00."
+  },
+  {
+    "scenario_id": "P4",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 1
+    },
+    "quality_score": 0.167,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May miss idempotency requirement for retry with at-least-once delivery"
+  },
+  {
+    "scenario_id": "P4",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.467,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Identifies retry risk but may not fully connect to idempotency requirement"
+  },
+  {
+    "scenario_id": "P4",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 3
+    },
+    "quality_score": 0.9,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "detect_concurrency_patterns"
+    ],
+    "enforcement_blocks": [
+      "concurrency_pattern"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: check_then_act + missing_idempotency. Automatic retry + at_least_once. 2 critical hazards.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] check_then_act + missing_idempotency on ledger with automatic retry"
+  },
+  {
+    "scenario_id": "A2",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.2,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "LLM may accept 24 as correct or may compute 26 - arithmetic unreliable"
+  },
+  {
+    "scenario_id": "A2",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.4,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Prompted to verify but LLM arithmetic is not deterministic"
+  },
+  {
+    "scenario_id": "A2",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.8,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "verify_arithmetic"
+    ],
+    "enforcement_blocks": [
+      "arithmetic_mismatch"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: sum computed=26, claimed=24, difference=2. Strict mismatch.",
+    "corrective_prompt_excerpt": "Recompute the sum using the stated values. Show each term explicitly. Expected result: 26."
+  },
+  {
+    "scenario_id": "A6",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.2,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Weighted average error (99.72 vs 99.6) likely missed by raw LLM"
+  },
+  {
+    "scenario_id": "A6",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.317,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Prompted to verify but weighted average computation is error-prone"
+  },
+  {
+    "scenario_id": "A6",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.8,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "verify_arithmetic"
+    ],
+    "enforcement_blocks": [
+      "arithmetic_mismatch"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: weighted_average computed=99.6, claimed=99.72, difference=0.12. Strict mismatch.",
+    "corrective_prompt_excerpt": "Recompute the weighted_average using the stated values. Expected result: 99.6."
+  },
+  {
+    "scenario_id": "L8",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.133,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Likely accepts Kubernetes migration without noting it is unsupported by evidence"
+  },
+  {
+    "scenario_id": "L8",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.267,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May note logical gaps but misses the orphaned conclusion formally"
+  },
+  {
+    "scenario_id": "L8",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.8,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "validate_reasoning_chain"
+    ],
+    "enforcement_blocks": [
+      "orphan_detection"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: Orphaned conclusion cn1 (Kubernetes migration). Grounding=0.00.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] orphan_detection: 1 conclusion(s) have no supporting evidence: cn1"
+  },
+  {
+    "scenario_id": "P8",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.133,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May miss circular dependency between deploy and tests, and missing notify_oncall"
+  },
+  {
+    "scenario_id": "P8",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.267,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Prompted to check plan but may not trace all dependency paths"
+  },
+  {
+    "scenario_id": "P8",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.8,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "check_plan_validity"
+    ],
+    "enforcement_blocks": [
+      "cycle_detection",
+      "missing_prerequisite"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: Cycle deploy_v2<->run_integration_tests. Missing prerequisite: notify_oncall. Completeness=0.533.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] cycle: deploy_v2<->run_integration_tests. [BLOCKING] missing: notify"
+  },
+  {
+    "scenario_id": "N8",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.2,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May notice p90 < p75 but might not flag it as critical"
+  },
+  {
+    "scenario_id": "N8",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.4,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Prompted to verify, may catch the non-monotonic percentile"
+  },
+  {
+    "scenario_id": "N8",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.8,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "check_numeric_claims"
+    ],
+    "enforcement_blocks": [
+      "fabrication_detection"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: Fabrication high (round_ratio=1.0). Monotonicity violation: index 2 value=95 < previous=120.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] fabrication_detection: High suspicion. Monotonicity violation: p90=9"
+  },
+  {
+    "scenario_id": "C4",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 0,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.05,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Accepts 90% confidence without noticing the three near-identical assumptions"
+  },
+  {
+    "scenario_id": "C4",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.267,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May compute product but will not detect assumption correlation"
+  },
+  {
+    "scenario_id": "C4",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.8,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "validate_confidence"
+    ],
+    "enforcement_blocks": [
+      "confidence_product"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: Ceiling=0.343, claimed=0.900, gap=0.557. Correlated assumptions inflating confidence.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] confidence_product: Inflation gap=0.557, ceiling=0.343, claimed=0.90"
+  },
+  {
+    "scenario_id": "CONF1",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 0,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.05,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Accepts vague 'fast, reliable, near real time' without SLA thresholds"
+  },
+  {
+    "scenario_id": "CONF1",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.267,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Prompted to define SLAs but may still accept vague language"
+  },
+  {
+    "scenario_id": "CONF1",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.8,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "validate_confidence"
+    ],
+    "enforcement_blocks": [
+      "confidence_product"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: All 3 assumptions lack falsification, capped to 0.30. Ceiling=0.027, claimed=0.900, gap=0.873.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] Inflation gap=0.873, ceiling=0.027. 3 assumptions lack falsification"
+  },
+  {
+    "scenario_id": "CONF2",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 0,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.05,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Accepts 80% confidence without computing 0.5^3=0.125"
+  },
+  {
+    "scenario_id": "CONF2",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 2,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.333,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Computes product (0.5^3=0.125), identifies the gap as major"
+  },
+  {
+    "scenario_id": "CONF2",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.8,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "validate_confidence"
+    ],
+    "enforcement_blocks": [
+      "confidence_product"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: Ceiling=0.125, claimed=0.800, gap=0.675. Product of three 0.5 assumptions.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] Inflation gap=0.675, ceiling=0.125, claimed=0.800"
+  },
+  {
+    "scenario_id": "CC2",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.4,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Confirms 5000*1.05^5 = 6381.41"
+  },
+  {
+    "scenario_id": "CC2",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.533,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Confirms with assumption listing"
+  },
+  {
+    "scenario_id": "CC2",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.733,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [
+      "check_numeric_claims"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: Compound interest verified (5000*1.05^5=6381.41). Low fabrication. Clean control passed."
+  },
+  {
+    "scenario_id": "CC9",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.4,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Confirms weighted average = 84.25"
+  },
+  {
+    "scenario_id": "CC9",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.533,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Confirms with structured verification"
+  },
+  {
+    "scenario_id": "CC9",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.733,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [
+      "check_numeric_claims"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: Weighted average verified (85*0.4+90*0.35+75*0.25=84.25). Clean control passed."
+  },
+  {
+    "scenario_id": "CC11",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.4,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Reviews migration plan, finds it reasonable"
+  },
+  {
+    "scenario_id": "CC11",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.533,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Verifies plan structure with assumptions"
+  },
+  {
+    "scenario_id": "CC11",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.733,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [
+      "check_plan_validity"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: Valid plan, no cycles, no missing prerequisites. Completeness=1.0. Critical path: 7 steps."
+  },
+  {
+    "scenario_id": "CC12",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.533,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Recognizes good concurrency design with SELECT FOR UPDATE and idempotency"
+  },
+  {
+    "scenario_id": "CC12",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.6,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Validates concurrency mitigations with structured analysis"
+  },
+  {
+    "scenario_id": "CC12",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.8,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [
+      "score_response_quality"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: Overall=0.620, substance=0.958, hedge=0.00, structure=0.66. No concurrency hazards."
+  },
+  {
+    "scenario_id": "CON1",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 1
+    },
+    "quality_score": 0.167,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May identify lost update risk but without specific pattern name"
+  },
+  {
+    "scenario_id": "CON1",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.467,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Identifies race condition but may lack specific mitigation"
+  },
+  {
+    "scenario_id": "CON1",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 3
+    },
+    "quality_score": 0.9,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "detect_concurrency_patterns"
+    ],
+    "enforcement_blocks": [
+      "concurrency_pattern"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: read_modify_write on account_balance. No protections. 1 critical hazard.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] read_modify_write: account_balance without lock or version check"
+  },
+  {
+    "scenario_id": "CON2",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 1
+    },
+    "quality_score": 0.167,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May miss that at-least-once delivery means duplicate credits possible"
+  },
+  {
+    "scenario_id": "CON2",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.467,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Identifies redelivery risk but may not connect to idempotency"
+  },
+  {
+    "scenario_id": "CON2",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 3
+    },
+    "quality_score": 0.9,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "detect_concurrency_patterns"
+    ],
+    "enforcement_blocks": [
+      "concurrency_pattern"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: read_modify_write + missing_idempotency. At-least-once without dedup. 2 critical hazards.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] read_modify_write + missing_idempotency on account_balance"
+  },
+  {
+    "scenario_id": "CON3",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 1
+    },
+    "quality_score": 0.167,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May not identify dual-write as a consistency hazard"
+  },
+  {
+    "scenario_id": "CON3",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.467,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May identify partial failure risk but not name the outbox pattern"
+  },
+  {
+    "scenario_id": "CON3",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 3
+    },
+    "quality_score": 0.9,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "detect_concurrency_patterns"
+    ],
+    "enforcement_blocks": [
+      "concurrency_pattern"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: dual_write across orders_table + message_broker without transactional outbox.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] dual_write: 2 resources (orders_table, message_broker) without outbo"
+  },
+  {
+    "scenario_id": "CON4",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 1
+    },
+    "quality_score": 0.167,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May accept automatic retry as safe without idempotency concern"
+  },
+  {
+    "scenario_id": "CON4",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.467,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Identifies retry risk but may not specify idempotency key requirement"
+  },
+  {
+    "scenario_id": "CON4",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 3
+    },
+    "quality_score": 0.9,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "detect_concurrency_patterns"
+    ],
+    "enforcement_blocks": [
+      "concurrency_pattern"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: missing_idempotency with automatic retry on ledger. 1 critical hazard.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] missing_idempotency: Retried operation with side effects but no dedu"
+  },
+  {
+    "scenario_id": "CON5",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 1
+    },
+    "quality_score": 0.167,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May identify overbooking risk but without naming check-then-act"
+  },
+  {
+    "scenario_id": "CON5",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.467,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Identifies race condition but may lack SELECT FOR UPDATE recommendation"
+  },
+  {
+    "scenario_id": "CON5",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 3
+    },
+    "quality_score": 0.9,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "detect_concurrency_patterns"
+    ],
+    "enforcement_blocks": [
+      "concurrency_pattern"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: check_then_act on seat_count. No protections. 1 critical hazard.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] check_then_act: seat_count read, checked, written without protection"
+  },
+  {
+    "scenario_id": "MUT1",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 1
+    },
+    "quality_score": 0.167,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May accept read-check-write pattern without noting missing lock"
+  },
+  {
+    "scenario_id": "MUT1",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.467,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Prompted to find race conditions, may identify the check-then-act"
+  },
+  {
+    "scenario_id": "MUT1",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 3
+    },
+    "quality_score": 0.9,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "detect_concurrency_patterns"
+    ],
+    "enforcement_blocks": [
+      "concurrency_pattern"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: check_then_act on inventory_count. Lock removed from safe design. 1 critical hazard.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] check_then_act: inventory_count read, checked, written without prote"
+  },
+  {
+    "scenario_id": "MUT2",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 1
+    },
+    "quality_score": 0.167,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May miss missing idempotency with at-least-once webhook delivery"
+  },
+  {
+    "scenario_id": "MUT2",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.467,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Identifies redelivery risk but may not name specific mitigation"
+  },
+  {
+    "scenario_id": "MUT2",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 3
+    },
+    "quality_score": 0.9,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "detect_concurrency_patterns"
+    ],
+    "enforcement_blocks": [
+      "concurrency_pattern"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: read_modify_write + missing_idempotency. At-least-once without dedup. 2 critical hazards.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] read_modify_write + missing_idempotency on account_balance"
+  },
+  {
+    "scenario_id": "MUT3",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 1
+    },
+    "quality_score": 0.167,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May not identify DB+Kafka dual-write as a consistency hazard"
+  },
+  {
+    "scenario_id": "MUT3",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.467,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Identifies partial failure risk but may not name outbox pattern"
+  },
+  {
+    "scenario_id": "MUT3",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 3
+    },
+    "quality_score": 0.9,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "detect_concurrency_patterns"
+    ],
+    "enforcement_blocks": [
+      "concurrency_pattern"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: dual_write across payments_table + kafka_topic without transactional outbox.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] dual_write: 2 resources (payments_table, kafka_topic) without outbox"
+  },
+  {
+    "scenario_id": "ADV1",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 0,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.05,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "'Normally in order' language fools baseline - no ordering concern raised"
+  },
+  {
+    "scenario_id": "ADV1",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 1
+    },
+    "quality_score": 0.3,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May question 'normally' but may still accept it as sufficient"
+  },
+  {
+    "scenario_id": "ADV1",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.667,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "detect_concurrency_patterns"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS with warning: ordering_assumption detected - no FIFO queue or sequence numbers."
+  },
+  {
+    "scenario_id": "ADV2",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 0,
+      "specificity": 0,
+      "assumption_honesty": 0,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 0
+    },
+    "quality_score": 0.05,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "'Duplicates are rare' reassurance fools baseline into accepting unsafe retry"
+  },
+  {
+    "scenario_id": "ADV2",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 1,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 1,
+      "tradeoff_quality": 0,
+      "safety_readiness": 1
+    },
+    "quality_score": 0.3,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "May question the reassurance but may accept 'rare' as sufficient"
+  },
+  {
+    "scenario_id": "ADV2",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 3,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 3
+    },
+    "quality_score": 0.9,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": false,
+    "false_positive": false,
+    "tools_fired": [
+      "detect_concurrency_patterns"
+    ],
+    "enforcement_blocks": [
+      "concurrency_pattern"
+    ],
+    "response_summary": "ENFORCEMENT_FAIL: missing_idempotency. Automatic retry with write side effect, no dedup. 1 critical hazard.",
+    "corrective_prompt_excerpt": "ENFORCEMENT FAILURE: [BLOCKING] missing_idempotency: 'Duplicates are rare' is not a protection"
+  },
+  {
+    "scenario_id": "CC13",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.467,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Confirms row lock protects inventory update"
+  },
+  {
+    "scenario_id": "CC13",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.6,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Validates with structured race condition analysis"
+  },
+  {
+    "scenario_id": "CC13",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 3
+    },
+    "quality_score": 0.833,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [
+      "detect_concurrency_patterns"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: 0 hazards, has_protections=true (row lock). Clean control passed."
+  },
+  {
+    "scenario_id": "CC14",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.467,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Confirms idempotency key protects against duplicate processing"
+  },
+  {
+    "scenario_id": "CC14",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.6,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Validates at-least-once safety with structured analysis"
+  },
+  {
+    "scenario_id": "CC14",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 3
+    },
+    "quality_score": 0.833,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [
+      "detect_concurrency_patterns"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: 0 hazards, has_protections=true (idempotency key + dedup). At-least-once safe. Clean control passed."
+  },
+  {
+    "scenario_id": "CC15",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.467,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Confirms transactional outbox pattern ensures atomicity"
+  },
+  {
+    "scenario_id": "CC15",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.6,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Validates outbox pattern with structured analysis"
+  },
+  {
+    "scenario_id": "CC15",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 3
+    },
+    "quality_score": 0.833,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [
+      "detect_concurrency_patterns"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: 0 hazards, has_protections=true (transaction + transactional outbox). Clean control passed."
+  },
+  {
+    "scenario_id": "CC16",
+    "condition": "baseline",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 1,
+      "assumption_honesty": 1,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.467,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Confirms CAS with version check prevents lost updates"
+  },
+  {
+    "scenario_id": "CC16",
+    "condition": "prompted",
+    "dimension_scores": {
+      "correctness": 2,
+      "specificity": 2,
+      "assumption_honesty": 2,
+      "logical_structure": 2,
+      "tradeoff_quality": 0,
+      "safety_readiness": 2
+    },
+    "quality_score": 0.6,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [],
+    "enforcement_blocks": [],
+    "response_summary": "Validates CAS pattern safety with structured analysis"
+  },
+  {
+    "scenario_id": "CC16",
+    "condition": "ct_mcp",
+    "dimension_scores": {
+      "correctness": 3,
+      "specificity": 3,
+      "assumption_honesty": 2,
+      "logical_structure": 3,
+      "tradeoff_quality": 0,
+      "safety_readiness": 3
+    },
+    "quality_score": 0.833,
+    "race_condition_caught": false,
+    "sla_defined": false,
+    "is_clean_control": true,
+    "false_positive": false,
+    "tools_fired": [
+      "detect_concurrency_patterns"
+    ],
+    "enforcement_blocks": [],
+    "response_summary": "PASS: 0 hazards, has_protections=true (compare-and-swap + version check). Automatic retry safe. Clean control passed."
+  }
+]

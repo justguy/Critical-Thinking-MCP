@@ -1,0 +1,84 @@
+{
+  "version": "1.0",
+  "description": "Machine-readable scoring rubric for CT-MCP benchmark scenarios.",
+  "dimensions": [
+    {
+      "id": "correctness",
+      "name": "Correctness",
+      "description": "Mathematical and logical accuracy of the tool's output",
+      "weight": 0.25,
+      "levels": {
+        "0": "Tool produced incorrect result or missed planted defect",
+        "1": "Tool detected issue but with wrong mechanism or incomplete analysis",
+        "2": "Tool correctly identified the issue with appropriate mechanism",
+        "3": "Tool correctly identified issue, provided actionable corrective prompt"
+      }
+    },
+    {
+      "id": "specificity",
+      "name": "Specificity",
+      "description": "Precision and actionability of enforcement output",
+      "weight": 0.20,
+      "levels": {
+        "0": "Vague or generic output",
+        "1": "Names the general area of concern",
+        "2": "Names specific mechanism, component, or threshold",
+        "3": "Names specific mechanism with measurable condition and time window"
+      }
+    },
+    {
+      "id": "assumption_honesty",
+      "name": "Assumption Honesty",
+      "description": "Whether confidence claims match mathematical basis",
+      "weight": 0.20,
+      "levels": {
+        "0": "Confidence inflation undetected",
+        "1": "Inflation flagged but not blocked",
+        "2": "Inflation blocked with corrective prompt",
+        "3": "Inflation blocked, corrective prompt forces specific falsification conditions"
+      }
+    },
+    {
+      "id": "logical_structure",
+      "name": "Logical Structure",
+      "description": "DAG integrity, cycle detection, grounding score",
+      "weight": 0.15,
+      "levels": {
+        "0": "Structural issues not detected",
+        "1": "Partial detection (e.g., found orphan but missed cycle)",
+        "2": "All structural issues detected",
+        "3": "All issues detected with accurate depth/path analysis"
+      }
+    },
+    {
+      "id": "tradeoff_quality",
+      "name": "Tradeoff Quality",
+      "description": "Whether tradeoffs are explicit, quantified, and actionable",
+      "weight": 0.10,
+      "levels": {
+        "0": "No tradeoff analysis",
+        "1": "Tradeoffs mentioned qualitatively",
+        "2": "Tradeoffs quantified with utility scores",
+        "3": "Quantified with indeterminate detection when scores are close"
+      }
+    },
+    {
+      "id": "safety_readiness",
+      "name": "Safety & Production Readiness",
+      "description": "Detection of concurrency issues, race conditions, missing locks",
+      "weight": 0.10,
+      "levels": {
+        "0": "Safety issues not addressed",
+        "1": "General concern raised without specifics",
+        "2": "Specific safety issue named (e.g., race condition)",
+        "3": "Safety issue named with specific mitigation (e.g., SELECT FOR UPDATE)"
+      }
+    }
+  ],
+  "max_score_per_dimension": 3,
+  "max_total_score": 18,
+  "normalization": "total_score / 18",
+  "pass_threshold": 0.5,
+  "good_threshold": 0.75,
+  "excellent_threshold": 0.9
+}

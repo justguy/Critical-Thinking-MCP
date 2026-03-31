@@ -1,0 +1,92 @@
+[
+  {
+    "gap_id": "GAP-1",
+    "category": "not_caught",
+    "description": "Semantic fabrication about real entities — plausible but wrong claims about real frameworks (e.g., 'Redis 8.0 supports ACID transactions') pass all checks because the tool has no world knowledge",
+    "example_scenario": "Response claims Redis supports multi-document ACID transactions. score_response_quality scores high specificity because the claim is precise and concrete.",
+    "affected_tool": "score_response_quality",
+    "severity": "high",
+    "potential_fix": "Out of scope for deterministic enforcement. Would require external knowledge base or LLM-as-verifier. Documented in Limitations."
+  },
+  {
+    "gap_id": "GAP-2",
+    "category": "coverage_gap",
+    "description": "Multi-step chained arithmetic where intermediate results compound errors — verify_arithmetic handles single operations only",
+    "example_scenario": "Compute revenue growth 10% per year for 5 years, then tax at 30%, then convert currency — error in year 3 propagates silently",
+    "affected_tool": "verify_arithmetic",
+    "severity": "medium",
+    "potential_fix": "Add chain verification mode that accepts an array of sequential operations and checks each step"
+  },
+  {
+    "gap_id": "GAP-3",
+    "category": "under_detected",
+    "description": "Soft ordering language ('usually in order', 'typically sequential') triggers warning but not blocking — reassuring language masks real gaps",
+    "example_scenario": "ADV1 scenario: 'events are normally processed in order' — detected as ordering_assumption warning, not blocking",
+    "affected_tool": "detect_concurrency_patterns",
+    "severity": "medium",
+    "potential_fix": "Escalate ordering_assumption to blocking when shared_resources exist and no protections are listed"
+  },
+  {
+    "gap_id": "GAP-4",
+    "category": "coverage_gap",
+    "description": "Cross-tool blind spots — billing scenario only runs validate_confidence but would also benefit from detect_concurrency_patterns. Wrong tool choice means missed findings.",
+    "example_scenario": "billing_system catches confidence inflation but not the specific concurrency pattern (check-then-act) because detect_concurrency_patterns isn't called",
+    "affected_tool": "none (routing issue)",
+    "severity": "medium",
+    "potential_fix": "Use claim_classifier to suggest secondary tools. Not yet wired into tool selection."
+  },
+  {
+    "gap_id": "GAP-5",
+    "category": "under_detected",
+    "description": "Floating-point precision and rounding at intermediate steps — verify_arithmetic uses 2-decimal strict matching which may miss accumulated rounding",
+    "example_scenario": "Weighted average of (33.33, 33.33, 33.34) at equal weights should be 33.333... but claimed as 33.33",
+    "affected_tool": "verify_arithmetic",
+    "severity": "low",
+    "potential_fix": "Add configurable decimal precision. Current strict default is correct for stated claims."
+  },
+  {
+    "gap_id": "GAP-6",
+    "category": "not_caught",
+    "description": "Well-structured but semantically wrong reasoning — DAG with valid structure but invalid claim-evidence relationships (e.g., latency evidence supporting security claim)",
+    "example_scenario": "Evidence: 'p99 latency is 50ms'. Claim: 'The system is secure against SQL injection'. Edge: supports. validate_reasoning_chain passes because graph structure is valid.",
+    "affected_tool": "validate_reasoning_chain",
+    "severity": "high",
+    "potential_fix": "Out of scope for structural analysis. Would require semantic similarity between edge endpoints. Documented in Limitations."
+  },
+  {
+    "gap_id": "GAP-7",
+    "category": "false_positive_risk",
+    "description": "Hedging penalty on honest uncertainty — score_response_quality penalizes hedging but sometimes uncertainty is the correct response",
+    "example_scenario": "Response honestly states 'this depends on your specific workload' — penalized for hedging when the uncertainty is genuine",
+    "affected_tool": "score_response_quality",
+    "severity": "low",
+    "potential_fix": "Design choice. Honest uncertainty should be expressed via validate_confidence with explicit assumptions, not via hedge words."
+  },
+  {
+    "gap_id": "GAP-8",
+    "category": "not_caught",
+    "description": "Causally linked but lexically distinct assumptions — confidence product assumes independence, correlation detection uses Jaccard similarity on text. Causal links with different wording are missed.",
+    "example_scenario": "Assumption A: 'database handles 500 connections'. Assumption B: 'query latency stays under 50ms'. These are causally linked (connection exhaustion causes latency spikes) but lexically different.",
+    "affected_tool": "validate_confidence",
+    "severity": "medium",
+    "potential_fix": "Would require semantic embeddings or LLM call to detect causal links. Violates 'no LLM in enforcement' rule. Documented as known limitation."
+  },
+  {
+    "gap_id": "GAP-9",
+    "category": "under_detected",
+    "description": "Fabricated data that looks realistic — truly random-looking numbers with realistic precision and spacing pass all fabrication signals",
+    "example_scenario": "Numbers [47.3, 12.1, 8.4, 31.2, 18.7] — entirely made up but statistically indistinguishable from real measurements",
+    "affected_tool": "check_numeric_claims",
+    "severity": "medium",
+    "potential_fix": "Fundamental limitation of statistical detection. Can only catch numbers that show structural patterns of fabrication. Documented in Limitations."
+  },
+  {
+    "gap_id": "GAP-10",
+    "category": "under_detected",
+    "description": "CT-MCP specificity scoring inflated — Score A gave specificity=3 to all 56 ct_mcp scenarios. Score B challenged this: tools like check_numeric_claims and score_response_quality name mechanisms but don't always produce time windows required for level 3.",
+    "example_scenario": "S1-A: check_numeric_claims returns 'low fabrication suspicion, round_number_ratio=0' — this is specificity 2 (mechanism + threshold), not 3 (mechanism + threshold + time window)",
+    "affected_tool": "benchmark scoring",
+    "severity": "medium",
+    "potential_fix": "Score B adjusts 18 scenarios from specificity 3 to 2. Reflected in inter-rater reliability analysis."
+  }
+]

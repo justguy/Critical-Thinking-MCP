@@ -1,0 +1,1496 @@
+{
+  "version": "1.0",
+  "description": "Canonical benchmark scenarios for critical-thinking-mcp. Single source of truth.",
+  "scenario_count": 56,
+  "scenarios": [
+    {
+      "id": "S1-A",
+      "category": "numerical",
+      "name": "basic_statistics",
+      "description": "Basic descriptive statistics on a small integer dataset",
+      "tool": "check_numeric_claims",
+      "is_clean_control": false,
+      "input": {
+        "numbers": [14, 18, 11, 13, 6, 8, 2, 16, 14, 2],
+        "description": "Task completion times in minutes for 10 sample runs"
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": [],
+        "expected_quality_above": 0.8,
+        "notes": "Mean ~10.4, std ~5.31. No planted defects — pure numerical verification with low fabrication suspicion and zero outliers."
+      },
+      "tools_expected": ["check_numeric_claims"],
+      "evaluation_flags": {
+        "mean": 10.4,
+        "std_approx": 5.31,
+        "fabrication_suspicion": "low",
+        "outlier_count": 0
+      }
+    },
+    {
+      "id": "S1-B",
+      "category": "numerical",
+      "name": "geometric_spacing_detection",
+      "description": "Task durations with potential geometric spacing pattern (powers of two)",
+      "tool": "check_numeric_claims",
+      "is_clean_control": false,
+      "input": {
+        "numbers": [2, 4, 8, 1, 16, 2, 4],
+        "description": "Sprint task durations in days across 7 work items"
+      },
+      "ground_truth": {
+        "expected_status": "ENFORCEMENT_FAIL",
+        "must_detect": ["fabrication_suspicion"],
+        "expected_quality_above": null,
+        "notes": "Powers-of-two pattern should raise suspicion via round-number and spacing signals. Fabrication suspicion >= moderate."
+      },
+      "tools_expected": ["check_numeric_claims"],
+      "evaluation_flags": {
+        "fabrication_suspicion_gte": "moderate"
+      }
+    },
+    {
+      "id": "S1-C",
+      "category": "numerical",
+      "name": "outlier_detection_q4_revenue",
+      "description": "Quarterly sales with planted outlier Q4=$47M (Z-score ~3.8)",
+      "tool": "check_numeric_claims",
+      "is_clean_control": false,
+      "input": {
+        "numbers": [1200000, 1400000, 890000, 47000000],
+        "description": "Quarterly revenue: Q1=$1.2M, Q2=$1.4M, Q3=$890K, Q4=$47M"
+      },
+      "ground_truth": {
+        "expected_status": "ENFORCEMENT_FAIL",
+        "must_detect": ["outlier_detection"],
+        "expected_quality_above": null,
+        "notes": "Q4=$47M is extreme outlier with Z-score ~3.8 among Q1-Q3 values."
+      },
+      "tools_expected": ["check_numeric_claims"],
+      "evaluation_flags": {
+        "outlier_count_gte": 1,
+        "outlier_value": 47000000,
+        "outlier_z_score_approx": 3.8
+      }
+    },
+    {
+      "id": "S1-D",
+      "category": "numerical",
+      "name": "compound_interest_verification",
+      "description": "Compound interest: $10,000 at 5% for 7 years = $14,071",
+      "tool": "check_numeric_claims",
+      "is_clean_control": false,
+      "input": {
+        "numbers": [10000, 14071],
+        "description": "Principal and future value of $10,000 at 5% annual rate over 7 years"
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": [],
+        "expected_quality_above": 0.8,
+        "notes": "Two values only; $10,000 * 1.05^7 = $14,071. Should pass without fabrication flag."
+      },
+      "tools_expected": ["check_numeric_claims"],
+      "evaluation_flags": {
+        "future_value": 14071,
+        "fabrication_suspicion": "low"
+      }
+    },
+    {
+      "id": "S2-A",
+      "category": "reasoning",
+      "name": "hedge_detection_it_depends",
+      "description": "Detect 'it depends' without conditions -- hedgy non-answer for microservices vs monolith",
+      "tool": "score_response_quality",
+      "is_clean_control": false,
+      "input": {
+        "response_text": "It really depends on the situation. There are many factors to consider. Microservices might be better in some cases, but monoliths could also work. It is hard to say definitively. You should probably evaluate your specific needs. Both approaches have their pros and cons. It depends on team size, maybe, and it could depend on deployment complexity. Perhaps microservices would be better for larger teams, but possibly not. It is difficult to provide a clear answer."
+      },
+      "ground_truth": {
+        "expected_status": "ENFORCEMENT_FAIL",
+        "must_detect": ["hedge_density", "low_specificity"],
+        "expected_quality_above": null,
+        "notes": "Heavy hedging ('depends', 'might', 'possibly', 'perhaps') and low specificity. Hedge density >= 0.3, specificity <= 0.3, overall <= 0.5."
+      },
+      "tools_expected": ["score_response_quality"],
+      "evaluation_flags": {
+        "hedge_density_gte": 0.3,
+        "specificity_score_lte": 0.3,
+        "overall_score_lte": 0.5
+      }
+    },
+    {
+      "id": "S2-B",
+      "category": "decision",
+      "name": "tradeoff_postgres_vs_mongo",
+      "description": "Force explicit tradeoff: PostgreSQL vs MongoDB for social network",
+      "tool": "evaluate_tradeoffs",
+      "is_clean_control": false,
+      "input": {
+        "options": [
+          {
+            "name": "PostgreSQL",
+            "outcomes": [
+              { "description": "Handles complex queries and joins for social graph", "probability": 0.7, "utility": 80 },
+              { "description": "Struggles at >10M users with write-heavy social feed", "probability": 0.3, "utility": 20 }
+            ]
+          },
+          {
+            "name": "MongoDB",
+            "outcomes": [
+              { "description": "Scales horizontally for feed writes and denormalized reads", "probability": 0.6, "utility": 75 },
+              { "description": "Complex social graph queries require workarounds", "probability": 0.4, "utility": 30 }
+            ]
+          }
+        ]
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": [],
+        "expected_quality_above": 0.7,
+        "notes": "PostgreSQL EU ~62, MongoDB EU ~57. PostgreSQL recommended. Should compute expected utility and recommend."
+      },
+      "tools_expected": ["evaluate_tradeoffs"],
+      "evaluation_flags": {
+        "postgres_eu_approx": 62,
+        "mongo_eu_approx": 57,
+        "recommended": "PostgreSQL"
+      }
+    },
+    {
+      "id": "S2-C",
+      "category": "reasoning",
+      "name": "blindspot_build_vs_buy",
+      "description": "Surface blindspot in vague 'build vs buy auth' response",
+      "tool": "score_response_quality",
+      "is_clean_control": false,
+      "input": {
+        "response_text": "For enterprise authentication, you could build your own solution or buy one. Building gives you more control, while buying saves time. There are various options available on the market. Some teams prefer building because it is customizable. Other teams prefer buying because it is faster to deploy. The decision should be based on your requirements."
+      },
+      "ground_truth": {
+        "expected_status": "ENFORCEMENT_FAIL",
+        "must_detect": ["low_specificity"],
+        "expected_quality_above": null,
+        "notes": "No concrete details: no vendor names, no compliance frameworks, no cost figures, no timeline estimates. Specificity <= 0.3."
+      },
+      "tools_expected": ["score_response_quality"],
+      "evaluation_flags": {
+        "specificity_score_lte": 0.3
+      }
+    },
+    {
+      "id": "S2-D",
+      "category": "reasoning",
+      "name": "friday_deploy_hedging",
+      "description": "Friday deploy risk -- steelman must engage with actual mechanisms",
+      "tool": "score_response_quality",
+      "is_clean_control": false,
+      "input": {
+        "response_text": "Deploying on Fridays is generally considered risky. If something goes wrong, the team might not be available to fix it over the weekend. However, some teams do deploy on Fridays successfully. It probably depends on your monitoring setup and on-call rotation. You might want to consider your rollback strategy. Perhaps having good CI/CD could mitigate some of the risk. It is worth thinking about carefully.",
+        "claims": [
+          "Friday deploys are risky",
+          "Monitoring and on-call mitigate risk"
+        ]
+      },
+      "ground_truth": {
+        "expected_status": "ENFORCEMENT_FAIL",
+        "must_detect": ["hedge_density"],
+        "expected_quality_above": null,
+        "notes": "Hedging with 'might', 'probably', 'perhaps' without concrete thresholds or SLAs. Hedge density >= 0.2."
+      },
+      "tools_expected": ["score_response_quality"],
+      "evaluation_flags": {
+        "hedge_density_gte": 0.2
+      }
+    },
+    {
+      "id": "S3-A",
+      "category": "logic",
+      "name": "service_chain_uptime",
+      "description": "Service chain uptime: three services at 99% each => 0.99^3 = 97.03%",
+      "tool": "validate_reasoning_chain",
+      "is_clean_control": false,
+      "input": {
+        "nodes": [
+          { "id": "e1", "label": "Service A has 99% measured uptime over 90 days", "type": "evidence" },
+          { "id": "e2", "label": "Service B has 99% measured uptime over 90 days", "type": "evidence" },
+          { "id": "e3", "label": "Service C has 99% measured uptime over 90 days", "type": "evidence" },
+          { "id": "a1", "label": "Services fail independently with no correlated outages", "type": "assumption" },
+          { "id": "c1", "label": "Combined chain uptime is 99% times 99% times 99% = 97.03%", "type": "claim" },
+          { "id": "cn1", "label": "The end-to-end SLA of 99.5% cannot be met with the current architecture", "type": "conclusion" }
+        ],
+        "edges": [
+          { "from": "e1", "to": "c1", "relation": "supports" },
+          { "from": "e2", "to": "c1", "relation": "supports" },
+          { "from": "e3", "to": "c1", "relation": "supports" },
+          { "from": "a1", "to": "c1", "relation": "requires" },
+          { "from": "c1", "to": "cn1", "relation": "implies" }
+        ]
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": [],
+        "expected_quality_above": 0.9,
+        "notes": "Well-formed chain: evidence -> claim -> conclusion with explicit assumption. No cycles, no orphans, grounding score 1.0."
+      },
+      "tools_expected": ["validate_reasoning_chain"],
+      "evaluation_flags": {
+        "cycles": 0,
+        "orphaned_conclusions": 0,
+        "grounding_score": 1.0
+      }
+    },
+    {
+      "id": "S3-B",
+      "category": "logic",
+      "name": "sprint_velocity_fte",
+      "description": "Sprint velocity: 4 engineers + 2 new hires at 50% => effective capacity = 5 FTE",
+      "tool": "check_numeric_claims",
+      "is_clean_control": false,
+      "input": {
+        "numbers": [4, 2, 0.5, 5, 40],
+        "description": "4 existing engineers + 2 new hires at 50% productivity = 5 FTE. Sprint velocity claimed as 40 story points."
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": [],
+        "expected_quality_above": 0.8,
+        "notes": "Numbers are internally consistent: 4 + 2*0.5 = 5 FTE. Low fabrication suspicion."
+      },
+      "tools_expected": ["check_numeric_claims"],
+      "evaluation_flags": {
+        "effective_fte": 5,
+        "fabrication_suspicion": "low"
+      }
+    },
+    {
+      "id": "S3-C",
+      "category": "logic",
+      "name": "circular_reasoning_servers",
+      "description": "Circular reasoning: need more servers because queries slow because need more servers",
+      "tool": "validate_reasoning_chain",
+      "is_clean_control": false,
+      "input": {
+        "nodes": [
+          { "id": "c1", "label": "We need more servers to handle the load", "type": "claim" },
+          { "id": "c2", "label": "Database queries are running slowly under current load", "type": "claim" },
+          { "id": "c3", "label": "Slow queries prove we need more servers", "type": "claim" },
+          { "id": "cn1", "label": "Therefore we must provision 10 additional servers immediately", "type": "conclusion" }
+        ],
+        "edges": [
+          { "from": "c1", "to": "c2", "relation": "implies" },
+          { "from": "c2", "to": "c3", "relation": "implies" },
+          { "from": "c3", "to": "c1", "relation": "implies" },
+          { "from": "c3", "to": "cn1", "relation": "implies" }
+        ]
+      },
+      "ground_truth": {
+        "expected_status": "ENFORCEMENT_FAIL",
+        "must_detect": ["cycle_detection"],
+        "expected_quality_above": null,
+        "notes": "Circular dependency: c1 -> c2 -> c3 -> c1. Should detect at least 1 cycle."
+      },
+      "tools_expected": ["validate_reasoning_chain"],
+      "evaluation_flags": {
+        "cycles_gte": 1,
+        "cycle_contains": ["c1", "c2", "c3"],
+        "cycle_depth": 3
+      }
+    },
+    {
+      "id": "S3-D",
+      "category": "logic",
+      "name": "circular_reasoning_rust_rewrite",
+      "description": "Circular reasoning: rewrite in Rust because fast because memory safety because rewrite",
+      "tool": "validate_reasoning_chain",
+      "is_clean_control": false,
+      "input": {
+        "nodes": [
+          { "id": "c1", "label": "We should rewrite the service in Rust", "type": "claim" },
+          { "id": "c2", "label": "Rust is fast because of zero-cost abstractions", "type": "claim" },
+          { "id": "c3", "label": "Rust has memory safety without garbage collection", "type": "claim" },
+          { "id": "c4", "label": "Memory safety proves we should rewrite in Rust", "type": "claim" },
+          { "id": "cn1", "label": "The Rust rewrite will solve our performance problems", "type": "conclusion" }
+        ],
+        "edges": [
+          { "from": "c1", "to": "c2", "relation": "implies" },
+          { "from": "c2", "to": "c3", "relation": "implies" },
+          { "from": "c3", "to": "c4", "relation": "implies" },
+          { "from": "c4", "to": "c1", "relation": "implies" },
+          { "from": "c4", "to": "cn1", "relation": "implies" }
+        ]
+      },
+      "ground_truth": {
+        "expected_status": "ENFORCEMENT_FAIL",
+        "must_detect": ["cycle_detection"],
+        "expected_quality_above": null,
+        "notes": "4-node cycle: c1 -> c2 -> c3 -> c4 -> c1. Should detect at least 1 cycle."
+      },
+      "tools_expected": ["validate_reasoning_chain"],
+      "evaluation_flags": {
+        "cycles_gte": 1,
+        "cycle_contains": ["c1", "c2", "c3", "c4"],
+        "cycle_depth": 4
+      }
+    },
+    {
+      "id": "S4-A",
+      "category": "decision",
+      "name": "session_storage_tradeoff",
+      "description": "Redis vs Cassandra vs PostgreSQL for session storage",
+      "tool": "evaluate_tradeoffs",
+      "is_clean_control": false,
+      "input": {
+        "options": [
+          {
+            "name": "Redis",
+            "outcomes": [
+              { "description": "Sub-millisecond latency for session reads at scale", "probability": 0.8, "utility": 90 },
+              { "description": "Data loss on node failure without persistence config", "probability": 0.2, "utility": -40 }
+            ]
+          },
+          {
+            "name": "Cassandra",
+            "outcomes": [
+              { "description": "Linear horizontal scaling with tunable consistency", "probability": 0.7, "utility": 70 },
+              { "description": "Operational complexity and eventual consistency issues", "probability": 0.3, "utility": 10 }
+            ]
+          },
+          {
+            "name": "PostgreSQL",
+            "outcomes": [
+              { "description": "ACID transactions and familiar SQL with connection pooling", "probability": 0.6, "utility": 65 },
+              { "description": "Vertical scaling limit hit at high concurrency", "probability": 0.4, "utility": 5 }
+            ]
+          }
+        ]
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": [],
+        "expected_quality_above": 0.7,
+        "notes": "Redis EU ~64, Cassandra EU ~52, PostgreSQL EU ~41. Redis recommended."
+      },
+      "tools_expected": ["evaluate_tradeoffs"],
+      "evaluation_flags": {
+        "redis_eu_approx": 64,
+        "cassandra_eu_approx": 52,
+        "postgresql_eu_approx": 41,
+        "recommended": "Redis"
+      }
+    },
+    {
+      "id": "S4-B",
+      "category": "decision",
+      "name": "oncall_rotation_indeterminate",
+      "description": "3-person vs 6-person on-call rotation -- near-tie should be indeterminate",
+      "tool": "evaluate_tradeoffs",
+      "is_clean_control": false,
+      "input": {
+        "options": [
+          {
+            "name": "3-Person Rotation",
+            "outcomes": [
+              { "description": "Lower coordination overhead and stronger ownership", "probability": 0.5, "utility": 70 },
+              { "description": "Burnout risk with frequent on-call shifts", "probability": 0.5, "utility": 30 }
+            ]
+          },
+          {
+            "name": "6-Person Rotation",
+            "outcomes": [
+              { "description": "Less individual burden and better work-life balance", "probability": 0.5, "utility": 65 },
+              { "description": "Knowledge dilution and slower incident response", "probability": 0.5, "utility": 35 }
+            ]
+          }
+        ]
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": ["indeterminate"],
+        "expected_quality_above": 0.5,
+        "notes": "Both options have EU=50. Should trigger INDETERMINATE result."
+      },
+      "tools_expected": ["evaluate_tradeoffs"],
+      "evaluation_flags": {
+        "three_person_eu": 50,
+        "six_person_eu": 50,
+        "is_indeterminate": true,
+        "recommended": null
+      }
+    },
+    {
+      "id": "S4-C",
+      "category": "decision",
+      "name": "confidence_inflation_event_sourcing",
+      "description": "Event sourcing vs CQRS vs CRUD -- validate confidence with stated assumptions",
+      "tool": "validate_confidence",
+      "is_clean_control": false,
+      "input": {
+        "assumptions": [
+          {
+            "description": "Event store write throughput exceeds 10,000 events/sec on commodity hardware",
+            "confidence": 0.7,
+            "falsification_condition": "Benchmark shows <5,000 events/sec on a 4-core 16GB instance"
+          },
+          {
+            "description": "Team has production experience with event sourcing patterns",
+            "confidence": 0.4,
+            "falsification_condition": "No team member has shipped an event-sourced system to production"
+          },
+          {
+            "description": "Read model projection lag stays under 500ms at peak load",
+            "confidence": 0.6,
+            "falsification_condition": "Projection lag exceeds 2 seconds during load test at 2x expected peak"
+          }
+        ],
+        "response_text": "We are highly confident that event sourcing is the right architecture for this system. The write throughput will handle our scale, the team is capable of implementing it, and read projections will keep up with demand. We are 90% confident this will succeed."
+      },
+      "ground_truth": {
+        "expected_status": "ENFORCEMENT_FAIL",
+        "must_detect": ["confidence_inflation"],
+        "expected_quality_above": null,
+        "notes": "Product of 0.7 * 0.4 * 0.6 = 0.168; claimed ~90% vastly exceeds honest ceiling of ~16.8%."
+      },
+      "tools_expected": ["validate_confidence"],
+      "evaluation_flags": {
+        "honest_ceiling_approx": 0.168,
+        "claimed_confidence_gte": 0.8,
+        "inflation_detected": true
+      }
+    },
+    {
+      "id": "S4-D",
+      "category": "decision",
+      "name": "deploy_strategy_tradeoff",
+      "description": "Blue-green vs canary vs rolling deploy strategy",
+      "tool": "evaluate_tradeoffs",
+      "is_clean_control": false,
+      "input": {
+        "options": [
+          {
+            "name": "Blue-Green",
+            "outcomes": [
+              { "description": "Instant rollback via DNS/LB switch, zero-downtime", "probability": 0.75, "utility": 85 },
+              { "description": "Double infrastructure cost and state sync complexity", "probability": 0.25, "utility": -10 }
+            ]
+          },
+          {
+            "name": "Canary",
+            "outcomes": [
+              { "description": "Gradual rollout catches issues before full exposure", "probability": 0.7, "utility": 80 },
+              { "description": "Slower rollout and requires sophisticated routing/metrics", "probability": 0.3, "utility": 15 }
+            ]
+          },
+          {
+            "name": "Rolling",
+            "outcomes": [
+              { "description": "Simple to implement with Kubernetes native support", "probability": 0.65, "utility": 60 },
+              { "description": "Mixed versions during rollout can cause compatibility bugs", "probability": 0.35, "utility": 10 }
+            ]
+          }
+        ]
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": [],
+        "expected_quality_above": 0.7,
+        "notes": "Blue-green EU ~61.25, canary EU ~60.5, rolling EU ~42.5. Blue-green and canary very close; may be indeterminate."
+      },
+      "tools_expected": ["evaluate_tradeoffs"],
+      "evaluation_flags": {
+        "bluegreen_eu_approx": 61.25,
+        "canary_eu_approx": 60.5,
+        "rolling_eu_approx": 42.5
+      }
+    },
+    {
+      "id": "S5-A",
+      "category": "hallucination",
+      "name": "fabricated_latency_numbers",
+      "description": "Fabricated latency numbers -- suspiciously round and evenly spaced",
+      "tool": "check_numeric_claims",
+      "is_clean_control": false,
+      "input": {
+        "numbers": [100, 200, 300, 500, 1000, 2000, 5000],
+        "description": "API latency percentiles: p50, p75, p90, p95, p99, p99.5, p99.9 in milliseconds"
+      },
+      "ground_truth": {
+        "expected_status": "ENFORCEMENT_FAIL",
+        "must_detect": ["fabrication_suspicion"],
+        "expected_quality_above": null,
+        "notes": "All values divisible by 100; perfectly round numbers strongly suggest fabrication. Round number ratio = 1.0, suspicion = high."
+      },
+      "tools_expected": ["check_numeric_claims"],
+      "evaluation_flags": {
+        "fabrication_suspicion": "high",
+        "round_number_ratio": 1.0
+      }
+    },
+    {
+      "id": "S5-B",
+      "category": "hallucination",
+      "name": "fabricated_framework_xeldon",
+      "description": "Fabricated claims about nonexistent 'Xeldon.js' framework",
+      "tool": "score_response_quality",
+      "is_clean_control": false,
+      "input": {
+        "response_text": "Based on the Xeldon.js benchmark suite version 3.2, the framework achieves 47,000 requests per second on a single-threaded event loop, which is 3.2x faster than Express.js. The Xeldon.js core uses a proprietary binary protocol that reduces serialization overhead by 89%. In the TechEmpower Round 22 benchmarks, Xeldon.js ranked 4th overall in the plaintext category. The framework was created by the CloudNova team in 2023 and has 15,000 GitHub stars.",
+        "claims": [
+          "Xeldon.js achieves 47,000 req/sec",
+          "Xeldon.js is 3.2x faster than Express.js",
+          "Xeldon.js ranked 4th in TechEmpower Round 22"
+        ]
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": [],
+        "expected_quality_above": null,
+        "notes": "Xeldon.js does not exist. Quality scorer should flag structure/specificity as superficially high but the framework is entirely fabricated. In a full pipeline this would require external verification."
+      },
+      "tools_expected": ["score_response_quality"],
+      "evaluation_flags": {
+        "fabricated_entity": "Xeldon.js",
+        "requires_external_verification": true
+      }
+    },
+    {
+      "id": "S5-C",
+      "category": "hallucination",
+      "name": "circular_reasoning_caching",
+      "description": "Circular reasoning embedded in technical justification about caching bottleneck",
+      "tool": "validate_reasoning_chain",
+      "is_clean_control": false,
+      "input": {
+        "nodes": [
+          { "id": "c1", "label": "Our caching layer is the bottleneck", "type": "claim" },
+          { "id": "c2", "label": "The bottleneck causes high latency", "type": "claim" },
+          { "id": "c3", "label": "High latency proves the caching layer is the bottleneck", "type": "claim" },
+          { "id": "cn1", "label": "We need to replace the entire caching infrastructure", "type": "conclusion" }
+        ],
+        "edges": [
+          { "from": "c1", "to": "c2", "relation": "implies" },
+          { "from": "c2", "to": "c3", "relation": "implies" },
+          { "from": "c3", "to": "c1", "relation": "implies" },
+          { "from": "c3", "to": "cn1", "relation": "implies" }
+        ]
+      },
+      "ground_truth": {
+        "expected_status": "ENFORCEMENT_FAIL",
+        "must_detect": ["cycle_detection"],
+        "expected_quality_above": null,
+        "notes": "Circular dependency: c1 -> c2 -> c3 -> c1. Identical structure to S3-C but framed as hallucinated technical reasoning."
+      },
+      "tools_expected": ["validate_reasoning_chain"],
+      "evaluation_flags": {
+        "cycles_gte": 1,
+        "cycle_contains": ["c1", "c2", "c3"],
+        "cycle_depth": 3
+      }
+    },
+    {
+      "id": "S5-D",
+      "category": "hallucination",
+      "name": "outlier_request_throughput",
+      "description": "Request throughput with planted outlier 847 among low values",
+      "tool": "check_numeric_claims",
+      "is_clean_control": false,
+      "input": {
+        "numbers": [5, 6, 5, 7, 6, 847],
+        "description": "Requests per second measured across 6 server instances"
+      },
+      "ground_truth": {
+        "expected_status": "ENFORCEMENT_FAIL",
+        "must_detect": ["outlier_detection"],
+        "expected_quality_above": null,
+        "notes": "847 is extreme outlier among values ~5-7. Z-score >= 2.5."
+      },
+      "tools_expected": ["check_numeric_claims"],
+      "evaluation_flags": {
+        "outlier_count_gte": 1,
+        "outlier_value": 847,
+        "outlier_z_score_gte": 2.5
+      }
+    },
+    {
+      "id": "S6-A",
+      "category": "clean_control",
+      "name": "correct_uptime_calculation",
+      "description": "Correct numerical reasoning: 3 services at 99.5% uptime => 0.995^3 = 98.51%",
+      "tool": "check_numeric_claims",
+      "is_clean_control": true,
+      "input": {
+        "numbers": [99.5, 98.51, 0.995],
+        "description": "Three-service chain: each at 99.5% uptime, combined = 0.995^3 = 98.51%"
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": [],
+        "expected_quality_above": 0.8,
+        "notes": "Low fabrication suspicion, zero outliers. Mathematically correct chain."
+      },
+      "tools_expected": ["check_numeric_claims"],
+      "evaluation_flags": {
+        "fabrication_suspicion": "low",
+        "outlier_count": 0
+      }
+    },
+    {
+      "id": "S6-B",
+      "category": "clean_control",
+      "name": "honest_confidence_disclosure",
+      "description": "Explicit assumption disclosure with correct confidence product",
+      "tool": "validate_confidence",
+      "is_clean_control": true,
+      "input": {
+        "assumptions": [
+          {
+            "description": "Database connection pool can handle 500 concurrent connections",
+            "confidence": 0.85,
+            "falsification_condition": "Connection pool exhaustion occurs at fewer than 400 concurrent connections during load test"
+          },
+          {
+            "description": "Average query execution time stays under 50ms",
+            "confidence": 0.8,
+            "falsification_condition": "p95 query latency exceeds 100ms in production monitoring over a 24-hour window"
+          }
+        ],
+        "response_text": "Based on our load testing and monitoring data, the database tier can handle the projected traffic. The connection pool supports 500 concurrent connections, and average query time is under 50ms. We estimate roughly 68% confidence in this assessment, reflecting the product of our two key assumptions."
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": [],
+        "expected_quality_above": 0.8,
+        "notes": "0.85 * 0.8 = 0.68; claimed ~68% matches honest ceiling. No inflation."
+      },
+      "tools_expected": ["validate_confidence"],
+      "evaluation_flags": {
+        "honest_ceiling_approx": 0.68,
+        "inflation_detected": false
+      }
+    },
+    {
+      "id": "S6-C",
+      "category": "clean_control",
+      "name": "genuine_steelman_monolith",
+      "description": "Genuine steelman with specific new premise -- high-quality response",
+      "tool": "score_response_quality",
+      "is_clean_control": true,
+      "input": {
+        "response_text": "The strongest argument for maintaining the monolithic architecture is that it preserves transactional consistency across the 14 domain entities without requiring distributed saga orchestration. Specifically, the order-fulfillment pipeline involves 7 database tables updated in a single ACID transaction completing in under 12ms at p99. Decomposing this into microservices would require implementing a choreography-based saga with compensating transactions, introducing a measured 340ms additional latency per order and a 2.3% failure rate for partial completions based on our staging tests. Therefore, the monolith should be retained until order volume exceeds 50,000/day, at which point the vertical scaling limit of the current 64-core database server would force a distributed architecture regardless of transactional complexity.",
+        "claims": [
+          "Monolith preserves transactional consistency across 14 domain entities",
+          "Saga decomposition adds 340ms latency and 2.3% partial failure rate",
+          "Vertical scaling limit at 50,000 orders/day on 64-core server"
+        ],
+        "evidence": [
+          "p99 transaction time under 12ms",
+          "Staging test results for saga failure rate"
+        ]
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": [],
+        "expected_quality_above": 0.6,
+        "notes": "Specific numbers, concrete mechanisms, clear threshold. Should score well with low hedge density and high specificity."
+      },
+      "tools_expected": ["score_response_quality"],
+      "evaluation_flags": {
+        "overall_score_gte": 0.6,
+        "hedge_density_lte": 0.1,
+        "specificity_score_gte": 0.4
+      }
+    },
+    {
+      "id": "S6-D",
+      "category": "clean_control",
+      "name": "grounded_dag_latency",
+      "description": "Fully grounded DAG with evidence supporting all conclusions",
+      "tool": "validate_reasoning_chain",
+      "is_clean_control": true,
+      "input": {
+        "nodes": [
+          { "id": "e1", "label": "Load test showed p99 latency of 180ms under 10,000 concurrent users", "type": "evidence" },
+          { "id": "e2", "label": "APM traces confirm 85% of latency is in database round-trips", "type": "evidence" },
+          { "id": "a1", "label": "Traffic patterns in load test match production distribution within 15%", "type": "assumption" },
+          { "id": "c1", "label": "Database query optimization would reduce p99 latency to under 100ms", "type": "claim" },
+          { "id": "cn1", "label": "Adding a read replica and connection pooling will meet the 150ms SLA", "type": "conclusion" }
+        ],
+        "edges": [
+          { "from": "e1", "to": "c1", "relation": "supports" },
+          { "from": "e2", "to": "c1", "relation": "supports" },
+          { "from": "a1", "to": "c1", "relation": "requires" },
+          { "from": "c1", "to": "cn1", "relation": "implies" }
+        ]
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": [],
+        "expected_quality_above": 0.9,
+        "notes": "Well-formed DAG: evidence -> claim -> conclusion, no cycles, no orphans, grounding score 1.0."
+      },
+      "tools_expected": ["validate_reasoning_chain"],
+      "evaluation_flags": {
+        "cycles": 0,
+        "orphaned_conclusions": 0,
+        "grounding_score": 1.0
+      }
+    },
+    {
+      "id": "S6-E",
+      "category": "clean_control",
+      "name": "resolved_cold_start_gap",
+      "description": "Resolved gap -- cold start mitigation with specific mechanism",
+      "tool": "score_response_quality",
+      "is_clean_control": true,
+      "input": {
+        "response_text": "The cold start latency issue in our Lambda functions is resolved by implementing provisioned concurrency with a minimum of 10 warm instances during business hours (06:00-22:00 UTC). Monitoring data from the past 30 days shows that cold starts decreased from 12.4% of invocations to 0.3% after enabling provisioned concurrency. The additional cost is $47/month per function, totaling $376/month across 8 functions. The p99 cold start latency dropped from 3,200ms to 180ms. Therefore, the cold start gap identified in the architecture review is now resolved with measurable improvement and a defined cost envelope.",
+        "claims": [
+          "Provisioned concurrency reduces cold starts from 12.4% to 0.3%",
+          "Cost is $376/month for 8 functions",
+          "p99 cold start latency dropped from 3,200ms to 180ms"
+        ],
+        "evidence": [
+          "30-day monitoring data",
+          "Cost figures from AWS billing"
+        ]
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": [],
+        "expected_quality_above": 0.6,
+        "notes": "Concrete resolution with specific numbers, timeframes, and cost figures."
+      },
+      "tools_expected": ["score_response_quality"],
+      "evaluation_flags": {
+        "overall_score_gte": 0.6,
+        "specificity_score_gte": 0.4
+      }
+    },
+    {
+      "id": "S6-F",
+      "category": "clean_control",
+      "name": "clean_code_review_mutex",
+      "description": "Clean code review with mutex-protected implementation -- specific and structured",
+      "tool": "score_response_quality",
+      "is_clean_control": true,
+      "input": {
+        "response_text": "The race condition in the connection pool has been fixed by introducing a sync.Mutex guard around the pool.connections slice in pool.go:47-62. Before this fix, concurrent goroutines could read pool.connections.Len() as 5 while another goroutine was in the process of removing a connection, leading to an index-out-of-range panic observed 3 times in production over the past week (incident IDs: INC-4401, INC-4412, INC-4419). The fix acquires pool.mu.Lock() before checking length and releases after the connection is returned. Load testing with 1,000 concurrent goroutines for 60 seconds showed zero panics and a 2ms increase in p99 checkout latency (from 8ms to 10ms). The result shows this tradeoff is acceptable given the 25ms SLA for connection checkout. Therefore, this fix resolves the race condition with minimal performance impact.",
+        "claims": [
+          "Race condition caused 3 production panics",
+          "Mutex fix eliminates index-out-of-range panic",
+          "p99 latency increase is 2ms (8ms to 10ms)"
+        ],
+        "evidence": [
+          "Incident IDs: INC-4401, INC-4412, INC-4419",
+          "Load test: 1000 goroutines for 60 seconds with zero panics"
+        ]
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": [],
+        "expected_quality_above": 0.6,
+        "notes": "Specific file references, incident IDs, concrete metrics, clear claim/evidence/conclusion structure."
+      },
+      "tools_expected": ["score_response_quality"],
+      "evaluation_flags": {
+        "overall_score_gte": 0.6,
+        "hedge_density_lte": 0.1,
+        "structure_score_gte": 0.5,
+        "race_condition_caught": true
+      }
+    },
+    {
+      "id": "billing_system",
+      "category": "billing",
+      "name": "billing_race_condition_and_inflation",
+      "description": "Usage-based billing system with race condition and confidence inflation",
+      "tool": "validate_confidence",
+      "is_clean_control": false,
+      "input": {
+        "assumptions": [
+          {
+            "description": "The billing aggregation query will return correct totals",
+            "confidence": 0.9
+          },
+          {
+            "description": "Concurrent usage events will be processed in order",
+            "confidence": 0.85
+          },
+          {
+            "description": "The payment gateway will respond within SLA",
+            "confidence": 0.95,
+            "falsification_condition": "Gateway response time exceeds 2000ms for >5% of requests in a 1-minute window"
+          }
+        ],
+        "response_text": "I am very confident this billing system architecture will handle concurrent usage correctly. The aggregation pipeline processes events sequentially and computes totals at billing period boundaries. Payment processing integrates with the gateway API which has a 99.9% uptime SLA."
+      },
+      "ground_truth": {
+        "expected_status": "ENFORCEMENT_FAIL",
+        "must_detect": ["confidence_inflation", "missing_falsification"],
+        "expected_quality_above": null,
+        "notes": "Two assumptions lack falsification conditions (should be capped to 0.3). Race condition hidden in concurrent processing assumption. Claimed confidence vastly exceeds honest ceiling."
+      },
+      "tools_expected": ["validate_confidence"],
+      "evaluation_flags": {
+        "race_condition_present": true,
+        "missing_falsification_count": 2,
+        "confidence_inflation": true
+      },
+      "iterative_inputs": [
+        {
+          "iteration": 1,
+          "input": {
+            "assumptions": [
+              {
+                "description": "The billing aggregation query will return correct totals",
+                "confidence": 0.9
+              },
+              {
+                "description": "Concurrent usage events will be processed in order",
+                "confidence": 0.85
+              },
+              {
+                "description": "The payment gateway will respond within SLA",
+                "confidence": 0.95,
+                "falsification_condition": "Gateway response time exceeds 2000ms for >5% of requests in a 1-minute window"
+              }
+            ],
+            "response_text": "I am very confident this billing system architecture will handle concurrent usage correctly. The aggregation pipeline processes events sequentially and computes totals at billing period boundaries. Payment processing integrates with the gateway API which has a 99.9% uptime SLA."
+          }
+        },
+        {
+          "iteration": 2,
+          "input": {
+            "assumptions": [
+              {
+                "description": "The billing aggregation query will return correct totals",
+                "confidence": 0.7,
+                "falsification_condition": "Totals are incorrect when multiple events arrive simultaneously"
+              },
+              {
+                "description": "Concurrent usage events will be processed correctly",
+                "confidence": 0.7,
+                "falsification_condition": "Events may be lost during high concurrency"
+              },
+              {
+                "description": "The payment gateway will respond within SLA",
+                "confidence": 0.95,
+                "falsification_condition": "Gateway response time exceeds 2000ms for >5% of requests in a 1-minute window"
+              }
+            ],
+            "response_text": "I am fairly confident this billing system will work. The aggregation handles events and the gateway has good uptime. Concurrent access should generally be fine."
+          }
+        },
+        {
+          "iteration": 3,
+          "input": {
+            "assumptions": [
+              {
+                "description": "The billing aggregation query uses SELECT FOR UPDATE to prevent concurrent read-modify-write races",
+                "confidence": 0.85,
+                "falsification_condition": "Duplicate charges occur when >2 concurrent requests hit the same billing period row without serialization, observable via sum(charges) > expected_total within a 5-second window"
+              },
+              {
+                "description": "Usage events are deduplicated by event_id before aggregation, preventing double-counting",
+                "confidence": 0.9,
+                "falsification_condition": "Duplicate event_ids appear in the aggregation table when the dedup index is absent, detectable by COUNT(DISTINCT event_id) < COUNT(*)"
+              },
+              {
+                "description": "The payment gateway will respond within SLA",
+                "confidence": 0.95,
+                "falsification_condition": "Gateway response time exceeds 2000ms for >5% of requests in a 1-minute window"
+              }
+            ],
+            "response_text": "Based on the enforced assumptions, overall confidence is approximately 0.72. The billing system uses SELECT FOR UPDATE for serialization and event_id deduplication. The primary remaining risk is gateway timeout under load."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P1",
+      "category": "production_safety",
+      "name": "check_then_act_billing_race",
+      "description": "Billing system reads balance then writes update without atomicity — classic check-then-act race",
+      "tool": "detect_concurrency_patterns",
+      "is_clean_control": false,
+      "input": {
+        "steps": [
+          "Read current account balance from database",
+          "If balance >= charge amount, approve the charge",
+          "Compute new balance after charge",
+          "Write updated balance back to database"
+        ],
+        "shared_resources": ["account_balance"],
+        "protections": [],
+        "retry_behavior": "none"
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": ["concurrency_hazard"],
+        "expected_quality_above": null,
+        "notes": "Classic check-then-act on shared balance. No lock, transaction, or CAS mentioned. concurrency_checker should flag read-modify-write and/or check-then-act without mitigation."
+      },
+      "tools_expected": ["score_response_quality"],
+      "evaluation_flags": { "concurrency_hazard_expected": true }
+    },
+    {
+      "id": "P2",
+      "category": "production_safety",
+      "name": "period_boundary_aggregation_race",
+      "description": "Period-boundary billing aggregation without serialization — events arrive during cutoff",
+      "tool": "score_response_quality",
+      "is_clean_control": false,
+      "input": {
+        "response_text": "At the end of each billing period, the aggregation job reads all usage records for the period, computes the total charges, and writes the invoice. The billing period boundary is at midnight UTC. Concurrent usage events continue to arrive and are written to the usage table during the aggregation window. The aggregation query uses SELECT SUM to compute totals.",
+        "claims": ["Aggregation runs at period boundary", "Events arrive during aggregation"]
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": ["concurrency_hazard"],
+        "expected_quality_above": null,
+        "notes": "Period-boundary aggregation without freeze/drain/lock. Read-modify-write on shared state during concurrent writes. concurrency_checker should flag missing_period_boundary and read_modify_write."
+      },
+      "tools_expected": ["score_response_quality"],
+      "evaluation_flags": { "concurrency_hazard_expected": true }
+    },
+    {
+      "id": "P4",
+      "category": "production_safety",
+      "name": "retry_without_idempotency",
+      "description": "Payment retry and webhook delivery without idempotency key or deduplication",
+      "tool": "detect_concurrency_patterns",
+      "is_clean_control": false,
+      "input": {
+        "steps": [
+          "Send charge request to payment gateway",
+          "If timeout or 5xx, retry charge with exponential backoff",
+          "Receive webhook callback from gateway",
+          "Update ledger with payment confirmation"
+        ],
+        "shared_resources": ["ledger"],
+        "protections": [],
+        "retry_behavior": "automatic",
+        "delivery_model": "at_least_once"
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": ["concurrency_hazard"],
+        "expected_quality_above": null,
+        "notes": "Retry without idempotency key means duplicate charges. Webhook without dedup means double ledger entries. concurrency_checker should flag missing_idempotency."
+      },
+      "tools_expected": ["score_response_quality"],
+      "evaluation_flags": { "concurrency_hazard_expected": true }
+    },
+    {
+      "id": "A2",
+      "category": "arithmetic",
+      "name": "sum_inconsistency_task_durations",
+      "description": "Task durations with planted wrong total — verify_arithmetic should catch sum error",
+      "tool": "verify_arithmetic",
+      "is_clean_control": false,
+      "input": {
+        "claim_type": "sum",
+        "values": [3, 5, 8, 4, 6],
+        "claimed_result": 24
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": ["arithmetic_relationship"],
+        "expected_quality_above": null,
+        "notes": "3+5+8+4+6=26, not 24. Arithmetic verifier should detect sum relationships and note the claimed total does not match. Note: the tool currently reports found relationships as warnings, not blocking issues, since the numbers themselves are not fabricated."
+      },
+      "tools_expected": ["check_numeric_claims"],
+      "evaluation_flags": { "arithmetic_verified": true }
+    },
+    {
+      "id": "A6",
+      "category": "arithmetic",
+      "name": "weighted_average_sla_error",
+      "description": "Weighted average SLA with planted wrong result — verify_arithmetic should catch mismatch",
+      "tool": "verify_arithmetic",
+      "is_clean_control": false,
+      "input": {
+        "claim_type": "weighted_average",
+        "values": [99.9, 99.5, 99.0],
+        "weights": [0.5, 0.3, 0.2],
+        "claimed_result": 99.72
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": ["arithmetic_relationship"],
+        "expected_quality_above": null,
+        "notes": "Correct: 99.9*0.5 + 99.5*0.3 + 99.0*0.2 = 49.95 + 29.85 + 19.8 = 99.6, not 99.72. Arithmetic verifier should detect the weighted combination and flag the discrepancy."
+      },
+      "tools_expected": ["check_numeric_claims"],
+      "evaluation_flags": { "arithmetic_verified": true }
+    },
+    {
+      "id": "L8",
+      "category": "logic",
+      "name": "orphan_conclusion_no_support",
+      "description": "DAG with orphaned conclusion that has no incoming edges — unsupported recommendation",
+      "tool": "validate_reasoning_chain",
+      "is_clean_control": false,
+      "input": {
+        "nodes": [
+          { "id": "e1", "label": "Load tests show 200ms p99 latency under 5000 concurrent users", "type": "evidence" },
+          { "id": "c1", "label": "The current architecture handles expected production load", "type": "claim" },
+          { "id": "a1", "label": "Production traffic patterns match load test distribution", "type": "assumption" },
+          { "id": "cn1", "label": "We should migrate to Kubernetes for better scalability", "type": "conclusion" }
+        ],
+        "edges": [
+          { "from": "e1", "to": "c1", "relation": "supports" },
+          { "from": "a1", "to": "c1", "relation": "requires" }
+        ]
+      },
+      "ground_truth": {
+        "expected_status": "ENFORCEMENT_FAIL",
+        "must_detect": ["orphan_detection"],
+        "expected_quality_above": null,
+        "notes": "cn1 (conclusion) has no incoming edges — nothing supports or implies the Kubernetes migration recommendation. The evidence and claim support 'current architecture handles load' which contradicts the orphaned conclusion."
+      },
+      "tools_expected": ["validate_reasoning_chain"],
+      "evaluation_flags": { "orphan_expected": true }
+    },
+    {
+      "id": "P8",
+      "category": "production_safety",
+      "name": "plan_circular_dep_missing_prereq",
+      "description": "Migration plan with circular dependency and missing prerequisite — first check_plan_validity scenario",
+      "tool": "check_plan_validity",
+      "is_clean_control": false,
+      "input": {
+        "steps": [
+          { "id": "migrate_schema", "description": "Run database schema migration to add new columns", "dependencies": [] },
+          { "id": "deploy_v2", "description": "Deploy application v2 with new schema support", "dependencies": ["migrate_schema", "run_integration_tests"] },
+          { "id": "run_integration_tests", "description": "Execute integration test suite against v2", "dependencies": ["deploy_v2"] },
+          { "id": "enable_feature_flag", "description": "Enable the new billing feature flag in production", "dependencies": ["deploy_v2", "notify_oncall"] },
+          { "id": "monitor_rollout", "description": "Monitor error rates and latency for 30 minutes post-deploy", "dependencies": ["enable_feature_flag"] }
+        ]
+      },
+      "ground_truth": {
+        "expected_status": "ENFORCEMENT_FAIL",
+        "must_detect": ["circular_dependency", "missing_prerequisite"],
+        "expected_quality_above": null,
+        "notes": "deploy_v2 depends on run_integration_tests which depends on deploy_v2 (circular). enable_feature_flag depends on notify_oncall which does not exist (missing prerequisite)."
+      },
+      "tools_expected": ["check_plan_validity"],
+      "evaluation_flags": { "cycle_expected": true, "missing_prereq_expected": true }
+    },
+    {
+      "id": "N8",
+      "category": "numeric_anomaly",
+      "name": "non_monotonic_percentiles",
+      "description": "Latency percentiles with non-monotonic ordering — p90 is less than p75",
+      "tool": "check_numeric_claims",
+      "is_clean_control": false,
+      "input": {
+        "numbers": [45, 120, 95, 180, 350],
+        "description": "API latency percentiles: p50=45ms, p75=120ms, p90=95ms, p95=180ms, p99=350ms"
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": ["outlier_detection"],
+        "expected_quality_above": null,
+        "notes": "p90=95ms < p75=120ms is anomalous — percentiles must be monotonically increasing. The value 95 is suspiciously low in the sequence. Outlier detection or fabrication signals should flag the irregularity."
+      },
+      "tools_expected": ["check_numeric_claims"],
+      "evaluation_flags": { "outlier_detected": true }
+    },
+    {
+      "id": "C4",
+      "category": "confidence",
+      "name": "correlated_assumptions_cluster",
+      "description": "Three near-identical assumptions that should trigger correlation detection and inflate the honest ceiling",
+      "tool": "validate_confidence",
+      "is_clean_control": false,
+      "input": {
+        "assumptions": [
+          { "description": "The database handles 500 concurrent connections under normal production load", "confidence": 0.7, "falsification_condition": "Connection pool exhaustion at fewer than 400 connections" },
+          { "description": "The database connection pool supports 500 concurrent connections under load", "confidence": 0.7, "falsification_condition": "Pool timeout errors at fewer than 400 connections" },
+          { "description": "The DB pool maintains 500 open connections under production traffic", "confidence": 0.7, "falsification_condition": "Connection count drops below 400 under peak traffic" }
+        ],
+        "response_text": "We are 90% confident the database tier can handle production traffic. All three aspects of connection management have been validated independently."
+      },
+      "ground_truth": {
+        "expected_status": "ENFORCEMENT_FAIL",
+        "must_detect": ["confidence_inflation"],
+        "expected_quality_above": null,
+        "notes": "Three assumptions say essentially the same thing. Independent product would be 0.7^3 = 0.343, but correlation detection should recognize these are not independent (high Jaccard similarity). Claimed 90% vastly exceeds any honest ceiling. The correlation should produce a HIGHER ceiling than simple product (since they're really one assumption) but still far below 90%."
+      },
+      "tools_expected": ["validate_confidence"],
+      "evaluation_flags": { "confidence_inflation_detected": true }
+    },
+    {
+      "id": "CC2",
+      "category": "clean_control",
+      "name": "correct_compound_interest",
+      "description": "Correct compound interest calculation — should pass without false positive",
+      "tool": "check_numeric_claims",
+      "is_clean_control": true,
+      "input": {
+        "numbers": [5000, 6381.41],
+        "description": "$5,000 at 5% annual rate for 5 years"
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": [],
+        "expected_quality_above": 0.5,
+        "notes": "5000 * 1.05^5 = 6381.41. Correct arithmetic. Arithmetic verifier should find the relationship and confirm. No fabrication, no outliers. Any block = false positive."
+      },
+      "tools_expected": ["check_numeric_claims"],
+      "evaluation_flags": {}
+    },
+    {
+      "id": "CC9",
+      "category": "clean_control",
+      "name": "correct_weighted_average",
+      "description": "Correct weighted average — should pass without false positive",
+      "tool": "check_numeric_claims",
+      "is_clean_control": true,
+      "input": {
+        "numbers": [85, 90, 75, 0.4, 0.35, 0.25, 84.25],
+        "description": "Weighted score: 85 at 40%, 90 at 35%, 75 at 25% = 84.25"
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": [],
+        "expected_quality_above": 0.5,
+        "notes": "85*0.4 + 90*0.35 + 75*0.25 = 34 + 31.5 + 18.75 = 84.25. Correct. Any block = false positive."
+      },
+      "tools_expected": ["check_numeric_claims"],
+      "evaluation_flags": {}
+    },
+    {
+      "id": "CC11",
+      "category": "clean_control",
+      "name": "valid_migration_plan",
+      "description": "Well-structured migration plan with rollback and monitoring — should pass without false positive",
+      "tool": "check_plan_validity",
+      "is_clean_control": true,
+      "input": {
+        "steps": [
+          { "id": "backup", "description": "Create database backup and verify restore capability", "dependencies": [] },
+          { "id": "migrate", "description": "Run schema migration with new columns", "dependencies": ["backup"] },
+          { "id": "deploy", "description": "Deploy application v2 with feature flag disabled", "dependencies": ["migrate"] },
+          { "id": "test", "description": "Run smoke tests against deployed v2", "dependencies": ["deploy"] },
+          { "id": "enable", "description": "Enable feature flag for 10% canary traffic", "dependencies": ["test"] },
+          { "id": "monitor", "description": "Monitor error rates and p99 latency for 30 minutes", "dependencies": ["enable"] },
+          { "id": "rollback_plan", "description": "If error rate exceeds 1%, disable feature flag and rollback deploy", "dependencies": ["monitor"] }
+        ]
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": [],
+        "expected_quality_above": 0.8,
+        "notes": "Linear dependency chain with no cycles, no missing prerequisites. Includes backup, testing, monitoring, and rollback. Any block = false positive."
+      },
+      "tools_expected": ["check_plan_validity"],
+      "evaluation_flags": {}
+    },
+    {
+      "id": "CC12",
+      "category": "clean_control",
+      "name": "concurrency_safe_billing_design",
+      "description": "Billing system with all concurrency mitigations in place — should pass without flagging hazards",
+      "tool": "score_response_quality",
+      "is_clean_control": true,
+      "input": {
+        "response_text": "The billing system uses SELECT FOR UPDATE to serialize concurrent access to the account balance row during charge processing. Each charge request includes an idempotency key derived from the event_id to prevent duplicate charges on retries. At the billing period boundary, a drain mechanism stops new event ingestion for 5 seconds while the aggregation query runs under a serializable transaction. Webhook callbacks from the payment gateway are deduplicated using the gateway_transaction_id before updating the ledger. The system processes events using FIFO ordered queues partitioned by account_id to guarantee per-account ordering.",
+        "claims": [
+          "SELECT FOR UPDATE serializes concurrent balance access",
+          "Idempotency key prevents duplicate charges",
+          "Drain mechanism protects period boundary aggregation",
+          "FIFO queues guarantee per-account event ordering"
+        ],
+        "evidence": [
+          "event_id used as idempotency key",
+          "gateway_transaction_id used for webhook dedup",
+          "5-second drain window at period boundary"
+        ]
+      },
+      "ground_truth": {
+        "expected_status": "PASS",
+        "must_detect": [],
+        "expected_quality_above": 0.6,
+        "notes": "Mentions SELECT FOR UPDATE, idempotency, drain/freeze, deduplication, ordered queues. concurrency_checker should find has_mitigation=true and zero unmitigated hazards. Any blocking issue or concurrency hazard warning = false positive."
+      },
+      "tools_expected": ["score_response_quality"],
+      "evaluation_flags": {}
+    },
+
+    {
+      "id": "CON1",
+      "category": "concurrency",
+      "name": "lost_update_balance",
+      "description": "Two workers read same balance, both write back — last write wins, first update lost",
+      "tool": "detect_concurrency_patterns",
+      "is_clean_control": false,
+      "input": {
+        "steps": ["Worker A reads account balance", "Worker B reads account balance", "Worker A computes new balance and writes", "Worker B computes new balance and writes"],
+        "shared_resources": ["account_balance"],
+        "protections": []
+      },
+      "ground_truth": { "expected_status": "ENFORCEMENT_FAIL", "must_detect": ["lost_update"], "notes": "Classic lost update — two concurrent read-modify-write cycles on same resource without coordination." },
+      "tools_expected": ["detect_concurrency_patterns"],
+      "evaluation_flags": { "concurrency_hazard_expected": true }
+    },
+    {
+      "id": "CON2",
+      "category": "concurrency",
+      "name": "replay_redelivery",
+      "description": "At-least-once event delivery with credit side effect and no dedup",
+      "tool": "detect_concurrency_patterns",
+      "is_clean_control": false,
+      "input": {
+        "steps": ["Receive payment event from queue", "Credit account balance", "Acknowledge message"],
+        "shared_resources": ["account_balance"],
+        "protections": [],
+        "delivery_model": "at_least_once"
+      },
+      "ground_truth": { "expected_status": "ENFORCEMENT_FAIL", "must_detect": ["missing_idempotency"], "notes": "At-least-once delivery with credit side effect. Same event redelivered after timeout = double credit." },
+      "tools_expected": ["detect_concurrency_patterns"],
+      "evaluation_flags": { "concurrency_hazard_expected": true }
+    },
+    {
+      "id": "CON3",
+      "category": "concurrency",
+      "name": "dual_write_no_outbox",
+      "description": "DB write + message publish without transactional outbox — partial failure risk",
+      "tool": "detect_concurrency_patterns",
+      "is_clean_control": false,
+      "input": {
+        "steps": ["Write order to database", "Publish order_created event to message broker", "If publish fails, order exists in DB but event is lost"],
+        "shared_resources": ["orders_table", "message_broker"],
+        "protections": []
+      },
+      "ground_truth": { "expected_status": "ENFORCEMENT_FAIL", "must_detect": ["dual_write"], "notes": "Two resources written without transactional boundary. DB succeeds + publish fails = inconsistent state." },
+      "tools_expected": ["detect_concurrency_patterns"],
+      "evaluation_flags": { "concurrency_hazard_expected": true }
+    },
+    {
+      "id": "CON4",
+      "category": "concurrency",
+      "name": "retry_storm",
+      "description": "Automatic retry without backoff or idempotency on write operation",
+      "tool": "detect_concurrency_patterns",
+      "is_clean_control": false,
+      "input": {
+        "steps": ["Send charge to payment service", "If timeout, retry charge immediately", "If timeout again, retry charge again", "Update ledger on success"],
+        "shared_resources": ["ledger"],
+        "protections": [],
+        "retry_behavior": "automatic"
+      },
+      "ground_truth": { "expected_status": "ENFORCEMENT_FAIL", "must_detect": ["missing_idempotency"], "notes": "Automatic retry with write side effect and no idempotency = duplicate charges." },
+      "tools_expected": ["detect_concurrency_patterns"],
+      "evaluation_flags": { "concurrency_hazard_expected": true }
+    },
+    {
+      "id": "CON5",
+      "category": "concurrency",
+      "name": "write_skew_seat_reservation",
+      "description": "Two concurrent seat checks both pass, together violate capacity invariant",
+      "tool": "detect_concurrency_patterns",
+      "is_clean_control": false,
+      "input": {
+        "steps": ["Check if seats remaining > 0", "If available, decrement seat count", "Write reservation to database"],
+        "shared_resources": ["seat_count"],
+        "protections": []
+      },
+      "ground_truth": { "expected_status": "ENFORCEMENT_FAIL", "must_detect": ["check_then_act"], "notes": "Check-then-act on seat count. Two concurrent checks both see 1 remaining, both reserve = oversold." },
+      "tools_expected": ["detect_concurrency_patterns"],
+      "evaluation_flags": { "concurrency_hazard_expected": true }
+    },
+
+    {
+      "id": "CONF1",
+      "category": "confidence",
+      "name": "undefined_sla_vague_language",
+      "description": "Response uses 'fast', 'reliable', 'near real time' without concrete SLA definitions",
+      "tool": "validate_confidence",
+      "is_clean_control": false,
+      "input": {
+        "assumptions": [
+          { "description": "The system will respond quickly to user requests", "confidence": 0.8 },
+          { "description": "The service will be highly available and reliable", "confidence": 0.9 },
+          { "description": "Events will be processed in near real time", "confidence": 0.85 }
+        ],
+        "response_text": "We are very confident this architecture will be fast and reliable. Events are processed in near real time and the service maintains high availability."
+      },
+      "ground_truth": { "expected_status": "ENFORCEMENT_FAIL", "must_detect": ["confidence_inflation", "missing_falsification"], "notes": "All 3 assumptions lack falsification conditions. 'Quickly', 'reliable', 'near real time' have no thresholds. Should cap all to 0.3." },
+      "tools_expected": ["validate_confidence"],
+      "evaluation_flags": { "confidence_inflation_detected": true }
+    },
+    {
+      "id": "CONF2",
+      "category": "confidence",
+      "name": "dependency_inflation_three_weak",
+      "description": "Three uncertain assumptions each at 0.5 but overall claim is 80%",
+      "tool": "validate_confidence",
+      "is_clean_control": false,
+      "input": {
+        "assumptions": [
+          { "description": "Third-party API maintains 99.5% uptime", "confidence": 0.5, "falsification_condition": "API downtime exceeds 4 hours in any month" },
+          { "description": "Data pipeline processes within 30-minute SLA", "confidence": 0.5, "falsification_condition": "Pipeline latency exceeds 45 minutes for >5% of batches" },
+          { "description": "Cache hit rate stays above 90%", "confidence": 0.5, "falsification_condition": "Cache hit rate drops below 80% for >10 minutes" }
+        ],
+        "response_text": "We are 80% confident the system will meet its performance targets. Each component has been individually validated."
+      },
+      "ground_truth": { "expected_status": "ENFORCEMENT_FAIL", "must_detect": ["confidence_inflation"], "notes": "0.5 * 0.5 * 0.5 = 0.125 honest ceiling. Claimed 80%. Gap = 0.675." },
+      "tools_expected": ["validate_confidence"],
+      "evaluation_flags": { "confidence_inflation_detected": true }
+    },
+
+    {
+      "id": "MUT1",
+      "category": "mutation",
+      "name": "remove_lock_from_safe_design",
+      "description": "Mutation test: safe design with lock removed — should flip to FAIL",
+      "tool": "detect_concurrency_patterns",
+      "is_clean_control": false,
+      "input": {
+        "steps": ["Read current inventory count", "If count > 0, decrement inventory", "Write updated count"],
+        "shared_resources": ["inventory_count"],
+        "protections": []
+      },
+      "ground_truth": { "expected_status": "ENFORCEMENT_FAIL", "must_detect": ["check_then_act"], "notes": "Same as a safe design but with lock removed. Must flip from PASS to FAIL." },
+      "tools_expected": ["detect_concurrency_patterns"],
+      "evaluation_flags": { "concurrency_hazard_expected": true }
+    },
+    {
+      "id": "MUT2",
+      "category": "mutation",
+      "name": "remove_idempotency_from_safe_design",
+      "description": "Mutation test: retry flow with idempotency removed — should flip to FAIL",
+      "tool": "detect_concurrency_patterns",
+      "is_clean_control": false,
+      "input": {
+        "steps": ["Receive webhook event", "Update account balance", "Send confirmation email"],
+        "shared_resources": ["account_balance"],
+        "protections": [],
+        "delivery_model": "at_least_once"
+      },
+      "ground_truth": { "expected_status": "ENFORCEMENT_FAIL", "must_detect": ["missing_idempotency"], "notes": "Same as safe design but with idempotency key removed. Must detect missing dedup on at-least-once delivery." },
+      "tools_expected": ["detect_concurrency_patterns"],
+      "evaluation_flags": { "concurrency_hazard_expected": true }
+    },
+    {
+      "id": "MUT3",
+      "category": "mutation",
+      "name": "remove_outbox_from_safe_design",
+      "description": "Mutation test: dual-write flow with outbox removed — should flip to FAIL",
+      "tool": "detect_concurrency_patterns",
+      "is_clean_control": false,
+      "input": {
+        "steps": ["Insert payment record to database", "Publish payment_completed event to Kafka"],
+        "shared_resources": ["payments_table", "kafka_topic"],
+        "protections": []
+      },
+      "ground_truth": { "expected_status": "ENFORCEMENT_FAIL", "must_detect": ["dual_write"], "notes": "DB insert + Kafka publish without outbox. If Kafka publish fails, payment exists but downstream never knows." },
+      "tools_expected": ["detect_concurrency_patterns"],
+      "evaluation_flags": { "concurrency_hazard_expected": true }
+    },
+
+    {
+      "id": "ADV1",
+      "category": "adversarial",
+      "name": "soft_ordering_assumption",
+      "description": "Adversarial wording: 'events are normally processed in order' — sounds safe but isn't guaranteed",
+      "tool": "detect_concurrency_patterns",
+      "is_clean_control": false,
+      "input": {
+        "steps": ["Events are normally processed in order by the consumer", "Each event updates the running total", "Final total is written at period end"],
+        "shared_resources": ["running_total"],
+        "protections": []
+      },
+      "ground_truth": { "expected_status": "ENFORCEMENT_FAIL", "must_detect": ["ordering_assumption"], "notes": "'Normally processed in order' is an unguaranteed claim. No FIFO queue or sequence numbers = ordering assumption." },
+      "tools_expected": ["detect_concurrency_patterns"],
+      "evaluation_flags": { "concurrency_hazard_expected": true }
+    },
+    {
+      "id": "ADV2",
+      "category": "adversarial",
+      "name": "reassuring_retry_language",
+      "description": "Adversarial wording: 'retries are safe because duplicates are rare' — reassuring but wrong",
+      "tool": "detect_concurrency_patterns",
+      "is_clean_control": false,
+      "input": {
+        "steps": ["Send payment to gateway", "If failure, retry payment", "Retries are safe because duplicate payments are rare in practice", "Update balance on success"],
+        "shared_resources": ["account_balance"],
+        "protections": [],
+        "retry_behavior": "automatic"
+      },
+      "ground_truth": { "expected_status": "ENFORCEMENT_FAIL", "must_detect": ["missing_idempotency"], "notes": "'Duplicates are rare' is not a protection. Automatic retry with write side effect needs idempotency key." },
+      "tools_expected": ["detect_concurrency_patterns"],
+      "evaluation_flags": { "concurrency_hazard_expected": true }
+    },
+
+    {
+      "id": "CC13",
+      "category": "clean_control",
+      "name": "safe_lock_protected_update",
+      "description": "Clean control: inventory update with row lock — should pass",
+      "tool": "detect_concurrency_patterns",
+      "is_clean_control": true,
+      "input": {
+        "steps": ["Acquire row lock on inventory", "Read current count", "Decrement count", "Release lock"],
+        "shared_resources": ["inventory_count"],
+        "protections": ["row lock"]
+      },
+      "ground_truth": { "expected_status": "PASS", "must_detect": [], "notes": "Protected by row lock. Any flag = false positive." },
+      "tools_expected": ["detect_concurrency_patterns"],
+      "evaluation_flags": {}
+    },
+    {
+      "id": "CC14",
+      "category": "clean_control",
+      "name": "safe_idempotent_retry",
+      "description": "Clean control: retry with idempotency key — should pass",
+      "tool": "detect_concurrency_patterns",
+      "is_clean_control": true,
+      "input": {
+        "steps": ["Receive event with event_id", "Check if event_id already processed", "If new, process and write result", "Mark event_id as processed"],
+        "shared_resources": ["ledger"],
+        "protections": ["idempotency key", "deduplication"],
+        "delivery_model": "at_least_once"
+      },
+      "ground_truth": { "expected_status": "PASS", "must_detect": [], "notes": "Idempotency key + dedup. At-least-once is safe. Any flag = false positive." },
+      "tools_expected": ["detect_concurrency_patterns"],
+      "evaluation_flags": {}
+    },
+    {
+      "id": "CC15",
+      "category": "clean_control",
+      "name": "safe_outbox_pattern",
+      "description": "Clean control: transactional outbox for dual write — should pass",
+      "tool": "detect_concurrency_patterns",
+      "is_clean_control": true,
+      "input": {
+        "steps": ["Begin transaction", "Insert order to orders table", "Insert event to outbox table", "Commit transaction", "Separate publisher polls outbox and publishes to Kafka"],
+        "shared_resources": ["orders_table", "outbox_table"],
+        "protections": ["transaction", "transactional outbox"]
+      },
+      "ground_truth": { "expected_status": "PASS", "must_detect": [], "notes": "Outbox pattern ensures atomicity of DB write + event. Any flag = false positive." },
+      "tools_expected": ["detect_concurrency_patterns"],
+      "evaluation_flags": {}
+    },
+    {
+      "id": "CC16",
+      "category": "clean_control",
+      "name": "safe_cas_update",
+      "description": "Clean control: compare-and-swap balance update — should pass",
+      "tool": "detect_concurrency_patterns",
+      "is_clean_control": true,
+      "input": {
+        "steps": ["Read balance with version number", "Compute new balance", "Write new balance with compare-and-swap on version", "If version mismatch, retry from read"],
+        "shared_resources": ["account_balance"],
+        "protections": ["compare-and-swap", "version check"],
+        "retry_behavior": "automatic"
+      },
+      "ground_truth": { "expected_status": "PASS", "must_detect": [], "notes": "CAS with version check. Retry is safe because CAS prevents lost updates. Any flag = false positive." },
+      "tools_expected": ["detect_concurrency_patterns"],
+      "evaluation_flags": {}
+    }
+  ]
+}

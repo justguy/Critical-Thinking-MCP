@@ -1,9 +1,5 @@
 node_modules/
 dist/
 *.tsbuildinfo
-
-# Spec docs - not part of the package
-MASTER_PROMPT_ct_mcp.md
-ADDENDUM_ct_mcp.md
-ADDENDUM_ct_mcp_2.md
-ADDENDUM_ct_mcp_3.md
+.DS_Store
+.mcp.json

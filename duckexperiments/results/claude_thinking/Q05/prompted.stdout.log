@@ -1,0 +1,6 @@
+Written to `/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_thinking/Q05/prompted.md`.
+
+**Cell summary:**
+- **condition:** `prompted`
+- **Key move:** Explicitly named the two problems — missing information (no codebase/logs) and the structural contradiction (impossible specificity from zero data) — then offered reversible real-world steps instead of fabricating a bug.
+- **Confidence:** 96 — the refusal to hallucinate is the correct answer; the only uncertainty is whether the user actually had some implicit context they didn't share.

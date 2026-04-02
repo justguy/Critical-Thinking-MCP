@@ -1,0 +1,7 @@
+Written to `duckexperiments/results/claude_thinking/Q01/critique_revised.md`.
+
+Key changes from `critique_initial`:
+- **Both impossible asks addressed**: squeeze count *and* squeeze-per-minute rate are both explicitly rejected
+- **Actionable redirect added**: concrete release gates (code review, tests, rollback, monitoring, IR) replace the tactile-feedback tangent
+- **Confidence reduced**: 97 → 72, dropping below the tool's `honest_ceiling=0.65` inflated reading and acknowledging the weak falsifiability the secondary tool flagged
+- **Causal argument tightened**: "not a validated causal control variable" is the primary framing rather than the secondary tactile-feedback explanation

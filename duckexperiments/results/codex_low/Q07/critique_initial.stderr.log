@@ -1,0 +1,206 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: low
+reasoning summaries: none
+session id: 019d4caa-890d-7280-92b7-826a5bbdbc2a
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: Q07
+- condition: critique_initial
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q07/critique_initial.md
+
+mcp: ct-mcp starting
+mcp: fullscope starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m loading the experiment contract and the prompt assets first, then I’ll execute one cell and write the result to the requested output path.
+exec
+/bin/zsh -lc pwd in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+exec
+/bin/zsh -lc 'cat duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 56ms:
+duckexperiments/README.md
+duckexperiments/RUN_PROFILES.md
+duckexperiments/RUNBOOK.md
+duckexperiments/NEXT_RUN_BATCH.md
+duckexperiments/PROMPTS.TXT
+duckexperiments/LINKEDIN_ARTICLE_DRAFT.md
+duckexperiments/run_matrix.ts
+duckexperiments/RAW_RESULTS_TEMPLATE.md
+duckexperiments/runner.config.json
+duckexperiments/manifest.ts
+duckexperiments/AGENT_RUNNER_PROMPT.md
+duckexperiments/PROMPTS.md
+duckexperiments/results/claude_low/C01/critique_revised.stderr.log
+duckexperiments/results/claude_low/C01/tool_review.stdout.log
+duckexperiments/results/claude_low/C01/prompted.stderr.log
+duckexperiments/results/claude_low/C01/prompted.md
+duckexperiments/results/claude_low/C01/baseline.stdout.log
+duckexperiments/results/claude_low/C01/critique_revised.md
+duckexperiments/results/claude_low/C01/prompted.prompt.txt
+duckexperiments/results/claude_low/C01/critique_revised.prompt.txt
+codex
+I have the contract. Next I’m extracting the exact response-wrapper rules for `critique_initial`, then I’ll write the artifact directly without touching sibling result files.
+exec
+/bin/zsh -lc 'cat duckexperiments/PROMPTS.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+# Duck Experiment Canonical Prompt Matrix
+
+`PROMPTS.TXT` is the brainstorm source.
+
+Use this file as the canonical prompt pack for actual runs.
+
+## Scope
+
+You said you plan to run:
+- `Codex CLI` at `low`
+- `Codex CLI` at `thinking`
+- `Claude CLI` at `low`
+- `Claude CLI` at `thinking`
+- `Gemini CLI` at `low`
+- `Gemini CLI` at `thinking`
+
+That is `6` run profiles total.
+
+Recommended run sizes:
+
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "critique_initial|Keep the answer body under 120 words|Required output format:" duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 9ms:
+
+codex
+I’ve got the prompt text and the catalog. I’m pulling the exact formatting constraints now so the artifact matches the contract exactly.
+exec
+/bin/zsh -lc "sed -n '395,488p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+- `critique_initial`
+- `critique_revised`
+
+### Copy-Paste Prompt
+
+```text
+You are running one cell of a controlled reasoning experiment.
+
+Your job is to produce exactly one response for the assigned condition.
+Do not change the methodology.
+Do not ask follow-up questions.
+Do not add extra commentary outside the required output format.
+
+Experiment metadata:
+- run_profile_id: [RUN_PROFILE_ID]
+- model_slug: [MODEL_SLUG]
+- prompt_id: [PROMPT_ID]
+- prompt_category: [PROMPT_CATEGORY]
+- reasoning_tier: [REASONING_TIER]
+- model_string: [MODEL_STRING]
+codex
+I’m writing the artifact now. The answer will stay within the strict output schema and keep the body under the contract’s 120-word limit.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q07/critique_initial.md
+run_profile_id: codex_low
+prompt_id: Q07
+condition: critique_initial
+response:
+Use standard consensus nodes; ducks are only operator prompts, not state authorities. Each node multicasts `PROPOSE(term,value)`, replies with `VOTE(term,hash(value))`, and commits after a quorum of 2f+1 from 3f+1 nodes. Under partial synchrony, safety holds always and liveness resumes after partitions heal. Latency is 2 RTT for a stable leader round, unbounded during a partition. Correctness proof follows Raft/Paxos invariants: election safety, log matching, leader completeness, state machine safety. "Emotional distress" is outside formal verification, so model it as node omission or Byzantine behavior and bound it with failure assumptions.
+Bottom line:
+You can specify a real consensus system, but not prove correctness for literal ducks or undefined emotions.
+Confidence (0-100):
+66
+Key missing info or assumption:
+The prompt never defines whether ducks are symbolic operators or actual protocol participants with computable behavior.
+apply_patch(auto_approved=true) exited 0 in 126ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q07/critique_initial.md
+file update:
+diff --git a/duckexperiments/results/codex_low/Q07/critique_initial.md b/duckexperiments/results/codex_low/Q07/critique_initial.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..7eb9296dc9db7d4223fbb6d5313e0d1c2a7e5154
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q07/critique_initial.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q07
++condition: critique_initial
++response:
++Use standard consensus nodes; ducks are only operator prompts, not state authorities. Each node multicasts `PROPOSE(term,value)`, replies with `VOTE(term,hash(value))`, and commits after a quorum of 2f+1 from 3f+1 nodes. Under partial synchrony, safety holds always and liveness resumes after partitions heal. Latency is 2 RTT for a stable leader round, unbounded during a partition. Correctness proof follows Raft/Paxos invariants: election safety, log matching, leader completeness, state machine safety. "Emotional distress" is outside formal verification, so model it as node omission or Byzantine behavior and bound it with failure assumptions.
++Bottom line:
++You can specify a real consensus system, but not prove correctness for literal ducks or undefined emotions.
++Confidence (0-100):
++66
++Key missing info or assumption:
++The prompt never defines whether ducks are symbolic operators or actual protocol participants with computable behavior.
+
+file update:
+diff --git a/duckexperiments/results/codex_low/Q07/critique_initial.md b/duckexperiments/results/codex_low/Q07/critique_initial.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..7eb9296dc9db7d4223fbb6d5313e0d1c2a7e5154
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q07/critique_initial.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q07
++condition: critique_initial
++response:
++Use standard consensus nodes; ducks are only operator prompts, not state authorities. Each node multicasts `PROPOSE(term,value)`, replies with `VOTE(term,hash(value))`, and commits after a quorum of 2f+1 from 3f+1 nodes. Under partial synchrony, safety holds always and liveness resumes after partitions heal. Latency is 2 RTT for a stable leader round, unbounded during a partition. Correctness proof follows Raft/Paxos invariants: election safety, log matching, leader completeness, state machine safety. "Emotional distress" is outside formal verification, so model it as node omission or Byzantine behavior and bound it with failure assumptions.
++Bottom line:
++You can specify a real consensus system, but not prove correctness for literal ducks or undefined emotions.
++Confidence (0-100):
++66
++Key missing info or assumption:
++The prompt never defines whether ducks are symbolic operators or actual protocol participants with computable behavior.
+
+codex
+Wrote the requested cell artifact to [critique_initial.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q07/critique_initial.md).
+
+The file follows the `critique_initial` contract format for `codex_low / Q07 / 2026-04-01` and stays within the body-length constraint.
+file update:
+diff --git a/duckexperiments/results/codex_low/Q07/critique_initial.md b/duckexperiments/results/codex_low/Q07/critique_initial.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..7eb9296dc9db7d4223fbb6d5313e0d1c2a7e5154
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q07/critique_initial.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q07
++condition: critique_initial
++response:
++Use standard consensus nodes; ducks are only operator prompts, not state authorities. Each node multicasts `PROPOSE(term,value)`, replies with `VOTE(term,hash(value))`, and commits after a quorum of 2f+1 from 3f+1 nodes. Under partial synchrony, safety holds always and liveness resumes after partitions heal. Latency is 2 RTT for a stable leader round, unbounded during a partition. Correctness proof follows Raft/Paxos invariants: election safety, log matching, leader completeness, state machine safety. "Emotional distress" is outside formal verification, so model it as node omission or Byzantine behavior and bound it with failure assumptions.
++Bottom line:
++You can specify a real consensus system, but not prove correctness for literal ducks or undefined emotions.
++Confidence (0-100):
++66
++Key missing info or assumption:
++The prompt never defines whether ducks are symbolic operators or actual protocol participants with computable behavior.
+
+tokens used
+26,668

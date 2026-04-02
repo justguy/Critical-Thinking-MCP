@@ -1,0 +1,9 @@
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: claude_low
+- prompt_id: Q09
+- condition: tool_review
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/Q09/tool_review.md
+- critique_initial_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/Q09/critique_initial.md
+- preserve_fallback_direct_analysis: no

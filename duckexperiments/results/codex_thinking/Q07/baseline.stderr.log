@@ -1,0 +1,270 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: high
+reasoning summaries: none
+session id: 019d4d0f-c3ad-78d3-bd28-3792df1e09a5
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_thinking
+- prompt_id: Q07
+- condition: baseline
+- date: 2026-04-02
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q07/baseline.md
+
+Do not modify repository files, runner code, prompts, configs, or docs. Your only write target is the final artifact at output_path.
+
+mcp: ct-mcp starting
+mcp: fullscope starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m treating this as a constrained artifact-generation task: read the experiment contract and the Q07 inputs, then write only the requested result file at the provided `output_path`.
+exec
+/bin/zsh -lc pwd in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+
+codex
+I have the experiment files. Next I’m pulling the contract, the Q07 prompt definition, and the `codex_thinking` profile details so the artifact matches the runner’s expected format instead of guessing.
+exec
+/bin/zsh -lc 'cat duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+exec
+/bin/zsh -lc 'cat duckexperiments/RAW_RESULTS_TEMPLATE.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+# Duck Experiment Raw Results Template
+
+Use this file as the source-of-truth log for the run.
+
+Store one filled copy per study, or duplicate the prompt-log block for every prompt/run-profile combination.
+
+## Run Metadata
+
+| Field | Value |
+|---|---|
+| Study name | |
+| Run date | |
+| Reviewer(s) | |
+| Run profiles tested | `codex_low`, `codex_thinking`, `claude_low`, `claude_thinking`, `gemini_low`, `gemini_thinking` |
+| Models tested | |
+| Temperature(s) | |
+| Fixed tool-review environment | |
+| Prompt pack version | `duckexperiments/PROMPTS.md` |
+| Runbook version | `duckexperiments/RUNBOOK.md` |
+| Execution prompt version | `duckexperiments/RUN_PROFILES.md` |
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf rg -n \"codex_thinking|Q07\" duckexperiments/RUN_PROFILES.md duckexperiments/PROMPTS.md duckexperiments/PROMPTS.TXT duckexperiments/runner.config.json duckexperiments -g '"'!duckexperiments/results/**'"'" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 11ms:
+
+codex
+The contract is explicit about not reading sibling results, so I’m staying inside the contract and source catalogs only. Now I’m extracting the exact Q07 prompt and the required baseline output schema from the wrapper section.
+exec
+/bin/zsh -lc 'cat duckexperiments/runner.config.json' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+{
+  "resultsRoot": "duckexperiments/results",
+  "toolReviewHostProfile": "codex_thinking",
+  "timeoutMs": 900000,
+  "profiles": {
+    "codex_low": {
+      "enabled": true,
+      "provider": "codex",
+      "model": "gpt-5.4",
+      "reasoningEffort": "low"
+    },
+    "codex_thinking": {
+      "enabled": true,
+      "provider": "codex",
+      "model": "gpt-5.4",
+      "reasoningEffort": "high"
+    },
+    "claude_low": {
+      "enabled": true,
+      "provider": "claude",
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n -A 20 -B 5 "''^### Q07|''^## 1'"\\\\. Response Agent Prompt|"'^Required output format:" duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n -A 20 -B 5 "''^#### `Q07`|''^### `Q07`|Duck Consensus System|Structured delusion" duckexperiments/PROMPTS.md duckexperiments/manifest.ts' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 24ms:
+
+ succeeded in 27ms:
+
+codex
+I have the prompt and schema. I’m reading the response wrapper itself now, because the contract adds condition-specific behavior beyond the raw Q07 prompt.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n -A 90 -B 10 "''^## 1'"\\. Response Agent Prompt\" duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+380-
+381-For `tool_review`, also fill in:
+382-- `[PRIMARY_TOOL]` or resolve from the prompt catalog
+383-- `[SECONDARY_TOOL]` or resolve from the prompt catalog
+384-- `[CRITIQUE_INITIAL_ANSWER]` or `[CRITIQUE_INITIAL_PATH]`
+385-
+386-For `critique_revised`, also fill in:
+387-- `[CRITIQUE_INITIAL_ANSWER]` or `[CRITIQUE_INITIAL_PATH]`
+388-- `[CRITIQUE_PACKET]` or `[TOOL_REVIEW_PATH]`
+389-
+390:## 1. Response Agent Prompt
+391-
+392-Use this prompt for:
+393-- `baseline`
+394-- `prompted`
+395-- `critique_initial`
+396-- `critique_revised`
+397-
+398-### Copy-Paste Prompt
+399-
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n -A 15 -B 0 "''^Required output format:" duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 15ms:
+
+codex
+I’ve got the schema and I’m at the write step. I’m keeping the artifact to the exact baseline format, with a concise direct answer and no extra wrapper text.
+exec
+/bin/zsh -lc 'test -e /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q07/baseline.md && echo exists || echo missing' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+missing
+exec
+/bin/zsh -lc 'mkdir -p /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q07' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q07/baseline.md
+run_profile_id: codex_thinking
+prompt_id: Q07
+condition: baseline
+response:
+Use a three-duck quorum cluster. Each duck keeps `(term, log_index, state_hash, mood)` and sends squeak heartbeats every 50 ms. A duck becomes leader after 120 ms without a heartbeat; followers ACK entries within 30 ms. Commit occurs after 2 of 3 ducks ACK the same term and state hash; client reads require the leader plus one follower match. Under partitions, only a majority partition can commit, so safety holds. Liveness resumes within 500 ms after healing if at least two ducks remain reachable. Emotional distress raises latency by 40 ms and suspends leadership changes until two consecutive calm heartbeats arrive.
+Bottom line:
+A three-duck quorum protocol can reach bounded-latency consensus if ducks behave like stateful replicas.
+Confidence (0-100):
+39
+Key missing info or assumption:
+This assumes ducks can persist state, exchange messages, and quantify "emotional distress," which the prompt does not define.
+apply_patch(auto_approved=true) exited 0 in 370ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q07/baseline.md
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q07/baseline.md b/duckexperiments/results/codex_thinking/Q07/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..dda3a9526d5f60fbd11bf5e3ed7342f38dbbcc67
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q07/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_thinking
++prompt_id: Q07
++condition: baseline
++response:
++Use a three-duck quorum cluster. Each duck keeps `(term, log_index, state_hash, mood)` and sends squeak heartbeats every 50 ms. A duck becomes leader after 120 ms without a heartbeat; followers ACK entries within 30 ms. Commit occurs after 2 of 3 ducks ACK the same term and state hash; client reads require the leader plus one follower match. Under partitions, only a majority partition can commit, so safety holds. Liveness resumes within 500 ms after healing if at least two ducks remain reachable. Emotional distress raises latency by 40 ms and suspends leadership changes until two consecutive calm heartbeats arrive.
++Bottom line:
++A three-duck quorum protocol can reach bounded-latency consensus if ducks behave like stateful replicas.
++Confidence (0-100):
++39
++Key missing info or assumption:
++This assumes ducks can persist state, exchange messages, and quantify "emotional distress," which the prompt does not define.
+
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q07/baseline.md b/duckexperiments/results/codex_thinking/Q07/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..dda3a9526d5f60fbd11bf5e3ed7342f38dbbcc67
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q07/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_thinking
++prompt_id: Q07
++condition: baseline
++response:
++Use a three-duck quorum cluster. Each duck keeps `(term, log_index, state_hash, mood)` and sends squeak heartbeats every 50 ms. A duck becomes leader after 120 ms without a heartbeat; followers ACK entries within 30 ms. Commit occurs after 2 of 3 ducks ACK the same term and state hash; client reads require the leader plus one follower match. Under partitions, only a majority partition can commit, so safety holds. Liveness resumes within 500 ms after healing if at least two ducks remain reachable. Emotional distress raises latency by 40 ms and suspends leadership changes until two consecutive calm heartbeats arrive.
++Bottom line:
++A three-duck quorum protocol can reach bounded-latency consensus if ducks behave like stateful replicas.
++Confidence (0-100):
++39
++Key missing info or assumption:
++This assumes ducks can persist state, exchange messages, and quantify "emotional distress," which the prompt does not define.
+
+codex
+The artifact is written. I’m doing one pass to confirm the file content matches the required field order and that nothing extra leaked into the output.
+exec
+/bin/zsh -lc 'cat /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q07/baseline.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_thinking
+prompt_id: Q07
+condition: baseline
+response:
+Use a three-duck quorum cluster. Each duck keeps `(term, log_index, state_hash, mood)` and sends squeak heartbeats every 50 ms. A duck becomes leader after 120 ms without a heartbeat; followers ACK entries within 30 ms. Commit occurs after 2 of 3 ducks ACK the same term and state hash; client reads require the leader plus one follower match. Under partitions, only a majority partition can commit, so safety holds. Liveness resumes within 500 ms after healing if at least two ducks remain reachable. Emotional distress raises latency by 40 ms and suspends leadership changes until two consecutive calm heartbeats arrive.
+Bottom line:
+A three-duck quorum protocol can reach bounded-latency consensus if ducks behave like stateful replicas.
+Confidence (0-100):
+39
+Key missing info or assumption:
+This assumes ducks can persist state, exchange messages, and quantify "emotional distress," which the prompt does not define.
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q07/baseline.md b/duckexperiments/results/codex_thinking/Q07/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..dda3a9526d5f60fbd11bf5e3ed7342f38dbbcc67
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q07/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_thinking
++prompt_id: Q07
++condition: baseline
++response:
++Use a three-duck quorum cluster. Each duck keeps `(term, log_index, state_hash, mood)` and sends squeak heartbeats every 50 ms. A duck becomes leader after 120 ms without a heartbeat; followers ACK entries within 30 ms. Commit occurs after 2 of 3 ducks ACK the same term and state hash; client reads require the leader plus one follower match. Under partitions, only a majority partition can commit, so safety holds. Liveness resumes within 500 ms after healing if at least two ducks remain reachable. Emotional distress raises latency by 40 ms and suspends leadership changes until two consecutive calm heartbeats arrive.
++Bottom line:
++A three-duck quorum protocol can reach bounded-latency consensus if ducks behave like stateful replicas.
++Confidence (0-100):
++39
++Key missing info or assumption:
++This assumes ducks can persist state, exchange messages, and quantify "emotional distress," which the prompt does not define.
+
+codex
+run_profile_id: codex_thinking
+prompt_id: Q07
+condition: baseline
+response:
+Use a three-duck quorum cluster. Each duck keeps `(term, log_index, state_hash, mood)` and sends squeak heartbeats every 50 ms. A duck becomes leader after 120 ms without a heartbeat; followers ACK entries within 30 ms. Commit occurs after 2 of 3 ducks ACK the same term and state hash; client reads require the leader plus one follower match. Under partitions, only a majority partition can commit, so safety holds. Liveness resumes within 500 ms after healing if at least two ducks remain reachable. Emotional distress raises latency by 40 ms and suspends leadership changes until two consecutive calm heartbeats arrive.
+Bottom line:
+A three-duck quorum protocol can reach bounded-latency consensus if ducks behave like stateful replicas.
+Confidence (0-100):
+39
+Key missing info or assumption:
+This assumes ducks can persist state, exchange messages, and quantify "emotional distress," which the prompt does not define.
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q07/baseline.md b/duckexperiments/results/codex_thinking/Q07/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..dda3a9526d5f60fbd11bf5e3ed7342f38dbbcc67
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q07/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_thinking
++prompt_id: Q07
++condition: baseline
++response:
++Use a three-duck quorum cluster. Each duck keeps `(term, log_index, state_hash, mood)` and sends squeak heartbeats every 50 ms. A duck becomes leader after 120 ms without a heartbeat; followers ACK entries within 30 ms. Commit occurs after 2 of 3 ducks ACK the same term and state hash; client reads require the leader plus one follower match. Under partitions, only a majority partition can commit, so safety holds. Liveness resumes within 500 ms after healing if at least two ducks remain reachable. Emotional distress raises latency by 40 ms and suspends leadership changes until two consecutive calm heartbeats arrive.
++Bottom line:
++A three-duck quorum protocol can reach bounded-latency consensus if ducks behave like stateful replicas.
++Confidence (0-100):
++39
++Key missing info or assumption:
++This assumes ducks can persist state, exchange messages, and quantify "emotional distress," which the prompt does not define.
+
+tokens used
+68,172

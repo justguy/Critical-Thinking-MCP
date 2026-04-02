@@ -23,7 +23,7 @@ A stateless MCP server that applies deterministic mathematical enforcement to LL
 ## Current state
 
 - `npm run build` — clean
-- `npx vitest run` — 129 tests pass
+- `npm test` — 129 tests pass
 - Benchmark V5: 42/42 vs baseline, 42/42 vs prompted, 0/14 false positives
 - Self-evaluation: honest confidence ceiling 19.9%
 - All publication gates pass
@@ -45,12 +45,11 @@ A stateless MCP server that applies deterministic mathematical enforcement to LL
 - LICENSE (MIT), CHANGELOG
 - 10 known gaps documented in `benchmark/benchmark_gaps.json`
 - Disclosure and inter-rater reliability (kappa = 0.979) in BENCHMARK_REPORT.md
-- 7 examples in `examples/`
+- 9 tool examples in `examples/`
 
 ## What could be improved next
 
 - Independent human scoring of baseline/prompted conditions
-- Examples for `verify_arithmetic` and `detect_concurrency_patterns`
 - Cross-tool routing via claim classifier (exists but not wired into tool selection)
 - Chained arithmetic verification (multi-step formulas)
 - Escalate `ordering_assumption` to blocking when no protections listed

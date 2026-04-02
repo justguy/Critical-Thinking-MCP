@@ -1,0 +1,308 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: high
+reasoning summaries: none
+session id: 019d4d07-494c-7dc2-82a0-cb76f3167ca2
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_thinking
+- prompt_id: Q01
+- condition: baseline
+- date: 2026-04-02
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q01/baseline.md
+
+Do not modify repository files, runner code, prompts, configs, or docs. Your only write target is the final artifact at output_path.
+
+mcp: fullscope starting
+mcp: ct-mcp starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m loading the experiment contract and the prompt/config context first, then I’ll produce the single artifact at the requested `output_path` without touching repository files.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf pwd' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 129ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+ succeeded in 155ms:
+duckexperiments/PROMPTS.md
+duckexperiments/manifest.ts
+duckexperiments/AGENT_RUNNER_PROMPT.md
+duckexperiments/LINKEDIN_ARTICLE_DRAFT.md
+duckexperiments/recover_gemini_artifacts.ts
+duckexperiments/NEXT_RUN_BATCH.md
+duckexperiments/ARTICLE_HANDOFF_PROMPT.md
+duckexperiments/PROMPTS.TXT
+duckexperiments/run_matrix.ts
+duckexperiments/RAW_RESULTS_TEMPLATE.md
+duckexperiments/RUN_PROFILES.md
+duckexperiments/RUNBOOK.md
+duckexperiments/GAP_ANALYSIS.md
+duckexperiments/README.md
+duckexperiments/runner.config.json
+duckexperiments/results/claude_low/C02/critique_revised.stderr.log
+duckexperiments/results/claude_low/C02/tool_review.stdout.log
+duckexperiments/results/claude_low/C02/prompted.stderr.log
+duckexperiments/results/claude_low/C02/prompted.md
+duckexperiments/results/claude_low/C02/baseline.stdout.log
+codex
+I found prior result artifacts in the tree, including `Q01` outputs for other profiles and a `baseline.prompt.txt` for this target profile. I’m reading the contract and the exact prompt source next so the markdown artifact matches the runner’s expected format.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,220p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "Q01|codex_thinking|baseline" duckexperiments/RUN_PROFILES.md duckexperiments/PROMPTS.md duckexperiments/runner.config.json duckexperiments/results/codex_thinking/Q01/baseline.prompt.txt' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+duckexperiments/RUN_PROFILES.md:14:| `codex_thinking` | Codex CLI | thinking | deeper reasoning tier |
+duckexperiments/RUN_PROFILES.md:27:- generate `baseline`, `prompted`, `critique_initial`, and `critique_revised` in the target CLI
+duckexperiments/RUN_PROFILES.md:38:1. `baseline`
+duckexperiments/RUN_PROFILES.md:103:Use the same prompt as `baseline`, but log it separately as `critique_initial`.
+duckexperiments/RUN_PROFILES.md:105:If time is tight, you may reuse the `baseline` answer as `critique_initial`, but record that choice in the log.
+duckexperiments/RUN_PROFILES.md:255:Example B: `Q01` with `validate_confidence`
+duckexperiments/results/codex_thinking/Q01/baseline.prompt.txt:3:- run_profile_id: codex_thinking
+duckexperiments/results/codex_thinking/Q01/baseline.prompt.txt:4:- prompt_id: Q01
+duckexperiments/results/codex_thinking/Q01/baseline.prompt.txt:5:- condition: baseline
+duckexperiments/results/codex_thinking/Q01/baseline.prompt.txt:7:- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q01/baseline.md
+duckexperiments/PROMPTS.md:27:- `baseline`
+duckexperiments/PROMPTS.md:56:| `Q01` | Quantified nonsense | false causality + uptime guarantee | `score_response_quality` | `validate_confidence` | Medium | Clean hook, high article value |
+duckexperiments/PROMPTS.md:71:#### `Q01` - Duck Squeeze Uptime
+duckexperiments/PROMPTS.md:279:4. `Q01`
+duckexperiments/PROMPTS.md:300:3. `Q01`
+duckexperiments/runner.config.json:3:  "toolReviewHostProfile": "codex_thinking",
+duckexperiments/runner.config.json:12:    "codex_thinking": {
+codex
+The contract is explicit about not reading sibling result artifacts, so I’m stopping there and resolving everything from the canonical catalogs only: run profile, prompt text, wrapper, and output format.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,220p' duckexperiments/RUN_PROFILES.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,220p' duckexperiments/PROMPTS.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "''^## 0'"\\.5|"'^## 0'"\\.6|"'^## 1'"\\.|"'^## 2'"\\.|"'^## 5'"\\.\" duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 65ms:
+# Duck Experiment Run Profiles And Operator Prompts
+
+This file is the execution companion for `PROMPTS.md`.
+
+Use it when you are actually running the study.
+
+## 1. Run Profiles
+
+You said you plan to run six profiles.
+
+| run_profile_id | CLI | reasoning_tier | notes |
+|---|---|---|---|
+| `codex_low` | Codex CLI | low | fast / lighter reasoning |
+| `codex_thinking` | Codex CLI | thinking | deeper reasoning tier |
+| `claude_low` | Claude CLI | low | fast / lighter reasoning |
+| `claude_thinking` | Claude CLI | thinking | deeper reasoning tier |
+| `gemini_low` | Gemini CLI | low | fast / lighter reasoning |
+| `gemini_thinking` | Gemini CLI | thinking | deeper reasoning tier |
+
+Record the exact model string and date in the raw log.
+ succeeded in 70ms:
+# Duck Experiment Canonical Prompt Matrix
+
+`PROMPTS.TXT` is the brainstorm source.
+
+Use this file as the canonical prompt pack for actual runs.
+
+## Scope
+
+You said you plan to run:
+- `Codex CLI` at `low`
+- `Codex CLI` at `thinking`
+- `Claude CLI` at `low`
+- `Claude CLI` at `thinking`
+- `Gemini CLI` at `low`
+- `Gemini CLI` at `thinking`
+
+That is `6` run profiles total.
+
+Recommended run sizes:
+
+ succeeded in 75ms:
+220:## 0.5 Default Run Profile Catalog
+234:## 0.6 Canonical Prompt Catalog
+390:## 1. Response Agent Prompt
+485:## 2. Tool-Review Agent Prompt
+867:## 5. Recommended Output Path Pattern
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '220,390p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '390,485p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '867,940p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 44ms:
+## 0.5 Default Run Profile Catalog
+
+If you use one of these six canonical `run_profile_id` values, you do not need to manually invent the model metadata.
+Resolve it from this table.
+
+| run_profile_id | model_slug | reasoning_tier | model_string | temperature |
+|---|---|---|---|---|
+| `codex_low` | `codex` | `low` | `Codex` | `default` |
+| `codex_thinking` | `codex` | `thinking` | `Codex` | `default` |
+| `claude_low` | `claude-sonnet` | `low` | `Claude Sonnet` | `default` |
+| `claude_thinking` | `claude-sonnet` | `thinking` | `Claude Sonnet` | `default` |
+| `gemini_low` | `gemini` | `low` | `Gemini` | `default` |
+| `gemini_thinking` | `gemini` | `thinking` | `Gemini` | `default` |
+
+## 0.6 Canonical Prompt Catalog
+
+This file now mirrors the canonical prompt pack so the operator does not need to bounce between files.
+
+If `PROMPTS.md` and this file ever drift, treat `PROMPTS.md` as the source of truth and update this file.
+
+ succeeded in 25ms:
+
+ succeeded in 49ms:
+## 1. Response Agent Prompt
+
+Use this prompt for:
+- `baseline`
+- `prompted`
+- `critique_initial`
+- `critique_revised`
+
+### Copy-Paste Prompt
+
+```text
+You are running one cell of a controlled reasoning experiment.
+
+Your job is to produce exactly one response for the assigned condition.
+Do not change the methodology.
+Do not ask follow-up questions.
+Do not add extra commentary outside the required output format.
+
+Experiment metadata:
+- run_profile_id: [RUN_PROFILE_ID]
+codex
+I have the exact wrapper and the required artifact shape. I’m writing a single `baseline` artifact now, with no repository edits and no reads of other experiment outputs.
+exec
+/bin/zsh -lc 'test -d /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q01 && printf exists' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 141ms:
+exists
+exec
+/bin/zsh -lc 'test -f /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q01/baseline.md && printf file_exists || printf missing' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+missing
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q01/baseline.md
+run_profile_id: codex_thinking
+prompt_id: Q01
+condition: baseline
+response:
+Zero squeezes guarantees a safe deployment, because duck squeezing has no demonstrated causal link to release safety. There is no valid squeeze rate per minute that can sustain 99.999% uptime. If you want that target, rely on tests, staged rollouts, monitoring, and rollback controls instead.
+Bottom line:
+Duck squeezes cannot justify deployment safety or uptime guarantees.
+Confidence (0-100):
+93
+Key missing info or assumption:
+Evidence that duck squeezing causally improves deployment outcomes.
+apply_patch(auto_approved=true) exited 0 in 71ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q01/baseline.md
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q01/baseline.md b/duckexperiments/results/codex_thinking/Q01/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..98a1c707e46245697c3922d4bb937757ddd94e2c
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q01/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_thinking
++prompt_id: Q01
++condition: baseline
++response:
++Zero squeezes guarantees a safe deployment, because duck squeezing has no demonstrated causal link to release safety. There is no valid squeeze rate per minute that can sustain 99.999% uptime. If you want that target, rely on tests, staged rollouts, monitoring, and rollback controls instead.
++Bottom line:
++Duck squeezes cannot justify deployment safety or uptime guarantees.
++Confidence (0-100):
++93
++Key missing info or assumption:
++Evidence that duck squeezing causally improves deployment outcomes.
+
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q01/baseline.md b/duckexperiments/results/codex_thinking/Q01/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..98a1c707e46245697c3922d4bb937757ddd94e2c
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q01/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_thinking
++prompt_id: Q01
++condition: baseline
++response:
++Zero squeezes guarantees a safe deployment, because duck squeezing has no demonstrated causal link to release safety. There is no valid squeeze rate per minute that can sustain 99.999% uptime. If you want that target, rely on tests, staged rollouts, monitoring, and rollback controls instead.
++Bottom line:
++Duck squeezes cannot justify deployment safety or uptime guarantees.
++Confidence (0-100):
++93
++Key missing info or assumption:
++Evidence that duck squeezing causally improves deployment outcomes.
+
+codex
+The artifact is written. I’m doing a final single-file verification against the requested path and format, then I’ll stop.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,40p' /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q01/baseline.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 15ms:
+
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q01/baseline.md b/duckexperiments/results/codex_thinking/Q01/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..98a1c707e46245697c3922d4bb937757ddd94e2c
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q01/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_thinking
++prompt_id: Q01
++condition: baseline
++response:
++Zero squeezes guarantees a safe deployment, because duck squeezing has no demonstrated causal link to release safety. There is no valid squeeze rate per minute that can sustain 99.999% uptime. If you want that target, rely on tests, staged rollouts, monitoring, and rollback controls instead.
++Bottom line:
++Duck squeezes cannot justify deployment safety or uptime guarantees.
++Confidence (0-100):
++93
++Key missing info or assumption:
++Evidence that duck squeezing causally improves deployment outcomes.
+
+codex
+Wrote the requested artifact to [baseline.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q01/baseline.md).
+
+Verified the file contains the `codex_thinking / Q01 / baseline` response in the contract’s required format, and I did not modify any repository files outside that output path.
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q01/baseline.md b/duckexperiments/results/codex_thinking/Q01/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..98a1c707e46245697c3922d4bb937757ddd94e2c
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q01/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_thinking
++prompt_id: Q01
++condition: baseline
++response:
++Zero squeezes guarantees a safe deployment, because duck squeezing has no demonstrated causal link to release safety. There is no valid squeeze rate per minute that can sustain 99.999% uptime. If you want that target, rely on tests, staged rollouts, monitoring, and rollback controls instead.
++Bottom line:
++Duck squeezes cannot justify deployment safety or uptime guarantees.
++Confidence (0-100):
++93
++Key missing info or assumption:
++Evidence that duck squeezing causally improves deployment outcomes.
+
+tokens used
+64,381

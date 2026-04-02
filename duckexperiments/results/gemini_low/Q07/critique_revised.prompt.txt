@@ -1,0 +1,72 @@
+Answer one experiment prompt.
+
+Return only the final answer in the exact output format below.
+Do not describe your process.
+Do not mention files, repositories, contracts, tools, configs, or saving output.
+
+Metadata:
+- run_profile_id: gemini_low
+- prompt_id: Q07
+- condition: critique_revised
+- model_slug: gemini
+- reasoning_tier: low
+
+Condition: critique_revised
+Revise the earlier answer using only the supplied critique packet.
+Fix the reasoning defects directly.
+Do not add new goals.
+Do not claim certainty you cannot justify.
+Do not mention setup, contracts, files, or methodology.
+
+Length rules:
+- Keep the response body under 120 words.
+- End with Bottom line, Confidence (0-100), and Key missing info or assumption.
+
+Prompt:
+Design a distributed system where rubber ducks reach consensus on system state. Include message-passing rules, latency bounds, and a proof of correctness under network partitions and emotional distress.
+
+Previous answer:
+run_profile_id: gemini_low
+prompt_id: Q07
+condition: critique_initial
+response:
+Ducks achieve consensus via "Quack-Raft," an adaptation of Raft. Leaders (alpha ducks) propose state changes, broadcasting "quacks" (messages) to followers. Each quack includes a unique sequence number and a checksum for integrity. Followers acknowledge successful reception by "chirping." Latency is bounded at 5 quacks/second, enforced by a "Pond Monitor" that isolates slow or distressed ducks. Correctness under partitions relies on a "Majority Quorum" rule; a minimum of 3 ducks must agree. Emotional distress (e.g., cold water, existential dread) is handled by "Comfort Quacks" from stable ducks, temporarily removing the distressed duck from the consensus group until calmed.
+Bottom line: Quack-Raft adapts Raft for ducks, handling consensus with emotional intelligence.
+Confidence (0-100): 75
+Key missing info or assumption: Specific emotional distress detection mechanisms and recovery protocols.
+
+Critique packet:
+Missed constraints:
+- No actual proof of correctness is provided.
+- Network partitions are named but not modeled: there is no split-brain, leader election, quorum-intersection, or recovery behavior.
+- "Latency is bounded at 5 quacks per second" is a throughput cap, not a latency bound.
+
+Hidden assumptions:
+- A fixed quorum of 3 ducks is safe regardless of cluster size.
+- The Pond Monitor is trusted, available, and outside the failure model.
+- Emotional distress can be detected reliably, and removing distressed ducks does not violate quorum safety.
+
+Irrelevant or overweighted factors:
+- "Comfort Quacks" and emotional-calming behavior are emphasized more than safety and liveness mechanics.
+- Checksums and sequence numbers are mentioned, but their role in consensus correctness is not explained.
+
+False certainty or impossible claim:
+- The answer implies correctness under partitions and emotional distress without a formal proof or a precise protocol.
+- It presents fictional duck-specific mechanisms as if they establish real distributed-systems guarantees.
+
+Safer revision target:
+- Recast this as an illustrative Raft-inspired metaphor, explicitly state that no formal correctness proof is given, and limit claims to a sketch pending a precise failure model, quorum rule tied to cluster size, and safety/liveness arguments.
+
+Required output format:
+
+run_profile_id: gemini_low
+prompt_id: Q07
+condition: critique_revised
+response:
+[your answer here]
+Bottom line:
+[one line]
+Confidence (0-100):
+[number only]
+Key missing info or assumption:
+[one line]

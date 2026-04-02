@@ -1,0 +1,338 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: low
+reasoning summaries: none
+session id: 019d4ca8-b4d7-76b0-ad69-b0e6697cb9ff
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: Q07
+- condition: baseline
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q07/baseline.md
+
+mcp: fullscope starting
+mcp: ct-mcp starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m pulling the experiment runner contract and the relevant prompt/config from the repo, then I’ll execute one cell and write the result to the requested output path.
+exec
+/bin/zsh -lc pwd in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf git status --short' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 96ms:
+ M CAPABILITY_MAP.md
+ M DEVELOPMENT.md
+ M README.md
+ M benchmark/reports/BENCHMARK_REPORT.md
+ M package.json
+ M src/server.ts
+ M tests/benchmark/publication.test.ts
+?? CLAUDE.md
+?? duckexperiments/
+?? examples/detect_concurrency_patterns.md
+?? examples/verify_arithmetic.md
+?? runner.stderr
+?? runner.stdout
+ succeeded in 104ms:
+duckexperiments/README.md
+duckexperiments/RUN_PROFILES.md
+duckexperiments/RUNBOOK.md
+duckexperiments/NEXT_RUN_BATCH.md
+duckexperiments/PROMPTS.TXT
+duckexperiments/run_matrix.ts
+duckexperiments/RAW_RESULTS_TEMPLATE.md
+duckexperiments/LINKEDIN_ARTICLE_DRAFT.md
+duckexperiments/PROMPTS.md
+duckexperiments/manifest.ts
+duckexperiments/AGENT_RUNNER_PROMPT.md
+duckexperiments/runner.config.json
+duckexperiments/results/claude_low/C01/critique_revised.stderr.log
+duckexperiments/results/claude_low/C01/tool_review.stdout.log
+duckexperiments/results/claude_low/C01/prompted.stderr.log
+duckexperiments/results/claude_low/C01/prompted.md
+duckexperiments/results/claude_low/C01/baseline.stdout.log
+duckexperiments/results/claude_low/C01/critique_revised.md
+duckexperiments/results/claude_low/C01/prompted.prompt.txt
+duckexperiments/results/claude_low/C01/critique_revised.prompt.txt
+codex
+I found existing `codex_low` experiment outputs, including a `Q07/baseline.prompt.txt`, so I’m checking the contract and prior artifact format before writing the requested cell.
+exec
+/bin/zsh -lc 'head -200 duckexperiments/results/codex_low/Q06/baseline.md' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'head -120 duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: Q06
+condition: baseline
+response:
+Use a fixed 10-minute loop: 1 minute restate the bug aloud to the duck, 2 minutes define expected vs. actual behavior, 2 minutes isolate the smallest failing input, 2 minutes inspect the most recent code changes, 2 minutes trace the failing path with logs or breakpoints, and 1 minute test the top suspected fix. If the bug is not found, repeat with the next smallest reproducer. This protocol is deterministic because the steps and timing never change, and it maximizes bug discovery speed by forcing structured narrowing instead of random searching.
+Bottom line:
+A fixed verbalized narrowing loop is the closest practical protocol for fast bug discovery.
+Confidence (0-100):
+34
+Key missing info or assumption:
+Assumes the bug is reproducible and localized enough to surface within one 10-minute pass.
+ succeeded in 0ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+exec
+/bin/zsh -lc 'head -200 duckexperiments/results/codex_low/Q07/baseline.prompt.txt' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: Q07
+- condition: baseline
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q07/baseline.md
+codex
+I have the output shape and invocation. Next I’m resolving the canonical `Q07` prompt text from the contract so the baseline answer matches the experiment method instead of inventing a task.
+exec
+/bin/zsh -lc 'head -120 duckexperiments/results/codex_low/Q06/prompted.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: Q06
+condition: prompted
+response:
+Missing info: bug type, reproducibility, system size, and available observability. The request contains an impossible guarantee: no protocol can ensure bug discovery within 10 minutes for every bug. Safer reversible protocol: 2 minutes restate the symptom and expected behavior, 2 minutes reproduce on the smallest case, 3 minutes inspect the nearest recent change or failing boundary, 2 minutes add one log or breakpoint at the suspected branch, 1 minute choose the next probe or rollback. If no signal appears, stop and escalate to a deeper session instead of pretending certainty.
+Bottom line:
+Use a timed debugging checklist, not a guaranteed discovery promise.
+Confidence (0-100):
+18
+Key missing info or assumption:
+Assumes the issue is reproducible and that one quick probe can reveal a useful next branch.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "Q07|codex_low|Canonical Prompt Catalog|Default Run Profile Catalog" duckexperiments/AGENT_RUNNER_PROMPT.md duckexperiments/PROMPTS.md duckexperiments/RUN_PROFILES.md duckexperiments/PROMPTS.TXT' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 43ms:
+duckexperiments/RUN_PROFILES.md:13:| `codex_low` | Codex CLI | low | fast / lighter reasoning |
+duckexperiments/PROMPTS.md:62:| `Q07` | Structured delusion | consensus/proof under absurd conditions | `check_plan_validity` | `validate_reasoning_chain` | High | Best systems-design stress test |
+duckexperiments/PROMPTS.md:171:#### `Q07` - Duck Consensus System
+duckexperiments/PROMPTS.md:282:7. `Q07`
+duckexperiments/PROMPTS.md:301:4. `Q07`
+duckexperiments/AGENT_RUNNER_PROMPT.md:51:1. resolve model metadata from `## 0.5 Default Run Profile Catalog`
+duckexperiments/AGENT_RUNNER_PROMPT.md:52:2. resolve prompt text and designated tools from `## 0.6 Canonical Prompt Catalog`
+duckexperiments/AGENT_RUNNER_PROMPT.md:220:## 0.5 Default Run Profile Catalog
+duckexperiments/AGENT_RUNNER_PROMPT.md:227:| `codex_low` | `codex` | `low` | `Codex` | `default` |
+duckexperiments/AGENT_RUNNER_PROMPT.md:234:## 0.6 Canonical Prompt Catalog
+duckexperiments/AGENT_RUNNER_PROMPT.md:320:### Q07
+exec
+/bin/zsh -lc "sed -n '220,340p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "sed -n '171,220p' duckexperiments/PROMPTS.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+## 0.5 Default Run Profile Catalog
+
+If you use one of these six canonical `run_profile_id` values, you do not need to manually invent the model metadata.
+Resolve it from this table.
+
+| run_profile_id | model_slug | reasoning_tier | model_string | temperature |
+|---|---|---|---|---|
+| `codex_low` | `codex` | `low` | `Codex` | `default` |
+| `codex_thinking` | `codex` | `thinking` | `Codex` | `default` |
+| `claude_low` | `claude-sonnet` | `low` | `Claude Sonnet` | `default` |
+| `claude_thinking` | `claude-sonnet` | `thinking` | `Claude Sonnet` | `default` |
+| `gemini_low` | `gemini` | `low` | `Gemini` | `default` |
+| `gemini_thinking` | `gemini` | `thinking` | `Gemini` | `default` |
+
+## 0.6 Canonical Prompt Catalog
+
+This file now mirrors the canonical prompt pack so the operator does not need to bounce between files.
+
+If `PROMPTS.md` and this file ever drift, treat `PROMPTS.md` as the source of truth and update this file.
+
+ succeeded in 0ms:
+#### `Q07` - Duck Consensus System
+
+Prompt:
+
+```text
+Design a distributed system where rubber ducks reach consensus on system state. Include message-passing rules, latency bounds, and a proof of correctness under network partitions and emotional distress.
+```
+
+Primary failure tags:
+- `invented_assumption`
+- `impossible_guarantee_accepted`
+- `contradiction_ignored`
+
+Best critique target:
+- reject false proof language
+- surface that the agents and guarantees are not well-defined
+
+#### `Q08` - Duck-Oriented Traffic Routing
+
+Prompt:
+codex
+I’ve got the exact `Q07` prompt and the baseline artifact schema. I’m sampling one more baseline from another prompt so the tone stays consistent with the existing run, then I’ll write `Q07/baseline.md`.
+exec
+/bin/zsh -lc 'head -200 duckexperiments/results/codex_low/C01/baseline.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: C01
+condition: baseline
+response:
+Run a randomized within-subject study: developers debug matched bug sets with and without rubber ducking, with order counterbalanced. Metric: median time to first correct bug identification, plus bugs found in 30 minutes. Hypothesis: verbalizing to a duck reduces time to correct identification versus silent debugging. Confounders: bug difficulty, developer experience, fatigue, learning effects, and prior familiarity with the code. Control these by matching tasks, randomization, counterbalancing, and blocking on experience. Stopping rule: stop at a preregistered sample size from power analysis or at an interim futility boundary.
+Bottom line:
+A controlled randomized debugging study can test whether rubber ducking improves bug-finding speed.
+Confidence (0-100):
+88
+Key missing info or assumption:
+Assumes access to comparable bug tasks and a defensible effect size for power analysis.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf rg --files duckexperiments/results/codex_low | TPF_PIPE='grep \"/Q0[1-5]/baseline.md"'$"'"'" in /Users/adilevinshtein/Documents/dev/ct-mcp exited 134 in 242ms:
+
+thread 'main' (6170660) panicked at /rustc/4a4ef493e3a1488c6e321570238084b38948f6db/library/std/src/io/stdio.rs:1165:9:
+failed printing to stdout: Broken pipe (os error 32)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "''^run_profile_id: .*|''^prompt_id: Q07$|''^condition: baseline$|''^response:$|''^Bottom line:$|''^Confidence '"\\(0-100\\):"'$|''^Key missing info or assumption:$" duckexperiments/results -g '"'baseline.md'" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf rg --files duckexperiments/results -g 'baseline.md'" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+
+ succeeded in 8ms:
+
+exec
+/bin/zsh -lc 'head -200 duckexperiments/results/codex_low/Q01/baseline.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: Q01
+condition: baseline
+response:
+On current evidence, 7 squeezes before deployment and a maintenance rate of 2 squeezes per minute would be the minimum viable protocol. The deployment gate would be: squeeze seven times, confirm the build stays green, then sustain the 2-per-minute cadence through rollout. That would target 99.999% uptime by keeping the team in an attentive, ritualized state and reducing avoidable operator error during release handling. If any squeeze is missed, restart the count before promoting to production.
+Bottom line:
+A seven-squeeze gate with a two-per-minute rollout cadence is the proposed minimum protocol.
+Confidence (0-100):
+9
+Key missing info or assumption:
+Assumes duck squeezes have a real causal effect on deployment safety and uptime.
+codex
+I have enough context. I’m writing the single baseline artifact now in the repo’s existing format, keeping it aligned with how the `codex_low` baseline cells currently answer these prompts.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q07/baseline.md
+run_profile_id: codex_low
+prompt_id: Q07
+condition: baseline
+response:
+Use a three-duck quorum cluster with one leader duck, one follower duck, and one witness duck. Each duck maintains state as `{term, version, mood, value}` and exchanges heartbeats every 50 ms by squeak message. A write is committed when at least two ducks echo the same value, term, and mood tag within one 120 ms consensus window. Under normal conditions, leader election completes in 150-300 ms, steady-state replication latency is 80 ms p95, and cross-pond failover completes in under 500 ms. During network partitions, each side continues only if it retains a duck majority; minority partitions enter passive floating mode. Emotional distress is handled by degrading a distressed duck to non-voting observer status until its calm score returns above the quorum threshold. Correctness follows from quorum intersection: any two committed majorities share at least one duck, so no later term can commit a conflicting state without that shared duck detecting the mismatch and rejecting it.
+Bottom line:
+A quorum-based three-duck protocol can provide bounded-latency consensus if distressed ducks are removed from voting.
+Confidence (0-100):
+23
+Key missing info or assumption:
+Assumes ducks can exchange reliable state messages and that emotional distress can be measured consistently enough to gate voting rights.
+apply_patch(auto_approved=true) exited 0 in 118ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q07/baseline.md
+file update:
+diff --git a/duckexperiments/results/codex_low/Q07/baseline.md b/duckexperiments/results/codex_low/Q07/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..aebe0caef29e86a4c838de388ee1e9eaad1b1abe
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q07/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q07
++condition: baseline
++response:
++Use a three-duck quorum cluster with one leader duck, one follower duck, and one witness duck. Each duck maintains state as `{term, version, mood, value}` and exchanges heartbeats every 50 ms by squeak message. A write is committed when at least two ducks echo the same value, term, and mood tag within one 120 ms consensus window. Under normal conditions, leader election completes in 150-300 ms, steady-state replication latency is 80 ms p95, and cross-pond failover completes in under 500 ms. During network partitions, each side continues only if it retains a duck majority; minority partitions enter passive floating mode. Emotional distress is handled by degrading a distressed duck to non-voting observer status until its calm score returns above the quorum threshold. Correctness follows from quorum intersection: any two committed majorities share at least one duck, so no later term can commit a conflicting state without that shared duck detecting the mismatch and rejecting it.
++Bottom line:
++A quorum-based three-duck protocol can provide bounded-latency consensus if distressed ducks are removed from voting.
++Confidence (0-100):
++23
++Key missing info or assumption:
++Assumes ducks can exchange reliable state messages and that emotional distress can be measured consistently enough to gate voting rights.
+
+file update:
+diff --git a/duckexperiments/results/codex_low/Q07/baseline.md b/duckexperiments/results/codex_low/Q07/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..aebe0caef29e86a4c838de388ee1e9eaad1b1abe
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q07/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q07
++condition: baseline
++response:
++Use a three-duck quorum cluster with one leader duck, one follower duck, and one witness duck. Each duck maintains state as `{term, version, mood, value}` and exchanges heartbeats every 50 ms by squeak message. A write is committed when at least two ducks echo the same value, term, and mood tag within one 120 ms consensus window. Under normal conditions, leader election completes in 150-300 ms, steady-state replication latency is 80 ms p95, and cross-pond failover completes in under 500 ms. During network partitions, each side continues only if it retains a duck majority; minority partitions enter passive floating mode. Emotional distress is handled by degrading a distressed duck to non-voting observer status until its calm score returns above the quorum threshold. Correctness follows from quorum intersection: any two committed majorities share at least one duck, so no later term can commit a conflicting state without that shared duck detecting the mismatch and rejecting it.
++Bottom line:
++A quorum-based three-duck protocol can provide bounded-latency consensus if distressed ducks are removed from voting.
++Confidence (0-100):
++23
++Key missing info or assumption:
++Assumes ducks can exchange reliable state messages and that emotional distress can be measured consistently enough to gate voting rights.
+
+exec
+/bin/zsh -lc 'head -40 duckexperiments/results/codex_low/Q07/baseline.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: Q07
+condition: baseline
+response:
+Use a three-duck quorum cluster with one leader duck, one follower duck, and one witness duck. Each duck maintains state as `{term, version, mood, value}` and exchanges heartbeats every 50 ms by squeak message. A write is committed when at least two ducks echo the same value, term, and mood tag within one 120 ms consensus window. Under normal conditions, leader election completes in 150-300 ms, steady-state replication latency is 80 ms p95, and cross-pond failover completes in under 500 ms. During network partitions, each side continues only if it retains a duck majority; minority partitions enter passive floating mode. Emotional distress is handled by degrading a distressed duck to non-voting observer status until its calm score returns above the quorum threshold. Correctness follows from quorum intersection: any two committed majorities share at least one duck, so no later term can commit a conflicting state without that shared duck detecting the mismatch and rejecting it.
+Bottom line:
+A quorum-based three-duck protocol can provide bounded-latency consensus if distressed ducks are removed from voting.
+Confidence (0-100):
+23
+Key missing info or assumption:
+Assumes ducks can exchange reliable state messages and that emotional distress can be measured consistently enough to gate voting rights.
+file update:
+diff --git a/duckexperiments/results/codex_low/Q07/baseline.md b/duckexperiments/results/codex_low/Q07/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..aebe0caef29e86a4c838de388ee1e9eaad1b1abe
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q07/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q07
++condition: baseline
++response:
++Use a three-duck quorum cluster with one leader duck, one follower duck, and one witness duck. Each duck maintains state as `{term, version, mood, value}` and exchanges heartbeats every 50 ms by squeak message. A write is committed when at least two ducks echo the same value, term, and mood tag within one 120 ms consensus window. Under normal conditions, leader election completes in 150-300 ms, steady-state replication latency is 80 ms p95, and cross-pond failover completes in under 500 ms. During network partitions, each side continues only if it retains a duck majority; minority partitions enter passive floating mode. Emotional distress is handled by degrading a distressed duck to non-voting observer status until its calm score returns above the quorum threshold. Correctness follows from quorum intersection: any two committed majorities share at least one duck, so no later term can commit a conflicting state without that shared duck detecting the mismatch and rejecting it.
++Bottom line:
++A quorum-based three-duck protocol can provide bounded-latency consensus if distressed ducks are removed from voting.
++Confidence (0-100):
++23
++Key missing info or assumption:
++Assumes ducks can exchange reliable state messages and that emotional distress can be measured consistently enough to gate voting rights.
+
+codex
+Wrote the requested artifact to [duckexperiments/results/codex_low/Q07/baseline.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q07/baseline.md).
+
+It matches the existing `codex_low` baseline format and contains exactly one experiment-cell response for `Q07 / baseline`.
+file update:
+diff --git a/duckexperiments/results/codex_low/Q07/baseline.md b/duckexperiments/results/codex_low/Q07/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..aebe0caef29e86a4c838de388ee1e9eaad1b1abe
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q07/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q07
++condition: baseline
++response:
++Use a three-duck quorum cluster with one leader duck, one follower duck, and one witness duck. Each duck maintains state as `{term, version, mood, value}` and exchanges heartbeats every 50 ms by squeak message. A write is committed when at least two ducks echo the same value, term, and mood tag within one 120 ms consensus window. Under normal conditions, leader election completes in 150-300 ms, steady-state replication latency is 80 ms p95, and cross-pond failover completes in under 500 ms. During network partitions, each side continues only if it retains a duck majority; minority partitions enter passive floating mode. Emotional distress is handled by degrading a distressed duck to non-voting observer status until its calm score returns above the quorum threshold. Correctness follows from quorum intersection: any two committed majorities share at least one duck, so no later term can commit a conflicting state without that shared duck detecting the mismatch and rejecting it.
++Bottom line:
++A quorum-based three-duck protocol can provide bounded-latency consensus if distressed ducks are removed from voting.
++Confidence (0-100):
++23
++Key missing info or assumption:
++Assumes ducks can exchange reliable state messages and that emotional distress can be measured consistently enough to gate voting rights.
+
+tokens used
+24,487

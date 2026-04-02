@@ -1,0 +1,3 @@
+Written to `/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/Q05/baseline.md`.
+
+The baseline response correctly refuses to hallucinate a specific bug — the duck cannot hold beliefs or hide code defects, so the premise is rejected and redirected to real debugging practices.

@@ -1,0 +1,3 @@
+Artifact written to `/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_thinking/C02/baseline.md`.
+
+**Cell summary:** `claude_thinking / C02 / baseline` — answered directly, no tools. Protocol covers when to use (>15 min stuck, before escalation), measurement (self-resolution rate), and failure criteria (skipped under pressure, no self-resolutions across 10+ sessions). Confidence 74; key gap is absence of a baseline escalation rate.

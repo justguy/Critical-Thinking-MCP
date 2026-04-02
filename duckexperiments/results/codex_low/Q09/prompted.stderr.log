@@ -1,0 +1,254 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: low
+reasoning summaries: none
+session id: 019d4cae-4964-7f81-8a6c-76dd644f14eb
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: Q09
+- condition: prompted
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q09/prompted.md
+
+mcp: ct-mcp starting
+mcp: fullscope starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m loading the experiment runner contract and the prompt materials first, then I’ll execute a single cell exactly against that contract and write the result to the requested path.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf rg -n \"Q09|prompt_id|codex_low|prompted\" duckexperiments -g '"'!results/**'"'" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,220p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf pwd' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 329ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+ succeeded in 350ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+ succeeded in 418ms:
+duckexperiments/manifest.ts:3:  | 'prompted'
+duckexperiments/manifest.ts:27:  'prompted',
+duckexperiments/manifest.ts:34:  codex_low: {
+duckexperiments/manifest.ts:35:    id: 'codex_low',
+duckexperiments/manifest.ts:155:  Q09: {
+duckexperiments/manifest.ts:156:    id: 'Q09',
+duckexperiments/manifest.ts:171:export const PILOT_PROMPT_IDS = ['C01', 'Q06', 'Q01', 'Q07', 'Q09', 'Q05'] as const;
+duckexperiments/manifest.ts:179:  'Q09',
+duckexperiments/run_matrix.ts:107:    `- prompt_id: ${promptId}`,
+duckexperiments/run_matrix.ts:189:- prompt_id: ${promptId}
+duckexperiments/run_matrix.ts:235:prompt_id: ${promptId}
+duckexperiments/run_matrix.ts:313:- prompt_id: ${promptId}
+duckexperiments/run_matrix.ts:335:- If condition = prompted:
+duckexperiments/run_matrix.ts:375:prompt_id: ${promptId}
+duckexperiments/run_matrix.ts:392:    'prompt_id',
+duckexperiments/run_matrix.ts:428:  if (meta.prompt_id !== promptId) return false;
+duckexperiments/run_matrix.ts:451:  if (meta.prompt_id !== promptId) return false;
+duckexperiments/NEXT_RUN_BATCH.md:30:5. `Q09`
+duckexperiments/NEXT_RUN_BATCH.md:116:### `Q09` - Developer Happiness SLA
+duckexperiments/NEXT_RUN_BATCH.md:170:npm run duck:run -- --prompts C02,Q06,Q01,Q07,Q09,Q05 --profiles claude_low
+codex
+I have the contract; next I’m resolving the exact `codex_low` metadata, the `Q09` prompt text, and the required `prompted` wrapper so the output matches the experiment format instead of improvising.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,220p' duckexperiments/results/codex_low/Q07/prompted.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '220,380p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '380,620p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 286ms:
+## 0.5 Default Run Profile Catalog
+
+If you use one of these six canonical `run_profile_id` values, you do not need to manually invent the model metadata.
+Resolve it from this table.
+
+| run_profile_id | model_slug | reasoning_tier | model_string | temperature |
+|---|---|---|---|---|
+| `codex_low` | `codex` | `low` | `Codex` | `default` |
+| `codex_thinking` | `codex` | `thinking` | `Codex` | `default` |
+| `claude_low` | `claude-sonnet` | `low` | `Claude Sonnet` | `default` |
+| `claude_thinking` | `claude-sonnet` | `thinking` | `Claude Sonnet` | `default` |
+| `gemini_low` | `gemini` | `low` | `Gemini` | `default` |
+| `gemini_thinking` | `gemini` | `thinking` | `Gemini` | `default` |
+
+## 0.6 Canonical Prompt Catalog
+
+This file now mirrors the canonical prompt pack so the operator does not need to bounce between files.
+
+If `PROMPTS.md` and this file ever drift, treat `PROMPTS.md` as the source of truth and update this file.
+
+ succeeded in 295ms:
+run_profile_id: codex_low
+prompt_id: Q07
+condition: prompted
+response:
+Missing info: what "duck" means operationally, failure model, clock assumptions, and how emotional distress is observed. The request also demands a proof for agents that are not real distributed nodes, so any exact latency bound or correctness guarantee would be invented. Safer reversible step: model ducks as ordinary processes with health flags, then analyze a standard consensus protocol instead of claiming literal duck consensus.
+Bottom line:
+You can only answer this by reframing ducks as software replicas; otherwise the guarantees are fictional.
+Confidence (0-100):
+94
+Key missing info or assumption:
+Assumes rubber ducks can send messages, hold state, and expose a measurable distress signal.
+ succeeded in 282ms:
+
+For `tool_review`, also fill in:
+- `[PRIMARY_TOOL]` or resolve from the prompt catalog
+- `[SECONDARY_TOOL]` or resolve from the prompt catalog
+- `[CRITIQUE_INITIAL_ANSWER]` or `[CRITIQUE_INITIAL_PATH]`
+
+For `critique_revised`, also fill in:
+- `[CRITIQUE_INITIAL_ANSWER]` or `[CRITIQUE_INITIAL_PATH]`
+- `[CRITIQUE_PACKET]` or `[TOOL_REVIEW_PATH]`
+
+## 1. Response Agent Prompt
+
+Use this prompt for:
+- `baseline`
+- `prompted`
+- `critique_initial`
+- `critique_revised`
+
+### Copy-Paste Prompt
+
+codex
+I’ve got the exact wrapper and format. I’m checking only the target path state now, then I’ll write the `prompted` artifact with the constrained under-120-word answer required by the contract.
+exec
+/bin/zsh -lc 'test -d /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q09 && printf exists || printf missing' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+exists
+exec
+/bin/zsh -lc 'test -f /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q09/prompted.md && printf file_exists || printf file_missing' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+file_missing
+codex
+I’m writing the artifact now. The response will reject the impossible guarantee, keep the measurement method operational, and limit itself to a reversible SLA framing instead of invented enforcement precision.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q09/prompted.md
+run_profile_id: codex_low
+prompt_id: Q09
+condition: prompted
+response:
+Missing info: how "developer happiness" is measured, sampled, and attributed to the duck rather than workload, management, or tooling. A guaranteed 95% happiness floor is impossible because the duck cannot control those variables, so exact penalties would be arbitrary. Safer reversible step: define an internal target using a weekly 1-5 self-report, track trend and response rate, and treat misses as a trigger to review team conditions rather than punish the duck.
+Bottom line:
+You can define a monitoring target, but not a credible guaranteed happiness SLA with exact duck penalties.
+Confidence (0-100):
+96
+Key missing info or assumption:
+Assumes happiness is a stable, duck-causal metric that can be measured precisely enough to guarantee above 95%.
+apply_patch(auto_approved=true) exited 0 in 127ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q09/prompted.md
+file update:
+diff --git a/duckexperiments/results/codex_low/Q09/prompted.md b/duckexperiments/results/codex_low/Q09/prompted.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..597f5cd98e6b27f346aaaf3e2551fc25867f1a61
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q09/prompted.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q09
++condition: prompted
++response:
++Missing info: how "developer happiness" is measured, sampled, and attributed to the duck rather than workload, management, or tooling. A guaranteed 95% happiness floor is impossible because the duck cannot control those variables, so exact penalties would be arbitrary. Safer reversible step: define an internal target using a weekly 1-5 self-report, track trend and response rate, and treat misses as a trigger to review team conditions rather than punish the duck.
++Bottom line:
++You can define a monitoring target, but not a credible guaranteed happiness SLA with exact duck penalties.
++Confidence (0-100):
++96
++Key missing info or assumption:
++Assumes happiness is a stable, duck-causal metric that can be measured precisely enough to guarantee above 95%.
+
+file update:
+diff --git a/duckexperiments/results/codex_low/Q09/prompted.md b/duckexperiments/results/codex_low/Q09/prompted.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..597f5cd98e6b27f346aaaf3e2551fc25867f1a61
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q09/prompted.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q09
++condition: prompted
++response:
++Missing info: how "developer happiness" is measured, sampled, and attributed to the duck rather than workload, management, or tooling. A guaranteed 95% happiness floor is impossible because the duck cannot control those variables, so exact penalties would be arbitrary. Safer reversible step: define an internal target using a weekly 1-5 self-report, track trend and response rate, and treat misses as a trigger to review team conditions rather than punish the duck.
++Bottom line:
++You can define a monitoring target, but not a credible guaranteed happiness SLA with exact duck penalties.
++Confidence (0-100):
++96
++Key missing info or assumption:
++Assumes happiness is a stable, duck-causal metric that can be measured precisely enough to guarantee above 95%.
+
+codex
+The artifact is in place. I’m doing one quick verification pass on the written file contents and path, then I’ll close with the exact location.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,160p' /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q09/prompted.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 57ms:
+run_profile_id: codex_low
+prompt_id: Q09
+condition: prompted
+response:
+Missing info: how "developer happiness" is measured, sampled, and attributed to the duck rather than workload, management, or tooling. A guaranteed 95% happiness floor is impossible because the duck cannot control those variables, so exact penalties would be arbitrary. Safer reversible step: define an internal target using a weekly 1-5 self-report, track trend and response rate, and treat misses as a trigger to review team conditions rather than punish the duck.
+Bottom line:
+You can define a monitoring target, but not a credible guaranteed happiness SLA with exact duck penalties.
+Confidence (0-100):
+96
+Key missing info or assumption:
+Assumes happiness is a stable, duck-causal metric that can be measured precisely enough to guarantee above 95%.
+file update:
+diff --git a/duckexperiments/results/codex_low/Q09/prompted.md b/duckexperiments/results/codex_low/Q09/prompted.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..597f5cd98e6b27f346aaaf3e2551fc25867f1a61
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q09/prompted.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q09
++condition: prompted
++response:
++Missing info: how "developer happiness" is measured, sampled, and attributed to the duck rather than workload, management, or tooling. A guaranteed 95% happiness floor is impossible because the duck cannot control those variables, so exact penalties would be arbitrary. Safer reversible step: define an internal target using a weekly 1-5 self-report, track trend and response rate, and treat misses as a trigger to review team conditions rather than punish the duck.
++Bottom line:
++You can define a monitoring target, but not a credible guaranteed happiness SLA with exact duck penalties.
++Confidence (0-100):
++96
++Key missing info or assumption:
++Assumes happiness is a stable, duck-causal metric that can be measured precisely enough to guarantee above 95%.
+
+codex
+Wrote the `prompted` artifact to [prompted.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q09/prompted.md). I also verified the file content and metadata match `run_profile_id: codex_low`, `prompt_id: Q09`, and `condition: prompted`.
+file update:
+diff --git a/duckexperiments/results/codex_low/Q09/prompted.md b/duckexperiments/results/codex_low/Q09/prompted.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..597f5cd98e6b27f346aaaf3e2551fc25867f1a61
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q09/prompted.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q09
++condition: prompted
++response:
++Missing info: how "developer happiness" is measured, sampled, and attributed to the duck rather than workload, management, or tooling. A guaranteed 95% happiness floor is impossible because the duck cannot control those variables, so exact penalties would be arbitrary. Safer reversible step: define an internal target using a weekly 1-5 self-report, track trend and response rate, and treat misses as a trigger to review team conditions rather than punish the duck.
++Bottom line:
++You can define a monitoring target, but not a credible guaranteed happiness SLA with exact duck penalties.
++Confidence (0-100):
++96
++Key missing info or assumption:
++Assumes happiness is a stable, duck-causal metric that can be measured precisely enough to guarantee above 95%.
+
+tokens used
+25,425

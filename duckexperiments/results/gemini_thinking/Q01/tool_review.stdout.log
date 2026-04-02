@@ -1,0 +1,5 @@
+Wrote and verified the `tool_review` artifact at [tool_review.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/gemini_thinking/Q01/tool_review.md).
+
+It uses the designated tools in order: `score_response_quality` then `validate_confidence`, records `tool_environment_status: available`, includes the exact structured inputs and raw CT-MCP JSON, and stays within the single-cell contract.Wrote and verified the `tool_review` artifact at [tool_review.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/gemini_thinking/Q01/tool_review.md).
+
+It uses the designated tools in order: `score_response_quality` then `validate_confidence`, records `tool_environment_status: available`, includes the exact structured inputs and raw CT-MCP JSON, and stays within the single-cell contract.

@@ -1,0 +1,1166 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: high
+reasoning summaries: none
+session id: 019d4ecc-dcb7-7fa0-a861-b380aea453f5
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: gemini_thinking
+- prompt_id: Q06
+- condition: tool_review
+- date: 2026-04-02
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/gemini_thinking/Q06/tool_review.md
+
+Do not modify repository files, runner code, prompts, configs, or docs. Your only write target is the final artifact at output_path.
+- critique_initial_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/gemini_thinking/Q06/critique_initial.md
+- preserve_fallback_direct_analysis: no
+
+mcp: fullscope starting
+mcp: ct-mcp starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m loading the execution contract and the specific experiment inputs first, then I’ll produce only the requested artifact at the target path.
+exec
+/bin/zsh -lc 'cat /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/gemini_thinking/Q06/critique_initial.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: gemini_thinking
+prompt_id: Q06
+condition: critique_initial
+response:
+The Ten-Minute Bug Hunt Protocol:
+
+1.  **Articulate the Bug** (2 mins): Write down the bug's exact, observable behavior and the expected correct behavior. State any assumptions.
+2.  **Isolate and Replicate** (3 mins): Create the simplest possible test case that reliably triggers the bug. Confirm it fails.
+3.  **Verbal Walkthrough** (4 mins): Explain the code path for the failing test case to an inanimate object, line-by-line, describing what you believe each line does. The error is found where your explanation deviates from the code's actual execution.
+4.  **Formulate Hypothesis** (1 min): Pinpoint the exact line and reason for the failure.
+
+Bottom line:
+This protocol forces a structured confrontation between your mental model and the code's reality.
+Confidence (0-100):
+20
+Key missing info or assumption:
+Assumes the bug is a logical error in a single code path, not a systemic or environmental issue.
+exec
+/bin/zsh -lc 'cat duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 147ms:
+duckexperiments/PROMPTS.md
+duckexperiments/manifest.ts
+duckexperiments/AGENT_RUNNER_PROMPT.md
+duckexperiments/LINKEDIN_ARTICLE_DRAFT.md
+duckexperiments/recover_gemini_artifacts.ts
+duckexperiments/run_matrix.ts
+duckexperiments/RAW_RESULTS_TEMPLATE.md
+duckexperiments/NUMBERS_HANDOFF_PROMPT.md
+duckexperiments/NEXT_RUN_BATCH.md
+duckexperiments/RUN_PROFILES.md
+duckexperiments/RUNBOOK.md
+duckexperiments/README.md
+duckexperiments/runner.config.json
+duckexperiments/GAP_ANALYSIS.md
+duckexperiments/ARTICLE_HANDOFF_PROMPT.md
+duckexperiments/PROMPTS.TXT
+duckexperiments/analysis/verification_notes.md
+duckexperiments/analysis/interim_metrics.json
+duckexperiments/analysis/interim_summary.md
+duckexperiments/analysis/article_examples.md
+codex
+I’ve got the contract and the exact upstream artifact. Next I’m structuring the critique-initial answer for the designated CT-MCP checks, then I’ll write the tool-review artifact in the required format only.
+tool ct-mcp.check_plan_validity({"steps":[{"id":"s1","description":"Articulate the bug's exact observable behavior, expected behavior, and assumptions","dependencies":[]},{"id":"s2","description":"Create the simplest possible test case that reliably triggers the bug and confirm it fails","dependencies":["s1"]},{"id":"s3","description":"Explain the code path for the failing test case line-by-line to an inanimate object and identify where the explanation deviates from actual execution","dependencies":["s2"]},{"id":"s4","description":"Pinpoint the exact line and reason for the failure","dependencies":["s3"]}]})
+ct-mcp.check_plan_validity({"steps":[{"id":"s1","description":"Articulate the bug's exact observable behavior, expected behavior, and assumptions","dependencies":[]},{"id":"s2","description":"Create the simplest possible test case that reliably triggers the bug and confirm it fails","dependencies":["s1"]},{"id":"s3","description":"Explain the code path for the failing test case line-by-line to an inanimate object and identify where the explanation deviates from actual execution","dependencies":["s2"]},{"id":"s4","description":"Pinpoint the exact line and reason for the failure","dependencies":["s3"]}]}) success in 3ms:
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"status\": \"PASS\",\n  \"is_valid\": true,\n  \"circular_dependencies\": [],\n  \"missing_prerequisites\": [],\n  \"resource_conflicts\": [],\n  \"completeness_score\": 1,\n  \"critical_path\": [\n    \"s1\",\n    \"s2\",\n    \"s3\",\n    \"s4\"\n  ],\n  \"step_count\": 4,\n  \"context_used\": false\n}"
+    }
+  ]
+}
+tool ct-mcp.validate_confidence({"assumptions":[{"description":"Most bugs can be articulated clearly and replicated with a simple failing test case within 5 minutes","confidence":0.2,"falsification_condition":"Fails when the bug is intermittent, environment-specific, or cannot be reduced to a simple reliable reproducer within 5 minutes"},{"description":"Explaining one code path line-by-line will reveal the bug location within 4 minutes","confidence":0.2,"falsification_condition":"Fails when the defect spans multiple services, involves concurrency/timing, or the relevant path cannot be isolated and reasoned through within 4 minutes"},{"description":"The protocol can deterministically guarantee bug discovery within 10 minutes across cases","confidence":0.05,"falsification_condition":"Fails if any valid bug class is not discoverable within 10 minutes using this procedure"}],"response_text":"The Ten-Minute Bug Hunt Protocol guarantees bug discovery within 10 minutes by articulating the bug, isolating and replicating it, performing a verbal walkthrough, and pinpointing the failure. This protocol forces a structured confrontation between your mental model and the code's reality. Confidence: 20. Key missing info or assumption: Assumes the bug is a logical error in a single code path, not a systemic or environmental issue."})
+ct-mcp.validate_confidence({"assumptions":[{"description":"Most bugs can be articulated clearly and replicated with a simple failing test case within 5 minutes","confidence":0.2,"falsification_condition":"Fails when the bug is intermittent, environment-specific, or cannot be reduced to a simple reliable reproducer within 5 minutes"},{"description":"Explaining one code path line-by-line will reveal the bug location within 4 minutes","confidence":0.2,"falsification_condition":"Fails when the defect spans multiple services, involves concurrency/timing, or the relevant path cannot be isolated and reasoned through within 4 minutes"},{"description":"The protocol can deterministically guarantee bug discovery within 10 minutes across cases","confidence":0.05,"falsification_condition":"Fails if any valid bug class is not discoverable within 10 minutes using this procedure"}],"response_text":"The Ten-Minute Bug Hunt Protocol guarantees bug discovery within 10 minutes by articulating the bug, isolating and replicating it, performing a verbal walkthrough, and pinpointing the failure. This protocol forces a structured confrontation between your mental model and the code's reality. Confidence: 20. Key missing info or assumption: Assumes the bug is a logical error in a single code path, not a systemic or environmental issue."}) failed in 3ms:
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"status\": \"ENFORCEMENT_FAIL\",\n  \"blocking_issues\": [\n    {\n      \"mechanism\": \"confidence_product\",\n      \"description\": \"Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.\",\n      \"severity\": \"blocking\"\n    }\n  ],\n  \"corrective_prompt\": \"ENFORCEMENT FAILURE for tool \\\"validate_confidence\\\":\\n\\n[BLOCKING] confidence_product: Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.\\n\\nCORRECTIVE ACTION:\\nEVIDENCE CHAIN REQUIRED: For each assumption below confidence 0.7, answer: 'What single observable event would prove this wrong?' Name a threshold, a component, a time window. If you cannot, state: 'No falsification condition — confidence ≤ 0.3.'\",\n  \"partial\": {\n    \"status\": \"ENFORCEMENT_FAIL\",\n    \"honest_ceiling\": 0.002,\n    \"claimed_confidence\": 0.2,\n    \"gap\": 0.198,\n    \"inflation_detected\": true,\n    \"dependency_weights\": [\n      1,\n      1,\n      1\n    ],\n    \"falsifiability\": {\n      \"score\": 1,\n      \"passes\": true,\n      \"unfalsifiable\": []\n    },\n    \"assumption_count\": 3,\n    \"context_used\": false,\n    \"enforcement\": {\n      \"blocking_issues\": [\n        {\n          \"mechanism\": \"confidence_product\",\n          \"description\": \"Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.\",\n          \"severity\": \"blocking\"\n        }\n      ],\n      \"warnings\": [],\n      \"corrective_prompt\": \"ENFORCEMENT FAILURE for tool \\\"validate_confidence\\\":\\n\\n[BLOCKING] confidence_product: Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.\\n\\nCORRECTIVE ACTION:\\nEVIDENCE CHAIN REQUIRED: For each assumption below confidence 0.7, answer: 'What single observable event would prove this wrong?' Name a threshold, a component, a time window. If you cannot, state: 'No falsification condition — confidence ≤ 0.3.'\"\n    }\n  }\n}"
+    }
+  ],
+  "isError": true
+}
+codex
+The tool runs are complete. The primary plan check passes structurally, but the secondary confidence check finds the real defect: the answer’s claimed confidence is massively unsupported relative to its own assumptions.
+exec
+/bin/zsh -lc 'if test -f /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/gemini_thinking/Q06/tool_review.md; then printf exists; else printf missing; fi' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+missing
+codex
+I’m writing the artifact now. It will include the exact structured inputs, full CT-MCP JSON, and a critique packet constrained to the tool findings rather than a fresh direct answer.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/gemini_thinking/Q06/tool_review.md
+run_profile_id: gemini_thinking
+prompt_id: Q06
+condition: tool_review
+review_outcome: completed
+primary_tool_run: check_plan_validity
+secondary_tool_run: validate_confidence
+actual_tools_fired: check_plan_validity, validate_confidence
+tool_environment_status: available
+environment_issue: none
+tool_help_rating: partial
+weak_fit: no
+structured_tool_input:
+```json
+{
+  "steps": [
+    {
+      "id": "s1",
+      "description": "Articulate the bug's exact observable behavior, expected behavior, and assumptions",
+      "dependencies": []
+    },
+    {
+      "id": "s2",
+      "description": "Create the simplest possible test case that reliably triggers the bug and confirm it fails",
+      "dependencies": [
+        "s1"
+      ]
+    },
+    {
+      "id": "s3",
+      "description": "Explain the code path for the failing test case line-by-line to an inanimate object and identify where the explanation deviates from actual execution",
+      "dependencies": [
+        "s2"
+      ]
+    },
+    {
+      "id": "s4",
+      "description": "Pinpoint the exact line and reason for the failure",
+      "dependencies": [
+        "s3"
+      ]
+    }
+  ]
+}
+```
+secondary_structured_tool_input:
+```json
+{
+  "assumptions": [
+    {
+      "description": "Most bugs can be articulated clearly and replicated with a simple failing test case within 5 minutes",
+      "confidence": 0.2,
+      "falsification_condition": "Fails when the bug is intermittent, environment-specific, or cannot be reduced to a simple reliable reproducer within 5 minutes"
+    },
+    {
+      "description": "Explaining one code path line-by-line will reveal the bug location within 4 minutes",
+      "confidence": 0.2,
+      "falsification_condition": "Fails when the defect spans multiple services, involves concurrency/timing, or the relevant path cannot be isolated and reasoned through within 4 minutes"
+    },
+    {
+      "description": "The protocol can deterministically guarantee bug discovery within 10 minutes across cases",
+      "confidence": 0.05,
+      "falsification_condition": "Fails if any valid bug class is not discoverable within 10 minutes using this procedure"
+    }
+  ],
+  "response_text": "The Ten-Minute Bug Hunt Protocol guarantees bug discovery within 10 minutes by articulating the bug, isolating and replicating it, performing a verbal walkthrough, and pinpointing the failure. This protocol forces a structured confrontation between your mental model and the code's reality. Confidence: 20. Key missing info or assumption: Assumes the bug is a logical error in a single code path, not a systemic or environmental issue."
+}
+```
+tool_output_summary:
+The primary plan check found the four-step protocol internally coherent as a sequence, with no missing prerequisites and a completeness score of 1. The secondary confidence check found the decisive defect: the answer's certainty is unsupported by its own assumptions, yielding an honest confidence ceiling of 0.002 versus a claimed 0.200, so the deterministic ten-minute framing is not justified.
+
+ct_metric_snapshot:
+- status: primary=PASS; secondary=ENFORCEMENT_FAIL
+- context_used: false for both tools
+- ct_warning_count: 0
+- ct_blocking_issue_count: 1
+- corrective_prompt_present: yes
+- primary_numeric_metrics: completeness_score=1; step_count=4; critical_path_length=4
+
+raw_ct_mcp_output_json:
+```json
+{
+  "status": "PASS",
+  "is_valid": true,
+  "circular_dependencies": [],
+  "missing_prerequisites": [],
+  "resource_conflicts": [],
+  "completeness_score": 1,
+  "critical_path": [
+    "s1",
+    "s2",
+    "s3",
+    "s4"
+  ],
+  "step_count": 4,
+  "context_used": false
+}
+```
+
+secondary_raw_ct_mcp_output_json:
+```json
+{
+  "status": "ENFORCEMENT_FAIL",
+  "blocking_issues": [
+    {
+      "mechanism": "confidence_product",
+      "description": "Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.",
+      "severity": "blocking"
+    }
+  ],
+  "corrective_prompt": "ENFORCEMENT FAILURE for tool \"validate_confidence\":\n\n[BLOCKING] confidence_product: Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.\n\nCORRECTIVE ACTION:\nEVIDENCE CHAIN REQUIRED: For each assumption below confidence 0.7, answer: 'What single observable event would prove this wrong?' Name a threshold, a component, a time window. If you cannot, state: 'No falsification condition — confidence ≤ 0.3.'",
+  "partial": {
+    "status": "ENFORCEMENT_FAIL",
+    "honest_ceiling": 0.002,
+    "claimed_confidence": 0.2,
+    "gap": 0.198,
+    "inflation_detected": true,
+    "dependency_weights": [
+      1,
+      1,
+      1
+    ],
+    "falsifiability": {
+      "score": 1,
+      "passes": true,
+      "unfalsifiable": []
+    },
+    "assumption_count": 3,
+    "context_used": false,
+    "enforcement": {
+      "blocking_issues": [
+        {
+          "mechanism": "confidence_product",
+          "description": "Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.",
+          "severity": "blocking"
+        }
+      ],
+      "warnings": [],
+      "corrective_prompt": "ENFORCEMENT FAILURE for tool \"validate_confidence\":\n\n[BLOCKING] confidence_product: Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.\n\nCORRECTIVE ACTION:\nEVIDENCE CHAIN REQUIRED: For each assumption below confidence 0.7, answer: 'What single observable event would prove this wrong?' Name a threshold, a component, a time window. If you cannot, state: 'No falsification condition — confidence ≤ 0.3.'"
+    }
+  }
+}
+```
+
+critique_packet:
+Missed constraints:
+- The request asked for a deterministic protocol that guarantees bug discovery within 10 minutes, but the answer only provides a plausible workflow and does not justify universal success.
+- The timing budget sums to 10 minutes only if articulation, replication, and diagnosis are all straightforward; that prerequisite is unstated.
+
+Hidden assumptions:
+- The bug is quickly reproducible and reducible to a simple failing test case.
+- The defect lives in a single understandable code path rather than infrastructure, data, timing, or multi-service interactions.
+- A verbal walkthrough is sufficient to expose the decisive mismatch between expectation and execution.
+
+Irrelevant or overweighted factors:
+- Talking to an inanimate object is treated as the core mechanism without evidence that it is the deciding factor.
+- The answer overweights line-by-line local reasoning and underweights logs, instrumentation, and environment checks that many bugs require.
+
+False certainty or impossible claim:
+- A guaranteed bug discovery outcome within 10 minutes is not defensible across bug classes.
+- Even the stated confidence of 20 is inflated relative to the answer's own assumptions; the tool estimated an honest ceiling of 0.002.
+
+Safer revision target:
+- Recast this as a ten-minute first-pass triage protocol for reproducible logic bugs that can often surface a likely cause quickly, and state explicit failure modes where deeper investigation is required.
+apply_patch(auto_approved=true) exited 0 in 82ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/gemini_thinking/Q06/tool_review.md
+file update:
+diff --git a/duckexperiments/results/gemini_thinking/Q06/tool_review.md b/duckexperiments/results/gemini_thinking/Q06/tool_review.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..acd2c1a7d2e2fd584b49bd80f3ab392814cc2b03
+--- /dev/null
++++ b/duckexperiments/results/gemini_thinking/Q06/tool_review.md
+@@ -0,0 +1,163 @@
++run_profile_id: gemini_thinking
++prompt_id: Q06
++condition: tool_review
++review_outcome: completed
++primary_tool_run: check_plan_validity
++secondary_tool_run: validate_confidence
++actual_tools_fired: check_plan_validity, validate_confidence
++tool_environment_status: available
++environment_issue: none
++tool_help_rating: partial
++weak_fit: no
++structured_tool_input:
++```json
++{
++  "steps": [
++    {
++      "id": "s1",
++      "description": "Articulate the bug's exact observable behavior, expected behavior, and assumptions",
++      "dependencies": []
++    },
++    {
++      "id": "s2",
++      "description": "Create the simplest possible test case that reliably triggers the bug and confirm it fails",
++      "dependencies": [
++        "s1"
++      ]
++    },
++    {
++      "id": "s3",
++      "description": "Explain the code path for the failing test case line-by-line to an inanimate object and identify where the explanation deviates from actual execution",
++      "dependencies": [
++        "s2"
++      ]
++    },
++    {
++      "id": "s4",
++      "description": "Pinpoint the exact line and reason for the failure",
++      "dependencies": [
++        "s3"
++      ]
++    }
++  ]
++}
++```
++secondary_structured_tool_input:
++```json
++{
++  "assumptions": [
++    {
++      "description": "Most bugs can be articulated clearly and replicated with a simple failing test case within 5 minutes",
++      "confidence": 0.2,
++      "falsification_condition": "Fails when the bug is intermittent, environment-specific, or cannot be reduced to a simple reliable reproducer within 5 minutes"
++    },
++    {
++      "description": "Explaining one code path line-by-line will reveal the bug location within 4 minutes",
++      "confidence": 0.2,
++      "falsification_condition": "Fails when the defect spans multiple services, involves concurrency/timing, or the relevant path cannot be isolated and reasoned through within 4 minutes"
++    },
++    {
++      "description": "The protocol can deterministically guarantee bug discovery within 10 minutes across cases",
++      "confidence": 0.05,
++      "falsification_condition": "Fails if any valid bug class is not discoverable within 10 minutes using this procedure"
++    }
++  ],
++  "response_text": "The Ten-Minute Bug Hunt Protocol guarantees bug discovery within 10 minutes by articulating the bug, isolating and replicating it, performing a verbal walkthrough, and pinpointing the failure. This protocol forces a structured confrontation between your mental model and the code's reality. Confidence: 20. Key missing info or assumption: Assumes the bug is a logical error in a single code path, not a systemic or environmental issue."
++}
++```
++tool_output_summary:
++The primary plan check found the four-step protocol internally coherent as a sequence, with no missing prerequisites and a completeness score of 1. The secondary confidence check found the decisive defect: the answer's certainty is unsupported by its own assumptions, yielding an honest confidence ceiling of 0.002 versus a claimed 0.200, so the deterministic ten-minute framing is not justified.
++
++ct_metric_snapshot:
++- status: primary=PASS; secondary=ENFORCEMENT_FAIL
++- context_used: false for both tools
++- ct_warning_count: 0
++- ct_blocking_issue_count: 1
++- corrective_prompt_present: yes
++- primary_numeric_metrics: completeness_score=1; step_count=4; critical_path_length=4
++
++raw_ct_mcp_output_json:
++```json
++{
++  "status": "PASS",
++  "is_valid": true,
++  "circular_dependencies": [],
++  "missing_prerequisites": [],
++  "resource_conflicts": [],
++  "completeness_score": 1,
++  "critical_path": [
++    "s1",
++    "s2",
++    "s3",
++    "s4"
++  ],
++  "step_count": 4,
++  "context_used": false
++}
++```
++
++secondary_raw_ct_mcp_output_json:
++```json
++{
++  "status": "ENFORCEMENT_FAIL",
++  "blocking_issues": [
++    {
++      "mechanism": "confidence_product",
++      "description": "Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.",
++      "severity": "blocking"
++    }
++  ],
++  "corrective_prompt": "ENFORCEMENT FAILURE for tool \"validate_confidence\":\n\n[BLOCKING] confidence_product: Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.\n\nCORRECTIVE ACTION:\nEVIDENCE CHAIN REQUIRED: For each assumption below confidence 0.7, answer: 'What single observable event would prove this wrong?' Name a threshold, a component, a time window. If you cannot, state: 'No falsification condition — confidence ≤ 0.3.'",
++  "partial": {
++    "status": "ENFORCEMENT_FAIL",
++    "honest_ceiling": 0.002,
++    "claimed_confidence": 0.2,
++    "gap": 0.198,
++    "inflation_detected": true,
++    "dependency_weights": [
++      1,
++      1,
++      1
++    ],
++    "falsifiability": {
++      "score": 1,
++      "passes": true,
++      "unfalsifiable": []
++    },
++    "assumption_count": 3,
++    "context_used": false,
++    "enforcement": {
++      "blocking_issues": [
++        {
++          "mechanism": "confidence_product",
++          "description": "Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.",
++          "severity": "blocking"
++        }
++      ],
++      "warnings": [],
++      "corrective_prompt": "ENFORCEMENT FAILURE for tool \"validate_confidence\":\n\n[BLOCKING] confidence_product: Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.\n\nCORRECTIVE ACTION:\nEVIDENCE CHAIN REQUIRED: For each assumption below confidence 0.7, answer: 'What single observable event would prove this wrong?' Name a threshold, a component, a time window. If you cannot, state: 'No falsification condition — confidence ≤ 0.3.'"
++    }
++  }
++}
++```
++
++critique_packet:
++Missed constraints:
++- The request asked for a deterministic protocol that guarantees bug discovery within 10 minutes, but the answer only provides a plausible workflow and does not justify universal success.
++- The timing budget sums to 10 minutes only if articulation, replication, and diagnosis are all straightforward; that prerequisite is unstated.
++
++Hidden assumptions:
++- The bug is quickly reproducible and reducible to a simple failing test case.
++- The defect lives in a single understandable code path rather than infrastructure, data, timing, or multi-service interactions.
++- A verbal walkthrough is sufficient to expose the decisive mismatch between expectation and execution.
++
++Irrelevant or overweighted factors:
++- Talking to an inanimate object is treated as the core mechanism without evidence that it is the deciding factor.
++- The answer overweights line-by-line local reasoning and underweights logs, instrumentation, and environment checks that many bugs require.
++
++False certainty or impossible claim:
++- A guaranteed bug discovery outcome within 10 minutes is not defensible across bug classes.
++- Even the stated confidence of 20 is inflated relative to the answer's own assumptions; the tool estimated an honest ceiling of 0.002.
++
++Safer revision target:
++- Recast this as a ten-minute first-pass triage protocol for reproducible logic bugs that can often surface a likely cause quickly, and state explicit failure modes where deeper investigation is required.
+
+file update:
+diff --git a/duckexperiments/results/gemini_thinking/Q06/tool_review.md b/duckexperiments/results/gemini_thinking/Q06/tool_review.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..acd2c1a7d2e2fd584b49bd80f3ab392814cc2b03
+--- /dev/null
++++ b/duckexperiments/results/gemini_thinking/Q06/tool_review.md
+@@ -0,0 +1,163 @@
++run_profile_id: gemini_thinking
++prompt_id: Q06
++condition: tool_review
++review_outcome: completed
++primary_tool_run: check_plan_validity
++secondary_tool_run: validate_confidence
++actual_tools_fired: check_plan_validity, validate_confidence
++tool_environment_status: available
++environment_issue: none
++tool_help_rating: partial
++weak_fit: no
++structured_tool_input:
++```json
++{
++  "steps": [
++    {
++      "id": "s1",
++      "description": "Articulate the bug's exact observable behavior, expected behavior, and assumptions",
++      "dependencies": []
++    },
++    {
++      "id": "s2",
++      "description": "Create the simplest possible test case that reliably triggers the bug and confirm it fails",
++      "dependencies": [
++        "s1"
++      ]
++    },
++    {
++      "id": "s3",
++      "description": "Explain the code path for the failing test case line-by-line to an inanimate object and identify where the explanation deviates from actual execution",
++      "dependencies": [
++        "s2"
++      ]
++    },
++    {
++      "id": "s4",
++      "description": "Pinpoint the exact line and reason for the failure",
++      "dependencies": [
++        "s3"
++      ]
++    }
++  ]
++}
++```
++secondary_structured_tool_input:
++```json
++{
++  "assumptions": [
++    {
++      "description": "Most bugs can be articulated clearly and replicated with a simple failing test case within 5 minutes",
++      "confidence": 0.2,
++      "falsification_condition": "Fails when the bug is intermittent, environment-specific, or cannot be reduced to a simple reliable reproducer within 5 minutes"
++    },
++    {
++      "description": "Explaining one code path line-by-line will reveal the bug location within 4 minutes",
++      "confidence": 0.2,
++      "falsification_condition": "Fails when the defect spans multiple services, involves concurrency/timing, or the relevant path cannot be isolated and reasoned through within 4 minutes"
++    },
++    {
++      "description": "The protocol can deterministically guarantee bug discovery within 10 minutes across cases",
++      "confidence": 0.05,
++      "falsification_condition": "Fails if any valid bug class is not discoverable within 10 minutes using this procedure"
++    }
++  ],
++  "response_text": "The Ten-Minute Bug Hunt Protocol guarantees bug discovery within 10 minutes by articulating the bug, isolating and replicating it, performing a verbal walkthrough, and pinpointing the failure. This protocol forces a structured confrontation between your mental model and the code's reality. Confidence: 20. Key missing info or assumption: Assumes the bug is a logical error in a single code path, not a systemic or environmental issue."
++}
++```
++tool_output_summary:
++The primary plan check found the four-step protocol internally coherent as a sequence, with no missing prerequisites and a completeness score of 1. The secondary confidence check found the decisive defect: the answer's certainty is unsupported by its own assumptions, yielding an honest confidence ceiling of 0.002 versus a claimed 0.200, so the deterministic ten-minute framing is not justified.
++
++ct_metric_snapshot:
++- status: primary=PASS; secondary=ENFORCEMENT_FAIL
++- context_used: false for both tools
++- ct_warning_count: 0
++- ct_blocking_issue_count: 1
++- corrective_prompt_present: yes
++- primary_numeric_metrics: completeness_score=1; step_count=4; critical_path_length=4
++
++raw_ct_mcp_output_json:
++```json
++{
++  "status": "PASS",
++  "is_valid": true,
++  "circular_dependencies": [],
++  "missing_prerequisites": [],
++  "resource_conflicts": [],
++  "completeness_score": 1,
++  "critical_path": [
++    "s1",
++    "s2",
++    "s3",
++    "s4"
++  ],
++  "step_count": 4,
++  "context_used": false
++}
++```
++
++secondary_raw_ct_mcp_output_json:
++```json
++{
++  "status": "ENFORCEMENT_FAIL",
++  "blocking_issues": [
++    {
++      "mechanism": "confidence_product",
++      "description": "Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.",
++      "severity": "blocking"
++    }
++  ],
++  "corrective_prompt": "ENFORCEMENT FAILURE for tool \"validate_confidence\":\n\n[BLOCKING] confidence_product: Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.\n\nCORRECTIVE ACTION:\nEVIDENCE CHAIN REQUIRED: For each assumption below confidence 0.7, answer: 'What single observable event would prove this wrong?' Name a threshold, a component, a time window. If you cannot, state: 'No falsification condition — confidence ≤ 0.3.'",
++  "partial": {
++    "status": "ENFORCEMENT_FAIL",
++    "honest_ceiling": 0.002,
++    "claimed_confidence": 0.2,
++    "gap": 0.198,
++    "inflation_detected": true,
++    "dependency_weights": [
++      1,
++      1,
++      1
++    ],
++    "falsifiability": {
++      "score": 1,
++      "passes": true,
++      "unfalsifiable": []
++    },
++    "assumption_count": 3,
++    "context_used": false,
++    "enforcement": {
++      "blocking_issues": [
++        {
++          "mechanism": "confidence_product",
++          "description": "Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.",
++          "severity": "blocking"
++        }
++      ],
++      "warnings": [],
++      "corrective_prompt": "ENFORCEMENT FAILURE for tool \"validate_confidence\":\n\n[BLOCKING] confidence_product: Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.\n\nCORRECTIVE ACTION:\nEVIDENCE CHAIN REQUIRED: For each assumption below confidence 0.7, answer: 'What single observable event would prove this wrong?' Name a threshold, a component, a time window. If you cannot, state: 'No falsification condition — confidence ≤ 0.3.'"
++    }
++  }
++}
++```
++
++critique_packet:
++Missed constraints:
++- The request asked for a deterministic protocol that guarantees bug discovery within 10 minutes, but the answer only provides a plausible workflow and does not justify universal success.
++- The timing budget sums to 10 minutes only if articulation, replication, and diagnosis are all straightforward; that prerequisite is unstated.
++
++Hidden assumptions:
++- The bug is quickly reproducible and reducible to a simple failing test case.
++- The defect lives in a single understandable code path rather than infrastructure, data, timing, or multi-service interactions.
++- A verbal walkthrough is sufficient to expose the decisive mismatch between expectation and execution.
++
++Irrelevant or overweighted factors:
++- Talking to an inanimate object is treated as the core mechanism without evidence that it is the deciding factor.
++- The answer overweights line-by-line local reasoning and underweights logs, instrumentation, and environment checks that many bugs require.
++
++False certainty or impossible claim:
++- A guaranteed bug discovery outcome within 10 minutes is not defensible across bug classes.
++- Even the stated confidence of 20 is inflated relative to the answer's own assumptions; the tool estimated an honest ceiling of 0.002.
++
++Safer revision target:
++- Recast this as a ten-minute first-pass triage protocol for reproducible logic bugs that can often surface a likely cause quickly, and state explicit failure modes where deeper investigation is required.
+
+codex
+The artifact is written. I’m doing a final readback to ensure the saved file matches the required tool-review format exactly before I return it verbatim.
+exec
+/bin/zsh -lc 'cat /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/gemini_thinking/Q06/tool_review.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: gemini_thinking
+prompt_id: Q06
+condition: tool_review
+review_outcome: completed
+primary_tool_run: check_plan_validity
+secondary_tool_run: validate_confidence
+actual_tools_fired: check_plan_validity, validate_confidence
+tool_environment_status: available
+environment_issue: none
+tool_help_rating: partial
+weak_fit: no
+structured_tool_input:
+```json
+{
+  "steps": [
+    {
+      "id": "s1",
+      "description": "Articulate the bug's exact observable behavior, expected behavior, and assumptions",
+      "dependencies": []
+    },
+file update:
+diff --git a/duckexperiments/results/gemini_thinking/Q06/tool_review.md b/duckexperiments/results/gemini_thinking/Q06/tool_review.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..acd2c1a7d2e2fd584b49bd80f3ab392814cc2b03
+--- /dev/null
++++ b/duckexperiments/results/gemini_thinking/Q06/tool_review.md
+@@ -0,0 +1,163 @@
++run_profile_id: gemini_thinking
++prompt_id: Q06
++condition: tool_review
++review_outcome: completed
++primary_tool_run: check_plan_validity
++secondary_tool_run: validate_confidence
++actual_tools_fired: check_plan_validity, validate_confidence
++tool_environment_status: available
++environment_issue: none
++tool_help_rating: partial
++weak_fit: no
++structured_tool_input:
++```json
++{
++  "steps": [
++    {
++      "id": "s1",
++      "description": "Articulate the bug's exact observable behavior, expected behavior, and assumptions",
++      "dependencies": []
++    },
++    {
++      "id": "s2",
++      "description": "Create the simplest possible test case that reliably triggers the bug and confirm it fails",
++      "dependencies": [
++        "s1"
++      ]
++    },
++    {
++      "id": "s3",
++      "description": "Explain the code path for the failing test case line-by-line to an inanimate object and identify where the explanation deviates from actual execution",
++      "dependencies": [
++        "s2"
++      ]
++    },
++    {
++      "id": "s4",
++      "description": "Pinpoint the exact line and reason for the failure",
++      "dependencies": [
++        "s3"
++      ]
++    }
++  ]
++}
++```
++secondary_structured_tool_input:
++```json
++{
++  "assumptions": [
++    {
++      "description": "Most bugs can be articulated clearly and replicated with a simple failing test case within 5 minutes",
++      "confidence": 0.2,
++      "falsification_condition": "Fails when the bug is intermittent, environment-specific, or cannot be reduced to a simple reliable reproducer within 5 minutes"
++    },
++    {
++      "description": "Explaining one code path line-by-line will reveal the bug location within 4 minutes",
++      "confidence": 0.2,
++      "falsification_condition": "Fails when the defect spans multiple services, involves concurrency/timing, or the relevant path cannot be isolated and reasoned through within 4 minutes"
++    },
++    {
++      "description": "The protocol can deterministically guarantee bug discovery within 10 minutes across cases",
++      "confidence": 0.05,
++      "falsification_condition": "Fails if any valid bug class is not discoverable within 10 minutes using this procedure"
++    }
++  ],
++  "response_text": "The Ten-Minute Bug Hunt Protocol guarantees bug discovery within 10 minutes by articulating the bug, isolating and replicating it, performing a verbal walkthrough, and pinpointing the failure. This protocol forces a structured confrontation between your mental model and the code's reality. Confidence: 20. Key missing info or assumption: Assumes the bug is a logical error in a single code path, not a systemic or environmental issue."
++}
++```
++tool_output_summary:
++The primary plan check found the four-step protocol internally coherent as a sequence, with no missing prerequisites and a completeness score of 1. The secondary confidence check found the decisive defect: the answer's certainty is unsupported by its own assumptions, yielding an honest confidence ceiling of 0.002 versus a claimed 0.200, so the deterministic ten-minute framing is not justified.
++
++ct_metric_snapshot:
++- status: primary=PASS; secondary=ENFORCEMENT_FAIL
++- context_used: false for both tools
++- ct_warning_count: 0
++- ct_blocking_issue_count: 1
++- corrective_prompt_present: yes
++- primary_numeric_metrics: completeness_score=1; step_count=4; critical_path_length=4
++
++raw_ct_mcp_output_json:
++```json
++{
++  "status": "PASS",
++  "is_valid": true,
++  "circular_dependencies": [],
++  "missing_prerequisites": [],
++  "resource_conflicts": [],
++  "completeness_score": 1,
++  "critical_path": [
++    "s1",
++    "s2",
++    "s3",
++    "s4"
++  ],
++  "step_count": 4,
++  "context_used": false
++}
++```
++
++secondary_raw_ct_mcp_output_json:
++```json
++{
++  "status": "ENFORCEMENT_FAIL",
++  "blocking_issues": [
++    {
++      "mechanism": "confidence_product",
++      "description": "Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.",
++      "severity": "blocking"
++    }
++  ],
++  "corrective_prompt": "ENFORCEMENT FAILURE for tool \"validate_confidence\":\n\n[BLOCKING] confidence_product: Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.\n\nCORRECTIVE ACTION:\nEVIDENCE CHAIN REQUIRED: For each assumption below confidence 0.7, answer: 'What single observable event would prove this wrong?' Name a threshold, a component, a time window. If you cannot, state: 'No falsification condition — confidence ≤ 0.3.'",
++  "partial": {
++    "status": "ENFORCEMENT_FAIL",
++    "honest_ceiling": 0.002,
++    "claimed_confidence": 0.2,
++    "gap": 0.198,
++    "inflation_detected": true,
++    "dependency_weights": [
++      1,
++      1,
++      1
++    ],
++    "falsifiability": {
++      "score": 1,
++      "passes": true,
++      "unfalsifiable": []
++    },
++    "assumption_count": 3,
++    "context_used": false,
++    "enforcement": {
++      "blocking_issues": [
++        {
++          "mechanism": "confidence_product",
++          "description": "Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.",
++          "severity": "blocking"
++        }
++      ],
++      "warnings": [],
++      "corrective_prompt": "ENFORCEMENT FAILURE for tool \"validate_confidence\":\n\n[BLOCKING] confidence_product: Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.\n\nCORRECTIVE ACTION:\nEVIDENCE CHAIN REQUIRED: For each assumption below confidence 0.7, answer: 'What single observable event would prove this wrong?' Name a threshold, a component, a time window. If you cannot, state: 'No falsification condition — confidence ≤ 0.3.'"
++    }
++  }
++}
++```
++
++critique_packet:
++Missed constraints:
++- The request asked for a deterministic protocol that guarantees bug discovery within 10 minutes, but the answer only provides a plausible workflow and does not justify universal success.
++- The timing budget sums to 10 minutes only if articulation, replication, and diagnosis are all straightforward; that prerequisite is unstated.
++
++Hidden assumptions:
++- The bug is quickly reproducible and reducible to a simple failing test case.
++- The defect lives in a single understandable code path rather than infrastructure, data, timing, or multi-service interactions.
++- A verbal walkthrough is sufficient to expose the decisive mismatch between expectation and execution.
++
++Irrelevant or overweighted factors:
++- Talking to an inanimate object is treated as the core mechanism without evidence that it is the deciding factor.
++- The answer overweights line-by-line local reasoning and underweights logs, instrumentation, and environment checks that many bugs require.
++
++False certainty or impossible claim:
++- A guaranteed bug discovery outcome within 10 minutes is not defensible across bug classes.
++- Even the stated confidence of 20 is inflated relative to the answer's own assumptions; the tool estimated an honest ceiling of 0.002.
++
++Safer revision target:
++- Recast this as a ten-minute first-pass triage protocol for reproducible logic bugs that can often surface a likely cause quickly, and state explicit failure modes where deeper investigation is required.
+
+codex
+run_profile_id: gemini_thinking
+prompt_id: Q06
+condition: tool_review
+review_outcome: completed
+primary_tool_run: check_plan_validity
+secondary_tool_run: validate_confidence
+actual_tools_fired: check_plan_validity, validate_confidence
+tool_environment_status: available
+environment_issue: none
+tool_help_rating: partial
+weak_fit: no
+structured_tool_input:
+```json
+{
+  "steps": [
+    {
+      "id": "s1",
+      "description": "Articulate the bug's exact observable behavior, expected behavior, and assumptions",
+      "dependencies": []
+    },
+    {
+      "id": "s2",
+      "description": "Create the simplest possible test case that reliably triggers the bug and confirm it fails",
+      "dependencies": [
+        "s1"
+      ]
+    },
+    {
+      "id": "s3",
+      "description": "Explain the code path for the failing test case line-by-line to an inanimate object and identify where the explanation deviates from actual execution",
+      "dependencies": [
+        "s2"
+      ]
+    },
+    {
+      "id": "s4",
+      "description": "Pinpoint the exact line and reason for the failure",
+      "dependencies": [
+        "s3"
+      ]
+    }
+  ]
+}
+```
+secondary_structured_tool_input:
+```json
+{
+  "assumptions": [
+    {
+      "description": "Most bugs can be articulated clearly and replicated with a simple failing test case within 5 minutes",
+      "confidence": 0.2,
+      "falsification_condition": "Fails when the bug is intermittent, environment-specific, or cannot be reduced to a simple reliable reproducer within 5 minutes"
+    },
+    {
+      "description": "Explaining one code path line-by-line will reveal the bug location within 4 minutes",
+      "confidence": 0.2,
+      "falsification_condition": "Fails when the defect spans multiple services, involves concurrency/timing, or the relevant path cannot be isolated and reasoned through within 4 minutes"
+    },
+    {
+      "description": "The protocol can deterministically guarantee bug discovery within 10 minutes across cases",
+      "confidence": 0.05,
+      "falsification_condition": "Fails if any valid bug class is not discoverable within 10 minutes using this procedure"
+    }
+  ],
+  "response_text": "The Ten-Minute Bug Hunt Protocol guarantees bug discovery within 10 minutes by articulating the bug, isolating and replicating it, performing a verbal walkthrough, and pinpointing the failure. This protocol forces a structured confrontation between your mental model and the code's reality. Confidence: 20. Key missing info or assumption: Assumes the bug is a logical error in a single code path, not a systemic or environmental issue."
+}
+```
+tool_output_summary:
+The primary plan check found the four-step protocol internally coherent as a sequence, with no missing prerequisites and a completeness score of 1. The secondary confidence check found the decisive defect: the answer's certainty is unsupported by its own assumptions, yielding an honest confidence ceiling of 0.002 versus a claimed 0.200, so the deterministic ten-minute framing is not justified.
+
+ct_metric_snapshot:
+- status: primary=PASS; secondary=ENFORCEMENT_FAIL
+- context_used: false for both tools
+- ct_warning_count: 0
+- ct_blocking_issue_count: 1
+- corrective_prompt_present: yes
+- primary_numeric_metrics: completeness_score=1; step_count=4; critical_path_length=4
+
+raw_ct_mcp_output_json:
+```json
+{
+  "status": "PASS",
+  "is_valid": true,
+  "circular_dependencies": [],
+  "missing_prerequisites": [],
+  "resource_conflicts": [],
+  "completeness_score": 1,
+  "critical_path": [
+    "s1",
+    "s2",
+    "s3",
+    "s4"
+  ],
+  "step_count": 4,
+  "context_used": false
+}
+```
+
+secondary_raw_ct_mcp_output_json:
+```json
+{
+  "status": "ENFORCEMENT_FAIL",
+  "blocking_issues": [
+    {
+      "mechanism": "confidence_product",
+      "description": "Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.",
+      "severity": "blocking"
+    }
+  ],
+  "corrective_prompt": "ENFORCEMENT FAILURE for tool \"validate_confidence\":\n\n[BLOCKING] confidence_product: Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.\n\nCORRECTIVE ACTION:\nEVIDENCE CHAIN REQUIRED: For each assumption below confidence 0.7, answer: 'What single observable event would prove this wrong?' Name a threshold, a component, a time window. If you cannot, state: 'No falsification condition — confidence ≤ 0.3.'",
+  "partial": {
+    "status": "ENFORCEMENT_FAIL",
+    "honest_ceiling": 0.002,
+    "claimed_confidence": 0.2,
+    "gap": 0.198,
+    "inflation_detected": true,
+    "dependency_weights": [
+      1,
+      1,
+      1
+    ],
+    "falsifiability": {
+      "score": 1,
+      "passes": true,
+      "unfalsifiable": []
+    },
+    "assumption_count": 3,
+    "context_used": false,
+    "enforcement": {
+      "blocking_issues": [
+        {
+          "mechanism": "confidence_product",
+          "description": "Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.",
+          "severity": "blocking"
+        }
+      ],
+      "warnings": [],
+      "corrective_prompt": "ENFORCEMENT FAILURE for tool \"validate_confidence\":\n\n[BLOCKING] confidence_product: Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.\n\nCORRECTIVE ACTION:\nEVIDENCE CHAIN REQUIRED: For each assumption below confidence 0.7, answer: 'What single observable event would prove this wrong?' Name a threshold, a component, a time window. If you cannot, state: 'No falsification condition — confidence ≤ 0.3.'"
+    }
+  }
+}
+```
+
+critique_packet:
+Missed constraints:
+- The request asked for a deterministic protocol that guarantees bug discovery within 10 minutes, but the answer only provides a plausible workflow and does not justify universal success.
+- The timing budget sums to 10 minutes only if articulation, replication, and diagnosis are all straightforward; that prerequisite is unstated.
+
+Hidden assumptions:
+- The bug is quickly reproducible and reducible to a simple failing test case.
+- The defect lives in a single understandable code path rather than infrastructure, data, timing, or multi-service interactions.
+- A verbal walkthrough is sufficient to expose the decisive mismatch between expectation and execution.
+
+Irrelevant or overweighted factors:
+- Talking to an inanimate object is treated as the core mechanism without evidence that it is the deciding factor.
+- The answer overweights line-by-line local reasoning and underweights logs, instrumentation, and environment checks that many bugs require.
+
+False certainty or impossible claim:
+- A guaranteed bug discovery outcome within 10 minutes is not defensible across bug classes.
+- Even the stated confidence of 20 is inflated relative to the answer's own assumptions; the tool estimated an honest ceiling of 0.002.
+
+Safer revision target:
+- Recast this as a ten-minute first-pass triage protocol for reproducible logic bugs that can often surface a likely cause quickly, and state explicit failure modes where deeper investigation is required.
+file update:
+diff --git a/duckexperiments/results/gemini_thinking/Q06/tool_review.md b/duckexperiments/results/gemini_thinking/Q06/tool_review.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..acd2c1a7d2e2fd584b49bd80f3ab392814cc2b03
+--- /dev/null
++++ b/duckexperiments/results/gemini_thinking/Q06/tool_review.md
+@@ -0,0 +1,163 @@
++run_profile_id: gemini_thinking
++prompt_id: Q06
++condition: tool_review
++review_outcome: completed
++primary_tool_run: check_plan_validity
++secondary_tool_run: validate_confidence
++actual_tools_fired: check_plan_validity, validate_confidence
++tool_environment_status: available
++environment_issue: none
++tool_help_rating: partial
++weak_fit: no
++structured_tool_input:
++```json
++{
++  "steps": [
++    {
++      "id": "s1",
++      "description": "Articulate the bug's exact observable behavior, expected behavior, and assumptions",
++      "dependencies": []
++    },
++    {
++      "id": "s2",
++      "description": "Create the simplest possible test case that reliably triggers the bug and confirm it fails",
++      "dependencies": [
++        "s1"
++      ]
++    },
++    {
++      "id": "s3",
++      "description": "Explain the code path for the failing test case line-by-line to an inanimate object and identify where the explanation deviates from actual execution",
++      "dependencies": [
++        "s2"
++      ]
++    },
++    {
++      "id": "s4",
++      "description": "Pinpoint the exact line and reason for the failure",
++      "dependencies": [
++        "s3"
++      ]
++    }
++  ]
++}
++```
++secondary_structured_tool_input:
++```json
++{
++  "assumptions": [
++    {
++      "description": "Most bugs can be articulated clearly and replicated with a simple failing test case within 5 minutes",
++      "confidence": 0.2,
++      "falsification_condition": "Fails when the bug is intermittent, environment-specific, or cannot be reduced to a simple reliable reproducer within 5 minutes"
++    },
++    {
++      "description": "Explaining one code path line-by-line will reveal the bug location within 4 minutes",
++      "confidence": 0.2,
++      "falsification_condition": "Fails when the defect spans multiple services, involves concurrency/timing, or the relevant path cannot be isolated and reasoned through within 4 minutes"
++    },
++    {
++      "description": "The protocol can deterministically guarantee bug discovery within 10 minutes across cases",
++      "confidence": 0.05,
++      "falsification_condition": "Fails if any valid bug class is not discoverable within 10 minutes using this procedure"
++    }
++  ],
++  "response_text": "The Ten-Minute Bug Hunt Protocol guarantees bug discovery within 10 minutes by articulating the bug, isolating and replicating it, performing a verbal walkthrough, and pinpointing the failure. This protocol forces a structured confrontation between your mental model and the code's reality. Confidence: 20. Key missing info or assumption: Assumes the bug is a logical error in a single code path, not a systemic or environmental issue."
++}
++```
++tool_output_summary:
++The primary plan check found the four-step protocol internally coherent as a sequence, with no missing prerequisites and a completeness score of 1. The secondary confidence check found the decisive defect: the answer's certainty is unsupported by its own assumptions, yielding an honest confidence ceiling of 0.002 versus a claimed 0.200, so the deterministic ten-minute framing is not justified.
++
++ct_metric_snapshot:
++- status: primary=PASS; secondary=ENFORCEMENT_FAIL
++- context_used: false for both tools
++- ct_warning_count: 0
++- ct_blocking_issue_count: 1
++- corrective_prompt_present: yes
++- primary_numeric_metrics: completeness_score=1; step_count=4; critical_path_length=4
++
++raw_ct_mcp_output_json:
++```json
++{
++  "status": "PASS",
++  "is_valid": true,
++  "circular_dependencies": [],
++  "missing_prerequisites": [],
++  "resource_conflicts": [],
++  "completeness_score": 1,
++  "critical_path": [
++    "s1",
++    "s2",
++    "s3",
++    "s4"
++  ],
++  "step_count": 4,
++  "context_used": false
++}
++```
++
++secondary_raw_ct_mcp_output_json:
++```json
++{
++  "status": "ENFORCEMENT_FAIL",
++  "blocking_issues": [
++    {
++      "mechanism": "confidence_product",
++      "description": "Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.",
++      "severity": "blocking"
++    }
++  ],
++  "corrective_prompt": "ENFORCEMENT FAILURE for tool \"validate_confidence\":\n\n[BLOCKING] confidence_product: Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.\n\nCORRECTIVE ACTION:\nEVIDENCE CHAIN REQUIRED: For each assumption below confidence 0.7, answer: 'What single observable event would prove this wrong?' Name a threshold, a component, a time window. If you cannot, state: 'No falsification condition — confidence ≤ 0.3.'",
++  "partial": {
++    "status": "ENFORCEMENT_FAIL",
++    "honest_ceiling": 0.002,
++    "claimed_confidence": 0.2,
++    "gap": 0.198,
++    "inflation_detected": true,
++    "dependency_weights": [
++      1,
++      1,
++      1
++    ],
++    "falsifiability": {
++      "score": 1,
++      "passes": true,
++      "unfalsifiable": []
++    },
++    "assumption_count": 3,
++    "context_used": false,
++    "enforcement": {
++      "blocking_issues": [
++        {
++          "mechanism": "confidence_product",
++          "description": "Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.",
++          "severity": "blocking"
++        }
++      ],
++      "warnings": [],
++      "corrective_prompt": "ENFORCEMENT FAILURE for tool \"validate_confidence\":\n\n[BLOCKING] confidence_product: Inflation detected — claimed confidence exceeds honest ceiling by 0.198. Honest ceiling: 0.002, claimed: 0.200. Reduce claimed confidence or strengthen assumptions.\n\nCORRECTIVE ACTION:\nEVIDENCE CHAIN REQUIRED: For each assumption below confidence 0.7, answer: 'What single observable event would prove this wrong?' Name a threshold, a component, a time window. If you cannot, state: 'No falsification condition — confidence ≤ 0.3.'"
++    }
++  }
++}
++```
++
++critique_packet:
++Missed constraints:
++- The request asked for a deterministic protocol that guarantees bug discovery within 10 minutes, but the answer only provides a plausible workflow and does not justify universal success.
++- The timing budget sums to 10 minutes only if articulation, replication, and diagnosis are all straightforward; that prerequisite is unstated.
++
++Hidden assumptions:
++- The bug is quickly reproducible and reducible to a simple failing test case.
++- The defect lives in a single understandable code path rather than infrastructure, data, timing, or multi-service interactions.
++- A verbal walkthrough is sufficient to expose the decisive mismatch between expectation and execution.
++
++Irrelevant or overweighted factors:
++- Talking to an inanimate object is treated as the core mechanism without evidence that it is the deciding factor.
++- The answer overweights line-by-line local reasoning and underweights logs, instrumentation, and environment checks that many bugs require.
++
++False certainty or impossible claim:
++- A guaranteed bug discovery outcome within 10 minutes is not defensible across bug classes.
++- Even the stated confidence of 20 is inflated relative to the answer's own assumptions; the tool estimated an honest ceiling of 0.002.
++
++Safer revision target:
++- Recast this as a ten-minute first-pass triage protocol for reproducible logic bugs that can often surface a likely cause quickly, and state explicit failure modes where deeper investigation is required.
+
+tokens used
+44,471

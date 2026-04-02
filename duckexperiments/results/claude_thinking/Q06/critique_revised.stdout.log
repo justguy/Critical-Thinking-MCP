@@ -1,0 +1,8 @@
+Written to `/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_thinking/Q06/critique_revised.md`.
+
+**What changed from critique_initial:**
+
+1. **Title** — removed "Deterministic" and added "(Not a Guarantee)" per the false-certainty finding
+2. **Step 5** — replaced "Confirm the fix is scoped" (which was downstream of discovery and didn't support the guarantee) with an explicit stop-and-reassess step that acknowledges the time bound can fail
+3. **Body** — made the non-guarantee explicit ("does not guarantee discovery") and listed the concrete failure modes the critique flagged
+4. **Confidence** — dropped from 65 to 25, aligned with the tool's honest ceiling of 0.21 under stated assumptions

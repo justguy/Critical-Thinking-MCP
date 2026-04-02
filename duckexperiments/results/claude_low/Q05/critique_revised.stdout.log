@@ -1,0 +1,6 @@
+Written to `/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/Q05/critique_revised.md`.
+
+**What changed from `critique_initial`:**
+- Removed the "correlates with in practice" section and candidate hiding places (integration tasks, test coverage gaps, migration scripts, API contracts) — per the critique, these were unfounded folklore, not evidence
+- Confidence lowered from 95 → 92 and explicitly scoped to the underdetermination claim only
+- Answer tightened to stay on the single defensible point: the prompt is insufficient for exact identification

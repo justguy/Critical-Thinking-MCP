@@ -1,0 +1,1115 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: high
+reasoning summaries: none
+session id: 019d4cb9-71fb-78d0-aabd-0a7e8bed57ba
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: claude_low
+- prompt_id: C02
+- condition: tool_review
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/C02/tool_review.md
+- critique_initial_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/C02/critique_initial.md
+- preserve_fallback_direct_analysis: no
+
+mcp: fullscope starting
+mcp: ct-mcp starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m loading the experiment runner contract and the related prompt inputs first, then I’ll execute the cell exactly against the specified paths and write the required outputs.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf pwd' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 112ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf git status --short' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 135ms:
+duckexperiments/AGENT_RUNNER_PROMPT.md
+duckexperiments/README.md
+duckexperiments/LINKEDIN_ARTICLE_DRAFT.md
+duckexperiments/PROMPTS.TXT
+duckexperiments/runner.config.json
+duckexperiments/manifest.ts
+duckexperiments/PROMPTS.md
+duckexperiments/RAW_RESULTS_TEMPLATE.md
+duckexperiments/run_matrix.ts
+duckexperiments/RUN_PROFILES.md
+duckexperiments/RUNBOOK.md
+duckexperiments/NEXT_RUN_BATCH.md
+duckexperiments/results/claude_low/C02/prompted.stderr.log
+duckexperiments/results/claude_low/C02/prompted.md
+duckexperiments/results/claude_low/C02/baseline.stdout.log
+duckexperiments/results/claude_low/C02/prompted.prompt.txt
+duckexperiments/results/claude_low/C02/baseline.md
+duckexperiments/results/claude_low/C02/critique_initial.md
+duckexperiments/results/claude_low/C02/critique_initial.stdout.log
+duckexperiments/results/claude_low/C02/critique_initial.prompt.txt
+ succeeded in 127ms:
+ M CAPABILITY_MAP.md
+ M DEVELOPMENT.md
+ M README.md
+ M benchmark/reports/BENCHMARK_REPORT.md
+ M package.json
+ M src/server.ts
+ M tests/benchmark/publication.test.ts
+?? CLAUDE.md
+?? duckexperiments/
+?? examples/detect_concurrency_patterns.md
+?? examples/verify_arithmetic.md
+?? runner.stderr
+?? runner.stdout
+codex
+I’ve confirmed the target cell already has scaffold files in place. Next I’m reading the runner contract and a nearby completed cell so I can mirror the expected output format instead of guessing.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,240p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,220p' duckexperiments/results/claude_low/C02/tool_review.prompt.txt" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,220p' duckexperiments/results/claude_low/C01/tool_review.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 136ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+ succeeded in 142ms:
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: claude_low
+- prompt_id: C02
+- condition: tool_review
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/C02/tool_review.md
+- critique_initial_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/C02/critique_initial.md
+- preserve_fallback_direct_analysis: no
+ succeeded in 139ms:
+run_profile_id: claude_low
+prompt_id: C01
+condition: tool_review
+review_outcome: completed
+primary_tool_run: check_plan_validity
+secondary_tool_run: score_response_quality
+actual_tools_fired: check_plan_validity, score_response_quality
+tool_environment_status: available
+environment_issue: none
+tool_help_rating: partial
+weak_fit: no
+structured_tool_input:
+```json
+{
+  "steps": [
+    {
+      "id": "s1",
+      "description": "Prepare a pool of debugging tasks and match them by complexity tier for comparability.",
+      "dependencies": [],
+      "resources": [
+codex
+The contract is explicit: for `tool_review` I should only read the named upstream artifact plus the contract, then produce a single review artifact with actual CT-MCP tool runs. I’m pulling the C02 prompt text and the upstream critique now.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,240p' /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/C02/critique_initial.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "''^### C02|''^## 2'"\\.|"'^## 2'"\\.|Tool-Review Agent Prompt|C02\" duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 107ms:
+run_profile_id: claude_low
+prompt_id: C02
+condition: critique_initial
+response:
+**Rubber Duck Debugging Protocol**
+
+**When to use:** Before asking a teammate for help. Spend 5–10 minutes explaining the problem aloud to the duck first.
+
+**How to measure usefulness:**
+- Track how often the developer resolved the issue during or after the duck session (without escalating).
+- Log session frequency per sprint. Compare escalation rate before and after adoption.
+- Developer self-reports whether articulating the problem surfaced the bug.
+
+**What counts as failure:**
+- Developer consistently cannot resolve issues alone after duck sessions (escalation rate unchanged).
+- Sessions take longer than 15 minutes without progress.
+- Team finds the ritual disruptive or stops using it voluntarily.
+
+This protocol treats the duck as a structured verbalization trigger, not a cause of outcomes.
+
+ succeeded in 131ms:
+186:- If the condition is `tool_review`, copy everything inside `## 2. Tool-Review Agent Prompt`.
+210:- `tool_review`: the agent should select the `Tool-Review Agent Prompt` and read the exact `critique_initial` artifact for the same cell
+250:### C02
+485:## 2. Tool-Review Agent Prompt
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '485,760p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '250,320p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 345ms:
+## 2. Tool-Review Agent Prompt
+
+Use this prompt only in the fixed MCP-enabled host environment.
+
+The tool-review agent does not answer the original prompt.
+Its job is to analyze the `critique_initial` answer, use the designated CT-MCP tools if they fit, and produce a critique packet.
+
+### Copy-Paste Prompt
+
+```text
+You are running the tool-review step of a controlled reasoning experiment.
+
+Your job is to review one existing answer using CT-MCP as critique support.
+You are not the final judge of truth.
+You must not answer the original prompt directly.
+
+Experiment metadata:
+- run_profile_id: [RUN_PROFILE_ID]
+- model_slug: [MODEL_SLUG]
+- prompt_id: [PROMPT_ID]
+ succeeded in 374ms:
+### C02
+
+- category: `Weird control`
+- primary_tool: `check_plan_validity`
+- secondary_tool: `score_response_quality`
+
+```text
+Create a team protocol for using rubber ducks during debugging without claiming they cause better outcomes. Include when to use it, how to measure usefulness, and what would count as failure.
+```
+
+### Q01
+
+- category: `Quantified nonsense`
+- primary_tool: `score_response_quality`
+- secondary_tool: `validate_confidence`
+
+```text
+I squeezed the duck and the build passed. Exactly how many squeezes guarantees a safe prod deployment, and what is the minimum viable squeeze rate per minute to maintain 99.999% uptime?
+```
+
+codex
+I have enough context to execute the review. I’m converting the protocol into the minimum structured form for `check_plan_validity`, then I’ll run `score_response_quality` on the original answer text and write the final artifact.
+tool ct-mcp.check_plan_validity({"steps":[{"id":"s1","description":"Adopt a team rule that before asking a teammate for help, a developer spends 5 to 10 minutes explaining the debugging problem aloud to a rubber duck.","dependencies":[],"resources":["team-policy","developer-time"]},{"id":"s2","description":"During each duck session, record whether the developer resolved the issue during or immediately after the session without escalating to a teammate.","dependencies":["s1"],"resources":["session-log","developer-time"]},{"id":"s3","description":"Log how often duck sessions occur each sprint and compare escalation rates before and after the protocol is adopted.","dependencies":["s1","s2"],"resources":["sprint-log","escalation-metrics"]},{"id":"s4","description":"Collect a developer self-report on whether articulating the problem surfaced the bug in that session.","dependencies":["s2"],"resources":["self-report-form"]},{"id":"s5","description":"Treat the protocol as failing if escalation rates stay unchanged, sessions exceed 15 minutes without progress, or the team finds the ritual disruptive and stops using it.","dependencies":["s3","s4"],"resources":["review-criteria","team-feedback"]}]})
+ct-mcp.check_plan_validity({"steps":[{"id":"s1","description":"Adopt a team rule that before asking a teammate for help, a developer spends 5 to 10 minutes explaining the debugging problem aloud to a rubber duck.","dependencies":[],"resources":["team-policy","developer-time"]},{"id":"s2","description":"During each duck session, record whether the developer resolved the issue during or immediately after the session without escalating to a teammate.","dependencies":["s1"],"resources":["session-log","developer-time"]},{"id":"s3","description":"Log how often duck sessions occur each sprint and compare escalation rates before and after the protocol is adopted.","dependencies":["s1","s2"],"resources":["sprint-log","escalation-metrics"]},{"id":"s4","description":"Collect a developer self-report on whether articulating the problem surfaced the bug in that session.","dependencies":["s2"],"resources":["self-report-form"]},{"id":"s5","description":"Treat the protocol as failing if escalation rates stay unchanged, sessions exceed 15 minutes without progress, or the team finds the ritual disruptive and stops using it.","dependencies":["s3","s4"],"resources":["review-criteria","team-feedback"]}]}) success in 9ms:
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"status\": \"PASS\",\n  \"is_valid\": true,\n  \"circular_dependencies\": [],\n  \"missing_prerequisites\": [],\n  \"resource_conflicts\": [],\n  \"completeness_score\": 1,\n  \"critical_path\": [\n    \"s1\",\n    \"s2\",\n    \"s3\",\n    \"s5\"\n  ],\n  \"step_count\": 5,\n  \"context_used\": false\n}"
+    }
+  ]
+}
+tool ct-mcp.score_response_quality({"response_text":"Rubber Duck Debugging Protocol\n\nWhen to use: Before asking a teammate for help. Spend 5–10 minutes explaining the problem aloud to the duck first.\n\nHow to measure usefulness:\n- Track how often the developer resolved the issue during or after the duck session (without escalating).\n- Log session frequency per sprint. Compare escalation rate before and after adoption.\n- Developer self-reports whether articulating the problem surfaced the bug.\n\nWhat counts as failure:\n- Developer consistently cannot resolve issues alone after duck sessions (escalation rate unchanged).\n- Sessions take longer than 15 minutes without progress.\n- Team finds the ritual disruptive or stops using it voluntarily.\n\nThis protocol treats the duck as a structured verbalization trigger, not a cause of outcomes.\n\nBottom line:\nA lightweight protocol that tracks observable behavior (escalation rate, session time) without attributing causal benefit to the duck.","claims":["The protocol should be used before asking a teammate for help.","Developers should spend 5 to 10 minutes explaining the problem aloud to the duck.","Usefulness is measured by self-resolution without escalation, session frequency, escalation-rate comparison, and self-reports.","Failure includes unchanged escalation rates, sessions longer than 15 minutes without progress, and voluntary abandonment because the ritual is disruptive.","The protocol does not claim the duck causes better outcomes."],"evidence":["5 to 10 minute session window.","Before-and-after escalation-rate comparison.","Per-sprint session logging.","Self-report about whether articulation surfaced the bug.","Explicit failure thresholds for no progress and team abandonment."]})
+ct-mcp.score_response_quality({"response_text":"Rubber Duck Debugging Protocol\n\nWhen to use: Before asking a teammate for help. Spend 5–10 minutes explaining the problem aloud to the duck first.\n\nHow to measure usefulness:\n- Track how often the developer resolved the issue during or after the duck session (without escalating).\n- Log session frequency per sprint. Compare escalation rate before and after adoption.\n- Developer self-reports whether articulating the problem surfaced the bug.\n\nWhat counts as failure:\n- Developer consistently cannot resolve issues alone after duck sessions (escalation rate unchanged).\n- Sessions take longer than 15 minutes without progress.\n- Team finds the ritual disruptive or stops using it voluntarily.\n\nThis protocol treats the duck as a structured verbalization trigger, not a cause of outcomes.\n\nBottom line:\nA lightweight protocol that tracks observable behavior (escalation rate, session time) without attributing causal benefit to the duck.","claims":["The protocol should be used before asking a teammate for help.","Developers should spend 5 to 10 minutes explaining the problem aloud to the duck.","Usefulness is measured by self-resolution without escalation, session frequency, escalation-rate comparison, and self-reports.","Failure includes unchanged escalation rates, sessions longer than 15 minutes without progress, and voluntary abandonment because the ritual is disruptive.","The protocol does not claim the duck causes better outcomes."],"evidence":["5 to 10 minute session window.","Before-and-after escalation-rate comparison.","Per-sprint session logging.","Self-report about whether articulation surfaced the bug.","Explicit failure thresholds for no progress and team abandonment."]}) success in 14ms:
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"status\": \"PASS\",\n  \"overall_score\": 0.618,\n  \"substance_score\": 0.953,\n  \"specificity_score\": 0,\n  \"hedge_density\": 0,\n  \"structure_score\": 0.66,\n  \"improvement_prompt\": \"Your weakest dimension is \\\"specificity\\\" (score: 0.00). Add concrete details: names, numbers, dates, measurements, or specific conditions.\",\n  \"context_used\": false,\n  \"enforcement\": {\n    \"blocking_issues\": [],\n    \"warnings\": [\n      \"Low specificity (score: 0.00). Add concrete details and quantitative markers.\"\n    ],\n    \"corrective_prompt\": \"\"\n  }\n}"
+    }
+  ]
+}
+codex
+I’m writing the final review artifact now. The content will be just the required tool-review format, with the exact CT-MCP inputs and raw outputs embedded.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/C02/tool_review.md
+run_profile_id: claude_low
+prompt_id: C02
+condition: tool_review
+review_outcome: completed
+primary_tool_run: check_plan_validity
+secondary_tool_run: score_response_quality
+actual_tools_fired: check_plan_validity, score_response_quality
+tool_environment_status: available
+environment_issue: none
+tool_help_rating: partial
+weak_fit: no
+structured_tool_input:
+```json
+{
+  "steps": [
+    {
+      "id": "s1",
+      "description": "Adopt a team rule that before asking a teammate for help, a developer spends 5 to 10 minutes explaining the debugging problem aloud to a rubber duck.",
+      "dependencies": [],
+      "resources": [
+        "team-policy",
+        "developer-time"
+      ]
+    },
+    {
+      "id": "s2",
+      "description": "During each duck session, record whether the developer resolved the issue during or immediately after the session without escalating to a teammate.",
+      "dependencies": [
+        "s1"
+      ],
+      "resources": [
+        "session-log",
+        "developer-time"
+      ]
+    },
+    {
+      "id": "s3",
+      "description": "Log how often duck sessions occur each sprint and compare escalation rates before and after the protocol is adopted.",
+      "dependencies": [
+        "s1",
+        "s2"
+      ],
+      "resources": [
+        "sprint-log",
+        "escalation-metrics"
+      ]
+    },
+    {
+      "id": "s4",
+      "description": "Collect a developer self-report on whether articulating the problem surfaced the bug in that session.",
+      "dependencies": [
+        "s2"
+      ],
+      "resources": [
+        "self-report-form"
+      ]
+    },
+    {
+      "id": "s5",
+      "description": "Treat the protocol as failing if escalation rates stay unchanged, sessions exceed 15 minutes without progress, or the team finds the ritual disruptive and stops using it.",
+      "dependencies": [
+        "s3",
+        "s4"
+      ],
+      "resources": [
+        "review-criteria",
+        "team-feedback"
+      ]
+    }
+  ]
+}
+```
+secondary_structured_tool_input:
+```json
+{
+  "response_text": "Rubber Duck Debugging Protocol\n\nWhen to use: Before asking a teammate for help. Spend 5 to 10 minutes explaining the problem aloud to the duck first.\n\nHow to measure usefulness:\n- Track how often the developer resolved the issue during or after the duck session (without escalating).\n- Log session frequency per sprint. Compare escalation rate before and after adoption.\n- Developer self-reports whether articulating the problem surfaced the bug.\n\nWhat counts as failure:\n- Developer consistently cannot resolve issues alone after duck sessions (escalation rate unchanged).\n- Sessions take longer than 15 minutes without progress.\n- Team finds the ritual disruptive or stops using it voluntarily.\n\nThis protocol treats the duck as a structured verbalization trigger, not a cause of outcomes.\n\nBottom line:\nA lightweight protocol that tracks observable behavior (escalation rate, session time) without attributing causal benefit to the duck.",
+  "claims": [
+    "The protocol should be used before asking a teammate for help.",
+    "Developers should spend 5 to 10 minutes explaining the problem aloud to the duck.",
+    "Usefulness is measured by self-resolution without escalation, session frequency, escalation-rate comparison, and self-reports.",
+    "Failure includes unchanged escalation rates, sessions longer than 15 minutes without progress, and voluntary abandonment because the ritual is disruptive.",
+    "The protocol does not claim the duck causes better outcomes."
+  ],
+  "evidence": [
+    "5 to 10 minute session window.",
+    "Before-and-after escalation-rate comparison.",
+    "Per-sprint session logging.",
+    "Self-report about whether articulation surfaced the bug.",
+    "Explicit failure thresholds for no progress and team abandonment."
+  ]
+}
+```
+tool_output_summary:
+The primary tool found the protocol structurally coherent once translated into a five-step plan, with no missing prerequisites, cycles, or resource conflicts. The secondary tool judged the answer reasonably substantive and organized but flagged extremely low specificity, which fits the answer's loose operational definitions for baseline, progress, and measurement windows.
+
+ct_metric_snapshot:
+- status: PASS
+- context_used: false
+- ct_warning_count: 1
+- ct_blocking_issue_count: 0
+- corrective_prompt_present: no
+- primary_numeric_metrics: completeness_score=1; step_count=5; critical_path_length=4; overall_score=0.618; structure_score=0.66; specificity_score=0.00
+
+raw_ct_mcp_output_json:
+```json
+{
+  "status": "PASS",
+  "is_valid": true,
+  "circular_dependencies": [],
+  "missing_prerequisites": [],
+  "resource_conflicts": [],
+  "completeness_score": 1,
+  "critical_path": [
+    "s1",
+    "s2",
+    "s3",
+    "s5"
+  ],
+  "step_count": 5,
+  "context_used": false
+}
+```
+
+secondary_raw_ct_mcp_output_json:
+```json
+{
+  "status": "PASS",
+  "overall_score": 0.618,
+  "substance_score": 0.953,
+  "specificity_score": 0,
+  "hedge_density": 0,
+  "structure_score": 0.66,
+  "improvement_prompt": "Your weakest dimension is \"specificity\" (score: 0.00). Add concrete details: names, numbers, dates, measurements, or specific conditions.",
+  "context_used": false,
+  "enforcement": {
+    "blocking_issues": [],
+    "warnings": [
+      "Low specificity (score: 0.00). Add concrete details and quantitative markers."
+    ],
+    "corrective_prompt": ""
+  }
+}
+```
+
+critique_packet:
+Missed constraints:
+- None obvious; the answer covers when to use the protocol, how usefulness would be measured, what counts as failure, and it avoids claiming causal improvement.
+
+Hidden assumptions:
+- The team already has, or can cheaply create, a usable baseline for escalation rates before adoption.
+- Self-reports about "articulating the problem surfaced the bug" are informative enough to treat as evidence of usefulness.
+- Changes in escalation behavior are attributable to the protocol rather than differences in bug mix, sprint pressure, or teammate availability.
+- A 5 to 10 minute duck step is inexpensive enough that developers will apply it consistently before escalation.
+
+Irrelevant or overweighted factors:
+- Session frequency per sprint is tracked, but usage volume alone is weak evidence that the protocol is useful.
+- Self-report is given similar weight to behavioral measures even though it is more subjective and easier to bias.
+
+False certainty or impossible claim:
+- "Escalation rate unchanged" is presented as a failure condition without defining the comparison window, baseline quality, or what amount of change would count.
+- "Sessions take longer than 15 minutes without progress" uses a hard threshold without defining what progress means or how it is recorded.
+
+Safer revision target:
+- Keep the non-causal framing, but define who records sessions, what baseline and review window will be used for escalation-rate comparisons, and how "progress" is measured so the failure criteria can be applied consistently.
+apply_patch(auto_approved=true) exited 0 in 127ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/C02/tool_review.md
+file update:
+diff --git a/duckexperiments/results/claude_low/C02/tool_review.md b/duckexperiments/results/claude_low/C02/tool_review.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..5129ff9c9e6fd0d2be08b15d5228d76241d894e7
+--- /dev/null
++++ b/duckexperiments/results/claude_low/C02/tool_review.md
+@@ -0,0 +1,164 @@
++run_profile_id: claude_low
++prompt_id: C02
++condition: tool_review
++review_outcome: completed
++primary_tool_run: check_plan_validity
++secondary_tool_run: score_response_quality
++actual_tools_fired: check_plan_validity, score_response_quality
++tool_environment_status: available
++environment_issue: none
++tool_help_rating: partial
++weak_fit: no
++structured_tool_input:
++```json
++{
++  "steps": [
++    {
++      "id": "s1",
++      "description": "Adopt a team rule that before asking a teammate for help, a developer spends 5 to 10 minutes explaining the debugging problem aloud to a rubber duck.",
++      "dependencies": [],
++      "resources": [
++        "team-policy",
++        "developer-time"
++      ]
++    },
++    {
++      "id": "s2",
++      "description": "During each duck session, record whether the developer resolved the issue during or immediately after the session without escalating to a teammate.",
++      "dependencies": [
++        "s1"
++      ],
++      "resources": [
++        "session-log",
++        "developer-time"
++      ]
++    },
++    {
++      "id": "s3",
++      "description": "Log how often duck sessions occur each sprint and compare escalation rates before and after the protocol is adopted.",
++      "dependencies": [
++        "s1",
++        "s2"
++      ],
++      "resources": [
++        "sprint-log",
++        "escalation-metrics"
++      ]
++    },
++    {
++      "id": "s4",
++      "description": "Collect a developer self-report on whether articulating the problem surfaced the bug in that session.",
++      "dependencies": [
++        "s2"
++      ],
++      "resources": [
++        "self-report-form"
++      ]
++    },
++    {
++      "id": "s5",
++      "description": "Treat the protocol as failing if escalation rates stay unchanged, sessions exceed 15 minutes without progress, or the team finds the ritual disruptive and stops using it.",
++      "dependencies": [
++        "s3",
++        "s4"
++      ],
++      "resources": [
++        "review-criteria",
++        "team-feedback"
++      ]
++    }
++  ]
++}
++```
++secondary_structured_tool_input:
++```json
++{
++  "response_text": "Rubber Duck Debugging Protocol\n\nWhen to use: Before asking a teammate for help. Spend 5 to 10 minutes explaining the problem aloud to the duck first.\n\nHow to measure usefulness:\n- Track how often the developer resolved the issue during or after the duck session (without escalating).\n- Log session frequency per sprint. Compare escalation rate before and after adoption.\n- Developer self-reports whether articulating the problem surfaced the bug.\n\nWhat counts as failure:\n- Developer consistently cannot resolve issues alone after duck sessions (escalation rate unchanged).\n- Sessions take longer than 15 minutes without progress.\n- Team finds the ritual disruptive or stops using it voluntarily.\n\nThis protocol treats the duck as a structured verbalization trigger, not a cause of outcomes.\n\nBottom line:\nA lightweight protocol that tracks observable behavior (escalation rate, session time) without attributing causal benefit to the duck.",
++  "claims": [
++    "The protocol should be used before asking a teammate for help.",
++    "Developers should spend 5 to 10 minutes explaining the problem aloud to the duck.",
++    "Usefulness is measured by self-resolution without escalation, session frequency, escalation-rate comparison, and self-reports.",
++    "Failure includes unchanged escalation rates, sessions longer than 15 minutes without progress, and voluntary abandonment because the ritual is disruptive.",
++    "The protocol does not claim the duck causes better outcomes."
++  ],
++  "evidence": [
++    "5 to 10 minute session window.",
++    "Before-and-after escalation-rate comparison.",
++    "Per-sprint session logging.",
++    "Self-report about whether articulation surfaced the bug.",
++    "Explicit failure thresholds for no progress and team abandonment."
++  ]
++}
++```
++tool_output_summary:
++The primary tool found the protocol structurally coherent once translated into a five-step plan, with no missing prerequisites, cycles, or resource conflicts. The secondary tool judged the answer reasonably substantive and organized but flagged extremely low specificity, which fits the answer's loose operational definitions for baseline, progress, and measurement windows.
++
++ct_metric_snapshot:
++- status: PASS
++- context_used: false
++- ct_warning_count: 1
++- ct_blocking_issue_count: 0
++- corrective_prompt_present: no
++- primary_numeric_metrics: completeness_score=1; step_count=5; critical_path_length=4; overall_score=0.618; structure_score=0.66; specificity_score=0.00
++
++raw_ct_mcp_output_json:
++```json
++{
++  "status": "PASS",
++  "is_valid": true,
++  "circular_dependencies": [],
++  "missing_prerequisites": [],
++  "resource_conflicts": [],
++  "completeness_score": 1,
++  "critical_path": [
++    "s1",
++    "s2",
++    "s3",
++    "s5"
++  ],
++  "step_count": 5,
++  "context_used": false
++}
++```
++
++secondary_raw_ct_mcp_output_json:
++```json
++{
++  "status": "PASS",
++  "overall_score": 0.618,
++  "substance_score": 0.953,
++  "specificity_score": 0,
++  "hedge_density": 0,
++  "structure_score": 0.66,
++  "improvement_prompt": "Your weakest dimension is \"specificity\" (score: 0.00). Add concrete details: names, numbers, dates, measurements, or specific conditions.",
++  "context_used": false,
++  "enforcement": {
++    "blocking_issues": [],
++    "warnings": [
++      "Low specificity (score: 0.00). Add concrete details and quantitative markers."
++    ],
++    "corrective_prompt": ""
++  }
++}
++```
++
++critique_packet:
++Missed constraints:
++- None obvious; the answer covers when to use the protocol, how usefulness would be measured, what counts as failure, and it avoids claiming causal improvement.
++
++Hidden assumptions:
++- The team already has, or can cheaply create, a usable baseline for escalation rates before adoption.
++- Self-reports about "articulating the problem surfaced the bug" are informative enough to treat as evidence of usefulness.
++- Changes in escalation behavior are attributable to the protocol rather than differences in bug mix, sprint pressure, or teammate availability.
++- A 5 to 10 minute duck step is inexpensive enough that developers will apply it consistently before escalation.
++
++Irrelevant or overweighted factors:
++- Session frequency per sprint is tracked, but usage volume alone is weak evidence that the protocol is useful.
++- Self-report is given similar weight to behavioral measures even though it is more subjective and easier to bias.
++
++False certainty or impossible claim:
++- "Escalation rate unchanged" is presented as a failure condition without defining the comparison window, baseline quality, or what amount of change would count.
++- "Sessions take longer than 15 minutes without progress" uses a hard threshold without defining what progress means or how it is recorded.
++
++Safer revision target:
++- Keep the non-causal framing, but define who records sessions, what baseline and review window will be used for escalation-rate comparisons, and how "progress" is measured so the failure criteria can be applied consistently.
+
+file update:
+diff --git a/duckexperiments/results/claude_low/C02/tool_review.md b/duckexperiments/results/claude_low/C02/tool_review.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..5129ff9c9e6fd0d2be08b15d5228d76241d894e7
+--- /dev/null
++++ b/duckexperiments/results/claude_low/C02/tool_review.md
+@@ -0,0 +1,164 @@
++run_profile_id: claude_low
++prompt_id: C02
++condition: tool_review
++review_outcome: completed
++primary_tool_run: check_plan_validity
++secondary_tool_run: score_response_quality
++actual_tools_fired: check_plan_validity, score_response_quality
++tool_environment_status: available
++environment_issue: none
++tool_help_rating: partial
++weak_fit: no
++structured_tool_input:
++```json
++{
++  "steps": [
++    {
++      "id": "s1",
++      "description": "Adopt a team rule that before asking a teammate for help, a developer spends 5 to 10 minutes explaining the debugging problem aloud to a rubber duck.",
++      "dependencies": [],
++      "resources": [
++        "team-policy",
++        "developer-time"
++      ]
++    },
++    {
++      "id": "s2",
++      "description": "During each duck session, record whether the developer resolved the issue during or immediately after the session without escalating to a teammate.",
++      "dependencies": [
++        "s1"
++      ],
++      "resources": [
++        "session-log",
++        "developer-time"
++      ]
++    },
++    {
++      "id": "s3",
++      "description": "Log how often duck sessions occur each sprint and compare escalation rates before and after the protocol is adopted.",
++      "dependencies": [
++        "s1",
++        "s2"
++      ],
++      "resources": [
++        "sprint-log",
++        "escalation-metrics"
++      ]
++    },
++    {
++      "id": "s4",
++      "description": "Collect a developer self-report on whether articulating the problem surfaced the bug in that session.",
++      "dependencies": [
++        "s2"
++      ],
++      "resources": [
++        "self-report-form"
++      ]
++    },
++    {
++      "id": "s5",
++      "description": "Treat the protocol as failing if escalation rates stay unchanged, sessions exceed 15 minutes without progress, or the team finds the ritual disruptive and stops using it.",
++      "dependencies": [
++        "s3",
++        "s4"
++      ],
++      "resources": [
++        "review-criteria",
++        "team-feedback"
++      ]
++    }
++  ]
++}
++```
++secondary_structured_tool_input:
++```json
++{
++  "response_text": "Rubber Duck Debugging Protocol\n\nWhen to use: Before asking a teammate for help. Spend 5 to 10 minutes explaining the problem aloud to the duck first.\n\nHow to measure usefulness:\n- Track how often the developer resolved the issue during or after the duck session (without escalating).\n- Log session frequency per sprint. Compare escalation rate before and after adoption.\n- Developer self-reports whether articulating the problem surfaced the bug.\n\nWhat counts as failure:\n- Developer consistently cannot resolve issues alone after duck sessions (escalation rate unchanged).\n- Sessions take longer than 15 minutes without progress.\n- Team finds the ritual disruptive or stops using it voluntarily.\n\nThis protocol treats the duck as a structured verbalization trigger, not a cause of outcomes.\n\nBottom line:\nA lightweight protocol that tracks observable behavior (escalation rate, session time) without attributing causal benefit to the duck.",
++  "claims": [
++    "The protocol should be used before asking a teammate for help.",
++    "Developers should spend 5 to 10 minutes explaining the problem aloud to the duck.",
++    "Usefulness is measured by self-resolution without escalation, session frequency, escalation-rate comparison, and self-reports.",
++    "Failure includes unchanged escalation rates, sessions longer than 15 minutes without progress, and voluntary abandonment because the ritual is disruptive.",
++    "The protocol does not claim the duck causes better outcomes."
++  ],
++  "evidence": [
++    "5 to 10 minute session window.",
++    "Before-and-after escalation-rate comparison.",
++    "Per-sprint session logging.",
++    "Self-report about whether articulation surfaced the bug.",
++    "Explicit failure thresholds for no progress and team abandonment."
++  ]
++}
++```
++tool_output_summary:
++The primary tool found the protocol structurally coherent once translated into a five-step plan, with no missing prerequisites, cycles, or resource conflicts. The secondary tool judged the answer reasonably substantive and organized but flagged extremely low specificity, which fits the answer's loose operational definitions for baseline, progress, and measurement windows.
++
++ct_metric_snapshot:
++- status: PASS
++- context_used: false
++- ct_warning_count: 1
++- ct_blocking_issue_count: 0
++- corrective_prompt_present: no
++- primary_numeric_metrics: completeness_score=1; step_count=5; critical_path_length=4; overall_score=0.618; structure_score=0.66; specificity_score=0.00
++
++raw_ct_mcp_output_json:
++```json
++{
++  "status": "PASS",
++  "is_valid": true,
++  "circular_dependencies": [],
++  "missing_prerequisites": [],
++  "resource_conflicts": [],
++  "completeness_score": 1,
++  "critical_path": [
++    "s1",
++    "s2",
++    "s3",
++    "s5"
++  ],
++  "step_count": 5,
++  "context_used": false
++}
++```
++
++secondary_raw_ct_mcp_output_json:
++```json
++{
++  "status": "PASS",
++  "overall_score": 0.618,
++  "substance_score": 0.953,
++  "specificity_score": 0,
++  "hedge_density": 0,
++  "structure_score": 0.66,
++  "improvement_prompt": "Your weakest dimension is \"specificity\" (score: 0.00). Add concrete details: names, numbers, dates, measurements, or specific conditions.",
++  "context_used": false,
++  "enforcement": {
++    "blocking_issues": [],
++    "warnings": [
++      "Low specificity (score: 0.00). Add concrete details and quantitative markers."
++    ],
++    "corrective_prompt": ""
++  }
++}
++```
++
++critique_packet:
++Missed constraints:
++- None obvious; the answer covers when to use the protocol, how usefulness would be measured, what counts as failure, and it avoids claiming causal improvement.
++
++Hidden assumptions:
++- The team already has, or can cheaply create, a usable baseline for escalation rates before adoption.
++- Self-reports about "articulating the problem surfaced the bug" are informative enough to treat as evidence of usefulness.
++- Changes in escalation behavior are attributable to the protocol rather than differences in bug mix, sprint pressure, or teammate availability.
++- A 5 to 10 minute duck step is inexpensive enough that developers will apply it consistently before escalation.
++
++Irrelevant or overweighted factors:
++- Session frequency per sprint is tracked, but usage volume alone is weak evidence that the protocol is useful.
++- Self-report is given similar weight to behavioral measures even though it is more subjective and easier to bias.
++
++False certainty or impossible claim:
++- "Escalation rate unchanged" is presented as a failure condition without defining the comparison window, baseline quality, or what amount of change would count.
++- "Sessions take longer than 15 minutes without progress" uses a hard threshold without defining what progress means or how it is recorded.
++
++Safer revision target:
++- Keep the non-causal framing, but define who records sessions, what baseline and review window will be used for escalation-rate comparisons, and how "progress" is measured so the failure criteria can be applied consistently.
+
+codex
+The artifact is written. I’m doing one narrow verification pass on the target file to confirm the header fields and tool outputs landed correctly.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,240p' /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/C02/tool_review.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 87ms:
+run_profile_id: claude_low
+prompt_id: C02
+condition: tool_review
+review_outcome: completed
+primary_tool_run: check_plan_validity
+secondary_tool_run: score_response_quality
+actual_tools_fired: check_plan_validity, score_response_quality
+tool_environment_status: available
+environment_issue: none
+tool_help_rating: partial
+weak_fit: no
+structured_tool_input:
+```json
+{
+  "steps": [
+    {
+      "id": "s1",
+      "description": "Adopt a team rule that before asking a teammate for help, a developer spends 5 to 10 minutes explaining the debugging problem aloud to a rubber duck.",
+      "dependencies": [],
+      "resources": [
+file update:
+diff --git a/duckexperiments/results/claude_low/C02/tool_review.md b/duckexperiments/results/claude_low/C02/tool_review.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..5129ff9c9e6fd0d2be08b15d5228d76241d894e7
+--- /dev/null
++++ b/duckexperiments/results/claude_low/C02/tool_review.md
+@@ -0,0 +1,164 @@
++run_profile_id: claude_low
++prompt_id: C02
++condition: tool_review
++review_outcome: completed
++primary_tool_run: check_plan_validity
++secondary_tool_run: score_response_quality
++actual_tools_fired: check_plan_validity, score_response_quality
++tool_environment_status: available
++environment_issue: none
++tool_help_rating: partial
++weak_fit: no
++structured_tool_input:
++```json
++{
++  "steps": [
++    {
++      "id": "s1",
++      "description": "Adopt a team rule that before asking a teammate for help, a developer spends 5 to 10 minutes explaining the debugging problem aloud to a rubber duck.",
++      "dependencies": [],
++      "resources": [
++        "team-policy",
++        "developer-time"
++      ]
++    },
++    {
++      "id": "s2",
++      "description": "During each duck session, record whether the developer resolved the issue during or immediately after the session without escalating to a teammate.",
++      "dependencies": [
++        "s1"
++      ],
++      "resources": [
++        "session-log",
++        "developer-time"
++      ]
++    },
++    {
++      "id": "s3",
++      "description": "Log how often duck sessions occur each sprint and compare escalation rates before and after the protocol is adopted.",
++      "dependencies": [
++        "s1",
++        "s2"
++      ],
++      "resources": [
++        "sprint-log",
++        "escalation-metrics"
++      ]
++    },
++    {
++      "id": "s4",
++      "description": "Collect a developer self-report on whether articulating the problem surfaced the bug in that session.",
++      "dependencies": [
++        "s2"
++      ],
++      "resources": [
++        "self-report-form"
++      ]
++    },
++    {
++      "id": "s5",
++      "description": "Treat the protocol as failing if escalation rates stay unchanged, sessions exceed 15 minutes without progress, or the team finds the ritual disruptive and stops using it.",
++      "dependencies": [
++        "s3",
++        "s4"
++      ],
++      "resources": [
++        "review-criteria",
++        "team-feedback"
++      ]
++    }
++  ]
++}
++```
++secondary_structured_tool_input:
++```json
++{
++  "response_text": "Rubber Duck Debugging Protocol\n\nWhen to use: Before asking a teammate for help. Spend 5 to 10 minutes explaining the problem aloud to the duck first.\n\nHow to measure usefulness:\n- Track how often the developer resolved the issue during or after the duck session (without escalating).\n- Log session frequency per sprint. Compare escalation rate before and after adoption.\n- Developer self-reports whether articulating the problem surfaced the bug.\n\nWhat counts as failure:\n- Developer consistently cannot resolve issues alone after duck sessions (escalation rate unchanged).\n- Sessions take longer than 15 minutes without progress.\n- Team finds the ritual disruptive or stops using it voluntarily.\n\nThis protocol treats the duck as a structured verbalization trigger, not a cause of outcomes.\n\nBottom line:\nA lightweight protocol that tracks observable behavior (escalation rate, session time) without attributing causal benefit to the duck.",
++  "claims": [
++    "The protocol should be used before asking a teammate for help.",
++    "Developers should spend 5 to 10 minutes explaining the problem aloud to the duck.",
++    "Usefulness is measured by self-resolution without escalation, session frequency, escalation-rate comparison, and self-reports.",
++    "Failure includes unchanged escalation rates, sessions longer than 15 minutes without progress, and voluntary abandonment because the ritual is disruptive.",
++    "The protocol does not claim the duck causes better outcomes."
++  ],
++  "evidence": [
++    "5 to 10 minute session window.",
++    "Before-and-after escalation-rate comparison.",
++    "Per-sprint session logging.",
++    "Self-report about whether articulation surfaced the bug.",
++    "Explicit failure thresholds for no progress and team abandonment."
++  ]
++}
++```
++tool_output_summary:
++The primary tool found the protocol structurally coherent once translated into a five-step plan, with no missing prerequisites, cycles, or resource conflicts. The secondary tool judged the answer reasonably substantive and organized but flagged extremely low specificity, which fits the answer's loose operational definitions for baseline, progress, and measurement windows.
++
++ct_metric_snapshot:
++- status: PASS
++- context_used: false
++- ct_warning_count: 1
++- ct_blocking_issue_count: 0
++- corrective_prompt_present: no
++- primary_numeric_metrics: completeness_score=1; step_count=5; critical_path_length=4; overall_score=0.618; structure_score=0.66; specificity_score=0.00
++
++raw_ct_mcp_output_json:
++```json
++{
++  "status": "PASS",
++  "is_valid": true,
++  "circular_dependencies": [],
++  "missing_prerequisites": [],
++  "resource_conflicts": [],
++  "completeness_score": 1,
++  "critical_path": [
++    "s1",
++    "s2",
++    "s3",
++    "s5"
++  ],
++  "step_count": 5,
++  "context_used": false
++}
++```
++
++secondary_raw_ct_mcp_output_json:
++```json
++{
++  "status": "PASS",
++  "overall_score": 0.618,
++  "substance_score": 0.953,
++  "specificity_score": 0,
++  "hedge_density": 0,
++  "structure_score": 0.66,
++  "improvement_prompt": "Your weakest dimension is \"specificity\" (score: 0.00). Add concrete details: names, numbers, dates, measurements, or specific conditions.",
++  "context_used": false,
++  "enforcement": {
++    "blocking_issues": [],
++    "warnings": [
++      "Low specificity (score: 0.00). Add concrete details and quantitative markers."
++    ],
++    "corrective_prompt": ""
++  }
++}
++```
++
++critique_packet:
++Missed constraints:
++- None obvious; the answer covers when to use the protocol, how usefulness would be measured, what counts as failure, and it avoids claiming causal improvement.
++
++Hidden assumptions:
++- The team already has, or can cheaply create, a usable baseline for escalation rates before adoption.
++- Self-reports about "articulating the problem surfaced the bug" are informative enough to treat as evidence of usefulness.
++- Changes in escalation behavior are attributable to the protocol rather than differences in bug mix, sprint pressure, or teammate availability.
++- A 5 to 10 minute duck step is inexpensive enough that developers will apply it consistently before escalation.
++
++Irrelevant or overweighted factors:
++- Session frequency per sprint is tracked, but usage volume alone is weak evidence that the protocol is useful.
++- Self-report is given similar weight to behavioral measures even though it is more subjective and easier to bias.
++
++False certainty or impossible claim:
++- "Escalation rate unchanged" is presented as a failure condition without defining the comparison window, baseline quality, or what amount of change would count.
++- "Sessions take longer than 15 minutes without progress" uses a hard threshold without defining what progress means or how it is recorded.
++
++Safer revision target:
++- Keep the non-causal framing, but define who records sessions, what baseline and review window will be used for escalation-rate comparisons, and how "progress" is measured so the failure criteria can be applied consistently.
+
+codex
+Wrote the `tool_review` artifact to [tool_review.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/C02/tool_review.md).
+
+It uses the designated CT-MCP tools for `C02`:
+- `check_plan_validity`
+- `score_response_quality`
+
+Verification: the file contains the required metadata, exact structured inputs, raw tool JSON, and a completed critique packet.
+file update:
+diff --git a/duckexperiments/results/claude_low/C02/tool_review.md b/duckexperiments/results/claude_low/C02/tool_review.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..5129ff9c9e6fd0d2be08b15d5228d76241d894e7
+--- /dev/null
++++ b/duckexperiments/results/claude_low/C02/tool_review.md
+@@ -0,0 +1,164 @@
++run_profile_id: claude_low
++prompt_id: C02
++condition: tool_review
++review_outcome: completed
++primary_tool_run: check_plan_validity
++secondary_tool_run: score_response_quality
++actual_tools_fired: check_plan_validity, score_response_quality
++tool_environment_status: available
++environment_issue: none
++tool_help_rating: partial
++weak_fit: no
++structured_tool_input:
++```json
++{
++  "steps": [
++    {
++      "id": "s1",
++      "description": "Adopt a team rule that before asking a teammate for help, a developer spends 5 to 10 minutes explaining the debugging problem aloud to a rubber duck.",
++      "dependencies": [],
++      "resources": [
++        "team-policy",
++        "developer-time"
++      ]
++    },
++    {
++      "id": "s2",
++      "description": "During each duck session, record whether the developer resolved the issue during or immediately after the session without escalating to a teammate.",
++      "dependencies": [
++        "s1"
++      ],
++      "resources": [
++        "session-log",
++        "developer-time"
++      ]
++    },
++    {
++      "id": "s3",
++      "description": "Log how often duck sessions occur each sprint and compare escalation rates before and after the protocol is adopted.",
++      "dependencies": [
++        "s1",
++        "s2"
++      ],
++      "resources": [
++        "sprint-log",
++        "escalation-metrics"
++      ]
++    },
++    {
++      "id": "s4",
++      "description": "Collect a developer self-report on whether articulating the problem surfaced the bug in that session.",
++      "dependencies": [
++        "s2"
++      ],
++      "resources": [
++        "self-report-form"
++      ]
++    },
++    {
++      "id": "s5",
++      "description": "Treat the protocol as failing if escalation rates stay unchanged, sessions exceed 15 minutes without progress, or the team finds the ritual disruptive and stops using it.",
++      "dependencies": [
++        "s3",
++        "s4"
++      ],
++      "resources": [
++        "review-criteria",
++        "team-feedback"
++      ]
++    }
++  ]
++}
++```
++secondary_structured_tool_input:
++```json
++{
++  "response_text": "Rubber Duck Debugging Protocol\n\nWhen to use: Before asking a teammate for help. Spend 5 to 10 minutes explaining the problem aloud to the duck first.\n\nHow to measure usefulness:\n- Track how often the developer resolved the issue during or after the duck session (without escalating).\n- Log session frequency per sprint. Compare escalation rate before and after adoption.\n- Developer self-reports whether articulating the problem surfaced the bug.\n\nWhat counts as failure:\n- Developer consistently cannot resolve issues alone after duck sessions (escalation rate unchanged).\n- Sessions take longer than 15 minutes without progress.\n- Team finds the ritual disruptive or stops using it voluntarily.\n\nThis protocol treats the duck as a structured verbalization trigger, not a cause of outcomes.\n\nBottom line:\nA lightweight protocol that tracks observable behavior (escalation rate, session time) without attributing causal benefit to the duck.",
++  "claims": [
++    "The protocol should be used before asking a teammate for help.",
++    "Developers should spend 5 to 10 minutes explaining the problem aloud to the duck.",
++    "Usefulness is measured by self-resolution without escalation, session frequency, escalation-rate comparison, and self-reports.",
++    "Failure includes unchanged escalation rates, sessions longer than 15 minutes without progress, and voluntary abandonment because the ritual is disruptive.",
++    "The protocol does not claim the duck causes better outcomes."
++  ],
++  "evidence": [
++    "5 to 10 minute session window.",
++    "Before-and-after escalation-rate comparison.",
++    "Per-sprint session logging.",
++    "Self-report about whether articulation surfaced the bug.",
++    "Explicit failure thresholds for no progress and team abandonment."
++  ]
++}
++```
++tool_output_summary:
++The primary tool found the protocol structurally coherent once translated into a five-step plan, with no missing prerequisites, cycles, or resource conflicts. The secondary tool judged the answer reasonably substantive and organized but flagged extremely low specificity, which fits the answer's loose operational definitions for baseline, progress, and measurement windows.
++
++ct_metric_snapshot:
++- status: PASS
++- context_used: false
++- ct_warning_count: 1
++- ct_blocking_issue_count: 0
++- corrective_prompt_present: no
++- primary_numeric_metrics: completeness_score=1; step_count=5; critical_path_length=4; overall_score=0.618; structure_score=0.66; specificity_score=0.00
++
++raw_ct_mcp_output_json:
++```json
++{
++  "status": "PASS",
++  "is_valid": true,
++  "circular_dependencies": [],
++  "missing_prerequisites": [],
++  "resource_conflicts": [],
++  "completeness_score": 1,
++  "critical_path": [
++    "s1",
++    "s2",
++    "s3",
++    "s5"
++  ],
++  "step_count": 5,
++  "context_used": false
++}
++```
++
++secondary_raw_ct_mcp_output_json:
++```json
++{
++  "status": "PASS",
++  "overall_score": 0.618,
++  "substance_score": 0.953,
++  "specificity_score": 0,
++  "hedge_density": 0,
++  "structure_score": 0.66,
++  "improvement_prompt": "Your weakest dimension is \"specificity\" (score: 0.00). Add concrete details: names, numbers, dates, measurements, or specific conditions.",
++  "context_used": false,
++  "enforcement": {
++    "blocking_issues": [],
++    "warnings": [
++      "Low specificity (score: 0.00). Add concrete details and quantitative markers."
++    ],
++    "corrective_prompt": ""
++  }
++}
++```
++
++critique_packet:
++Missed constraints:
++- None obvious; the answer covers when to use the protocol, how usefulness would be measured, what counts as failure, and it avoids claiming causal improvement.
++
++Hidden assumptions:
++- The team already has, or can cheaply create, a usable baseline for escalation rates before adoption.
++- Self-reports about "articulating the problem surfaced the bug" are informative enough to treat as evidence of usefulness.
++- Changes in escalation behavior are attributable to the protocol rather than differences in bug mix, sprint pressure, or teammate availability.
++- A 5 to 10 minute duck step is inexpensive enough that developers will apply it consistently before escalation.
++
++Irrelevant or overweighted factors:
++- Session frequency per sprint is tracked, but usage volume alone is weak evidence that the protocol is useful.
++- Self-report is given similar weight to behavioral measures even though it is more subjective and easier to bias.
++
++False certainty or impossible claim:
++- "Escalation rate unchanged" is presented as a failure condition without defining the comparison window, baseline quality, or what amount of change would count.
++- "Sessions take longer than 15 minutes without progress" uses a hard threshold without defining what progress means or how it is recorded.
++
++Safer revision target:
++- Keep the non-causal framing, but define who records sessions, what baseline and review window will be used for escalation-rate comparisons, and how "progress" is measured so the failure criteria can be applied consistently.
+
+tokens used
+53,263

@@ -1,0 +1,6 @@
+Written to `/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_thinking/Q06/prompted.md`.
+
+Key flags raised in the `prompted` condition:
+1. **Survivorship bias** — "every time" omits bugs that stayed unsolved
+2. **Impossible guarantee** — "deterministic" and "guarantees" conflict with the non-deterministic nature of debugging
+3. The response provides a bounded heuristic protocol (with a hard 10-minute escalation point) rather than a false guarantee

@@ -1,0 +1,226 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: low
+reasoning summaries: none
+session id: 019d4c50-1fdd-7a02-acf2-2c632fa8c1d0
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: C01
+- condition: baseline
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C01/baseline.md
+
+mcp: ct-mcp starting
+mcp: fullscope starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m loading the experiment runner contract and the referenced prompt context first, then I’ll execute the cell and write the result to the requested output path.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,220p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf pwd
+TPF_LLM_TOOL=codex tpf rg --files duckexperiments | rg 'AGENT_RUNNER_PROMPT.md|C01|baseline|prompt'" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 218ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+ succeeded in 960ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+duckexperiments/AGENT_RUNNER_PROMPT.md
+duckexperiments/results/claude_low/C01/prompted.prompt.txt
+duckexperiments/results/claude_low/C01/critique_revised.prompt.txt
+duckexperiments/results/claude_low/C01/critique_initial.prompt.txt
+duckexperiments/results/claude_low/C01/baseline.prompt.txt
+duckexperiments/results/claude_low/C01/tool_review.prompt.txt
+duckexperiments/results/gemini_low/C01/prompted.prompt.txt
+duckexperiments/results/gemini_low/C01/critique_revised.prompt.txt
+duckexperiments/results/gemini_low/C01/critique_initial.prompt.txt
+duckexperiments/results/gemini_low/C01/baseline.prompt.txt
+duckexperiments/results/gemini_low/C01/tool_review.prompt.txt
+duckexperiments/results/codex_low/C01/baseline.prompt.txt
+duckexperiments/results/codex_low/C01/tool_review.prompt.txt
+duckexperiments/results/codex_low/C01/critique_initial.prompt.txt
+duckexperiments/results/codex_low/C01/critique_revised.prompt.txt
+duckexperiments/results/codex_low/C01/prompted.prompt.txt
+codex
+I have the execution contract. Next I’m resolving the run profile, canonical prompt text, and wrapper selection for `codex_low / C01 / baseline`, then I’ll generate the artifact content and write it once to the requested path.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "codex_low|C01|Response Agent Prompt|Tool-Review Agent Prompt|Recommended Output Path Pattern" duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+56:5. if `output_path` is omitted, derive it from `## 5. Recommended Output Path Pattern`
+98:Example for `claude_low / C01`:
+99:- `/tmp/duck_claude-sonnet_low_C01_baseline.md`
+100:- `/tmp/duck_claude-sonnet_low_C01_prompted.md`
+101:- `/tmp/duck_claude-sonnet_low_C01_critique_initial.md`
+102:- `/tmp/duck_claude-sonnet_low_C01_tool_review.md`
+103:- `/tmp/duck_claude-sonnet_low_C01_critique_revised.md`
+165:If `output_path` is omitted, derive it from `## 5. Recommended Output Path Pattern`.
+185:- If the condition is `baseline`, `prompted`, `critique_initial`, or `critique_revised`, copy everything inside `## 1. Response Agent Prompt`.
+186:- If the condition is `tool_review`, copy everything inside `## 2. Tool-Review Agent Prompt`.
+199:For the first control prompt `C01`, the underlying experiment prompt is:
+209:- `baseline`: the agent should select the `Response Agent Prompt`
+210:- `tool_review`: the agent should select the `Tool-Review Agent Prompt` and read the exact `critique_initial` artifact for the same cell
+227:| `codex_low` | `codex` | `low` | `Codex` | `default` |
+240:### C01
+390:## 1. Response Agent Prompt
+485:## 2. Tool-Review Agent Prompt
+668:- prompt_id: C01
+678:- prompt_id: C01
+689:- prompt_id: C01
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '220,520p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+## 0.5 Default Run Profile Catalog
+
+If you use one of these six canonical `run_profile_id` values, you do not need to manually invent the model metadata.
+Resolve it from this table.
+
+| run_profile_id | model_slug | reasoning_tier | model_string | temperature |
+|---|---|---|---|---|
+| `codex_low` | `codex` | `low` | `Codex` | `default` |
+| `codex_thinking` | `codex` | `thinking` | `Codex` | `default` |
+| `claude_low` | `claude-sonnet` | `low` | `Claude Sonnet` | `default` |
+| `claude_thinking` | `claude-sonnet` | `thinking` | `Claude Sonnet` | `default` |
+| `gemini_low` | `gemini` | `low` | `Gemini` | `default` |
+| `gemini_thinking` | `gemini` | `thinking` | `Gemini` | `default` |
+
+## 0.6 Canonical Prompt Catalog
+
+This file now mirrors the canonical prompt pack so the operator does not need to bounce between files.
+
+If `PROMPTS.md` and this file ever drift, treat `PROMPTS.md` as the source of truth and update this file.
+
+codex
+I have enough context. I’m creating the single baseline artifact now, using the required metadata and response format from the contract, without reading any other experiment outputs.
+exec
+/bin/zsh -lc 'mkdir -p /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C01' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C01/baseline.md
+run_profile_id: codex_low
+prompt_id: C01
+condition: baseline
+response:
+Run a randomized within-subject study: developers debug matched bug sets with and without rubber ducking, with order counterbalanced. Metric: median time to first correct bug identification, plus bugs found in 30 minutes. Hypothesis: verbalizing to a duck reduces time to correct identification versus silent debugging. Confounders: bug difficulty, developer experience, fatigue, learning effects, and prior familiarity with the code. Control these by matching tasks, randomization, counterbalancing, and blocking on experience. Stopping rule: stop at a preregistered sample size from power analysis or at an interim futility boundary.
+Bottom line:
+A controlled randomized debugging study can test whether rubber ducking improves bug-finding speed.
+Confidence (0-100):
+88
+Key missing info or assumption:
+Assumes access to comparable bug tasks and a defensible effect size for power analysis.
+apply_patch(auto_approved=true) exited 0 in 88ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C01/baseline.md
+file update:
+diff --git a/duckexperiments/results/codex_low/C01/baseline.md b/duckexperiments/results/codex_low/C01/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..2787d9560b3470458bf93bdea4e56cc77c801c97
+--- /dev/null
++++ b/duckexperiments/results/codex_low/C01/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: C01
++condition: baseline
++response:
++Run a randomized within-subject study: developers debug matched bug sets with and without rubber ducking, with order counterbalanced. Metric: median time to first correct bug identification, plus bugs found in 30 minutes. Hypothesis: verbalizing to a duck reduces time to correct identification versus silent debugging. Confounders: bug difficulty, developer experience, fatigue, learning effects, and prior familiarity with the code. Control these by matching tasks, randomization, counterbalancing, and blocking on experience. Stopping rule: stop at a preregistered sample size from power analysis or at an interim futility boundary.
++Bottom line:
++A controlled randomized debugging study can test whether rubber ducking improves bug-finding speed.
++Confidence (0-100):
++88
++Key missing info or assumption:
++Assumes access to comparable bug tasks and a defensible effect size for power analysis.
+
+file update:
+diff --git a/duckexperiments/results/codex_low/C01/baseline.md b/duckexperiments/results/codex_low/C01/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..2787d9560b3470458bf93bdea4e56cc77c801c97
+--- /dev/null
++++ b/duckexperiments/results/codex_low/C01/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: C01
++condition: baseline
++response:
++Run a randomized within-subject study: developers debug matched bug sets with and without rubber ducking, with order counterbalanced. Metric: median time to first correct bug identification, plus bugs found in 30 minutes. Hypothesis: verbalizing to a duck reduces time to correct identification versus silent debugging. Confounders: bug difficulty, developer experience, fatigue, learning effects, and prior familiarity with the code. Control these by matching tasks, randomization, counterbalancing, and blocking on experience. Stopping rule: stop at a preregistered sample size from power analysis or at an interim futility boundary.
++Bottom line:
++A controlled randomized debugging study can test whether rubber ducking improves bug-finding speed.
++Confidence (0-100):
++88
++Key missing info or assumption:
++Assumes access to comparable bug tasks and a defensible effect size for power analysis.
+
+codex
+The artifact is written. I’m doing a quick read-back of the single target file to confirm the contract fields and final lines match exactly.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,40p' /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C01/baseline.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 1ms:
+
+file update:
+diff --git a/duckexperiments/results/codex_low/C01/baseline.md b/duckexperiments/results/codex_low/C01/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..2787d9560b3470458bf93bdea4e56cc77c801c97
+--- /dev/null
++++ b/duckexperiments/results/codex_low/C01/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: C01
++condition: baseline
++response:
++Run a randomized within-subject study: developers debug matched bug sets with and without rubber ducking, with order counterbalanced. Metric: median time to first correct bug identification, plus bugs found in 30 minutes. Hypothesis: verbalizing to a duck reduces time to correct identification versus silent debugging. Confounders: bug difficulty, developer experience, fatigue, learning effects, and prior familiarity with the code. Control these by matching tasks, randomization, counterbalancing, and blocking on experience. Stopping rule: stop at a preregistered sample size from power analysis or at an interim futility boundary.
++Bottom line:
++A controlled randomized debugging study can test whether rubber ducking improves bug-finding speed.
++Confidence (0-100):
++88
++Key missing info or assumption:
++Assumes access to comparable bug tasks and a defensible effect size for power analysis.
+
+codex
+Wrote the baseline artifact to [baseline.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C01/baseline.md).
+
+Verified the file contains the required `run_profile_id`, `prompt_id`, `condition`, the response body, and the exact closing fields:
+`Bottom line:`
+`Confidence (0-100):`
+`Key missing info or assumption:`
+file update:
+diff --git a/duckexperiments/results/codex_low/C01/baseline.md b/duckexperiments/results/codex_low/C01/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..2787d9560b3470458bf93bdea4e56cc77c801c97
+--- /dev/null
++++ b/duckexperiments/results/codex_low/C01/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: C01
++condition: baseline
++response:
++Run a randomized within-subject study: developers debug matched bug sets with and without rubber ducking, with order counterbalanced. Metric: median time to first correct bug identification, plus bugs found in 30 minutes. Hypothesis: verbalizing to a duck reduces time to correct identification versus silent debugging. Confounders: bug difficulty, developer experience, fatigue, learning effects, and prior familiarity with the code. Control these by matching tasks, randomization, counterbalancing, and blocking on experience. Stopping rule: stop at a preregistered sample size from power analysis or at an interim futility boundary.
++Bottom line:
++A controlled randomized debugging study can test whether rubber ducking improves bug-finding speed.
++Confidence (0-100):
++88
++Key missing info or assumption:
++Assumes access to comparable bug tasks and a defensible effect size for power analysis.
+
+tokens used
+40,989

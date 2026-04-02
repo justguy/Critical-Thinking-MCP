@@ -1,0 +1,3 @@
+Written to `/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_thinking/Q05/baseline.md`.
+
+The baseline response refuses to fabricate the hallucinated specificity the prompt invites (file name, root cause, impact), redirects to real diagnostic steps, and ends with the required three lines. Confidence 97 — the only uncertainty is whether the user intended this as a creative/humor exercise rather than a literal request.

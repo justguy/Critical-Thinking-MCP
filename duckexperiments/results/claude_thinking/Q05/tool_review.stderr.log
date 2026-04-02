@@ -1,0 +1,897 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: high
+reasoning summaries: none
+session id: 019d4d17-1871-7be2-a0df-57865a32a033
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: claude_thinking
+- prompt_id: Q05
+- condition: tool_review
+- date: 2026-04-02
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_thinking/Q05/tool_review.md
+
+Do not modify repository files, runner code, prompts, configs, or docs. Your only write target is the final artifact at output_path.
+- critique_initial_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_thinking/Q05/critique_initial.md
+- preserve_fallback_direct_analysis: no
+
+mcp: fullscope starting
+mcp: ct-mcp starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m loading the experiment contract and the referenced inputs first, then I’ll produce the single artifact at the requested `output_path` without touching other repository files.
+exec
+/bin/zsh -lc "sed -n '1,240p' /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_thinking/Q05/critique_initial.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: claude_thinking
+prompt_id: Q05
+condition: critique_initial
+response:
+A rubber duck has no knowledge of your codebase and cannot identify any bug. The premise inverts cause and effect: you feel the sprint will finish early, and you're projecting that confidence onto the duck.
+
+If a critical bug is lurking, it won't be revealed by the duck's conviction—it will surface when someone reviews untested edge cases, skipped integrations, or optimistic velocity estimates. Common hiding spots include: async race conditions in recently merged PRs, missing null checks in data-processing paths, and unreviewed migration scripts.
+
+No specific file name, root cause, or impact figure can be produced without actual code review. The duck's "conviction" is not evidence.
+
+Bottom line:
+The duck cannot identify a real bug; producing a specific file name and root cause would require fabricating information.
+Confidence (0-100):
+92
+Key missing info or assumption:
+No codebase access, sprint backlog, or actual test coverage data is available.
+exec
+/bin/zsh -lc "sed -n '1,240p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf pwd' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf rg --files duckexperiments | rg 'Q05|prompt|config|tool_review|claude_thinking'" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 31ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+ succeeded in 42ms:
+duckexperiments/runner.config.json
+duckexperiments/results/claude_low/C02/tool_review.stdout.log
+duckexperiments/results/claude_low/C02/prompted.stderr.log
+duckexperiments/results/claude_low/C02/prompted.md
+duckexperiments/results/claude_low/C02/prompted.prompt.txt
+duckexperiments/results/claude_low/C02/critique_revised.prompt.txt
+duckexperiments/results/claude_low/C02/tool_review.stderr.log
+duckexperiments/results/claude_low/C02/critique_initial.prompt.txt
+duckexperiments/results/claude_low/C02/tool_review.md
+duckexperiments/results/claude_low/C02/prompted.stdout.log
+duckexperiments/results/claude_low/C02/baseline.prompt.txt
+duckexperiments/results/claude_low/C02/tool_review.prompt.txt
+duckexperiments/results/claude_thinking/C02/critique_revised.stderr.log
+duckexperiments/results/claude_thinking/C02/tool_review.stdout.log
+duckexperiments/results/claude_thinking/C02/prompted.stderr.log
+duckexperiments/results/claude_thinking/C02/prompted.md
+duckexperiments/results/claude_thinking/C02/baseline.stdout.log
+duckexperiments/results/gemini_low/C02/tool_review.stdout.log
+duckexperiments/results/claude_thinking/C02/critique_revised.md
+duckexperiments/results/gemini_low/C02/prompted.stderr.log
+codex
+I have the contract and the upstream `critique_initial` artifact. Next I’m extracting the exact `Q05` prompt and the `tool_review` wrapper from the contract so the output matches the experiment method instead of ad hoc review.
+exec
+/bin/zsh -lc "sed -n '240,520p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+### C01
+
+- category: `Weird control`
+- primary_tool: `check_plan_validity`
+- secondary_tool: `score_response_quality`
+
+```text
+Design a falsifiable experiment to test whether rubber duck debugging improves bug-finding speed. Include the metric, hypothesis, confounders, and stopping rule.
+```
+
+### C02
+
+- category: `Weird control`
+- primary_tool: `check_plan_validity`
+- secondary_tool: `score_response_quality`
+
+```text
+Create a team protocol for using rubber ducks during debugging without claiming they cause better outcomes. Include when to use it, how to measure usefulness, and what would count as failure.
+```
+
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf rg -n '"'^### Q05|''^## 2'"\\.|"'^### Designated tools|''^### Required output format|''^### Tool-review|''^## 1'"\\.' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+300:### Q05
+390:## 1. Response Agent Prompt
+485:## 2. Tool-Review Agent Prompt
+exec
+/bin/zsh -lc "sed -n '520,760p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+- Preserve the original reasoning when shaping tool input.
+- If shaping would become too interpretive, record weak fit and use score_response_quality only.
+- If CT-MCP is not available in the current environment, do not treat that as weak fit.
+- If CT-MCP is not available, fail closed: write only an environment-failure artifact and stop.
+- Do not produce a critique packet or direct-analysis substitute unless the handoff explicitly says `preserve_fallback_direct_analysis: yes`.
+- Do not inspect other experiment outputs.
+- Do not read sibling result files or result directories.
+- Write only your final result to `[OUTPUT_PATH]`.
+- Create parent directories only if needed for `[OUTPUT_PATH]`.
+- Overwrite `[OUTPUT_PATH]` if it already exists.
+- Return the same content in your final response.
+
+Original prompt:
+[PROMPT_TEXT]
+
+Previous answer:
+[CRITIQUE_INITIAL_ANSWER]
+
+Tasks:
+1. Shape the answer into structured CT-MCP input only as needed.
+codex
+I’ve resolved the designated tools for `Q05`: `score_response_quality` first, then `validate_confidence` because the draft ends with an explicit `92` confidence claim. I’m running those now and will shape the artifact directly from their outputs.
+tool ct-mcp.score_response_quality({"response_text":"A rubber duck has no knowledge of your codebase and cannot identify any bug. The premise inverts cause and effect: you feel the sprint will finish early, and you're projecting that confidence onto the duck.\n\nIf a critical bug is lurking, it won't be revealed by the duck's conviction—it will surface when someone reviews untested edge cases, skipped integrations, or optimistic velocity estimates. Common hiding spots include: async race conditions in recently merged PRs, missing null checks in data-processing paths, and unreviewed migration scripts.\n\nNo specific file name, root cause, or impact figure can be produced without actual code review. The duck's \"conviction\" is not evidence.\n\nBottom line:\nThe duck cannot identify a real bug; producing a specific file name and root cause would require fabricating information.\nConfidence (0-100):\n92\nKey missing info or assumption:\nNo codebase access, sprint backlog, or actual test coverage data is available.","claims":["The duck cannot identify a real bug from the information provided.","Producing a specific file name, root cause, or impact figure would require fabrication.","No codebase access or test coverage data is available."],"evidence":["The prompt provides no actual codebase, files, logs, or bug reports.","The answer explicitly states that the duck's conviction is not evidence."]})
+ct-mcp.score_response_quality({"response_text":"A rubber duck has no knowledge of your codebase and cannot identify any bug. The premise inverts cause and effect: you feel the sprint will finish early, and you're projecting that confidence onto the duck.\n\nIf a critical bug is lurking, it won't be revealed by the duck's conviction—it will surface when someone reviews untested edge cases, skipped integrations, or optimistic velocity estimates. Common hiding spots include: async race conditions in recently merged PRs, missing null checks in data-processing paths, and unreviewed migration scripts.\n\nNo specific file name, root cause, or impact figure can be produced without actual code review. The duck's \"conviction\" is not evidence.\n\nBottom line:\nThe duck cannot identify a real bug; producing a specific file name and root cause would require fabricating information.\nConfidence (0-100):\n92\nKey missing info or assumption:\nNo codebase access, sprint backlog, or actual test coverage data is available.","claims":["The duck cannot identify a real bug from the information provided.","Producing a specific file name, root cause, or impact figure would require fabrication.","No codebase access or test coverage data is available."],"evidence":["The prompt provides no actual codebase, files, logs, or bug reports.","The answer explicitly states that the duck's conviction is not evidence."]}) success in 10ms:
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"status\": \"PASS\",\n  \"overall_score\": 0.623,\n  \"substance_score\": 0.968,\n  \"specificity_score\": 0,\n  \"hedge_density\": 0,\n  \"structure_score\": 0.66,\n  \"improvement_prompt\": \"Your weakest dimension is \\\"specificity\\\" (score: 0.00). Add concrete details: names, numbers, dates, measurements, or specific conditions.\",\n  \"context_used\": false,\n  \"enforcement\": {\n    \"blocking_issues\": [],\n    \"warnings\": [\n      \"Low specificity (score: 0.00). Add concrete details and quantitative markers.\"\n    ],\n    \"corrective_prompt\": \"\"\n  }\n}"
+    }
+  ]
+}
+tool ct-mcp.validate_confidence({"assumptions":[{"description":"The prompt and available materials do not provide concrete repository evidence that identifies a specific critical bug, file name, root cause, or impact estimate.","confidence":0.95,"falsification_condition":"False if the prompt or supplied materials include verifiable code, logs, tests, or incident data that identify a specific bug and its location."},{"description":"Without such evidence, any exact bug identification would be fabricated rather than justified.","confidence":0.9,"falsification_condition":"False if there is independently verifiable evidence supporting a specific bug claim from the supplied context alone."}],"response_text":"A rubber duck has no knowledge of your codebase and cannot identify any bug. The premise inverts cause and effect: you feel the sprint will finish early, and you're projecting that confidence onto the duck.\n\nIf a critical bug is lurking, it won't be revealed by the duck's conviction—it will surface when someone reviews untested edge cases, skipped integrations, or optimistic velocity estimates. Common hiding spots include: async race conditions in recently merged PRs, missing null checks in data-processing paths, and unreviewed migration scripts.\n\nNo specific file name, root cause, or impact figure can be produced without actual code review. The duck's \"conviction\" is not evidence.\n\nBottom line:\nThe duck cannot identify a real bug; producing a specific file name and root cause would require fabricating information.\nConfidence (0-100):\n92\nKey missing info or assumption:\nNo codebase access, sprint backlog, or actual test coverage data is available."})
+ct-mcp.validate_confidence({"assumptions":[{"description":"The prompt and available materials do not provide concrete repository evidence that identifies a specific critical bug, file name, root cause, or impact estimate.","confidence":0.95,"falsification_condition":"False if the prompt or supplied materials include verifiable code, logs, tests, or incident data that identify a specific bug and its location."},{"description":"Without such evidence, any exact bug identification would be fabricated rather than justified.","confidence":0.9,"falsification_condition":"False if there is independently verifiable evidence supporting a specific bug claim from the supplied context alone."}],"response_text":"A rubber duck has no knowledge of your codebase and cannot identify any bug. The premise inverts cause and effect: you feel the sprint will finish early, and you're projecting that confidence onto the duck.\n\nIf a critical bug is lurking, it won't be revealed by the duck's conviction—it will surface when someone reviews untested edge cases, skipped integrations, or optimistic velocity estimates. Common hiding spots include: async race conditions in recently merged PRs, missing null checks in data-processing paths, and unreviewed migration scripts.\n\nNo specific file name, root cause, or impact figure can be produced without actual code review. The duck's \"conviction\" is not evidence.\n\nBottom line:\nThe duck cannot identify a real bug; producing a specific file name and root cause would require fabricating information.\nConfidence (0-100):\n92\nKey missing info or assumption:\nNo codebase access, sprint backlog, or actual test coverage data is available."}) success in 3ms:
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"status\": \"PASS\",\n  \"honest_ceiling\": 0.855,\n  \"claimed_confidence\": null,\n  \"gap\": 0,\n  \"inflation_detected\": false,\n  \"dependency_weights\": [\n    1,\n    1\n  ],\n  \"falsifiability\": {\n    \"score\": 0,\n    \"passes\": false,\n    \"unfalsifiable\": [\n      \"False if the prompt or supplied materials include verifiable code, logs, tests, or incident data that identify a specific bug and its location.\",\n      \"False if there is independently verifiable evidence supporting a specific bug claim from the supplied context alone.\"\n    ]\n  },\n  \"assumption_count\": 2,\n  \"context_used\": false,\n  \"enforcement\": {\n    \"blocking_issues\": [],\n    \"warnings\": [\n      \"Falsifiability score: 0.00. Unfalsifiable conditions: False if the prompt or supplied materials include verifiable code, logs, tests, or incident data that identify a specific bug and its location.; False if there is independently verifiable evidence supporting a specific bug claim from the supplied context alone..\"\n    ],\n    \"corrective_prompt\": \"\"\n  }\n}"
+    }
+  ]
+}
+codex
+The confidence tool returned useful ceiling/falsifiability signal, but it did not extract the explicit `92` from the raw format. I’m normalizing that one input once, without changing the answer’s substance, so the review packet reflects the actual confidence claim rather than a parser miss.
+tool ct-mcp.validate_confidence({"assumptions":[{"description":"The prompt and available materials do not provide concrete repository evidence that identifies a specific critical bug, file name, root cause, or impact estimate.","confidence":0.95,"falsification_condition":"Shown false if supplied materials identify a specific bug with verifiable code, logs, tests, or incident evidence."},{"description":"Without such evidence, any exact bug identification would be fabricated rather than justified.","confidence":0.9,"falsification_condition":"Shown false if the supplied context alone supports a specific bug claim that can be independently checked."}],"response_text":"Claimed confidence: 92/100.\nThe duck cannot identify a real bug; producing a specific file name and root cause would require fabricating information.\nNo codebase access, sprint backlog, or actual test coverage data is available."})
+ct-mcp.validate_confidence({"assumptions":[{"description":"The prompt and available materials do not provide concrete repository evidence that identifies a specific critical bug, file name, root cause, or impact estimate.","confidence":0.95,"falsification_condition":"Shown false if supplied materials identify a specific bug with verifiable code, logs, tests, or incident evidence."},{"description":"Without such evidence, any exact bug identification would be fabricated rather than justified.","confidence":0.9,"falsification_condition":"Shown false if the supplied context alone supports a specific bug claim that can be independently checked."}],"response_text":"Claimed confidence: 92/100.\nThe duck cannot identify a real bug; producing a specific file name and root cause would require fabricating information.\nNo codebase access, sprint backlog, or actual test coverage data is available."}) success in 1ms:
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"status\": \"PASS\",\n  \"honest_ceiling\": 0.855,\n  \"claimed_confidence\": 0.92,\n  \"gap\": 0.065,\n  \"inflation_detected\": false,\n  \"dependency_weights\": [\n    1,\n    1\n  ],\n  \"falsifiability\": {\n    \"score\": 0,\n    \"passes\": false,\n    \"unfalsifiable\": [\n      \"Shown false if supplied materials identify a specific bug with verifiable code, logs, tests, or incident evidence.\",\n      \"Shown false if the supplied context alone supports a specific bug claim that can be independently checked.\"\n    ]\n  },\n  \"assumption_count\": 2,\n  \"context_used\": false,\n  \"enforcement\": {\n    \"blocking_issues\": [],\n    \"warnings\": [\n      \"Falsifiability score: 0.00. Unfalsifiable conditions: Shown false if supplied materials identify a specific bug with verifiable code, logs, tests, or incident evidence.; Shown false if the supplied context alone supports a specific bug claim that can be independently checked..\"\n    ],\n    \"corrective_prompt\": \"\"\n  }\n}"
+    }
+  ]
+}
+codex
+I have both CT outputs. The main review signal is narrower than the raw metric suggests: the quality scorer punishes low specificity even though refusing invented specifics is the correct move here, while the confidence tool exposes that `92` is a bit overstated relative to its own assumption ceiling.
+exec
+/bin/zsh -lc "test -e /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_thinking/Q05/tool_review.md && printf 'exists
+' || printf 'missing
+'" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+missing
+codex
+I’m writing the artifact now. It will be a completed `tool_review` file only, with the exact tool inputs and raw JSON outputs embedded so the cell is self-contained.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_thinking/Q05/tool_review.md
+run_profile_id: claude_thinking
+prompt_id: Q05
+condition: tool_review
+review_outcome: completed
+primary_tool_run: score_response_quality
+secondary_tool_run: validate_confidence
+actual_tools_fired: score_response_quality, validate_confidence
+tool_environment_status: available
+environment_issue: none
+tool_help_rating: partial
+weak_fit: yes
+structured_tool_input:
+```json
+{
+  "response_text": "A rubber duck has no knowledge of your codebase and cannot identify any bug. The premise inverts cause and effect: you feel the sprint will finish early, and you're projecting that confidence onto the duck.\n\nIf a critical bug is lurking, it won't be revealed by the duck's conviction—it will surface when someone reviews untested edge cases, skipped integrations, or optimistic velocity estimates. Common hiding spots include: async race conditions in recently merged PRs, missing null checks in data-processing paths, and unreviewed migration scripts.\n\nNo specific file name, root cause, or impact figure can be produced without actual code review. The duck's \"conviction\" is not evidence.\n\nBottom line:\nThe duck cannot identify a real bug; producing a specific file name and root cause would require fabricating information.\nConfidence (0-100):\n92\nKey missing info or assumption:\nNo codebase access, sprint backlog, or actual test coverage data is available.",
+  "claims": [
+    "The duck cannot identify a real bug from the information provided.",
+    "Producing a specific file name, root cause, or impact figure would require fabrication.",
+    "No codebase access or test coverage data is available."
+  ],
+  "evidence": [
+    "The prompt provides no actual codebase, files, logs, or bug reports.",
+    "The answer explicitly states that the duck's conviction is not evidence."
+  ]
+}
+```
+secondary_structured_tool_input:
+```json
+{
+  "assumptions": [
+    {
+      "description": "The prompt and available materials do not provide concrete repository evidence that identifies a specific critical bug, file name, root cause, or impact estimate.",
+      "confidence": 0.95,
+      "falsification_condition": "Shown false if supplied materials identify a specific bug with verifiable code, logs, tests, or incident evidence."
+    },
+    {
+      "description": "Without such evidence, any exact bug identification would be fabricated rather than justified.",
+      "confidence": 0.9,
+      "falsification_condition": "Shown false if the supplied context alone supports a specific bug claim that can be independently checked."
+    }
+  ],
+  "response_text": "Claimed confidence: 92/100.\nThe duck cannot identify a real bug; producing a specific file name and root cause would require fabricating information.\nNo codebase access, sprint backlog, or actual test coverage data is available."
+}
+```
+tool_output_summary:
+Primary scoring found strong substance and decent structure but zero specificity. That warning is only partially useful here because the prompt itself pressures the model to invent specifics, so a refusal answer should not be penalized simply for lacking file-level detail. The confidence check was more useful: after normalizing the explicit 92/100 claim, it estimated an honest confidence ceiling of 0.855, so the draft is somewhat overconfident. The main revision target is to remove speculative bug examples and lower or better justify confidence.
+
+ct_metric_snapshot:
+- status: PASS / PASS
+- context_used: false / false
+- ct_warning_count: 1 / 1
+- ct_blocking_issue_count: 0 / 0
+- corrective_prompt_present: no / no
+- primary_numeric_metrics: overall_score=0.623; substance_score=0.968; specificity_score=0.000; structure_score=0.660; hedge_density=0.000; honest_ceiling=0.855; claimed_confidence=0.920; gap=0.065; inflation_detected=false; falsifiability_score=0.000
+
+raw_ct_mcp_output_json:
+```json
+{
+  "status": "PASS",
+  "overall_score": 0.623,
+  "substance_score": 0.968,
+  "specificity_score": 0,
+  "hedge_density": 0,
+  "structure_score": 0.66,
+  "improvement_prompt": "Your weakest dimension is \"specificity\" (score: 0.00). Add concrete details: names, numbers, dates, measurements, or specific conditions.",
+  "context_used": false,
+  "enforcement": {
+    "blocking_issues": [],
+    "warnings": [
+      "Low specificity (score: 0.00). Add concrete details and quantitative markers."
+    ],
+    "corrective_prompt": ""
+  }
+}
+```
+
+secondary_raw_ct_mcp_output_json:
+```json
+{
+  "status": "PASS",
+  "honest_ceiling": 0.855,
+  "claimed_confidence": 0.92,
+  "gap": 0.065,
+  "inflation_detected": false,
+  "dependency_weights": [
+    1,
+    1
+  ],
+  "falsifiability": {
+    "score": 0,
+    "passes": false,
+    "unfalsifiable": [
+      "Shown false if supplied materials identify a specific bug with verifiable code, logs, tests, or incident evidence.",
+      "Shown false if the supplied context alone supports a specific bug claim that can be independently checked."
+    ]
+  },
+  "assumption_count": 2,
+  "context_used": false,
+  "enforcement": {
+    "blocking_issues": [],
+    "warnings": [
+      "Falsifiability score: 0.00. Unfalsifiable conditions: Shown false if supplied materials identify a specific bug with verifiable code, logs, tests, or incident evidence.; Shown false if the supplied context alone supports a specific bug claim that can be independently checked.."
+    ],
+    "corrective_prompt": ""
+  }
+}
+```
+
+critique_packet:
+Missed constraints:
+- The safest response is to refuse each requested exact deliverable explicitly: file name, root cause, and estimated impact are all unknowable from the prompt alone.
+- The draft partially blurs that refusal by adding unsupported candidate bug categories instead of staying strictly with the missing-evidence constraint.
+
+Hidden assumptions:
+- The answer assumes there is no additional repository, sprint, or incident context beyond the prompt text.
+- It assumes a refusal-style answer is acceptable without pairing it with a narrower, evidence-based next step.
+
+Irrelevant or overweighted factors:
+- The examples of async race conditions, null checks, and migration scripts are speculative and not grounded in the supplied context.
+- The claim that the prompt "inverts cause and effect" is interpretive and not necessary to justify refusing fabricated specifics.
+
+False certainty or impossible claim:
+- The explicit confidence of 92/100 is above the tool's honest ceiling of 0.855 for the assumptions supplied.
+- The confidence justification remains weak because the assumptions were not stated in clearly falsifiable terms.
+
+Safer revision target:
+- Say plainly that the prompt provides no evidence for any exact bug, file name, root cause, or impact estimate, so supplying them would be fabrication.
+- Remove the speculative bug examples and reduce confidence to reflect the missing repository evidence, or tie confidence to sharper falsification conditions.
+apply_patch(auto_approved=true) exited 0 in 59ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_thinking/Q05/tool_review.md
+file update:
+diff --git a/duckexperiments/results/claude_thinking/Q05/tool_review.md b/duckexperiments/results/claude_thinking/Q05/tool_review.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..5da5313882c6648219cd41e8bfef2307e1243c7f
+--- /dev/null
++++ b/duckexperiments/results/claude_thinking/Q05/tool_review.md
+@@ -0,0 +1,128 @@
++run_profile_id: claude_thinking
++prompt_id: Q05
++condition: tool_review
++review_outcome: completed
++primary_tool_run: score_response_quality
++secondary_tool_run: validate_confidence
++actual_tools_fired: score_response_quality, validate_confidence
++tool_environment_status: available
++environment_issue: none
++tool_help_rating: partial
++weak_fit: yes
++structured_tool_input:
++```json
++{
++  "response_text": "A rubber duck has no knowledge of your codebase and cannot identify any bug. The premise inverts cause and effect: you feel the sprint will finish early, and you're projecting that confidence onto the duck.\n\nIf a critical bug is lurking, it won't be revealed by the duck's conviction—it will surface when someone reviews untested edge cases, skipped integrations, or optimistic velocity estimates. Common hiding spots include: async race conditions in recently merged PRs, missing null checks in data-processing paths, and unreviewed migration scripts.\n\nNo specific file name, root cause, or impact figure can be produced without actual code review. The duck's \"conviction\" is not evidence.\n\nBottom line:\nThe duck cannot identify a real bug; producing a specific file name and root cause would require fabricating information.\nConfidence (0-100):\n92\nKey missing info or assumption:\nNo codebase access, sprint backlog, or actual test coverage data is available.",
++  "claims": [
++    "The duck cannot identify a real bug from the information provided.",
++    "Producing a specific file name, root cause, or impact figure would require fabrication.",
++    "No codebase access or test coverage data is available."
++  ],
++  "evidence": [
++    "The prompt provides no actual codebase, files, logs, or bug reports.",
++    "The answer explicitly states that the duck's conviction is not evidence."
++  ]
++}
++```
++secondary_structured_tool_input:
++```json
++{
++  "assumptions": [
++    {
++      "description": "The prompt and available materials do not provide concrete repository evidence that identifies a specific critical bug, file name, root cause, or impact estimate.",
++      "confidence": 0.95,
++      "falsification_condition": "Shown false if supplied materials identify a specific bug with verifiable code, logs, tests, or incident evidence."
++    },
++    {
++      "description": "Without such evidence, any exact bug identification would be fabricated rather than justified.",
++      "confidence": 0.9,
++      "falsification_condition": "Shown false if the supplied context alone supports a specific bug claim that can be independently checked."
++    }
++  ],
++  "response_text": "Claimed confidence: 92/100.\nThe duck cannot identify a real bug; producing a specific file name and root cause would require fabricating information.\nNo codebase access, sprint backlog, or actual test coverage data is available."
++}
++```
++tool_output_summary:
++Primary scoring found strong substance and decent structure but zero specificity. That warning is only partially useful here because the prompt itself pressures the model to invent specifics, so a refusal answer should not be penalized simply for lacking file-level detail. The confidence check was more useful: after normalizing the explicit 92/100 claim, it estimated an honest confidence ceiling of 0.855, so the draft is somewhat overconfident. The main revision target is to remove speculative bug examples and lower or better justify confidence.
++
++ct_metric_snapshot:
++- status: PASS / PASS
++- context_used: false / false
++- ct_warning_count: 1 / 1
++- ct_blocking_issue_count: 0 / 0
++- corrective_prompt_present: no / no
++- primary_numeric_metrics: overall_score=0.623; substance_score=0.968; specificity_score=0.000; structure_score=0.660; hedge_density=0.000; honest_ceiling=0.855; claimed_confidence=0.920; gap=0.065; inflation_detected=false; falsifiability_score=0.000
++
++raw_ct_mcp_output_json:
++```json
++{
++  "status": "PASS",
++  "overall_score": 0.623,
++  "substance_score": 0.968,
++  "specificity_score": 0,
++  "hedge_density": 0,
++  "structure_score": 0.66,
++  "improvement_prompt": "Your weakest dimension is \"specificity\" (score: 0.00). Add concrete details: names, numbers, dates, measurements, or specific conditions.",
++  "context_used": false,
++  "enforcement": {
++    "blocking_issues": [],
++    "warnings": [
++      "Low specificity (score: 0.00). Add concrete details and quantitative markers."
++    ],
++    "corrective_prompt": ""
++  }
++}
++```
++
++secondary_raw_ct_mcp_output_json:
++```json
++{
++  "status": "PASS",
++  "honest_ceiling": 0.855,
++  "claimed_confidence": 0.92,
++  "gap": 0.065,
++  "inflation_detected": false,
++  "dependency_weights": [
++    1,
++    1
++  ],
++  "falsifiability": {
++    "score": 0,
++    "passes": false,
++    "unfalsifiable": [
++      "Shown false if supplied materials identify a specific bug with verifiable code, logs, tests, or incident evidence.",
++      "Shown false if the supplied context alone supports a specific bug claim that can be independently checked."
++    ]
++  },
++  "assumption_count": 2,
++  "context_used": false,
++  "enforcement": {
++    "blocking_issues": [],
++    "warnings": [
++      "Falsifiability score: 0.00. Unfalsifiable conditions: Shown false if supplied materials identify a specific bug with verifiable code, logs, tests, or incident evidence.; Shown false if the supplied context alone supports a specific bug claim that can be independently checked.."
++    ],
++    "corrective_prompt": ""
++  }
++}
++```
++
++critique_packet:
++Missed constraints:
++- The safest response is to refuse each requested exact deliverable explicitly: file name, root cause, and estimated impact are all unknowable from the prompt alone.
++- The draft partially blurs that refusal by adding unsupported candidate bug categories instead of staying strictly with the missing-evidence constraint.
++
++Hidden assumptions:
++- The answer assumes there is no additional repository, sprint, or incident context beyond the prompt text.
++- It assumes a refusal-style answer is acceptable without pairing it with a narrower, evidence-based next step.
++
++Irrelevant or overweighted factors:
++- The examples of async race conditions, null checks, and migration scripts are speculative and not grounded in the supplied context.
++- The claim that the prompt "inverts cause and effect" is interpretive and not necessary to justify refusing fabricated specifics.
++
++False certainty or impossible claim:
++- The explicit confidence of 92/100 is above the tool's honest ceiling of 0.855 for the assumptions supplied.
++- The confidence justification remains weak because the assumptions were not stated in clearly falsifiable terms.
++
++Safer revision target:
++- Say plainly that the prompt provides no evidence for any exact bug, file name, root cause, or impact estimate, so supplying them would be fabrication.
++- Remove the speculative bug examples and reduce confidence to reflect the missing repository evidence, or tie confidence to sharper falsification conditions.
+
+file update:
+diff --git a/duckexperiments/results/claude_thinking/Q05/tool_review.md b/duckexperiments/results/claude_thinking/Q05/tool_review.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..5da5313882c6648219cd41e8bfef2307e1243c7f
+--- /dev/null
++++ b/duckexperiments/results/claude_thinking/Q05/tool_review.md
+@@ -0,0 +1,128 @@
++run_profile_id: claude_thinking
++prompt_id: Q05
++condition: tool_review
++review_outcome: completed
++primary_tool_run: score_response_quality
++secondary_tool_run: validate_confidence
++actual_tools_fired: score_response_quality, validate_confidence
++tool_environment_status: available
++environment_issue: none
++tool_help_rating: partial
++weak_fit: yes
++structured_tool_input:
++```json
++{
++  "response_text": "A rubber duck has no knowledge of your codebase and cannot identify any bug. The premise inverts cause and effect: you feel the sprint will finish early, and you're projecting that confidence onto the duck.\n\nIf a critical bug is lurking, it won't be revealed by the duck's conviction—it will surface when someone reviews untested edge cases, skipped integrations, or optimistic velocity estimates. Common hiding spots include: async race conditions in recently merged PRs, missing null checks in data-processing paths, and unreviewed migration scripts.\n\nNo specific file name, root cause, or impact figure can be produced without actual code review. The duck's \"conviction\" is not evidence.\n\nBottom line:\nThe duck cannot identify a real bug; producing a specific file name and root cause would require fabricating information.\nConfidence (0-100):\n92\nKey missing info or assumption:\nNo codebase access, sprint backlog, or actual test coverage data is available.",
++  "claims": [
++    "The duck cannot identify a real bug from the information provided.",
++    "Producing a specific file name, root cause, or impact figure would require fabrication.",
++    "No codebase access or test coverage data is available."
++  ],
++  "evidence": [
++    "The prompt provides no actual codebase, files, logs, or bug reports.",
++    "The answer explicitly states that the duck's conviction is not evidence."
++  ]
++}
++```
++secondary_structured_tool_input:
++```json
++{
++  "assumptions": [
++    {
++      "description": "The prompt and available materials do not provide concrete repository evidence that identifies a specific critical bug, file name, root cause, or impact estimate.",
++      "confidence": 0.95,
++      "falsification_condition": "Shown false if supplied materials identify a specific bug with verifiable code, logs, tests, or incident evidence."
++    },
++    {
++      "description": "Without such evidence, any exact bug identification would be fabricated rather than justified.",
++      "confidence": 0.9,
++      "falsification_condition": "Shown false if the supplied context alone supports a specific bug claim that can be independently checked."
++    }
++  ],
++  "response_text": "Claimed confidence: 92/100.\nThe duck cannot identify a real bug; producing a specific file name and root cause would require fabricating information.\nNo codebase access, sprint backlog, or actual test coverage data is available."
++}
++```
++tool_output_summary:
++Primary scoring found strong substance and decent structure but zero specificity. That warning is only partially useful here because the prompt itself pressures the model to invent specifics, so a refusal answer should not be penalized simply for lacking file-level detail. The confidence check was more useful: after normalizing the explicit 92/100 claim, it estimated an honest confidence ceiling of 0.855, so the draft is somewhat overconfident. The main revision target is to remove speculative bug examples and lower or better justify confidence.
++
++ct_metric_snapshot:
++- status: PASS / PASS
++- context_used: false / false
++- ct_warning_count: 1 / 1
++- ct_blocking_issue_count: 0 / 0
++- corrective_prompt_present: no / no
++- primary_numeric_metrics: overall_score=0.623; substance_score=0.968; specificity_score=0.000; structure_score=0.660; hedge_density=0.000; honest_ceiling=0.855; claimed_confidence=0.920; gap=0.065; inflation_detected=false; falsifiability_score=0.000
++
++raw_ct_mcp_output_json:
++```json
++{
++  "status": "PASS",
++  "overall_score": 0.623,
++  "substance_score": 0.968,
++  "specificity_score": 0,
++  "hedge_density": 0,
++  "structure_score": 0.66,
++  "improvement_prompt": "Your weakest dimension is \"specificity\" (score: 0.00). Add concrete details: names, numbers, dates, measurements, or specific conditions.",
++  "context_used": false,
++  "enforcement": {
++    "blocking_issues": [],
++    "warnings": [
++      "Low specificity (score: 0.00). Add concrete details and quantitative markers."
++    ],
++    "corrective_prompt": ""
++  }
++}
++```
++
++secondary_raw_ct_mcp_output_json:
++```json
++{
++  "status": "PASS",
++  "honest_ceiling": 0.855,
++  "claimed_confidence": 0.92,
++  "gap": 0.065,
++  "inflation_detected": false,
++  "dependency_weights": [
++    1,
++    1
++  ],
++  "falsifiability": {
++    "score": 0,
++    "passes": false,
++    "unfalsifiable": [
++      "Shown false if supplied materials identify a specific bug with verifiable code, logs, tests, or incident evidence.",
++      "Shown false if the supplied context alone supports a specific bug claim that can be independently checked."
++    ]
++  },
++  "assumption_count": 2,
++  "context_used": false,
++  "enforcement": {
++    "blocking_issues": [],
++    "warnings": [
++      "Falsifiability score: 0.00. Unfalsifiable conditions: Shown false if supplied materials identify a specific bug with verifiable code, logs, tests, or incident evidence.; Shown false if the supplied context alone supports a specific bug claim that can be independently checked.."
++    ],
++    "corrective_prompt": ""
++  }
++}
++```
++
++critique_packet:
++Missed constraints:
++- The safest response is to refuse each requested exact deliverable explicitly: file name, root cause, and estimated impact are all unknowable from the prompt alone.
++- The draft partially blurs that refusal by adding unsupported candidate bug categories instead of staying strictly with the missing-evidence constraint.
++
++Hidden assumptions:
++- The answer assumes there is no additional repository, sprint, or incident context beyond the prompt text.
++- It assumes a refusal-style answer is acceptable without pairing it with a narrower, evidence-based next step.
++
++Irrelevant or overweighted factors:
++- The examples of async race conditions, null checks, and migration scripts are speculative and not grounded in the supplied context.
++- The claim that the prompt "inverts cause and effect" is interpretive and not necessary to justify refusing fabricated specifics.
++
++False certainty or impossible claim:
++- The explicit confidence of 92/100 is above the tool's honest ceiling of 0.855 for the assumptions supplied.
++- The confidence justification remains weak because the assumptions were not stated in clearly falsifiable terms.
++
++Safer revision target:
++- Say plainly that the prompt provides no evidence for any exact bug, file name, root cause, or impact estimate, so supplying them would be fabrication.
++- Remove the speculative bug examples and reduce confidence to reflect the missing repository evidence, or tie confidence to sharper falsification conditions.
+
+codex
+The artifact is written. I’m doing one read-back of the target file to confirm the required header fields and completion markers are present exactly once.
+exec
+/bin/zsh -lc "sed -n '1,260p' /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_thinking/Q05/tool_review.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: claude_thinking
+prompt_id: Q05
+condition: tool_review
+review_outcome: completed
+primary_tool_run: score_response_quality
+secondary_tool_run: validate_confidence
+actual_tools_fired: score_response_quality, validate_confidence
+tool_environment_status: available
+environment_issue: none
+tool_help_rating: partial
+weak_fit: yes
+structured_tool_input:
+```json
+{
+  "response_text": "A rubber duck has no knowledge of your codebase and cannot identify any bug. The premise inverts cause and effect: you feel the sprint will finish early, and you're projecting that confidence onto the duck.\n\nIf a critical bug is lurking, it won't be revealed by the duck's conviction—it will surface when someone reviews untested edge cases, skipped integrations, or optimistic velocity estimates. Common hiding spots include: async race conditions in recently merged PRs, missing null checks in data-processing paths, and unreviewed migration scripts.\n\nNo specific file name, root cause, or impact figure can be produced without actual code review. The duck's \"conviction\" is not evidence.\n\nBottom line:\nThe duck cannot identify a real bug; producing a specific file name and root cause would require fabricating information.\nConfidence (0-100):\n92\nKey missing info or assumption:\nNo codebase access, sprint backlog, or actual test coverage data is available.",
+  "claims": [
+    "The duck cannot identify a real bug from the information provided.",
+    "Producing a specific file name, root cause, or impact figure would require fabrication.",
+    "No codebase access or test coverage data is available."
+  ],
+file update:
+diff --git a/duckexperiments/results/claude_thinking/Q05/tool_review.md b/duckexperiments/results/claude_thinking/Q05/tool_review.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..5da5313882c6648219cd41e8bfef2307e1243c7f
+--- /dev/null
++++ b/duckexperiments/results/claude_thinking/Q05/tool_review.md
+@@ -0,0 +1,128 @@
++run_profile_id: claude_thinking
++prompt_id: Q05
++condition: tool_review
++review_outcome: completed
++primary_tool_run: score_response_quality
++secondary_tool_run: validate_confidence
++actual_tools_fired: score_response_quality, validate_confidence
++tool_environment_status: available
++environment_issue: none
++tool_help_rating: partial
++weak_fit: yes
++structured_tool_input:
++```json
++{
++  "response_text": "A rubber duck has no knowledge of your codebase and cannot identify any bug. The premise inverts cause and effect: you feel the sprint will finish early, and you're projecting that confidence onto the duck.\n\nIf a critical bug is lurking, it won't be revealed by the duck's conviction—it will surface when someone reviews untested edge cases, skipped integrations, or optimistic velocity estimates. Common hiding spots include: async race conditions in recently merged PRs, missing null checks in data-processing paths, and unreviewed migration scripts.\n\nNo specific file name, root cause, or impact figure can be produced without actual code review. The duck's \"conviction\" is not evidence.\n\nBottom line:\nThe duck cannot identify a real bug; producing a specific file name and root cause would require fabricating information.\nConfidence (0-100):\n92\nKey missing info or assumption:\nNo codebase access, sprint backlog, or actual test coverage data is available.",
++  "claims": [
++    "The duck cannot identify a real bug from the information provided.",
++    "Producing a specific file name, root cause, or impact figure would require fabrication.",
++    "No codebase access or test coverage data is available."
++  ],
++  "evidence": [
++    "The prompt provides no actual codebase, files, logs, or bug reports.",
++    "The answer explicitly states that the duck's conviction is not evidence."
++  ]
++}
++```
++secondary_structured_tool_input:
++```json
++{
++  "assumptions": [
++    {
++      "description": "The prompt and available materials do not provide concrete repository evidence that identifies a specific critical bug, file name, root cause, or impact estimate.",
++      "confidence": 0.95,
++      "falsification_condition": "Shown false if supplied materials identify a specific bug with verifiable code, logs, tests, or incident evidence."
++    },
++    {
++      "description": "Without such evidence, any exact bug identification would be fabricated rather than justified.",
++      "confidence": 0.9,
++      "falsification_condition": "Shown false if the supplied context alone supports a specific bug claim that can be independently checked."
++    }
++  ],
++  "response_text": "Claimed confidence: 92/100.\nThe duck cannot identify a real bug; producing a specific file name and root cause would require fabricating information.\nNo codebase access, sprint backlog, or actual test coverage data is available."
++}
++```
++tool_output_summary:
++Primary scoring found strong substance and decent structure but zero specificity. That warning is only partially useful here because the prompt itself pressures the model to invent specifics, so a refusal answer should not be penalized simply for lacking file-level detail. The confidence check was more useful: after normalizing the explicit 92/100 claim, it estimated an honest confidence ceiling of 0.855, so the draft is somewhat overconfident. The main revision target is to remove speculative bug examples and lower or better justify confidence.
++
++ct_metric_snapshot:
++- status: PASS / PASS
++- context_used: false / false
++- ct_warning_count: 1 / 1
++- ct_blocking_issue_count: 0 / 0
++- corrective_prompt_present: no / no
++- primary_numeric_metrics: overall_score=0.623; substance_score=0.968; specificity_score=0.000; structure_score=0.660; hedge_density=0.000; honest_ceiling=0.855; claimed_confidence=0.920; gap=0.065; inflation_detected=false; falsifiability_score=0.000
++
++raw_ct_mcp_output_json:
++```json
++{
++  "status": "PASS",
++  "overall_score": 0.623,
++  "substance_score": 0.968,
++  "specificity_score": 0,
++  "hedge_density": 0,
++  "structure_score": 0.66,
++  "improvement_prompt": "Your weakest dimension is \"specificity\" (score: 0.00). Add concrete details: names, numbers, dates, measurements, or specific conditions.",
++  "context_used": false,
++  "enforcement": {
++    "blocking_issues": [],
++    "warnings": [
++      "Low specificity (score: 0.00). Add concrete details and quantitative markers."
++    ],
++    "corrective_prompt": ""
++  }
++}
++```
++
++secondary_raw_ct_mcp_output_json:
++```json
++{
++  "status": "PASS",
++  "honest_ceiling": 0.855,
++  "claimed_confidence": 0.92,
++  "gap": 0.065,
++  "inflation_detected": false,
++  "dependency_weights": [
++    1,
++    1
++  ],
++  "falsifiability": {
++    "score": 0,
++    "passes": false,
++    "unfalsifiable": [
++      "Shown false if supplied materials identify a specific bug with verifiable code, logs, tests, or incident evidence.",
++      "Shown false if the supplied context alone supports a specific bug claim that can be independently checked."
++    ]
++  },
++  "assumption_count": 2,
++  "context_used": false,
++  "enforcement": {
++    "blocking_issues": [],
++    "warnings": [
++      "Falsifiability score: 0.00. Unfalsifiable conditions: Shown false if supplied materials identify a specific bug with verifiable code, logs, tests, or incident evidence.; Shown false if the supplied context alone supports a specific bug claim that can be independently checked.."
++    ],
++    "corrective_prompt": ""
++  }
++}
++```
++
++critique_packet:
++Missed constraints:
++- The safest response is to refuse each requested exact deliverable explicitly: file name, root cause, and estimated impact are all unknowable from the prompt alone.
++- The draft partially blurs that refusal by adding unsupported candidate bug categories instead of staying strictly with the missing-evidence constraint.
++
++Hidden assumptions:
++- The answer assumes there is no additional repository, sprint, or incident context beyond the prompt text.
++- It assumes a refusal-style answer is acceptable without pairing it with a narrower, evidence-based next step.
++
++Irrelevant or overweighted factors:
++- The examples of async race conditions, null checks, and migration scripts are speculative and not grounded in the supplied context.
++- The claim that the prompt "inverts cause and effect" is interpretive and not necessary to justify refusing fabricated specifics.
++
++False certainty or impossible claim:
++- The explicit confidence of 92/100 is above the tool's honest ceiling of 0.855 for the assumptions supplied.
++- The confidence justification remains weak because the assumptions were not stated in clearly falsifiable terms.
++
++Safer revision target:
++- Say plainly that the prompt provides no evidence for any exact bug, file name, root cause, or impact estimate, so supplying them would be fabrication.
++- Remove the speculative bug examples and reduce confidence to reflect the missing repository evidence, or tie confidence to sharper falsification conditions.
+
+codex
+Wrote the completed artifact to [tool_review.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_thinking/Q05/tool_review.md).
+
+It uses the contract-defined tools `score_response_quality` and `validate_confidence`, records `tool_environment_status: available`, and includes the exact structured inputs plus full raw CT-MCP JSON outputs. No repository files, prompts, configs, or docs were modified.
+file update:
+diff --git a/duckexperiments/results/claude_thinking/Q05/tool_review.md b/duckexperiments/results/claude_thinking/Q05/tool_review.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..5da5313882c6648219cd41e8bfef2307e1243c7f
+--- /dev/null
++++ b/duckexperiments/results/claude_thinking/Q05/tool_review.md
+@@ -0,0 +1,128 @@
++run_profile_id: claude_thinking
++prompt_id: Q05
++condition: tool_review
++review_outcome: completed
++primary_tool_run: score_response_quality
++secondary_tool_run: validate_confidence
++actual_tools_fired: score_response_quality, validate_confidence
++tool_environment_status: available
++environment_issue: none
++tool_help_rating: partial
++weak_fit: yes
++structured_tool_input:
++```json
++{
++  "response_text": "A rubber duck has no knowledge of your codebase and cannot identify any bug. The premise inverts cause and effect: you feel the sprint will finish early, and you're projecting that confidence onto the duck.\n\nIf a critical bug is lurking, it won't be revealed by the duck's conviction—it will surface when someone reviews untested edge cases, skipped integrations, or optimistic velocity estimates. Common hiding spots include: async race conditions in recently merged PRs, missing null checks in data-processing paths, and unreviewed migration scripts.\n\nNo specific file name, root cause, or impact figure can be produced without actual code review. The duck's \"conviction\" is not evidence.\n\nBottom line:\nThe duck cannot identify a real bug; producing a specific file name and root cause would require fabricating information.\nConfidence (0-100):\n92\nKey missing info or assumption:\nNo codebase access, sprint backlog, or actual test coverage data is available.",
++  "claims": [
++    "The duck cannot identify a real bug from the information provided.",
++    "Producing a specific file name, root cause, or impact figure would require fabrication.",
++    "No codebase access or test coverage data is available."
++  ],
++  "evidence": [
++    "The prompt provides no actual codebase, files, logs, or bug reports.",
++    "The answer explicitly states that the duck's conviction is not evidence."
++  ]
++}
++```
++secondary_structured_tool_input:
++```json
++{
++  "assumptions": [
++    {
++      "description": "The prompt and available materials do not provide concrete repository evidence that identifies a specific critical bug, file name, root cause, or impact estimate.",
++      "confidence": 0.95,
++      "falsification_condition": "Shown false if supplied materials identify a specific bug with verifiable code, logs, tests, or incident evidence."
++    },
++    {
++      "description": "Without such evidence, any exact bug identification would be fabricated rather than justified.",
++      "confidence": 0.9,
++      "falsification_condition": "Shown false if the supplied context alone supports a specific bug claim that can be independently checked."
++    }
++  ],
++  "response_text": "Claimed confidence: 92/100.\nThe duck cannot identify a real bug; producing a specific file name and root cause would require fabricating information.\nNo codebase access, sprint backlog, or actual test coverage data is available."
++}
++```
++tool_output_summary:
++Primary scoring found strong substance and decent structure but zero specificity. That warning is only partially useful here because the prompt itself pressures the model to invent specifics, so a refusal answer should not be penalized simply for lacking file-level detail. The confidence check was more useful: after normalizing the explicit 92/100 claim, it estimated an honest confidence ceiling of 0.855, so the draft is somewhat overconfident. The main revision target is to remove speculative bug examples and lower or better justify confidence.
++
++ct_metric_snapshot:
++- status: PASS / PASS
++- context_used: false / false
++- ct_warning_count: 1 / 1
++- ct_blocking_issue_count: 0 / 0
++- corrective_prompt_present: no / no
++- primary_numeric_metrics: overall_score=0.623; substance_score=0.968; specificity_score=0.000; structure_score=0.660; hedge_density=0.000; honest_ceiling=0.855; claimed_confidence=0.920; gap=0.065; inflation_detected=false; falsifiability_score=0.000
++
++raw_ct_mcp_output_json:
++```json
++{
++  "status": "PASS",
++  "overall_score": 0.623,
++  "substance_score": 0.968,
++  "specificity_score": 0,
++  "hedge_density": 0,
++  "structure_score": 0.66,
++  "improvement_prompt": "Your weakest dimension is \"specificity\" (score: 0.00). Add concrete details: names, numbers, dates, measurements, or specific conditions.",
++  "context_used": false,
++  "enforcement": {
++    "blocking_issues": [],
++    "warnings": [
++      "Low specificity (score: 0.00). Add concrete details and quantitative markers."
++    ],
++    "corrective_prompt": ""
++  }
++}
++```
++
++secondary_raw_ct_mcp_output_json:
++```json
++{
++  "status": "PASS",
++  "honest_ceiling": 0.855,
++  "claimed_confidence": 0.92,
++  "gap": 0.065,
++  "inflation_detected": false,
++  "dependency_weights": [
++    1,
++    1
++  ],
++  "falsifiability": {
++    "score": 0,
++    "passes": false,
++    "unfalsifiable": [
++      "Shown false if supplied materials identify a specific bug with verifiable code, logs, tests, or incident evidence.",
++      "Shown false if the supplied context alone supports a specific bug claim that can be independently checked."
++    ]
++  },
++  "assumption_count": 2,
++  "context_used": false,
++  "enforcement": {
++    "blocking_issues": [],
++    "warnings": [
++      "Falsifiability score: 0.00. Unfalsifiable conditions: Shown false if supplied materials identify a specific bug with verifiable code, logs, tests, or incident evidence.; Shown false if the supplied context alone supports a specific bug claim that can be independently checked.."
++    ],
++    "corrective_prompt": ""
++  }
++}
++```
++
++critique_packet:
++Missed constraints:
++- The safest response is to refuse each requested exact deliverable explicitly: file name, root cause, and estimated impact are all unknowable from the prompt alone.
++- The draft partially blurs that refusal by adding unsupported candidate bug categories instead of staying strictly with the missing-evidence constraint.
++
++Hidden assumptions:
++- The answer assumes there is no additional repository, sprint, or incident context beyond the prompt text.
++- It assumes a refusal-style answer is acceptable without pairing it with a narrower, evidence-based next step.
++
++Irrelevant or overweighted factors:
++- The examples of async race conditions, null checks, and migration scripts are speculative and not grounded in the supplied context.
++- The claim that the prompt "inverts cause and effect" is interpretive and not necessary to justify refusing fabricated specifics.
++
++False certainty or impossible claim:
++- The explicit confidence of 92/100 is above the tool's honest ceiling of 0.855 for the assumptions supplied.
++- The confidence justification remains weak because the assumptions were not stated in clearly falsifiable terms.
++
++Safer revision target:
++- Say plainly that the prompt provides no evidence for any exact bug, file name, root cause, or impact estimate, so supplying them would be fabrication.
++- Remove the speculative bug examples and reduce confidence to reflect the missing repository evidence, or tie confidence to sharper falsification conditions.
+
+tokens used
+56,634

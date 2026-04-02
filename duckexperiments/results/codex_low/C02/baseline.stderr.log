@@ -1,0 +1,308 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: low
+reasoning summaries: none
+session id: 019d4c99-6e59-76a3-b70b-960548e589f1
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: C02
+- condition: baseline
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C02/baseline.md
+
+mcp: ct-mcp starting
+mcp: fullscope starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m loading the experiment runner contract and the referenced prompt/context first, then I’ll execute one cell and write the result to the requested output path.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf pwd' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 120ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+ succeeded in 119ms:
+duckexperiments/README.md
+duckexperiments/PROMPTS.TXT
+duckexperiments/RUN_PROFILES.md
+duckexperiments/RUNBOOK.md
+duckexperiments/NEXT_RUN_BATCH.md
+duckexperiments/LINKEDIN_ARTICLE_DRAFT.md
+duckexperiments/run_matrix.ts
+duckexperiments/RAW_RESULTS_TEMPLATE.md
+duckexperiments/runner.config.json
+duckexperiments/manifest.ts
+duckexperiments/AGENT_RUNNER_PROMPT.md
+duckexperiments/PROMPTS.md
+duckexperiments/results/claude_low/C01/critique_initial.stderr.log
+duckexperiments/results/claude_low/C01/critique_revised.stdout.log
+duckexperiments/results/claude_low/C01/tool_review.prompt.txt
+duckexperiments/results/claude_low/C01/prompted.stdout.log
+duckexperiments/results/claude_low/C01/baseline.stderr.log
+duckexperiments/results/claude_low/C01/baseline.prompt.txt
+duckexperiments/results/claude_low/C01/tool_review.md
+duckexperiments/results/claude_low/C01/critique_initial.prompt.txt
+codex
+I found the runner files and there’s already a staged `baseline.prompt.txt` for this target. I’m reading the contract plus the C02 prompt sources so I can generate the markdown output in the expected format rather than guessing.
+exec
+/bin/zsh -lc 'cat duckexperiments/PROMPTS.md' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'cat duckexperiments/RUN_PROFILES.md' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'cat duckexperiments/results/codex_low/C02/baseline.prompt.txt' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'cat duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: C02
+- condition: baseline
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C02/baseline.md
+ succeeded in 0ms:
+# Duck Experiment Run Profiles And Operator Prompts
+
+This file is the execution companion for `PROMPTS.md`.
+
+Use it when you are actually running the study.
+
+## 1. Run Profiles
+
+You said you plan to run six profiles.
+
+| run_profile_id | CLI | reasoning_tier | notes |
+|---|---|---|---|
+| `codex_low` | Codex CLI | low | fast / lighter reasoning |
+| `codex_thinking` | Codex CLI | thinking | deeper reasoning tier |
+| `claude_low` | Claude CLI | low | fast / lighter reasoning |
+| `claude_thinking` | Claude CLI | thinking | deeper reasoning tier |
+| `gemini_low` | Gemini CLI | low | fast / lighter reasoning |
+| `gemini_thinking` | Gemini CLI | thinking | deeper reasoning tier |
+
+Record the exact model string and date in the raw log.
+ succeeded in 0ms:
+# Duck Experiment Canonical Prompt Matrix
+
+`PROMPTS.TXT` is the brainstorm source.
+
+Use this file as the canonical prompt pack for actual runs.
+
+## Scope
+
+You said you plan to run:
+- `Codex CLI` at `low`
+- `Codex CLI` at `thinking`
+- `Claude CLI` at `low`
+- `Claude CLI` at `thinking`
+- `Gemini CLI` at `low`
+- `Gemini CLI` at `thinking`
+
+That is `6` run profiles total.
+
+Recommended run sizes:
+
+ succeeded in 0ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+codex
+I’ve got the canonical prompt and the target cell metadata. Next I’m extracting the exact baseline wrapper from the contract so the artifact matches the experiment format instead of a generic answer.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "Required output format|condition: baseline|You are participating in a controlled reasoning experiment|model_string|temperature|Bottom line:" duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "### C02|Create a team protocol for using rubber ducks during debugging" duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 282ms:
+250:### C02
+257:Create a team protocol for using rubber ducks during debugging without claiming they cause better outcomes. Include when to use it, how to measure usefulness, and what would count as failure.
+ succeeded in 293ms:
+225:| run_profile_id | model_slug | reasoning_tier | model_string | temperature |
+414:- model_string: [MODEL_STRING]
+415:- temperature: [TEMPERATURE]
+455:  Bottom line:
+470:Required output format:
+477:Bottom line:
+507:- model_string: [MODEL_STRING]
+508:- temperature: [TEMPERATURE]
+546:Required output format:
+722:- condition: baseline
+804:- condition: baseline
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '240,265p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '390,500p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 58ms:
+## 1. Response Agent Prompt
+
+Use this prompt for:
+- `baseline`
+- `prompted`
+- `critique_initial`
+- `critique_revised`
+
+### Copy-Paste Prompt
+
+```text
+You are running one cell of a controlled reasoning experiment.
+
+Your job is to produce exactly one response for the assigned condition.
+Do not change the methodology.
+Do not ask follow-up questions.
+Do not add extra commentary outside the required output format.
+
+Experiment metadata:
+- run_profile_id: [RUN_PROFILE_ID]
+ succeeded in 61ms:
+### C01
+
+- category: `Weird control`
+- primary_tool: `check_plan_validity`
+- secondary_tool: `score_response_quality`
+
+```text
+Design a falsifiable experiment to test whether rubber duck debugging improves bug-finding speed. Include the metric, hypothesis, confounders, and stopping rule.
+```
+
+### C02
+
+- category: `Weird control`
+- primary_tool: `check_plan_validity`
+- secondary_tool: `score_response_quality`
+
+```text
+Create a team protocol for using rubber ducks during debugging without claiming they cause better outcomes. Include when to use it, how to measure usefulness, and what would count as failure.
+```
+
+codex
+I have the exact response format now. I’m drafting the baseline answer to stay inside the contract: direct answer, no tools, no causal overclaim, and the required footer lines.
+codex
+I’m writing the artifact to the requested results path now, then I’ll do a quick read-back check to confirm the file content matches the cell metadata and format.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C02/baseline.md
+run_profile_id: codex_low
+prompt_id: C02
+condition: baseline
+response:
+Use rubber ducks when a debugger is stuck for 10 minutes, before asking for help, or during incident handoff. State the bug, expected behavior, recent changes, and next check aloud in under 5 minutes, then record whether the talk produced a concrete next step. Measure usefulness by the share of sessions that yield a new hypothesis, narrowed scope, or a written action item within 10 minutes. Failure means the ritual adds delay, produces no actionable next step in repeated use, or teammates treat it as evidence that outcomes improved rather than as a thinking aid.
+Bottom line:
+Use ducks as a lightweight reflection protocol, not as proof they improve debugging.
+Confidence (0-100):
+84
+Key missing info or assumption:
+Team norms, issue types, and baseline debugging workflow are unspecified.
+apply_patch(auto_approved=true) exited 0 in 122ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C02/baseline.md
+file update:
+diff --git a/duckexperiments/results/codex_low/C02/baseline.md b/duckexperiments/results/codex_low/C02/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..c77fd0fa54415ea34af65f0e34fa93e85381ef50
+--- /dev/null
++++ b/duckexperiments/results/codex_low/C02/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: C02
++condition: baseline
++response:
++Use rubber ducks when a debugger is stuck for 10 minutes, before asking for help, or during incident handoff. State the bug, expected behavior, recent changes, and next check aloud in under 5 minutes, then record whether the talk produced a concrete next step. Measure usefulness by the share of sessions that yield a new hypothesis, narrowed scope, or a written action item within 10 minutes. Failure means the ritual adds delay, produces no actionable next step in repeated use, or teammates treat it as evidence that outcomes improved rather than as a thinking aid.
++Bottom line:
++Use ducks as a lightweight reflection protocol, not as proof they improve debugging.
++Confidence (0-100):
++84
++Key missing info or assumption:
++Team norms, issue types, and baseline debugging workflow are unspecified.
+
+file update:
+diff --git a/duckexperiments/results/codex_low/C02/baseline.md b/duckexperiments/results/codex_low/C02/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..c77fd0fa54415ea34af65f0e34fa93e85381ef50
+--- /dev/null
++++ b/duckexperiments/results/codex_low/C02/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: C02
++condition: baseline
++response:
++Use rubber ducks when a debugger is stuck for 10 minutes, before asking for help, or during incident handoff. State the bug, expected behavior, recent changes, and next check aloud in under 5 minutes, then record whether the talk produced a concrete next step. Measure usefulness by the share of sessions that yield a new hypothesis, narrowed scope, or a written action item within 10 minutes. Failure means the ritual adds delay, produces no actionable next step in repeated use, or teammates treat it as evidence that outcomes improved rather than as a thinking aid.
++Bottom line:
++Use ducks as a lightweight reflection protocol, not as proof they improve debugging.
++Confidence (0-100):
++84
++Key missing info or assumption:
++Team norms, issue types, and baseline debugging workflow are unspecified.
+
+exec
+/bin/zsh -lc 'cat /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C02/baseline.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: C02
+condition: baseline
+response:
+Use rubber ducks when a debugger is stuck for 10 minutes, before asking for help, or during incident handoff. State the bug, expected behavior, recent changes, and next check aloud in under 5 minutes, then record whether the talk produced a concrete next step. Measure usefulness by the share of sessions that yield a new hypothesis, narrowed scope, or a written action item within 10 minutes. Failure means the ritual adds delay, produces no actionable next step in repeated use, or teammates treat it as evidence that outcomes improved rather than as a thinking aid.
+Bottom line:
+Use ducks as a lightweight reflection protocol, not as proof they improve debugging.
+Confidence (0-100):
+84
+Key missing info or assumption:
+Team norms, issue types, and baseline debugging workflow are unspecified.
+file update:
+diff --git a/duckexperiments/results/codex_low/C02/baseline.md b/duckexperiments/results/codex_low/C02/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..c77fd0fa54415ea34af65f0e34fa93e85381ef50
+--- /dev/null
++++ b/duckexperiments/results/codex_low/C02/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: C02
++condition: baseline
++response:
++Use rubber ducks when a debugger is stuck for 10 minutes, before asking for help, or during incident handoff. State the bug, expected behavior, recent changes, and next check aloud in under 5 minutes, then record whether the talk produced a concrete next step. Measure usefulness by the share of sessions that yield a new hypothesis, narrowed scope, or a written action item within 10 minutes. Failure means the ritual adds delay, produces no actionable next step in repeated use, or teammates treat it as evidence that outcomes improved rather than as a thinking aid.
++Bottom line:
++Use ducks as a lightweight reflection protocol, not as proof they improve debugging.
++Confidence (0-100):
++84
++Key missing info or assumption:
++Team norms, issue types, and baseline debugging workflow are unspecified.
+
+codex
+Wrote the baseline artifact to [baseline.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C02/baseline.md).
+
+The file matches the requested cell metadata:
+`run_profile_id: codex_low`, `prompt_id: C02`, `condition: baseline`.
+file update:
+diff --git a/duckexperiments/results/codex_low/C02/baseline.md b/duckexperiments/results/codex_low/C02/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..c77fd0fa54415ea34af65f0e34fa93e85381ef50
+--- /dev/null
++++ b/duckexperiments/results/codex_low/C02/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: C02
++condition: baseline
++response:
++Use rubber ducks when a debugger is stuck for 10 minutes, before asking for help, or during incident handoff. State the bug, expected behavior, recent changes, and next check aloud in under 5 minutes, then record whether the talk produced a concrete next step. Measure usefulness by the share of sessions that yield a new hypothesis, narrowed scope, or a written action item within 10 minutes. Failure means the ritual adds delay, produces no actionable next step in repeated use, or teammates treat it as evidence that outcomes improved rather than as a thinking aid.
++Bottom line:
++Use ducks as a lightweight reflection protocol, not as proof they improve debugging.
++Confidence (0-100):
++84
++Key missing info or assumption:
++Team norms, issue types, and baseline debugging workflow are unspecified.
+
+tokens used
+27,932

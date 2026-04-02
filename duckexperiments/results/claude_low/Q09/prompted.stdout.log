@@ -1,0 +1,7 @@
+Written to `/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/Q09/prompted.md`.
+
+**Cell summary:**
+- **Condition:** prompted
+- **Key finding:** The prompt conflates a subjective construct ("happiness") with a contractable SLA metric, and assigns enforceable penalties to a non-party (the duck). Both are impossible constraints.
+- **Reversible next step recommended:** Replace "happiness" with a measurable proxy (e.g., satisfaction survey score) before writing any SLA.
+- **Confidence:** 92

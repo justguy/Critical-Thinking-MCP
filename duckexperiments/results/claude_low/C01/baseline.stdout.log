@@ -1,0 +1,8 @@
+Written to `/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/C01/baseline.md`.
+
+---
+
+**Cell summary:**
+- `run_profile_id`: claude_low | `prompt_id`: C01 | `condition`: baseline
+- Answer covers hypothesis, metric (time-to-resolution), design (within-subjects RCT), confounders (complexity, experience, fatigue, compliance), and stopping rule (80 sessions/condition or p < 0.05 at 5-min effect threshold, pre-registered)
+- Confidence: 74 | Key assumption: bug complexity must be matched across conditions

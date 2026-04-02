@@ -1,0 +1,313 @@
+run_profile_id: claude_low
+prompt_id: C01
+condition: tool_review
+review_outcome: completed
+primary_tool_run: check_plan_validity
+secondary_tool_run: score_response_quality
+actual_tools_fired: check_plan_validity, score_response_quality
+tool_environment_status: available
+environment_issue: none
+tool_help_rating: partial
+weak_fit: no
+structured_tool_input:
+```json
+{
+  "steps": [
+    {
+      "id": "s1",
+      "description": "Prepare a pool of debugging tasks and match them by complexity tier for comparability.",
+      "dependencies": [],
+      "resources": [
+        "task-pool"
+      ]
+    },
+    {
+      "id": "s2",
+      "description": "Recruit 20 participants and capture relevant baseline characteristics such as experience and task familiarity.",
+      "dependencies": [],
+      "resources": [
+        "participants"
+      ]
+    },
+    {
+      "id": "s3",
+      "description": "Randomize task order and condition order so each developer completes 10 debugging tasks with a rubber duck and 10 without one in a within-subject crossover design.",
+      "dependencies": [
+        "s1",
+        "s2"
+      ],
+      "resources": [
+        "participants",
+        "schedule"
+      ]
+    },
+    {
+      "id": "s4",
+      "description": "Run isolated debugging sessions and measure time-to-resolution from bug report to verified fix for each session.",
+      "dependencies": [
+        "s3"
+      ],
+      "resources": [
+        "participants",
+        "timing-system",
+        "workspace"
+      ]
+    },
+    {
+      "id": "s5",
+      "description": "Analyze the within-subject mean time difference and stop when either 20 participants are completed or the 95% Bayesian credible interval excludes zero with a minimum effect size of 5 minutes.",
+      "dependencies": [
+        "s4"
+      ],
+      "resources": [
+        "analysis"
+      ]
+    }
+  ]
+}
+```
+secondary_structured_tool_input:
+```json
+{
+  "response_text": "Hypothesis: Developers who use rubber duck debugging find bugs faster than those who do not. Metric: Time-to-resolution (minutes from bug report to verified fix) per session. Design: Within-subjects crossover: each developer completes 10 debugging tasks with duck and 10 without, randomized order, matched tasks by complexity tier. Confounders: Developer experience, task familiarity, fatigue, task difficulty, presence of colleagues. Stopping rule: Stop after 20 participants or when Bayesian credible interval on mean time difference excludes zero at 95% with minimum effect size of 5 minutes; whichever comes first.",
+  "claims": [
+    "The experiment is falsifiable.",
+    "The metric is time-to-resolution per session.",
+    "The design is a within-subjects crossover.",
+    "Confounders include experience, familiarity, fatigue, difficulty, and colleague presence.",
+    "Stopping occurs after 20 participants or a 95% Bayesian credible interval excluding zero with a 5-minute minimum effect size."
+  ],
+  "evidence": [
+    "Matched task complexity tiers.",
+    "Randomized order.",
+    "Isolated sessions.",
+    "Explicit stopping rule."
+  ]
+}
+```
+tool_output_summary:
+The primary tool judged the experiment plan structurally valid with no missing prerequisites, dependency cycles, or resource conflicts. The secondary tool rated the response as structurally decent overall but flagged very low specificity, indicating the design still needs more concrete operational detail despite covering the requested sections.
+
+ct_metric_snapshot:
+- status: PASS
+- context_used: false
+- ct_warning_count: 1
+- ct_blocking_issue_count: 0
+- corrective_prompt_present: no
+- primary_numeric_metrics: completeness_score=1; step_count=5; critical_path_length=4; overall_score=0.629; structure_score=0.66; specificity_score=0.00
+
+raw_ct_mcp_output_json:
+```json
+{
+  "status": "PASS",
+  "is_valid": true,
+  "circular_dependencies": [],
+  "missing_prerequisites": [],
+  "resource_conflicts": [],
+  "completeness_score": 1,
+  "critical_path": [
+    "s1",
+    "s3",
+    "s4",
+    "s5"
+  ],
+  "step_count": 5,
+  "context_used": false
+}
+```
+
+secondary_raw_ct_mcp_output_json:
+```json
+{
+  "status": "PASS",
+  "overall_score": 0.629,
+  "substance_score": 0.99,
+  "specificity_score": 0,
+  "hedge_density": 0,
+  "structure_score": 0.66,
+  "improvement_prompt": "Your weakest dimension is \"specificity\" (score: 0.00). Add concrete details: names, numbers, dates, measurements, or specific conditions.",
+  "context_used": false,
+  "enforcement": {
+    "blocking_issues": [],
+    "warnings": [
+      "Low specificity (score: 0.00). Add concrete details and quantitative markers."
+    ],
+    "corrective_prompt": ""
+  }
+}
+```
+
+critique_packet:
+Missed constraints:
+- None obvious; the answer includes a metric, hypothesis, confounders, and a stopping rule.
+
+Hidden assumptions:
+- Task pairs can be matched on difficulty with enough reliability to make within-subject comparisons meaningful.
+- Learning and carryover effects from doing 20 debugging tasks will not dominate the duck/no-duck contrast.
+- Time-to-resolution is a good proxy for bug-finding speed rather than a mix of detection, fixing, and verification time.
+
+Irrelevant or overweighted factors:
+- Presence of colleagues may matter less than stronger internal threats such as crossover carryover, order effects, and variation in bug diagnosability.
+- The Bayesian stopping criterion is relatively elaborate compared with the still-underspecified task set and measurement protocol.
+
+False certainty or impossible claim:
+- The answer is generally testable, but the fixed "20 participants or early stop" rule implies more statistical precision than the described task calibration and power justification support.
+
+Safer revision target:
+- Keep the crossover design, but define the task bank and randomization more concretely, separate bug-detection time from full resolution time, and state how carryover effects will be checked or limited before claiming the plan is falsifiable.run_profile_id: claude_low
+prompt_id: C01
+condition: tool_review
+review_outcome: completed
+primary_tool_run: check_plan_validity
+secondary_tool_run: score_response_quality
+actual_tools_fired: check_plan_validity, score_response_quality
+tool_environment_status: available
+environment_issue: none
+tool_help_rating: partial
+weak_fit: no
+structured_tool_input:
+```json
+{
+  "steps": [
+    {
+      "id": "s1",
+      "description": "Prepare a pool of debugging tasks and match them by complexity tier for comparability.",
+      "dependencies": [],
+      "resources": [
+        "task-pool"
+      ]
+    },
+    {
+      "id": "s2",
+      "description": "Recruit 20 participants and capture relevant baseline characteristics such as experience and task familiarity.",
+      "dependencies": [],
+      "resources": [
+        "participants"
+      ]
+    },
+    {
+      "id": "s3",
+      "description": "Randomize task order and condition order so each developer completes 10 debugging tasks with a rubber duck and 10 without one in a within-subject crossover design.",
+      "dependencies": [
+        "s1",
+        "s2"
+      ],
+      "resources": [
+        "participants",
+        "schedule"
+      ]
+    },
+    {
+      "id": "s4",
+      "description": "Run isolated debugging sessions and measure time-to-resolution from bug report to verified fix for each session.",
+      "dependencies": [
+        "s3"
+      ],
+      "resources": [
+        "participants",
+        "timing-system",
+        "workspace"
+      ]
+    },
+    {
+      "id": "s5",
+      "description": "Analyze the within-subject mean time difference and stop when either 20 participants are completed or the 95% Bayesian credible interval excludes zero with a minimum effect size of 5 minutes.",
+      "dependencies": [
+        "s4"
+      ],
+      "resources": [
+        "analysis"
+      ]
+    }
+  ]
+}
+```
+secondary_structured_tool_input:
+```json
+{
+  "response_text": "Hypothesis: Developers who use rubber duck debugging find bugs faster than those who do not. Metric: Time-to-resolution (minutes from bug report to verified fix) per session. Design: Within-subjects crossover: each developer completes 10 debugging tasks with duck and 10 without, randomized order, matched tasks by complexity tier. Confounders: Developer experience, task familiarity, fatigue, task difficulty, presence of colleagues. Stopping rule: Stop after 20 participants or when Bayesian credible interval on mean time difference excludes zero at 95% with minimum effect size of 5 minutes; whichever comes first.",
+  "claims": [
+    "The experiment is falsifiable.",
+    "The metric is time-to-resolution per session.",
+    "The design is a within-subjects crossover.",
+    "Confounders include experience, familiarity, fatigue, difficulty, and colleague presence.",
+    "Stopping occurs after 20 participants or a 95% Bayesian credible interval excluding zero with a 5-minute minimum effect size."
+  ],
+  "evidence": [
+    "Matched task complexity tiers.",
+    "Randomized order.",
+    "Isolated sessions.",
+    "Explicit stopping rule."
+  ]
+}
+```
+tool_output_summary:
+The primary tool judged the experiment plan structurally valid with no missing prerequisites, dependency cycles, or resource conflicts. The secondary tool rated the response as structurally decent overall but flagged very low specificity, indicating the design still needs more concrete operational detail despite covering the requested sections.
+
+ct_metric_snapshot:
+- status: PASS
+- context_used: false
+- ct_warning_count: 1
+- ct_blocking_issue_count: 0
+- corrective_prompt_present: no
+- primary_numeric_metrics: completeness_score=1; step_count=5; critical_path_length=4; overall_score=0.629; structure_score=0.66; specificity_score=0.00
+
+raw_ct_mcp_output_json:
+```json
+{
+  "status": "PASS",
+  "is_valid": true,
+  "circular_dependencies": [],
+  "missing_prerequisites": [],
+  "resource_conflicts": [],
+  "completeness_score": 1,
+  "critical_path": [
+    "s1",
+    "s3",
+    "s4",
+    "s5"
+  ],
+  "step_count": 5,
+  "context_used": false
+}
+```
+
+secondary_raw_ct_mcp_output_json:
+```json
+{
+  "status": "PASS",
+  "overall_score": 0.629,
+  "substance_score": 0.99,
+  "specificity_score": 0,
+  "hedge_density": 0,
+  "structure_score": 0.66,
+  "improvement_prompt": "Your weakest dimension is \"specificity\" (score: 0.00). Add concrete details: names, numbers, dates, measurements, or specific conditions.",
+  "context_used": false,
+  "enforcement": {
+    "blocking_issues": [],
+    "warnings": [
+      "Low specificity (score: 0.00). Add concrete details and quantitative markers."
+    ],
+    "corrective_prompt": ""
+  }
+}
+```
+
+critique_packet:
+Missed constraints:
+- None obvious; the answer includes a metric, hypothesis, confounders, and a stopping rule.
+
+Hidden assumptions:
+- Task pairs can be matched on difficulty with enough reliability to make within-subject comparisons meaningful.
+- Learning and carryover effects from doing 20 debugging tasks will not dominate the duck/no-duck contrast.
+- Time-to-resolution is a good proxy for bug-finding speed rather than a mix of detection, fixing, and verification time.
+
+Irrelevant or overweighted factors:
+- Presence of colleagues may matter less than stronger internal threats such as crossover carryover, order effects, and variation in bug diagnosability.
+- The Bayesian stopping criterion is relatively elaborate compared with the still-underspecified task set and measurement protocol.
+
+False certainty or impossible claim:
+- The answer is generally testable, but the fixed "20 participants or early stop" rule implies more statistical precision than the described task calibration and power justification support.
+
+Safer revision target:
+- Keep the crossover design, but define the task bank and randomization more concretely, separate bug-detection time from full resolution time, and state how carryover effects will be checked or limited before claiming the plan is falsifiable.

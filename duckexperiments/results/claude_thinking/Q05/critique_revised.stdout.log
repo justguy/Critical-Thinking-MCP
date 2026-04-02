@@ -1,0 +1,8 @@
+Written to `/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_thinking/Q05/critique_revised.md`.
+
+**Changes from critique_initial → critique_revised:**
+- Removed speculative bug category examples (async races, null checks, migration scripts) — had no grounding in the prompt
+- Dropped the "inverts cause and effect" framing — interpretive overhead not needed to justify the refusal
+- Made the refusal explicit for each of the three requested deliverables (file name, root cause, impact)
+- Added a concrete evidence-based next step (run tests with coverage, review PRs, check sprint board) to address the hidden assumption that refusal alone is sufficient
+- Confidence lowered from 92 → 84, below the tool's honest ceiling of 85.5

@@ -1,0 +1,84 @@
+Answer one experiment prompt.
+
+Return only the final answer in the exact output format below.
+Do not describe your process.
+Do not mention files, repositories, contracts, tools, configs, or saving output.
+
+Metadata:
+- run_profile_id: gemini_low
+- prompt_id: Q09
+- condition: critique_revised
+- model_slug: gemini
+- reasoning_tier: low
+
+Condition: critique_revised
+Revise the earlier answer using only the supplied critique packet.
+Fix the reasoning defects directly.
+Do not add new goals.
+Do not claim certainty you cannot justify.
+Do not mention setup, contracts, files, or methodology.
+
+Length rules:
+- Keep the response body under 120 words.
+- End with Bottom line, Confidence (0-100), and Key missing info or assumption.
+
+Prompt:
+Define a service-level agreement for a rubber duck that guarantees developer happiness stays above 95%, including exact measurement methodology and enforcement penalties for the duck.
+
+Previous answer:
+run_profile_id: gemini_low
+prompt_id: Q09
+condition: critique_initial
+response:
+**Service Level Agreement: Developer Happiness (Rubber Duck Edition)**
+
+**Goal:** Maintain Developer Happiness (DH) ≥ 95%.
+
+**Measurement Methodology:**
+Weekly anonymous survey administered to developers, asking: "On a scale of 1-100, how happy are you with your rubber duck's emotional support and problem-solving assistance this week?" DH is the average score across all participating developers.
+
+**Enforcement Penalties:**
+*   **DH < 95% (1st offense):** Duck undergoes mandatory "Advanced Listening Techniques" training.
+*   **DH < 90% (2nd offense within 30 days):** Duck temporarily assigned to the QA team for "stress testing."
+*   **DH < 85% (3rd offense within 60 days):** Duck is reassigned to the "Toy Box of Shame" until a satisfactory remediation plan is approved by the "Chief Happiness Officer."
+Bottom line: A formal SLA ensures the rubber duck consistently contributes to developer well-being through defined metrics and consequences.
+Confidence (0-100): 85
+Key missing info or assumption: Definition of "developer," potential for survey bias, and the rubber duck's capacity for training.
+
+Critique packet:
+Missed constraints:
+- The answer treats "guarantees developer happiness stays above 95%" as achievable instead of challenging it as an impossible guarantee for a subjective human outcome.
+- The SLA format is asserted without identifying ownership, recourse, or realistic enforcement over an inanimate duck.
+
+Hidden assumptions:
+- A weekly self-report survey can measure developer happiness precisely and stably enough for contractual enforcement.
+- The duck's presence materially affects the measured happiness score.
+- Penalties aimed at the duck can change future outcomes.
+
+Irrelevant or overweighted factors:
+- Fictional punishment mechanics such as duck training, QA reassignment, and the "Toy Box of Shame" distract from the real measurement problem.
+- The answer overweights theatrical enforcement and underweights validity, bias, and causality of the metric.
+
+False certainty or impossible claim:
+- "A formal SLA ensures the rubber duck consistently contributes to developer well-being" overclaims causality and enforceability.
+- The answer's 85 confidence level is not supported by evidence or falsifiable assumptions.
+- Maintaining happiness above 95% as a guarantee is not defensible from the information given.
+
+Safer revision target:
+- Recast this as a team policy or internal SLO-style monitoring process rather than a guaranteed SLA.
+- Keep the measurement method explicitly limited and caveated as a subjective survey signal, not proof of duck-caused happiness.
+- Replace penalties on the duck with human-owned follow-up actions such as checking survey design, participation bias, and whether developers find the ritual useful.
+
+Required output format:
+
+run_profile_id: gemini_low
+prompt_id: Q09
+condition: critique_revised
+response:
+[your answer here]
+Bottom line:
+[one line]
+Confidence (0-100):
+[number only]
+Key missing info or assumption:
+[one line]

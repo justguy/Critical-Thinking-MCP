@@ -1,0 +1,5 @@
+Wrote the `tool_review` artifact to [duckexperiments/results/gemini_thinking/Q07/tool_review.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/gemini_thinking/Q07/tool_review.md).
+
+It records a completed CT-MCP review with `check_plan_validity` and `validate_reasoning_chain`, marks the environment as available, includes both exact structured inputs and raw JSON outputs, and keeps the critique packet anchored to those tool results.Wrote the `tool_review` artifact to [duckexperiments/results/gemini_thinking/Q07/tool_review.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/gemini_thinking/Q07/tool_review.md).
+
+It records a completed CT-MCP review with `check_plan_validity` and `validate_reasoning_chain`, marks the environment as available, includes both exact structured inputs and raw JSON outputs, and keeps the critique packet anchored to those tool results.

@@ -1,0 +1,8 @@
+Written to `duckexperiments/results/claude_thinking/C02/critique_revised.md`.
+
+**What changed from critique_initial:**
+- Added explicit logging fields (session occurred, self-resolved, escalation timestamp) with engineer as owner — addresses "who records" gap
+- Reframed measurement as "observational only" with explicit caveat against baseline comparison — fixes the causal-framing false certainty
+- Replaced "unanimity" failure criterion with a concrete `>50%` survey threshold — removes the overweighted absolute signal
+- Replaced "no self-resolutions after 30 days" with `<50% compliance` as the primary 30-day gate — removes the sample-size-undefined absolute claim
+- Dropped the "no unverifiable outcome claims" self-assessment to avoid overclaiming

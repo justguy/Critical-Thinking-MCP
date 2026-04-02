@@ -96,6 +96,46 @@ Iteration 3: PASS → honest confidence with specific falsification conditions
 
 No hidden state — all context is in the request.
 
+## Experimental Workflow And Formulas
+
+The public comparison workflow in [`duckexperiments/`](duckexperiments/) uses CT-MCP as critique support, not as the final judge of truth.
+
+Process:
+
+1. `baseline` — raw answer
+2. `prompted` — fixed reasoning-hygiene wrapper
+3. `critique_initial` — first answer used for review
+4. `tool_review` — CT-MCP review in one fixed MCP-enabled environment
+5. `critique_revised` — revision using the critique packet
+
+Core formulas used in that workflow:
+
+- `normalized_score = total_rubric_points / 18`
+- `score_delta = critique_revised_score - critique_initial_score`
+- `confidence_gap = reported_confidence - (normalized_score * 100)`
+- `tool_help_rate = materially_helpful_tool_reviews / tool_review_runs`
+- `weak_fit_prompt_rate = weak_fit_tool_reviews / tool_review_runs`
+
+Why this matters:
+- `score_delta` shows whether critique improved the answer
+- `confidence_gap` shows whether a model sounded more certain than its scored quality justified
+- `tool_help_rate` shows where CT-MCP materially improved critique quality
+- `weak_fit_prompt_rate` makes it explicit that some prompts are poor fits for deterministic tool leverage
+
+Statelessness:
+
+- CT-MCP itself is stateless per call
+- iterative workflows are created by the caller passing explicit prior context
+- there is no hidden conversation memory inside the server
+
+Token and cost profile:
+
+- CT-MCP makes no LLM calls in enforcement logic
+- running the tools does not itself consume model tokens
+- only the surrounding model turns in the host client consume inference tokens
+
+This is different from evaluator pipelines that call another LLM judge on every step.
+
 ## Why This Works Differently
 
 Most AI evaluation checks outputs after they're produced. These tools intervene during reasoning. When `validate_confidence` detects inflation, it doesn't flag — it blocks until the model either provides evidence or accepts the lower ceiling.

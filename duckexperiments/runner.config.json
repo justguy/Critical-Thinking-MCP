@@ -1,0 +1,41 @@
+{
+  "resultsRoot": "duckexperiments/results",
+  "toolReviewHostProfile": "codex_thinking",
+  "timeoutMs": 900000,
+  "profiles": {
+    "codex_low": {
+      "enabled": true,
+      "provider": "codex",
+      "model": "gpt-5.4",
+      "reasoningEffort": "low"
+    },
+    "codex_thinking": {
+      "enabled": true,
+      "provider": "codex",
+      "model": "gpt-5.4",
+      "reasoningEffort": "high"
+    },
+    "claude_low": {
+      "enabled": true,
+      "provider": "claude",
+      "model": "sonnet",
+      "effort": "low"
+    },
+    "claude_thinking": {
+      "enabled": true,
+      "provider": "claude",
+      "model": "sonnet",
+      "effort": "high"
+    },
+    "gemini_low": {
+      "enabled": true,
+      "provider": "gemini",
+      "model": "gemini-2.5-flash"
+    },
+    "gemini_thinking": {
+      "enabled": true,
+      "provider": "gemini",
+      "model": "gemini-2.5-pro"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+run_profile_id: claude_low
+prompt_id: C01
+condition: critique_initial
+response:
+**Hypothesis:** Developers who use rubber duck debugging find bugs faster than those who do not.
+
+**Metric:** Time-to-resolution (minutes from bug report to verified fix) per session.
+
+**Design:** Within-subjects crossover: each developer completes 10 debugging tasks with duck and 10 without, randomized order, matched tasks by complexity tier.
+
+**Confounders:** Developer experience, task familiarity, fatigue (counterbalanced via randomization), task difficulty (controlled via pre-scored complexity tiers), presence of colleagues (isolated sessions).
+
+**Stopping rule:** Stop after 20 participants or when Bayesian credible interval on mean time difference excludes zero at 95% with minimum effect size of 5 minutes; whichever comes first.
+
+Bottom line:
+The experiment is feasible but requires task complexity matching to isolate the duck effect from difficulty variance.
+Confidence (0-100):
+72
+Key missing info or assumption:
+Assumes task pools can be matched on difficulty with sufficient reliability; unvalidated task scoring would confound results.

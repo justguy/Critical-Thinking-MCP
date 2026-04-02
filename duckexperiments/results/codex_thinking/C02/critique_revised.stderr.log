@@ -1,0 +1,304 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: high
+reasoning summaries: none
+session id: 019d4cff-420a-78f0-bf0c-ec40a23eb5a3
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_thinking
+- prompt_id: C02
+- condition: critique_revised
+- date: 2026-04-02
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/C02/critique_revised.md
+
+Do not modify repository files, runner code, prompts, configs, or docs. Your only write target is the final artifact at output_path.
+- critique_initial_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/C02/critique_initial.md
+- tool_review_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/C02/tool_review.md
+
+mcp: ct-mcp starting
+mcp: fullscope starting
+mcp: fullscope ready
+mcp: ct-mcp ready
+mcp startup: ready: fullscope, ct-mcp
+codex
+I’m treating `duckexperiments/AGENT_RUNNER_PROMPT.md` as the contract, then I’ll read the referenced critique inputs and produce only the requested artifact at the given output path.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf pwd' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 19ms:
+
+ succeeded in 44ms:
+duckexperiments/README.md
+duckexperiments/RUN_PROFILES.md
+duckexperiments/RUNBOOK.md
+duckexperiments/GAP_ANALYSIS.md
+duckexperiments/NEXT_RUN_BATCH.md
+duckexperiments/ARTICLE_HANDOFF_PROMPT.md
+duckexperiments/PROMPTS.TXT
+duckexperiments/LINKEDIN_ARTICLE_DRAFT.md
+duckexperiments/recover_gemini_artifacts.ts
+duckexperiments/run_matrix.ts
+duckexperiments/RAW_RESULTS_TEMPLATE.md
+duckexperiments/runner.config.json
+duckexperiments/manifest.ts
+duckexperiments/AGENT_RUNNER_PROMPT.md
+duckexperiments/PROMPTS.md
+duckexperiments/results/claude_low/Q06/critique_revised.stderr.log
+duckexperiments/results/claude_low/Q06/tool_review.stdout.log
+duckexperiments/results/claude_low/Q06/prompted.stderr.log
+duckexperiments/results/claude_low/Q06/prompted.md
+duckexperiments/results/claude_low/Q06/baseline.stdout.log
+codex
+I have the target cell and its inputs. Next I’m reading the runner contract plus the existing critique artifacts to match the expected output shape before I write the final markdown.
+exec
+/bin/zsh -lc 'cat /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_thinking/C02/critique_revised.md' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'cat /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/C02/tool_review.md' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'cat /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/C02/critique_initial.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: claude_thinking
+prompt_id: C02
+condition: critique_revised
+response:
+**Rubber Duck Debugging Protocol v1.0**
+
+**When to use:** Before escalating; or after 15+ minutes stuck on one bug.
+
+**How to use:** Verbally explain step-by-step as if teaching a newcomer. State assumptions. Note expected vs. actual behavior. Engineer logs immediately after: session occurred, self-resolved (yes/no), escalation timestamp.
+
+**Measuring usefulness (observational only):** Each sprint, track session count, self-resolution rate, and median time-to-escalation. Do not compare against a no-protocol baseline unless a defined baseline window is established first.
+
+**What counts as failure:**
+- <50% of engineers complete a session log entry after 30 days (compliance threshold)
+- >50% of sprint survey responses report net friction with no perceived benefit
+
+Bottom line:
+An operational articulation-first protocol with defined logging fields, observational-only metrics, and non-absolute failure thresholds.
+Confidence (0-100):
+82
+ succeeded in 0ms:
+run_profile_id: codex_thinking
+prompt_id: C02
+condition: critique_initial
+response:
+Use the protocol when an engineer is blocked for 10 minutes, before escalation, or during handoff on a confusing bug. In a 3-minute duck pass, state the symptom, expected behavior, recent change, evidence checked, and next hypothesis aloud, then write the next action before returning to work. Measure usefulness by the share of sessions that produce a new hypothesis, narrowed scope, or concrete next step within 10 minutes, plus voluntary reuse and time-to-escalation. Failure is repeated sessions with no actionable output, slower escalation, or teammates treating the ritual as proof it improves debugging outcomes.
+Bottom line:
+Use ducks as a structured reflection protocol, not as evidence of causal improvement.
+Confidence (0-100):
+90
+Key missing info or assumption:
+Current debugging workflow, escalation norms, and baseline timings are unspecified.
+exec
+/bin/zsh -lc 'cat duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_thinking
+prompt_id: C02
+condition: tool_review
+review_outcome: completed
+primary_tool_run: check_plan_validity
+secondary_tool_run: score_response_quality
+actual_tools_fired: check_plan_validity, score_response_quality
+tool_environment_status: available
+environment_issue: none
+tool_help_rating: partial
+weak_fit: no
+structured_tool_input:
+```json
+{
+  "steps": [
+    {
+      "id": "s1",
+      "description": "Use the protocol when an engineer is blocked for 10 minutes, before escalation, or during handoff on a confusing bug.",
+      "dependencies": [],
+      "resources": [
+ succeeded in 0ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+codex
+I have the upstream artifacts and one matching revised example for formatting. I’m pulling the exact `critique_revised` wrapper requirements out of the contract now so the final artifact matches the mandated fields, not just the general style.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "critique_revised|Required output format|Previous answer|critique packet|Original prompt" duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "''^run_profile_id: codex_thinking$|''^prompt_id: C02$|''^condition: critique_revised$|''^response:" duckexperiments/results -g '"'critique_revised.md'" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 30ms:
+11:- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+54:   `baseline` -> `prompted` -> `critique_initial` -> `tool_review` -> `critique_revised`
+58:7. if `condition = critique_revised` and upstream paths are omitted, derive the canonical same-cell paths
+77:If `condition = critique_revised`, you also need either:
+103:- `/tmp/duck_claude-sonnet_low_C01_critique_revised.md`
+120:7. Never skip from `critique_initial` to `critique_revised` unless a valid completed `tool_review` exists or the handoff explicitly says `preserve_fallback_direct_analysis: yes`.
+151:For `critique_revised`, add either:
+155:- critique_packet: [paste the full critique packet]
+174:5. `critique_revised`
+185:- If the condition is `baseline`, `prompted`, `critique_initial`, or `critique_revised`, copy everything inside `## 1. Response Agent Prompt`.
+386:For `critique_revised`, also fill in:
+396:- `critique_revised`
+445:- If condition = critique_revised:
+446:  Revise the earlier answer using only the supplied critique packet.
+462:If condition = critique_revised, use these additional inputs:
+464:Previous answer:
+470:Required output format:
+490:Its job is to analyze the `critique_initial` answer, use the designated CT-MCP tools if they fit, and produce a critique packet.
+524:- Do not produce a critique packet or direct-analysis substitute unless the handoff explicitly says `preserve_fallback_direct_analysis: yes`.
+532:Original prompt:
+ succeeded in 24ms:
+
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '430,485p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+  Answer the prompt directly.
+  Do not use tools.
+
+- If condition = prompted:
+  Before answering:
+  1. State the most important missing information or assumptions.
+  2. State any direct conflict, contradiction, or impossible guarantee in the request.
+  3. Prefer a reversible next step when uncertainty is high.
+  4. Avoid invented facts.
+  5. Do not use tools.
+
+- If condition = critique_initial:
+  Answer the prompt directly as an initial draft for later critique.
+  Do not use tools.
+
+- If condition = critique_revised:
+  Revise the earlier answer using only the supplied critique packet.
+  Fix the reasoning defects directly.
+  Do not add new goals.
+  Do not use tools.
+codex
+I have the exact output contract. The revision will keep the original protocol, add the missing operational definitions the tool review asked for, and lower certainty to match the evidence before I write the artifact.
+exec
+/bin/zsh -lc 'test -f /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/C02/critique_revised.md && echo exists || echo missing' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+missing
+codex
+I’m writing the final markdown artifact now at the requested output path. No repository files or runner inputs will be changed.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/C02/critique_revised.md
+run_profile_id: codex_thinking
+prompt_id: C02
+condition: critique_revised
+response:
+Use the protocol when an engineer is blocked for 10 minutes on one bug, before escalation, or during handoff. In a 3-minute duck pass, say the symptom, expected behavior, recent change, evidence checked, and next hypothesis aloud, then add one ticket note recording: duck session, new hypothesis, narrowed scope, next action written, and escalation time. Measure usefulness as the percentage of logged duck sessions that produce at least one of those three outputs within 10 minutes, plus median time-to-escalation. Failure is two consecutive sprints with under 60% useful sessions or a 15% slower median escalation time.
+Bottom line:
+Use ducks as a structured reflection protocol with explicit logging and failure thresholds, not as proof they improve debugging.
+Confidence (0-100):
+82
+Key missing info or assumption:
+Assumes the team has a shared ticketing workflow and baseline escalation timing to compare against.
+apply_patch(auto_approved=true) exited 0 in 77ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/C02/critique_revised.md
+file update:
+diff --git a/duckexperiments/results/codex_thinking/C02/critique_revised.md b/duckexperiments/results/codex_thinking/C02/critique_revised.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..ca1ba974f4c646d6a31f7751a3190148e4a9647d
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/C02/critique_revised.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_thinking
++prompt_id: C02
++condition: critique_revised
++response:
++Use the protocol when an engineer is blocked for 10 minutes on one bug, before escalation, or during handoff. In a 3-minute duck pass, say the symptom, expected behavior, recent change, evidence checked, and next hypothesis aloud, then add one ticket note recording: duck session, new hypothesis, narrowed scope, next action written, and escalation time. Measure usefulness as the percentage of logged duck sessions that produce at least one of those three outputs within 10 minutes, plus median time-to-escalation. Failure is two consecutive sprints with under 60% useful sessions or a 15% slower median escalation time.
++Bottom line:
++Use ducks as a structured reflection protocol with explicit logging and failure thresholds, not as proof they improve debugging.
++Confidence (0-100):
++82
++Key missing info or assumption:
++Assumes the team has a shared ticketing workflow and baseline escalation timing to compare against.
+
+file update:
+diff --git a/duckexperiments/results/codex_thinking/C02/critique_revised.md b/duckexperiments/results/codex_thinking/C02/critique_revised.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..ca1ba974f4c646d6a31f7751a3190148e4a9647d
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/C02/critique_revised.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_thinking
++prompt_id: C02
++condition: critique_revised
++response:
++Use the protocol when an engineer is blocked for 10 minutes on one bug, before escalation, or during handoff. In a 3-minute duck pass, say the symptom, expected behavior, recent change, evidence checked, and next hypothesis aloud, then add one ticket note recording: duck session, new hypothesis, narrowed scope, next action written, and escalation time. Measure usefulness as the percentage of logged duck sessions that produce at least one of those three outputs within 10 minutes, plus median time-to-escalation. Failure is two consecutive sprints with under 60% useful sessions or a 15% slower median escalation time.
++Bottom line:
++Use ducks as a structured reflection protocol with explicit logging and failure thresholds, not as proof they improve debugging.
++Confidence (0-100):
++82
++Key missing info or assumption:
++Assumes the team has a shared ticketing workflow and baseline escalation timing to compare against.
+
+codex
+The artifact is written. I’m doing a quick readback to confirm the file content and required field order match the contract exactly.
+exec
+/bin/zsh -lc 'cat /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/C02/critique_revised.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_thinking
+prompt_id: C02
+condition: critique_revised
+response:
+Use the protocol when an engineer is blocked for 10 minutes on one bug, before escalation, or during handoff. In a 3-minute duck pass, say the symptom, expected behavior, recent change, evidence checked, and next hypothesis aloud, then add one ticket note recording: duck session, new hypothesis, narrowed scope, next action written, and escalation time. Measure usefulness as the percentage of logged duck sessions that produce at least one of those three outputs within 10 minutes, plus median time-to-escalation. Failure is two consecutive sprints with under 60% useful sessions or a 15% slower median escalation time.
+Bottom line:
+Use ducks as a structured reflection protocol with explicit logging and failure thresholds, not as proof they improve debugging.
+Confidence (0-100):
+82
+Key missing info or assumption:
+Assumes the team has a shared ticketing workflow and baseline escalation timing to compare against.
+file update:
+diff --git a/duckexperiments/results/codex_thinking/C02/critique_revised.md b/duckexperiments/results/codex_thinking/C02/critique_revised.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..ca1ba974f4c646d6a31f7751a3190148e4a9647d
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/C02/critique_revised.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_thinking
++prompt_id: C02
++condition: critique_revised
++response:
++Use the protocol when an engineer is blocked for 10 minutes on one bug, before escalation, or during handoff. In a 3-minute duck pass, say the symptom, expected behavior, recent change, evidence checked, and next hypothesis aloud, then add one ticket note recording: duck session, new hypothesis, narrowed scope, next action written, and escalation time. Measure usefulness as the percentage of logged duck sessions that produce at least one of those three outputs within 10 minutes, plus median time-to-escalation. Failure is two consecutive sprints with under 60% useful sessions or a 15% slower median escalation time.
++Bottom line:
++Use ducks as a structured reflection protocol with explicit logging and failure thresholds, not as proof they improve debugging.
++Confidence (0-100):
++82
++Key missing info or assumption:
++Assumes the team has a shared ticketing workflow and baseline escalation timing to compare against.
+
+codex
+Wrote the artifact to [critique_revised.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/C02/critique_revised.md) and verified the content matches the `critique_revised` contract format.
+file update:
+diff --git a/duckexperiments/results/codex_thinking/C02/critique_revised.md b/duckexperiments/results/codex_thinking/C02/critique_revised.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..ca1ba974f4c646d6a31f7751a3190148e4a9647d
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/C02/critique_revised.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_thinking
++prompt_id: C02
++condition: critique_revised
++response:
++Use the protocol when an engineer is blocked for 10 minutes on one bug, before escalation, or during handoff. In a 3-minute duck pass, say the symptom, expected behavior, recent change, evidence checked, and next hypothesis aloud, then add one ticket note recording: duck session, new hypothesis, narrowed scope, next action written, and escalation time. Measure usefulness as the percentage of logged duck sessions that produce at least one of those three outputs within 10 minutes, plus median time-to-escalation. Failure is two consecutive sprints with under 60% useful sessions or a 15% slower median escalation time.
++Bottom line:
++Use ducks as a structured reflection protocol with explicit logging and failure thresholds, not as proof they improve debugging.
++Confidence (0-100):
++82
++Key missing info or assumption:
++Assumes the team has a shared ticketing workflow and baseline escalation timing to compare against.
+
+tokens used
+43,507

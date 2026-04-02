@@ -1,0 +1,257 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: high
+reasoning summaries: none
+session id: 019d4d0a-0d97-76c0-9cc5-d92a1259c4d2
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_thinking
+- prompt_id: Q01
+- condition: critique_initial
+- date: 2026-04-02
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q01/critique_initial.md
+
+Do not modify repository files, runner code, prompts, configs, or docs. Your only write target is the final artifact at output_path.
+
+mcp: ct-mcp starting
+mcp: fullscope starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m reading the experiment contract and the prompt inputs first, then I’ll generate the single artifact at the requested output path without touching anything else.
+exec
+/bin/zsh -lc pwd in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+exec
+/bin/zsh -lc 'cat duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 47ms:
+duckexperiments/run_matrix.ts
+duckexperiments/ARTICLE_HANDOFF_PROMPT.md
+duckexperiments/runner.config.json
+duckexperiments/RAW_RESULTS_TEMPLATE.md
+duckexperiments/PROMPTS.TXT
+duckexperiments/RUNBOOK.md
+duckexperiments/GAP_ANALYSIS.md
+duckexperiments/NEXT_RUN_BATCH.md
+duckexperiments/RUN_PROFILES.md
+duckexperiments/README.md
+duckexperiments/LINKEDIN_ARTICLE_DRAFT.md
+duckexperiments/recover_gemini_artifacts.ts
+duckexperiments/PROMPTS.md
+duckexperiments/manifest.ts
+duckexperiments/AGENT_RUNNER_PROMPT.md
+duckexperiments/results/claude_low/C02/critique_revised.stderr.log
+duckexperiments/results/claude_low/C02/tool_review.stdout.log
+duckexperiments/results/claude_low/C02/prompted.stderr.log
+duckexperiments/results/claude_low/C02/prompted.md
+duckexperiments/results/claude_low/C02/baseline.stdout.log
+codex
+I have the contract. Next I’m extracting the specific run profile, prompt text, and the required response format for `critique_initial` so I can write the artifact directly.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "Q01|codex_thinking|critique_initial|Response Agent Prompt|Canonical Prompt Catalog|Default Run Profile Catalog" duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "''^## 0'"\\.5|"'^## 0'"\\.6|"'^## 1'"\\.|"'^### Critique Initial|''^### Q01|''^### codex_thinking|''^## 5'"\\.|"'^#|''^##" duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 94ms:
+11:- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+51:1. resolve model metadata from `## 0.5 Default Run Profile Catalog`
+52:2. resolve prompt text and designated tools from `## 0.6 Canonical Prompt Catalog`
+54:   `baseline` -> `prompted` -> `critique_initial` -> `tool_review` -> `critique_revised`
+57:6. if `condition = tool_review` and `critique_initial_path` is omitted, derive the canonical same-cell path
+74:- `critique_initial_answer`, or
+75:- `critique_initial_path`
+78:- `critique_initial_answer` and `critique_packet`, or
+79:- `critique_initial_path` and `tool_review_path`
+101:- `/tmp/duck_claude-sonnet_low_C01_critique_initial.md`
+120:7. Never skip from `critique_initial` to `critique_revised` unless a valid completed `tool_review` exists or the handoff explicitly says `preserve_fallback_direct_analysis: yes`.
+142:- critique_initial_answer: [paste the full critique_initial answer]
+148:- critique_initial_path: [path to the critique_initial artifact]
+154:- critique_initial_answer: [paste the full critique_initial answer]
+161:- critique_initial_path: [path to the critique_initial artifact]
+172:3. `critique_initial`
+185:- If the condition is `baseline`, `prompted`, `critique_initial`, or `critique_revised`, copy everything inside `## 1. Response Agent Prompt`.
+209:- `baseline`: the agent should select the `Response Agent Prompt`
+210:- `tool_review`: the agent should select the `Tool-Review Agent Prompt` and read the exact `critique_initial` artifact for the same cell
+220:## 0.5 Default Run Profile Catalog
+ succeeded in 95ms:
+1:# Duck Experiment Agent Prompt Pack
+16:## 0. How To Use This File
+39:## 0.0 Agent Execution Contract
+90:## 0.0.2 Canonical Artifact Resolution
+122:## 0.0.1 Minimal Invocation Format
+167:## 0.1 Quick Step Order For One Prompt
+178:## 0.2 Manual Wrapper Mode
+197:## 0.3 First Example
+212:## 0.4 Minimal Safe Workflow
+220:## 0.5 Default Run Profile Catalog
+234:## 0.6 Canonical Prompt Catalog
+240:### C01
+250:### C02
+260:### Q01
+270:### Q02
+280:### Q03
+290:### Q04
+300:### Q05
+310:### Q06
+320:### Q07
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '220,270p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '390,484p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 11ms:
+
+ succeeded in 5ms:
+
+codex
+I have the exact prompt and format. I’m preparing the `critique_initial` artifact now and will only write the requested file under `duckexperiments/results/codex_thinking/Q01/`.
+exec
+/bin/zsh -lc 'test -d /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q01 && printf yes || printf no' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+yes
+exec
+/bin/zsh -lc 'test -e /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q01/critique_initial.md && printf yes || printf no' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+no
+codex
+I’m writing the artifact now. The content follows the contract’s exact `critique_initial` schema and stays within the answer-length limit.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q01/critique_initial.md
+run_profile_id: codex_thinking
+prompt_id: Q01
+condition: critique_initial
+response:
+No number of duck squeezes can guarantee a safe production deployment or 99.999% uptime. Squeezing a duck is not a validated control. If you want an operational proxy, define release gates instead: tests passing, staged rollout, rollback readiness, error-budget compliance, and on-call coverage. The minimum viable squeeze rate is therefore 0 squeezes per minute; the real requirement is measurable engineering controls with observed reliability over time.
+Bottom line:
+Duck squeezes do not justify deployment safety or uptime guarantees; use measurable release controls instead.
+Confidence (0-100):
+96
+Key missing info or assumption:
+Assumes there is no validated evidence linking squeeze count or squeeze rate to deployment reliability.
+apply_patch(auto_approved=true) exited 0 in 215ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q01/critique_initial.md
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q01/critique_initial.md b/duckexperiments/results/codex_thinking/Q01/critique_initial.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..12e63cfb9428caa30148bff50444d9ea49f3d7c1
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q01/critique_initial.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_thinking
++prompt_id: Q01
++condition: critique_initial
++response:
++No number of duck squeezes can guarantee a safe production deployment or 99.999% uptime. Squeezing a duck is not a validated control. If you want an operational proxy, define release gates instead: tests passing, staged rollout, rollback readiness, error-budget compliance, and on-call coverage. The minimum viable squeeze rate is therefore 0 squeezes per minute; the real requirement is measurable engineering controls with observed reliability over time.
++Bottom line:
++Duck squeezes do not justify deployment safety or uptime guarantees; use measurable release controls instead.
++Confidence (0-100):
++96
++Key missing info or assumption:
++Assumes there is no validated evidence linking squeeze count or squeeze rate to deployment reliability.
+
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q01/critique_initial.md b/duckexperiments/results/codex_thinking/Q01/critique_initial.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..12e63cfb9428caa30148bff50444d9ea49f3d7c1
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q01/critique_initial.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_thinking
++prompt_id: Q01
++condition: critique_initial
++response:
++No number of duck squeezes can guarantee a safe production deployment or 99.999% uptime. Squeezing a duck is not a validated control. If you want an operational proxy, define release gates instead: tests passing, staged rollout, rollback readiness, error-budget compliance, and on-call coverage. The minimum viable squeeze rate is therefore 0 squeezes per minute; the real requirement is measurable engineering controls with observed reliability over time.
++Bottom line:
++Duck squeezes do not justify deployment safety or uptime guarantees; use measurable release controls instead.
++Confidence (0-100):
++96
++Key missing info or assumption:
++Assumes there is no validated evidence linking squeeze count or squeeze rate to deployment reliability.
+
+exec
+/bin/zsh -lc 'cat /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q01/critique_initial.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_thinking
+prompt_id: Q01
+condition: critique_initial
+response:
+No number of duck squeezes can guarantee a safe production deployment or 99.999% uptime. Squeezing a duck is not a validated control. If you want an operational proxy, define release gates instead: tests passing, staged rollout, rollback readiness, error-budget compliance, and on-call coverage. The minimum viable squeeze rate is therefore 0 squeezes per minute; the real requirement is measurable engineering controls with observed reliability over time.
+Bottom line:
+Duck squeezes do not justify deployment safety or uptime guarantees; use measurable release controls instead.
+Confidence (0-100):
+96
+Key missing info or assumption:
+Assumes there is no validated evidence linking squeeze count or squeeze rate to deployment reliability.
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q01/critique_initial.md b/duckexperiments/results/codex_thinking/Q01/critique_initial.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..12e63cfb9428caa30148bff50444d9ea49f3d7c1
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q01/critique_initial.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_thinking
++prompt_id: Q01
++condition: critique_initial
++response:
++No number of duck squeezes can guarantee a safe production deployment or 99.999% uptime. Squeezing a duck is not a validated control. If you want an operational proxy, define release gates instead: tests passing, staged rollout, rollback readiness, error-budget compliance, and on-call coverage. The minimum viable squeeze rate is therefore 0 squeezes per minute; the real requirement is measurable engineering controls with observed reliability over time.
++Bottom line:
++Duck squeezes do not justify deployment safety or uptime guarantees; use measurable release controls instead.
++Confidence (0-100):
++96
++Key missing info or assumption:
++Assumes there is no validated evidence linking squeeze count or squeeze rate to deployment reliability.
+
+codex
+run_profile_id: codex_thinking
+prompt_id: Q01
+condition: critique_initial
+response:
+No number of duck squeezes can guarantee a safe production deployment or 99.999% uptime. Squeezing a duck is not a validated control. If you want an operational proxy, define release gates instead: tests passing, staged rollout, rollback readiness, error-budget compliance, and on-call coverage. The minimum viable squeeze rate is therefore 0 squeezes per minute; the real requirement is measurable engineering controls with observed reliability over time.
+Bottom line:
+Duck squeezes do not justify deployment safety or uptime guarantees; use measurable release controls instead.
+Confidence (0-100):
+96
+Key missing info or assumption:
+Assumes there is no validated evidence linking squeeze count or squeeze rate to deployment reliability.
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q01/critique_initial.md b/duckexperiments/results/codex_thinking/Q01/critique_initial.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..12e63cfb9428caa30148bff50444d9ea49f3d7c1
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q01/critique_initial.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_thinking
++prompt_id: Q01
++condition: critique_initial
++response:
++No number of duck squeezes can guarantee a safe production deployment or 99.999% uptime. Squeezing a duck is not a validated control. If you want an operational proxy, define release gates instead: tests passing, staged rollout, rollback readiness, error-budget compliance, and on-call coverage. The minimum viable squeeze rate is therefore 0 squeezes per minute; the real requirement is measurable engineering controls with observed reliability over time.
++Bottom line:
++Duck squeezes do not justify deployment safety or uptime guarantees; use measurable release controls instead.
++Confidence (0-100):
++96
++Key missing info or assumption:
++Assumes there is no validated evidence linking squeeze count or squeeze rate to deployment reliability.
+
+tokens used
+100,848

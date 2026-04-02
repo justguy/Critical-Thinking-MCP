@@ -1,0 +1,31 @@
+Wrote the required artifact to [critique_revised.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C01/critique_revised.md).
+
+Content written:
+```text
+run_profile_id: codex_low
+prompt_id: C01
+condition: critique_revised
+response:
+Run a preregistered randomized crossover study where each developer debugs two difficulty-matched bugs, one while explaining aloud to a rubber duck and one silently, with order counterbalanced and a 24-hour washout. Primary metric: minutes to first correctly identify the root cause, scored by a blinded rubric; secondary metric: proportion fully fixed within 30 minutes. Null: no median time difference between conditions. Alternative: ducking reduces median time. Control confounders by blocking on experience and prior code familiarity before assignment. Stop at 40 developers or one interim futility check at 20 if the observed median improvement is under 5%.
+Bottom line:
+A preregistered crossover experiment can falsify the claim if scoring and stopping rules are fixed in advance.
+Confidence (0-100):
+84
+Key missing info or assumption:
+Assumes you can build bug pairs that are genuinely matched in difficulty and comparable across participants.
+```Wrote the required artifact to [critique_revised.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C01/critique_revised.md).
+
+Content written:
+```text
+run_profile_id: codex_low
+prompt_id: C01
+condition: critique_revised
+response:
+Run a preregistered randomized crossover study where each developer debugs two difficulty-matched bugs, one while explaining aloud to a rubber duck and one silently, with order counterbalanced and a 24-hour washout. Primary metric: minutes to first correctly identify the root cause, scored by a blinded rubric; secondary metric: proportion fully fixed within 30 minutes. Null: no median time difference between conditions. Alternative: ducking reduces median time. Control confounders by blocking on experience and prior code familiarity before assignment. Stop at 40 developers or one interim futility check at 20 if the observed median improvement is under 5%.
+Bottom line:
+A preregistered crossover experiment can falsify the claim if scoring and stopping rules are fixed in advance.
+Confidence (0-100):
+84
+Key missing info or assumption:
+Assumes you can build bug pairs that are genuinely matched in difficulty and comparable across participants.
+```

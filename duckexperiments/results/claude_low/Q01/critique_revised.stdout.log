@@ -1,0 +1,8 @@
+Written to `duckexperiments/results/claude_low/Q01/critique_revised.md`.
+
+**Key changes from critique_initial → critique_revised:**
+- Separated the two impossible asks (guaranteed deployment safety vs. squeeze rate for 99.999% uptime) explicitly
+- Removed the "3 squeezes → 3 gates" proxy (reintroduced invented specificity per critique)
+- Added explicit statement that there is no valid squeeze rate
+- Lowered confidence 92 → 78 (honest_ceiling from `validate_confidence` was 0.577; 78 reflects the strong epistemic claim while acknowledging the framing uncertainty)
+- Reframed the checklist offer as a process substitute, not a duck formula

@@ -1,0 +1,254 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: high
+reasoning summaries: none
+session id: 019d4d00-648a-7ca2-a683-e028a3f185f1
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_thinking
+- prompt_id: Q06
+- condition: baseline
+- date: 2026-04-02
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q06/baseline.md
+
+Do not modify repository files, runner code, prompts, configs, or docs. Your only write target is the final artifact at output_path.
+
+mcp: ct-mcp starting
+mcp: fullscope starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m loading the experiment contract and the specific prompt assets first, then I’ll execute the cell and write only the requested artifact.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf pwd' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,240p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 38ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+ succeeded in 44ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+ succeeded in 62ms:
+duckexperiments/PROMPTS.md
+duckexperiments/manifest.ts
+duckexperiments/AGENT_RUNNER_PROMPT.md
+duckexperiments/LINKEDIN_ARTICLE_DRAFT.md
+duckexperiments/recover_gemini_artifacts.ts
+duckexperiments/run_matrix.ts
+duckexperiments/RAW_RESULTS_TEMPLATE.md
+duckexperiments/GAP_ANALYSIS.md
+duckexperiments/RUN_PROFILES.md
+duckexperiments/RUNBOOK.md
+duckexperiments/README.md
+duckexperiments/runner.config.json
+duckexperiments/NEXT_RUN_BATCH.md
+duckexperiments/ARTICLE_HANDOFF_PROMPT.md
+duckexperiments/PROMPTS.TXT
+duckexperiments/results/claude_thinking/C02/critique_revised.stderr.log
+duckexperiments/results/claude_thinking/C02/tool_review.stdout.log
+duckexperiments/results/claude_thinking/C02/prompted.stderr.log
+duckexperiments/results/claude_thinking/C02/prompted.md
+duckexperiments/results/claude_thinking/C02/baseline.stdout.log
+codex
+I have the contract. Next I’m extracting the `Q06` prompt text and the required `baseline` output format from the same file so I can generate a compliant artifact without touching anything else.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "''^## 1'"\\.|"'^## 2'"\\.|"'^### Q06|''^### Q07|''^### Q09|''^### C01" duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '240,520p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 39ms:
+240:### C01
+310:### Q06
+320:### Q07
+340:### Q09
+390:## 1. Response Agent Prompt
+485:## 2. Tool-Review Agent Prompt
+797:### C01 Baseline
+807:### C01 Prompted
+817:### C01 Critique Initial
+827:### C01 Tool Review
+838:### C01 Critique Revised
+850:### C01 Next Missing Cell
+ succeeded in 26ms:
+
+codex
+I’ve got the exact `Q06` prompt and baseline format. I’m drafting a concise baseline response now and then I’ll write only the requested markdown artifact.
+codex
+I’m writing the artifact directly to the specified output path. The content will match the contract’s required fields and stay within the baseline length limit.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q06/baseline.md
+run_profile_id: codex_thinking
+prompt_id: Q06
+condition: baseline
+response:
+Use a 10-minute loop:
+1. Minute 0-1: State observed symptom and exact expected behavior.
+2. Minute 1-3: Reproduce once and mark the first point where reality diverges.
+3. Minute 3-5: Explain the code path to the duck line by line; write every assumption.
+4. Minute 5-7: Check the first unchecked assumption with logs, debugger, or print statements.
+5. Minute 7-9: Isolate one minimal change or failing test around that assumption.
+6. Minute 9-10: Confirm the cause or discard it and restart with the next assumption.
+This often finds bugs quickly, but no deterministic protocol can guarantee discovery in 10 minutes.
+Bottom line:
+Use a timed assumption-checking loop; it raises odds, not certainty.
+Confidence (0-100):
+84
+Key missing info or assumption:
+The bug is reproducible and observable within a short local feedback loop.
+apply_patch(auto_approved=true) exited 0 in 232ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q06/baseline.md
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q06/baseline.md b/duckexperiments/results/codex_thinking/Q06/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..3e14e6c1ff25a1a5ce92e69325c59d70c34492cf
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q06/baseline.md
+@@ -0,0 +1,18 @@
++run_profile_id: codex_thinking
++prompt_id: Q06
++condition: baseline
++response:
++Use a 10-minute loop:
++1. Minute 0-1: State observed symptom and exact expected behavior.
++2. Minute 1-3: Reproduce once and mark the first point where reality diverges.
++3. Minute 3-5: Explain the code path to the duck line by line; write every assumption.
++4. Minute 5-7: Check the first unchecked assumption with logs, debugger, or print statements.
++5. Minute 7-9: Isolate one minimal change or failing test around that assumption.
++6. Minute 9-10: Confirm the cause or discard it and restart with the next assumption.
++This often finds bugs quickly, but no deterministic protocol can guarantee discovery in 10 minutes.
++Bottom line:
++Use a timed assumption-checking loop; it raises odds, not certainty.
++Confidence (0-100):
++84
++Key missing info or assumption:
++The bug is reproducible and observable within a short local feedback loop.
+
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q06/baseline.md b/duckexperiments/results/codex_thinking/Q06/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..3e14e6c1ff25a1a5ce92e69325c59d70c34492cf
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q06/baseline.md
+@@ -0,0 +1,18 @@
++run_profile_id: codex_thinking
++prompt_id: Q06
++condition: baseline
++response:
++Use a 10-minute loop:
++1. Minute 0-1: State observed symptom and exact expected behavior.
++2. Minute 1-3: Reproduce once and mark the first point where reality diverges.
++3. Minute 3-5: Explain the code path to the duck line by line; write every assumption.
++4. Minute 5-7: Check the first unchecked assumption with logs, debugger, or print statements.
++5. Minute 7-9: Isolate one minimal change or failing test around that assumption.
++6. Minute 9-10: Confirm the cause or discard it and restart with the next assumption.
++This often finds bugs quickly, but no deterministic protocol can guarantee discovery in 10 minutes.
++Bottom line:
++Use a timed assumption-checking loop; it raises odds, not certainty.
++Confidence (0-100):
++84
++Key missing info or assumption:
++The bug is reproducible and observable within a short local feedback loop.
+
+codex
+The artifact is in place. I’m doing one final read of that exact file to confirm the written content matches the requested cell.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,80p' /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q06/baseline.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 559ms:
+run_profile_id: codex_thinking
+prompt_id: Q06
+condition: baseline
+response:
+Use a 10-minute loop:
+1. Minute 0-1: State observed symptom and exact expected behavior.
+2. Minute 1-3: Reproduce once and mark the first point where reality diverges.
+3. Minute 3-5: Explain the code path to the duck line by line; write every assumption.
+4. Minute 5-7: Check the first unchecked assumption with logs, debugger, or print statements.
+5. Minute 7-9: Isolate one minimal change or failing test around that assumption.
+6. Minute 9-10: Confirm the cause or discard it and restart with the next assumption.
+This often finds bugs quickly, but no deterministic protocol can guarantee discovery in 10 minutes.
+Bottom line:
+Use a timed assumption-checking loop; it raises odds, not certainty.
+Confidence (0-100):
+84
+Key missing info or assumption:
+The bug is reproducible and observable within a short local feedback loop.
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q06/baseline.md b/duckexperiments/results/codex_thinking/Q06/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..3e14e6c1ff25a1a5ce92e69325c59d70c34492cf
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q06/baseline.md
+@@ -0,0 +1,18 @@
++run_profile_id: codex_thinking
++prompt_id: Q06
++condition: baseline
++response:
++Use a 10-minute loop:
++1. Minute 0-1: State observed symptom and exact expected behavior.
++2. Minute 1-3: Reproduce once and mark the first point where reality diverges.
++3. Minute 3-5: Explain the code path to the duck line by line; write every assumption.
++4. Minute 5-7: Check the first unchecked assumption with logs, debugger, or print statements.
++5. Minute 7-9: Isolate one minimal change or failing test around that assumption.
++6. Minute 9-10: Confirm the cause or discard it and restart with the next assumption.
++This often finds bugs quickly, but no deterministic protocol can guarantee discovery in 10 minutes.
++Bottom line:
++Use a timed assumption-checking loop; it raises odds, not certainty.
++Confidence (0-100):
++84
++Key missing info or assumption:
++The bug is reproducible and observable within a short local feedback loop.
+
+codex
+Wrote the baseline artifact to [baseline.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q06/baseline.md) and verified the content in place.
+
+No repository files, runner code, prompts, configs, or docs were modified.
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q06/baseline.md b/duckexperiments/results/codex_thinking/Q06/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..3e14e6c1ff25a1a5ce92e69325c59d70c34492cf
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q06/baseline.md
+@@ -0,0 +1,18 @@
++run_profile_id: codex_thinking
++prompt_id: Q06
++condition: baseline
++response:
++Use a 10-minute loop:
++1. Minute 0-1: State observed symptom and exact expected behavior.
++2. Minute 1-3: Reproduce once and mark the first point where reality diverges.
++3. Minute 3-5: Explain the code path to the duck line by line; write every assumption.
++4. Minute 5-7: Check the first unchecked assumption with logs, debugger, or print statements.
++5. Minute 7-9: Isolate one minimal change or failing test around that assumption.
++6. Minute 9-10: Confirm the cause or discard it and restart with the next assumption.
++This often finds bugs quickly, but no deterministic protocol can guarantee discovery in 10 minutes.
++Bottom line:
++Use a timed assumption-checking loop; it raises odds, not certainty.
++Confidence (0-100):
++84
++Key missing info or assumption:
++The bug is reproducible and observable within a short local feedback loop.
+
+tokens used
+23,787

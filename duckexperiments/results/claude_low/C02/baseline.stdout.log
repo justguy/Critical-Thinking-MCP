@@ -1,0 +1,9 @@
+Written to `/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/C02/baseline.md`.
+
+---
+
+**Cell summary:**
+- **run_profile_id**: claude_low | **prompt_id**: C02 | **condition**: baseline
+- Answer treats duck sessions as a structured pause mechanism with three measurable dimensions (resolution rate, duration logging, survey) and explicit failure criteria
+- No tools used (baseline condition)
+- Confidence: 82 — protocol is well-scoped but assumes teams track escalation events

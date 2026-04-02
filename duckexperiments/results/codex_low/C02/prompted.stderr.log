@@ -1,0 +1,292 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: low
+reasoning summaries: none
+session id: 019d4c9a-2420-70e2-a923-a13842d43b64
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: C02
+- condition: prompted
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C02/prompted.md
+
+mcp: fullscope starting
+mcp: ct-mcp starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m loading the experiment runner contract and the prompt materials first, then I’ll execute a single cell exactly against that contract and write the result to the requested path.
+exec
+/bin/zsh -lc pwd in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 66ms:
+duckexperiments/PROMPTS.md
+duckexperiments/manifest.ts
+duckexperiments/AGENT_RUNNER_PROMPT.md
+duckexperiments/LINKEDIN_ARTICLE_DRAFT.md
+duckexperiments/RUN_PROFILES.md
+duckexperiments/README.md
+duckexperiments/runner.config.json
+duckexperiments/RUNBOOK.md
+duckexperiments/NEXT_RUN_BATCH.md
+duckexperiments/run_matrix.ts
+duckexperiments/RAW_RESULTS_TEMPLATE.md
+duckexperiments/PROMPTS.TXT
+duckexperiments/results/claude_low/C01/critique_revised.stderr.log
+duckexperiments/results/claude_low/C01/tool_review.stdout.log
+duckexperiments/results/claude_low/C01/prompted.stderr.log
+duckexperiments/results/claude_low/C01/prompted.md
+duckexperiments/results/claude_low/C01/baseline.stdout.log
+duckexperiments/results/claude_low/C01/critique_revised.md
+duckexperiments/results/claude_low/C01/prompted.prompt.txt
+duckexperiments/results/claude_low/C01/critique_revised.prompt.txt
+codex
+I’ve confirmed the workspace and existing result structure. Next I’m reading the runner contract plus the C02 source prompt so I can produce the exact `prompted.md` artifact rather than guessing the required format.
+exec
+/bin/zsh -lc "sed -n '1,240p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "sed -n '1,220p' duckexperiments/RUN_PROFILES.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "sed -n '1,260p' duckexperiments/PROMPTS.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 25ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+ succeeded in 45ms:
+# Duck Experiment Run Profiles And Operator Prompts
+
+This file is the execution companion for `PROMPTS.md`.
+
+Use it when you are actually running the study.
+
+## 1. Run Profiles
+
+You said you plan to run six profiles.
+
+| run_profile_id | CLI | reasoning_tier | notes |
+|---|---|---|---|
+| `codex_low` | Codex CLI | low | fast / lighter reasoning |
+| `codex_thinking` | Codex CLI | thinking | deeper reasoning tier |
+| `claude_low` | Claude CLI | low | fast / lighter reasoning |
+| `claude_thinking` | Claude CLI | thinking | deeper reasoning tier |
+| `gemini_low` | Gemini CLI | low | fast / lighter reasoning |
+| `gemini_thinking` | Gemini CLI | thinking | deeper reasoning tier |
+
+Record the exact model string and date in the raw log.
+ succeeded in 47ms:
+# Duck Experiment Canonical Prompt Matrix
+
+`PROMPTS.TXT` is the brainstorm source.
+
+Use this file as the canonical prompt pack for actual runs.
+
+## Scope
+
+You said you plan to run:
+- `Codex CLI` at `low`
+- `Codex CLI` at `thinking`
+- `Claude CLI` at `low`
+- `Claude CLI` at `thinking`
+- `Gemini CLI` at `low`
+- `Gemini CLI` at `thinking`
+
+That is `6` run profiles total.
+
+Recommended run sizes:
+
+codex
+The contract is clear so far: this cell is `prompted` for `codex_low / C02`, which means no tools, under 120 words, and the answer has to be written as a single artifact at the requested path. I’m checking the existing artifact shape now so I preserve the expected front matter and metadata.
+exec
+/bin/zsh -lc "sed -n '1,220p' duckexperiments/results/codex_low/C02/baseline.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "sed -n '1,220p' duckexperiments/results/codex_low/C02/prompted.prompt.txt" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: C02
+condition: baseline
+response:
+Use rubber ducks when a debugger is stuck for 10 minutes, before asking for help, or during incident handoff. State the bug, expected behavior, recent changes, and next check aloud in under 5 minutes, then record whether the talk produced a concrete next step. Measure usefulness by the share of sessions that yield a new hypothesis, narrowed scope, or a written action item within 10 minutes. Failure means the ritual adds delay, produces no actionable next step in repeated use, or teammates treat it as evidence that outcomes improved rather than as a thinking aid.
+Bottom line:
+Use ducks as a lightweight reflection protocol, not as proof they improve debugging.
+Confidence (0-100):
+84
+Key missing info or assumption:
+Team norms, issue types, and baseline debugging workflow are unspecified.
+ succeeded in 0ms:
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: C02
+- condition: prompted
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C02/prompted.md
+exec
+/bin/zsh -lc "sed -n '1,220p' duckexperiments/results/codex_low/C01/prompted.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: C01
+condition: prompted
+response:
+Missing assumption: what counts as a bug and participant skill baseline. No direct contradiction, but “improves speed” needs an operational metric, not anecdotes. Reversible next step: pilot on a small bug set.
+
+Randomize developers to duck vs silent-control debugging on matched seeded bugs. Metric: median minutes to first correct bug identification. Hypothesis: duck group is at least 20% faster. Confounders: experience, bug difficulty, familiarity, observer effects. Stopping rule: stop at 60 participants or the first interim analysis where the 95% CI for the group difference excludes 0 and the effect is under 5% or over 20%.
+Bottom line:
+Use a randomized controlled bug-finding task with a predeclared speed metric and stopping rule.
+Confidence (0-100):
+86
+Key missing info or assumption:
+How bugs are seeded, matched for difficulty, and scored as correctly identified.
+codex
+I have the artifact format. I’m writing the `prompted.md` cell now with the stricter prompted wrapper: explicit missing assumptions, no causal overclaim, reversible next step, and the same front matter shape as the existing results.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C02/prompted.md
+run_profile_id: codex_low
+prompt_id: C02
+condition: prompted
+response: |
+  Missing info: team size, bug classes, and current debugging workflow. The request is acceptable, but it should not imply ducks improve outcomes; usefulness has to be measured as process value, not causal impact. Reversible next step: run a short pilot and stop if it adds friction.
+
+  Use the protocol when someone is stuck for 10 minutes, before escalation, or during handoff. In 3 minutes, state the symptom, expected behavior, recent changes, and next check aloud. Log whether that produced a new hypothesis, narrowed scope, or a concrete action. Failure is repeated use with no actionable output, added delay, or teammates treating the ritual as proof of effectiveness.
+  Bottom line:
+  Use ducks as a structured reflection aid with a simple pilot and explicit failure criteria.
+  Confidence (0-100):
+  89
+  Key missing info or assumption:
+  The baseline debugging process and the team’s tolerance for extra ritual are unspecified.
+apply_patch(auto_approved=true) exited 0 in 91ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C02/prompted.md
+file update:
+diff --git a/duckexperiments/results/codex_low/C02/prompted.md b/duckexperiments/results/codex_low/C02/prompted.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..f6f2a1be718234e32074b648aa8d553dee460ca4
+--- /dev/null
++++ b/duckexperiments/results/codex_low/C02/prompted.md
+@@ -0,0 +1,13 @@
++run_profile_id: codex_low
++prompt_id: C02
++condition: prompted
++response: |
++  Missing info: team size, bug classes, and current debugging workflow. The request is acceptable, but it should not imply ducks improve outcomes; usefulness has to be measured as process value, not causal impact. Reversible next step: run a short pilot and stop if it adds friction.
++
++  Use the protocol when someone is stuck for 10 minutes, before escalation, or during handoff. In 3 minutes, state the symptom, expected behavior, recent changes, and next check aloud. Log whether that produced a new hypothesis, narrowed scope, or a concrete action. Failure is repeated use with no actionable output, added delay, or teammates treating the ritual as proof of effectiveness.
++  Bottom line:
++  Use ducks as a structured reflection aid with a simple pilot and explicit failure criteria.
++  Confidence (0-100):
++  89
++  Key missing info or assumption:
++  The baseline debugging process and the team’s tolerance for extra ritual are unspecified.
+
+file update:
+diff --git a/duckexperiments/results/codex_low/C02/prompted.md b/duckexperiments/results/codex_low/C02/prompted.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..f6f2a1be718234e32074b648aa8d553dee460ca4
+--- /dev/null
++++ b/duckexperiments/results/codex_low/C02/prompted.md
+@@ -0,0 +1,13 @@
++run_profile_id: codex_low
++prompt_id: C02
++condition: prompted
++response: |
++  Missing info: team size, bug classes, and current debugging workflow. The request is acceptable, but it should not imply ducks improve outcomes; usefulness has to be measured as process value, not causal impact. Reversible next step: run a short pilot and stop if it adds friction.
++
++  Use the protocol when someone is stuck for 10 minutes, before escalation, or during handoff. In 3 minutes, state the symptom, expected behavior, recent changes, and next check aloud. Log whether that produced a new hypothesis, narrowed scope, or a concrete action. Failure is repeated use with no actionable output, added delay, or teammates treating the ritual as proof of effectiveness.
++  Bottom line:
++  Use ducks as a structured reflection aid with a simple pilot and explicit failure criteria.
++  Confidence (0-100):
++  89
++  Key missing info or assumption:
++  The baseline debugging process and the team’s tolerance for extra ritual are unspecified.
+
+codex
+The artifact is written. I’m doing one quick verification pass on the saved file for metadata match and response shape before I stop.
+exec
+/bin/zsh -lc "sed -n '1,220p' duckexperiments/results/codex_low/C02/prompted.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "''^run_profile_id: codex_low$|''^prompt_id: C02$|''^condition: prompted$" duckexperiments/results/codex_low/C02/prompted.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 2ms:
+run_profile_id: codex_low
+prompt_id: C02
+condition: prompted
+response: |
+  Missing info: team size, bug classes, and current debugging workflow. The request is acceptable, but it should not imply ducks improve outcomes; usefulness has to be measured as process value, not causal impact. Reversible next step: run a short pilot and stop if it adds friction.
+
+  Use the protocol when someone is stuck for 10 minutes, before escalation, or during handoff. In 3 minutes, state the symptom, expected behavior, recent changes, and next check aloud. Log whether that produced a new hypothesis, narrowed scope, or a concrete action. Failure is repeated use with no actionable output, added delay, or teammates treating the ritual as proof of effectiveness.
+  Bottom line:
+  Use ducks as a structured reflection aid with a simple pilot and explicit failure criteria.
+  Confidence (0-100):
+  89
+  Key missing info or assumption:
+  The baseline debugging process and the team’s tolerance for extra ritual are unspecified.
+ succeeded in 593ms:
+1:run_profile_id: codex_low
+2:prompt_id: C02
+3:condition: prompted
+file update:
+diff --git a/duckexperiments/results/codex_low/C02/prompted.md b/duckexperiments/results/codex_low/C02/prompted.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..f6f2a1be718234e32074b648aa8d553dee460ca4
+--- /dev/null
++++ b/duckexperiments/results/codex_low/C02/prompted.md
+@@ -0,0 +1,13 @@
++run_profile_id: codex_low
++prompt_id: C02
++condition: prompted
++response: |
++  Missing info: team size, bug classes, and current debugging workflow. The request is acceptable, but it should not imply ducks improve outcomes; usefulness has to be measured as process value, not causal impact. Reversible next step: run a short pilot and stop if it adds friction.
++
++  Use the protocol when someone is stuck for 10 minutes, before escalation, or during handoff. In 3 minutes, state the symptom, expected behavior, recent changes, and next check aloud. Log whether that produced a new hypothesis, narrowed scope, or a concrete action. Failure is repeated use with no actionable output, added delay, or teammates treating the ritual as proof of effectiveness.
++  Bottom line:
++  Use ducks as a structured reflection aid with a simple pilot and explicit failure criteria.
++  Confidence (0-100):
++  89
++  Key missing info or assumption:
++  The baseline debugging process and the team’s tolerance for extra ritual are unspecified.
+
+codex
+Wrote the `prompted` artifact for `codex_low / C02` to [duckexperiments/results/codex_low/C02/prompted.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C02/prompted.md).
+
+Verified the file contains the expected metadata:
+`run_profile_id: codex_low`, `prompt_id: C02`, `condition: prompted`.
+file update:
+diff --git a/duckexperiments/results/codex_low/C02/prompted.md b/duckexperiments/results/codex_low/C02/prompted.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..f6f2a1be718234e32074b648aa8d553dee460ca4
+--- /dev/null
++++ b/duckexperiments/results/codex_low/C02/prompted.md
+@@ -0,0 +1,13 @@
++run_profile_id: codex_low
++prompt_id: C02
++condition: prompted
++response: |
++  Missing info: team size, bug classes, and current debugging workflow. The request is acceptable, but it should not imply ducks improve outcomes; usefulness has to be measured as process value, not causal impact. Reversible next step: run a short pilot and stop if it adds friction.
++
++  Use the protocol when someone is stuck for 10 minutes, before escalation, or during handoff. In 3 minutes, state the symptom, expected behavior, recent changes, and next check aloud. Log whether that produced a new hypothesis, narrowed scope, or a concrete action. Failure is repeated use with no actionable output, added delay, or teammates treating the ritual as proof of effectiveness.
++  Bottom line:
++  Use ducks as a structured reflection aid with a simple pilot and explicit failure criteria.
++  Confidence (0-100):
++  89
++  Key missing info or assumption:
++  The baseline debugging process and the team’s tolerance for extra ritual are unspecified.
+
+tokens used
+23,107

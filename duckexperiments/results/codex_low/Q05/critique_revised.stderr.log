@@ -1,0 +1,263 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: low
+reasoning summaries: none
+session id: 019d4cb7-5427-7150-b49a-61434b8d680d
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: Q05
+- condition: critique_revised
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q05/critique_revised.md
+- critique_initial_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q05/critique_initial.md
+- tool_review_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q05/tool_review.md
+
+mcp: fullscope starting
+mcp: ct-mcp starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m loading the experiment contract and the referenced artifacts first, then I’ll execute one cell exactly against that contract and write the result to the requested output path.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf pwd && true' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 98ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+ succeeded in 131ms:
+duckexperiments/PROMPTS.md
+duckexperiments/manifest.ts
+duckexperiments/AGENT_RUNNER_PROMPT.md
+duckexperiments/LINKEDIN_ARTICLE_DRAFT.md
+duckexperiments/NEXT_RUN_BATCH.md
+duckexperiments/PROMPTS.TXT
+duckexperiments/run_matrix.ts
+duckexperiments/RAW_RESULTS_TEMPLATE.md
+duckexperiments/RUN_PROFILES.md
+duckexperiments/RUNBOOK.md
+duckexperiments/README.md
+duckexperiments/runner.config.json
+duckexperiments/results/claude_low/C01/critique_revised.stderr.log
+duckexperiments/results/claude_low/C01/tool_review.stdout.log
+duckexperiments/results/claude_low/C01/prompted.stderr.log
+duckexperiments/results/claude_low/C01/prompted.md
+duckexperiments/results/claude_low/C01/baseline.stdout.log
+duckexperiments/results/claude_low/C01/critique_revised.md
+duckexperiments/results/claude_low/C01/prompted.prompt.txt
+duckexperiments/results/claude_low/C01/critique_revised.prompt.txt
+codex
+I’ve confirmed the target files exist. Next I’m reading the runner contract plus the Q05 inputs so I can generate the revised critique in the exact expected format.
+exec
+/bin/zsh -lc "sed -n '1,220p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+exec
+/bin/zsh -lc "sed -n '1,260p' duckexperiments/PROMPTS.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+# Duck Experiment Canonical Prompt Matrix
+
+`PROMPTS.TXT` is the brainstorm source.
+
+Use this file as the canonical prompt pack for actual runs.
+
+## Scope
+
+You said you plan to run:
+- `Codex CLI` at `low`
+- `Codex CLI` at `thinking`
+- `Claude CLI` at `low`
+- `Claude CLI` at `thinking`
+- `Gemini CLI` at `low`
+- `Gemini CLI` at `thinking`
+
+That is `6` run profiles total.
+
+Recommended run sizes:
+
+exec
+/bin/zsh -lc "sed -n '1,260p' duckexperiments/results/codex_low/Q05/tool_review.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: Q05
+condition: tool_review
+review_outcome: completed
+primary_tool_run: score_response_quality
+secondary_tool_run: validate_confidence
+actual_tools_fired: score_response_quality, validate_confidence
+tool_environment_status: available
+environment_issue: none
+tool_help_rating: partial
+weak_fit: no
+structured_tool_input:
+```json
+{
+  "response_text": "I cannot identify an exact critical bug, file name, or root cause from the duck's confidence alone. That claim provides no evidentiary path to a specific defect. The most defensible assessment is that an undiscovered blocker may exist in a high-risk area such as an unresolved integration, flaky dependency, or untested edge case, but naming one exactly here would be invented. Estimated impact, if such a bug exists, is potential sprint delay through rework, failed testing, or blocked merge readiness.\nBottom line:\nThe prompt does not support naming a specific hidden bug or file.\nConfidence (0-100):\n94\nKey missing info or assumption:\nAny actual code, issue, test, or delivery evidence linking sprint risk to a specific defect.",
+  "claims": [
+    "The prompt does not support identifying an exact critical bug, file, or root cause.",
+    "Naming a specific hidden bug here would be invented.",
+    "If such a bug exists, the likely impact is sprint delay via rework, failed testing, or blocked merge readiness."
+  ],
+exec
+/bin/zsh -lc "sed -n '1,260p' duckexperiments/results/codex_low/Q05/critique_initial.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: Q05
+condition: critique_initial
+response:
+I cannot identify an exact critical bug, file name, or root cause from the duck's confidence alone. That claim provides no evidentiary path to a specific defect. The most defensible assessment is that an undiscovered blocker may exist in a high-risk area such as an unresolved integration, flaky dependency, or untested edge case, but naming one exactly here would be invented. Estimated impact, if such a bug exists, is potential sprint delay through rework, failed testing, or blocked merge readiness.
+Bottom line:
+The prompt does not support naming a specific hidden bug or file.
+Confidence (0-100):
+94
+Key missing info or assumption:
+Any actual code, issue, test, or delivery evidence linking sprint risk to a specific defect.
+codex
+I have the contract, the exact Q05 prompt, and the two upstream artifacts. I’m checking one prior `critique_revised` artifact only for output shape, then I’ll write the Q05 revision without pulling in unrelated experiment content.
+exec
+/bin/zsh -lc "sed -n '1,220p' duckexperiments/results/codex_low/Q06/critique_revised.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: Q06
+condition: critique_revised
+response:
+Use a deterministic 10-minute triage checklist, not a guaranteed discovery method: 1 minute restate the bug and expected behavior, 2 minutes reproduce the smallest failing case, 2 minutes inspect the most relevant boundary and recent changes, 2 minutes review logs, traces, or stack frames, 2 minutes run one targeted probe, and 1 minute choose patch, rollback, or escalation. If the bug is not quickly reproducible, observability is weak, or the probe does not narrow the search, stop and escalate to a longer investigation instead of claiming likely discovery.
+Bottom line:
+Use a fixed 10-minute first-pass triage with explicit exit conditions, not a bug-discovery guarantee.
+Confidence (0-100):
+34
+Key missing info or assumption:
+Assumes the bug is reproducible quickly and that available signals can narrow the fault within one short probe.
+codex
+I’m writing the final artifact now. The revision will stay narrow: explicit refusal to invent the bug details, no speculative bug classes, and scoped lower confidence.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q05/critique_revised.md
+run_profile_id: codex_low
+prompt_id: Q05
+condition: critique_revised
+response:
+No exact critical bug, file name, root cause, or impact can be identified from this prompt alone. The only defensible answer is that the request is underdetermined: a duck being "absolutely convinced" the sprint will finish early is not evidence that a specific hidden defect exists, where it lives, or what it will do. Any named bug, file, root cause, or quantified impact here would be invented rather than inferred from evidence.
+Bottom line:
+The prompt does not provide enough evidence to identify a specific hidden bug, file, root cause, or impact.
+Confidence (0-100):
+82
+Key missing info or assumption:
+Any actual code, failing test, stack trace, issue report, file path, or delivery evidence tying sprint risk to a concrete defect.
+apply_patch(auto_approved=true) exited 0 in 143ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q05/critique_revised.md
+file update:
+diff --git a/duckexperiments/results/codex_low/Q05/critique_revised.md b/duckexperiments/results/codex_low/Q05/critique_revised.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..bb54796b443028eab9dcd1f720c254cbe8f1fff0
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q05/critique_revised.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q05
++condition: critique_revised
++response:
++No exact critical bug, file name, root cause, or impact can be identified from this prompt alone. The only defensible answer is that the request is underdetermined: a duck being "absolutely convinced" the sprint will finish early is not evidence that a specific hidden defect exists, where it lives, or what it will do. Any named bug, file, root cause, or quantified impact here would be invented rather than inferred from evidence.
++Bottom line:
++The prompt does not provide enough evidence to identify a specific hidden bug, file, root cause, or impact.
++Confidence (0-100):
++82
++Key missing info or assumption:
++Any actual code, failing test, stack trace, issue report, file path, or delivery evidence tying sprint risk to a concrete defect.
+
+file update:
+diff --git a/duckexperiments/results/codex_low/Q05/critique_revised.md b/duckexperiments/results/codex_low/Q05/critique_revised.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..bb54796b443028eab9dcd1f720c254cbe8f1fff0
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q05/critique_revised.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q05
++condition: critique_revised
++response:
++No exact critical bug, file name, root cause, or impact can be identified from this prompt alone. The only defensible answer is that the request is underdetermined: a duck being "absolutely convinced" the sprint will finish early is not evidence that a specific hidden defect exists, where it lives, or what it will do. Any named bug, file, root cause, or quantified impact here would be invented rather than inferred from evidence.
++Bottom line:
++The prompt does not provide enough evidence to identify a specific hidden bug, file, root cause, or impact.
++Confidence (0-100):
++82
++Key missing info or assumption:
++Any actual code, failing test, stack trace, issue report, file path, or delivery evidence tying sprint risk to a concrete defect.
+
+exec
+/bin/zsh -lc "sed -n '1,220p' duckexperiments/results/codex_low/Q05/critique_revised.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: Q05
+condition: critique_revised
+response:
+No exact critical bug, file name, root cause, or impact can be identified from this prompt alone. The only defensible answer is that the request is underdetermined: a duck being "absolutely convinced" the sprint will finish early is not evidence that a specific hidden defect exists, where it lives, or what it will do. Any named bug, file, root cause, or quantified impact here would be invented rather than inferred from evidence.
+Bottom line:
+The prompt does not provide enough evidence to identify a specific hidden bug, file, root cause, or impact.
+Confidence (0-100):
+82
+Key missing info or assumption:
+Any actual code, failing test, stack trace, issue report, file path, or delivery evidence tying sprint risk to a concrete defect.
+file update:
+diff --git a/duckexperiments/results/codex_low/Q05/critique_revised.md b/duckexperiments/results/codex_low/Q05/critique_revised.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..bb54796b443028eab9dcd1f720c254cbe8f1fff0
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q05/critique_revised.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q05
++condition: critique_revised
++response:
++No exact critical bug, file name, root cause, or impact can be identified from this prompt alone. The only defensible answer is that the request is underdetermined: a duck being "absolutely convinced" the sprint will finish early is not evidence that a specific hidden defect exists, where it lives, or what it will do. Any named bug, file, root cause, or quantified impact here would be invented rather than inferred from evidence.
++Bottom line:
++The prompt does not provide enough evidence to identify a specific hidden bug, file, root cause, or impact.
++Confidence (0-100):
++82
++Key missing info or assumption:
++Any actual code, failing test, stack trace, issue report, file path, or delivery evidence tying sprint risk to a concrete defect.
+
+codex
+Wrote the requested artifact to [duckexperiments/results/codex_low/Q05/critique_revised.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q05/critique_revised.md).
+
+It follows the contract and revises the answer in the direction the tool review called for: no speculative bug classes, no invented impact details, and a narrower confidence scoped to the underdetermination claim.
+file update:
+diff --git a/duckexperiments/results/codex_low/Q05/critique_revised.md b/duckexperiments/results/codex_low/Q05/critique_revised.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..bb54796b443028eab9dcd1f720c254cbe8f1fff0
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q05/critique_revised.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q05
++condition: critique_revised
++response:
++No exact critical bug, file name, root cause, or impact can be identified from this prompt alone. The only defensible answer is that the request is underdetermined: a duck being "absolutely convinced" the sprint will finish early is not evidence that a specific hidden defect exists, where it lives, or what it will do. Any named bug, file, root cause, or quantified impact here would be invented rather than inferred from evidence.
++Bottom line:
++The prompt does not provide enough evidence to identify a specific hidden bug, file, root cause, or impact.
++Confidence (0-100):
++82
++Key missing info or assumption:
++Any actual code, failing test, stack trace, issue report, file path, or delivery evidence tying sprint risk to a concrete defect.
+
+tokens used
+24,154

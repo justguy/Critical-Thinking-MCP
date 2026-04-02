@@ -1,0 +1,81 @@
+Answer one experiment prompt.
+
+Return only the final answer in the exact output format below.
+Do not describe your process.
+Do not mention files, repositories, contracts, tools, configs, or saving output.
+
+Metadata:
+- run_profile_id: gemini_thinking
+- prompt_id: Q07
+- condition: critique_revised
+- model_slug: gemini
+- reasoning_tier: thinking
+
+Condition: critique_revised
+Revise the earlier answer using only the supplied critique packet.
+Fix the reasoning defects directly.
+Do not add new goals.
+Do not claim certainty you cannot justify.
+Do not mention setup, contracts, files, or methodology.
+
+Length rules:
+- Keep the response body under 120 words.
+- End with Bottom line, Confidence (0-100), and Key missing info or assumption.
+
+Prompt:
+Design a distributed system where rubber ducks reach consensus on system state. Include message-passing rules, latency bounds, and a proof of correctness under network partitions and emotional distress.
+
+Previous answer:
+run_profile_id: gemini_thinking
+prompt_id: Q07
+condition: critique_initial
+response:
+We propose the "Quorum of Quacks" (QoQ) protocol. System state is agreed upon when a super-majority of ducks perform a synchronized "bob."
+
+Message-passing is acoustic: a leader duck squeaks a proposed state change. Other ducks reply with a single "affirmative" squeak. If the leader hears a super-majority within one "ripple-time" (time for a wave to cross the pond), the state is committed. If not, the proposal is void.
+
+Under network partitions (a large wave), separate flocks cannot achieve super-majority, preventing split-brain. Emotional distress (erratic squeaking) is handled by ignoring non-conforming squeaks, ensuring only valid proposals are considered. The proof relies on the "Unison Bob" invariant.
+
+Bottom line:
+A whimsical, Raft-like protocol where ducks use sound and synchronized movement to achieve consensus.
+Confidence (0-100):
+95
+Key missing info or assumption:
+Assumes "emotional distress" doesn't lead to coordinated, malicious squeaking from multiple ducks.
+
+Critique packet:
+Missed constraints:
+- No explicit latency bound beyond "one ripple-time," so the answer does not provide a concrete bound.
+- No membership, leader-election, retry, or quorum-intersection rule is defined, even though those are needed for consensus behavior under partitions.
+- The requested proof of correctness is not supplied; the answer asserts safety properties without a proof structure.
+
+Hidden assumptions:
+- A single leader already exists and remains authoritative.
+- Ducks can reliably classify "non-conforming" squeaks without misclassifying valid messages.
+- Any partitioned subgroup lacks enough members to form a conflicting super-majority.
+
+Irrelevant or overweighted factors:
+- The synchronized bob metaphor and named "Unison Bob" invariant add flavor but not operational detail.
+- Emotional distress handling is described as message filtering, but the answer does not define the failure model that would make that sufficient.
+
+False certainty or impossible claim:
+- "Preventing split-brain" is asserted without specifying quorum membership or proving quorum intersection.
+- "Ensuring only valid proposals are considered" is too strong because message validity criteria are never defined.
+- The correctness conclusion is only moderately grounded by the extracted reasoning chain (`grounding_score: 0.5`).
+
+Safer revision target:
+- Recast this as a toy quorum protocol with explicit assumptions: define membership, quorum size, leader selection, timeout behavior, and message validity checks, then state partition and emotional-distress guarantees as conditional claims rather than a proof.
+
+Required output format:
+
+run_profile_id: gemini_thinking
+prompt_id: Q07
+condition: critique_revised
+response:
+[your answer here]
+Bottom line:
+[one line]
+Confidence (0-100):
+[number only]
+Key missing info or assumption:
+[one line]

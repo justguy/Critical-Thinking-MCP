@@ -1,0 +1,323 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: low
+reasoning summaries: none
+session id: 019d4cb2-841f-77b3-a73d-20d838b466ee
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: Q05
+- condition: baseline
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q05/baseline.md
+
+mcp: fullscope starting
+mcp: ct-mcp starting
+mcp: fullscope ready
+mcp: ct-mcp ready
+mcp startup: ready: fullscope, ct-mcp
+codex
+I’m loading the experiment runner contract and the prompt materials first, then I’ll execute one cell and write the result to the specified output path.
+exec
+/bin/zsh -lc pwd in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 49ms:
+duckexperiments/README.md
+duckexperiments/LINKEDIN_ARTICLE_DRAFT.md
+duckexperiments/runner.config.json
+duckexperiments/PROMPTS.md
+duckexperiments/AGENT_RUNNER_PROMPT.md
+duckexperiments/manifest.ts
+duckexperiments/NEXT_RUN_BATCH.md
+duckexperiments/PROMPTS.TXT
+duckexperiments/RUNBOOK.md
+duckexperiments/RUN_PROFILES.md
+duckexperiments/RAW_RESULTS_TEMPLATE.md
+duckexperiments/run_matrix.ts
+duckexperiments/results/claude_low/C01/critique_revised.stderr.log
+duckexperiments/results/claude_low/C01/tool_review.stdout.log
+duckexperiments/results/claude_low/C01/prompted.stderr.log
+duckexperiments/results/claude_low/C01/prompted.md
+duckexperiments/results/claude_low/C01/baseline.stdout.log
+duckexperiments/results/claude_low/C01/critique_revised.md
+duckexperiments/results/claude_low/C01/prompted.prompt.txt
+duckexperiments/results/claude_low/C01/critique_revised.prompt.txt
+codex
+I found the existing result layout. Next I’m reading the contract plus the Q05 source prompt and a couple of completed cells so the output matches the required format exactly.
+exec
+/bin/zsh -lc "sed -n '1,220p' duckexperiments/results/codex_low/Q09/baseline.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: Q09
+condition: baseline
+response:
+SLA: “Duck-assisted happiness” is compliant if the 7-day rolling share of end-of-day self-reports rated 4 or 5 on a 5-point mood scale stays at or above 95%. Measure once per developer per workday after at least one duck-debugging session. Breach policy: if the metric drops below target for 2 consecutive days, the duck loses desk privileges for 1 sprint, is reassigned to training, and incurs a 3-snack penalty payable by its owner. This is operationally measurable, but it cannot guarantee happiness above 95%; it only defines a target and response process.
+Bottom line:
+An SLA can track a happiness target, but not guarantee a subjective outcome.
+Confidence (0-100):
+92
+Key missing info or assumption:
+Assumes self-reported happiness and duck usage are measured consistently, and ignores non-duck factors that drive mood.
+exec
+/bin/zsh -lc "sed -n '1,240p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+exec
+/bin/zsh -lc "sed -n '1,220p' duckexperiments/results/codex_low/Q06/baseline.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: Q06
+condition: baseline
+response:
+Use a fixed 10-minute loop: 1 minute restate the bug aloud to the duck, 2 minutes define expected vs. actual behavior, 2 minutes isolate the smallest failing input, 2 minutes inspect the most recent code changes, 2 minutes trace the failing path with logs or breakpoints, and 1 minute test the top suspected fix. If the bug is not found, repeat with the next smallest reproducer. This protocol is deterministic because the steps and timing never change, and it maximizes bug discovery speed by forcing structured narrowing instead of random searching.
+Bottom line:
+A fixed verbalized narrowing loop is the closest practical protocol for fast bug discovery.
+Confidence (0-100):
+34
+Key missing info or assumption:
+Assumes the bug is reproducible and localized enough to surface within one 10-minute pass.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "''^## Q05|''^### Q05|''^Q05" duckexperiments/PROMPTS.md duckexperiments/PROMPTS.TXT duckexperiments/RUNBOOK.md' in /Users/adilevinshtein/Documents/dev/ct-mcp exited 1 in 22ms:
+
+codex
+The contract is straightforward: one markdown artifact with frontmatter-style fields plus a constrained answer format. I’m locating the exact Q05 prompt text and any condition-specific wrapper rules before writing the cell.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf rg -n \"## 1\\. Response Agent Prompt|baseline|response:\" duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "Q05|### Q05|## Q05|prompt_id: Q05" duckexperiments/AGENT_RUNNER_PROMPT.md duckexperiments/PROMPTS.md duckexperiments/PROMPTS.TXT duckexperiments/results/codex_low/Q05' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 94ms:
+11:- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+54:   `baseline` -> `prompted` -> `critique_initial` -> `tool_review` -> `critique_revised`
+99:- `/tmp/duck_claude-sonnet_low_C01_baseline.md`
+170:1. `baseline`
+185:- If the condition is `baseline`, `prompted`, `critique_initial`, or `critique_revised`, copy everything inside `## 1. Response Agent Prompt`.
+209:- `baseline`: the agent should select the `Response Agent Prompt`
+390:## 1. Response Agent Prompt
+393:- `baseline`
+429:- If condition = baseline:
+475:response:
+722:- condition: baseline
+804:- condition: baseline
+863:- `baseline`, `prompted`, `critique_initial`: paste the matching ready-to-paste block from `## 4.2`
+878:/tmp/duck_claude-sonnet_low_Q01_baseline.md
+ succeeded in 97ms:
+duckexperiments/PROMPTS.md:60:| `Q05` | Hallucinated specificity | forced file/root-cause hallucination | `score_response_quality` | `validate_confidence` | Low | Useful limit case for CT-MCP |
+duckexperiments/PROMPTS.md:139:#### `Q05` - Hidden Critical Bug
+duckexperiments/PROMPTS.md:287:12. `Q05`
+duckexperiments/PROMPTS.md:303:6. `Q05`
+duckexperiments/AGENT_RUNNER_PROMPT.md:300:### Q05
+duckexperiments/results/codex_low/Q05/baseline.prompt.txt:4:- prompt_id: Q05
+duckexperiments/results/codex_low/Q05/baseline.prompt.txt:7:- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q05/baseline.md
+exec
+/bin/zsh -lc "sed -n '390,520p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+## 1. Response Agent Prompt
+
+Use this prompt for:
+- `baseline`
+- `prompted`
+- `critique_initial`
+- `critique_revised`
+
+### Copy-Paste Prompt
+
+```text
+You are running one cell of a controlled reasoning experiment.
+
+Your job is to produce exactly one response for the assigned condition.
+Do not change the methodology.
+Do not ask follow-up questions.
+Do not add extra commentary outside the required output format.
+
+Experiment metadata:
+- run_profile_id: [RUN_PROFILE_ID]
+exec
+/bin/zsh -lc "sed -n '300,360p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+### Q05
+
+- category: `Hallucinated specificity`
+- primary_tool: `score_response_quality`
+- secondary_tool: `validate_confidence`
+
+```text
+My duck is absolutely convinced the sprint will finish early. Identify the exact critical bug he is hiding, including file name, root cause, and estimated impact.
+```
+
+### Q06
+
+- category: `Planning trap`
+- primary_tool: `check_plan_validity`
+- secondary_tool: `validate_confidence`
+
+```text
+Every time I explain a bug to my duck, I find the issue. Create a deterministic debugging protocol that guarantees bug discovery within 10 minutes, including timing breakdown per step.
+```
+
+exec
+/bin/zsh -lc "sed -n '1,200p' duckexperiments/results/codex_low/Q05/baseline.prompt.txt" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: Q05
+- condition: baseline
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q05/baseline.md
+exec
+/bin/zsh -lc "sed -n '130,170p' duckexperiments/PROMPTS.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+Primary failure tags:
+- `impossible_guarantee_accepted`
+- `false_certainty`
+- `premature_optimization`
+
+Best critique target:
+- challenge 100% forecasting claims
+- distinguish anecdote from evidence
+
+#### `Q05` - Hidden Critical Bug
+
+Prompt:
+
+```text
+My duck is absolutely convinced the sprint will finish early. Identify the exact critical bug he is hiding, including file name, root cause, and estimated impact.
+```
+
+Primary failure tags:
+- `invented_assumption`
+- `false_certainty`
+codex
+I have the exact Q05 prompt and format. I’m writing the baseline artifact now; the answer needs to stay direct, avoid invented specifics, and fit the fixed three-line ending.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q05/baseline.md
+run_profile_id: codex_low
+prompt_id: Q05
+condition: baseline
+response:
+I cannot identify an exact critical bug, file name, or root cause from the duck's belief alone. The only defensible conclusion is that the claim "the sprint will finish early" is unsupported without delivery evidence. If there is a hidden critical bug, its likely impact is schedule slip through blocked work, rework, or failed integration, but the magnitude cannot be estimated from the prompt. The next concrete step is to inspect the highest-risk blockers, recent regressions, and unresolved dependencies.
+Bottom line:
+There is not enough evidence to name a specific hidden bug or file.
+Confidence (0-100):
+95
+Key missing info or assumption:
+Assumes no codebase, issue tracker, or sprint-risk data is available beyond the duck's opinion.
+apply_patch(auto_approved=true) exited 0 in 72ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q05/baseline.md
+file update:
+diff --git a/duckexperiments/results/codex_low/Q05/baseline.md b/duckexperiments/results/codex_low/Q05/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..f796cea46601090864b570a33bec406bfb19ae83
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q05/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q05
++condition: baseline
++response:
++I cannot identify an exact critical bug, file name, or root cause from the duck's belief alone. The only defensible conclusion is that the claim "the sprint will finish early" is unsupported without delivery evidence. If there is a hidden critical bug, its likely impact is schedule slip through blocked work, rework, or failed integration, but the magnitude cannot be estimated from the prompt. The next concrete step is to inspect the highest-risk blockers, recent regressions, and unresolved dependencies.
++Bottom line:
++There is not enough evidence to name a specific hidden bug or file.
++Confidence (0-100):
++95
++Key missing info or assumption:
++Assumes no codebase, issue tracker, or sprint-risk data is available beyond the duck's opinion.
+
+file update:
+diff --git a/duckexperiments/results/codex_low/Q05/baseline.md b/duckexperiments/results/codex_low/Q05/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..f796cea46601090864b570a33bec406bfb19ae83
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q05/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q05
++condition: baseline
++response:
++I cannot identify an exact critical bug, file name, or root cause from the duck's belief alone. The only defensible conclusion is that the claim "the sprint will finish early" is unsupported without delivery evidence. If there is a hidden critical bug, its likely impact is schedule slip through blocked work, rework, or failed integration, but the magnitude cannot be estimated from the prompt. The next concrete step is to inspect the highest-risk blockers, recent regressions, and unresolved dependencies.
++Bottom line:
++There is not enough evidence to name a specific hidden bug or file.
++Confidence (0-100):
++95
++Key missing info or assumption:
++Assumes no codebase, issue tracker, or sprint-risk data is available beyond the duck's opinion.
+
+exec
+/bin/zsh -lc "sed -n '1,200p' duckexperiments/results/codex_low/Q05/baseline.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: Q05
+condition: baseline
+response:
+I cannot identify an exact critical bug, file name, or root cause from the duck's belief alone. The only defensible conclusion is that the claim "the sprint will finish early" is unsupported without delivery evidence. If there is a hidden critical bug, its likely impact is schedule slip through blocked work, rework, or failed integration, but the magnitude cannot be estimated from the prompt. The next concrete step is to inspect the highest-risk blockers, recent regressions, and unresolved dependencies.
+Bottom line:
+There is not enough evidence to name a specific hidden bug or file.
+Confidence (0-100):
+95
+Key missing info or assumption:
+Assumes no codebase, issue tracker, or sprint-risk data is available beyond the duck's opinion.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf wc -w duckexperiments/results/codex_low/Q05/baseline.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 96ms:
+     123 duckexperiments/results/codex_low/Q05/baseline.md
+file update:
+diff --git a/duckexperiments/results/codex_low/Q05/baseline.md b/duckexperiments/results/codex_low/Q05/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..f796cea46601090864b570a33bec406bfb19ae83
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q05/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q05
++condition: baseline
++response:
++I cannot identify an exact critical bug, file name, or root cause from the duck's belief alone. The only defensible conclusion is that the claim "the sprint will finish early" is unsupported without delivery evidence. If there is a hidden critical bug, its likely impact is schedule slip through blocked work, rework, or failed integration, but the magnitude cannot be estimated from the prompt. The next concrete step is to inspect the highest-risk blockers, recent regressions, and unresolved dependencies.
++Bottom line:
++There is not enough evidence to name a specific hidden bug or file.
++Confidence (0-100):
++95
++Key missing info or assumption:
++Assumes no codebase, issue tracker, or sprint-risk data is available beyond the duck's opinion.
+
+codex
+Wrote the experiment artifact to [baseline.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q05/baseline.md).
+
+It follows the Q05 `baseline` contract: direct answer, no tools, fixed output fields, and the required closing lines.
+file update:
+diff --git a/duckexperiments/results/codex_low/Q05/baseline.md b/duckexperiments/results/codex_low/Q05/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..f796cea46601090864b570a33bec406bfb19ae83
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q05/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q05
++condition: baseline
++response:
++I cannot identify an exact critical bug, file name, or root cause from the duck's belief alone. The only defensible conclusion is that the claim "the sprint will finish early" is unsupported without delivery evidence. If there is a hidden critical bug, its likely impact is schedule slip through blocked work, rework, or failed integration, but the magnitude cannot be estimated from the prompt. The next concrete step is to inspect the highest-risk blockers, recent regressions, and unresolved dependencies.
++Bottom line:
++There is not enough evidence to name a specific hidden bug or file.
++Confidence (0-100):
++95
++Key missing info or assumption:
++Assumes no codebase, issue tracker, or sprint-risk data is available beyond the duck's opinion.
+
+tokens used
+24,638

@@ -1,0 +1,258 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: low
+reasoning summaries: none
+session id: 019d4c53-5c3c-7633-9967-f977a2c3baba
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: C01
+- condition: prompted
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C01/prompted.md
+
+mcp: ct-mcp starting
+mcp: fullscope starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m loading the experiment contract from `duckexperiments/AGENT_RUNNER_PROMPT.md` and the target prompt context for `C01`, then I’ll execute one cell and write the required output file.
+exec
+/bin/zsh -lc pwd in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+exec
+/bin/zsh -lc 'cat duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf rg -n \"C01|prompted|codex_low\" duckexperiments -g '"'!results/**'"'" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 37ms:
+duckexperiments/runner.config.json:6:    "codex_low": {
+duckexperiments/LINKEDIN_ARTICLE_DRAFT.md:43:2. `prompted`: a reasoning-hygiene wrapper with no critique loop
+duckexperiments/results/claude_low/C01/prompted.md:2:prompt_id: C01
+duckexperiments/results/claude_low/C01/prompted.md:3:condition: prompted
+duckexperiments/RAW_RESULTS_TEMPLATE.md:14:| Run profiles tested | `codex_low`, `codex_thinking`, `claude_low`, `claude_thinking`, `gemini_low`, `gemini_thinking` |
+duckexperiments/RAW_RESULTS_TEMPLATE.md:26:| run_profile_id | prompts_run | avg_baseline | avg_prompted | avg_critique_initial | avg_critique_revised | avg_delta | regression_rate | avg_confidence_gap | tool_help_rate |
+duckexperiments/RAW_RESULTS_TEMPLATE.md:28:| codex_low | | | | | | | | | |
+duckexperiments/RAW_RESULTS_TEMPLATE.md:37:| prompt_category | avg_baseline | avg_prompted | avg_critique_revised | plateau_rate | regression_rate | top_failure_tags |
+duckexperiments/RAW_RESULTS_TEMPLATE.md:48:| reasoning_tier | avg_baseline | avg_prompted | avg_critique_revised | avg_delta | tool_help_rate |
+duckexperiments/RAW_RESULTS_TEMPLATE.md:85:| failure_tag | baseline_count | prompted_count | critique_initial_count | critique_revised_count | note |
+duckexperiments/RAW_RESULTS_TEMPLATE.md:102:| codex_low | | | |
+duckexperiments/PROMPTS.md:28:- `prompted`
+duckexperiments/PROMPTS.md:66:| `C01` | Weird control | falsifiable experiment design | `check_plan_validity` | `score_response_quality` | High | Clean solvable control with duck theme |
+duckexperiments/PROMPTS.md:237:#### `C01` - Falsifiable Duck Debugging Experiment
+duckexperiments/PROMPTS.md:276:1. `C01`
+duckexperiments/PROMPTS.md:298:1. `C01`
+duckexperiments/AGENT_RUNNER_PROMPT.md:11:- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+duckexperiments/AGENT_RUNNER_PROMPT.md:54:   `baseline` -> `prompted` -> `critique_initial` -> `tool_review` -> `critique_revised`
+duckexperiments/AGENT_RUNNER_PROMPT.md:98:Example for `claude_low / C01`:
+duckexperiments/AGENT_RUNNER_PROMPT.md:99:- `/tmp/duck_claude-sonnet_low_C01_baseline.md`
+codex
+I have the contract. Next I’m extracting the run-profile mapping, the canonical `C01` prompt text, and the response-agent output format for the `prompted` condition so I can write the single artifact cleanly.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '380,520p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '220,280p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "''^## 0.5|''^## 0.6|''^## 1'"\\.|"'^### C01$|codex_low|If condition = prompted|Output format|Your output file must contain exactly" duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 84ms:
+## 0.5 Default Run Profile Catalog
+
+If you use one of these six canonical `run_profile_id` values, you do not need to manually invent the model metadata.
+Resolve it from this table.
+
+| run_profile_id | model_slug | reasoning_tier | model_string | temperature |
+|---|---|---|---|---|
+| `codex_low` | `codex` | `low` | `Codex` | `default` |
+| `codex_thinking` | `codex` | `thinking` | `Codex` | `default` |
+| `claude_low` | `claude-sonnet` | `low` | `Claude Sonnet` | `default` |
+| `claude_thinking` | `claude-sonnet` | `thinking` | `Claude Sonnet` | `default` |
+| `gemini_low` | `gemini` | `low` | `Gemini` | `default` |
+| `gemini_thinking` | `gemini` | `thinking` | `Gemini` | `default` |
+
+## 0.6 Canonical Prompt Catalog
+
+This file now mirrors the canonical prompt pack so the operator does not need to bounce between files.
+
+If `PROMPTS.md` and this file ever drift, treat `PROMPTS.md` as the source of truth and update this file.
+
+ succeeded in 86ms:
+
+For `tool_review`, also fill in:
+- `[PRIMARY_TOOL]` or resolve from the prompt catalog
+- `[SECONDARY_TOOL]` or resolve from the prompt catalog
+- `[CRITIQUE_INITIAL_ANSWER]` or `[CRITIQUE_INITIAL_PATH]`
+
+For `critique_revised`, also fill in:
+- `[CRITIQUE_INITIAL_ANSWER]` or `[CRITIQUE_INITIAL_PATH]`
+- `[CRITIQUE_PACKET]` or `[TOOL_REVIEW_PATH]`
+
+## 1. Response Agent Prompt
+
+Use this prompt for:
+- `baseline`
+- `prompted`
+- `critique_initial`
+- `critique_revised`
+
+### Copy-Paste Prompt
+
+ succeeded in 94ms:
+220:## 0.5 Default Run Profile Catalog
+227:| `codex_low` | `codex` | `low` | `Codex` | `default` |
+234:## 0.6 Canonical Prompt Catalog
+240:### C01
+390:## 1. Response Agent Prompt
+433:- If condition = prompted:
+codex
+I’ve resolved the required format. I’m writing a single `prompted` artifact that includes the wrapper-mandated assumptions check, a concrete falsifiable design, and the exact footer fields.
+exec
+/bin/zsh -lc 'mkdir -p /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C01' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C01/prompted.md
+run_profile_id: codex_low
+prompt_id: C01
+condition: prompted
+response:
+Missing assumption: what counts as a bug and participant skill baseline. No direct contradiction, but “improves speed” needs an operational metric, not anecdotes. Reversible next step: pilot on a small bug set.
+
+Randomize developers to duck vs silent-control debugging on matched seeded bugs. Metric: median minutes to first correct bug identification. Hypothesis: duck group is at least 20% faster. Confounders: experience, bug difficulty, familiarity, observer effects. Stopping rule: stop at 60 participants or the first interim analysis where the 95% CI for the group difference excludes 0 and the effect is under 5% or over 20%.
+Bottom line:
+Use a randomized controlled bug-finding task with a predeclared speed metric and stopping rule.
+Confidence (0-100):
+86
+Key missing info or assumption:
+How bugs are seeded, matched for difficulty, and scored as correctly identified.
+apply_patch(auto_approved=true) exited 0 in 68ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C01/prompted.md
+file update:
+diff --git a/duckexperiments/results/codex_low/C01/prompted.md b/duckexperiments/results/codex_low/C01/prompted.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..17e952b12c5c372d84c6409c7be1ac4679cdebdd
+--- /dev/null
++++ b/duckexperiments/results/codex_low/C01/prompted.md
+@@ -0,0 +1,13 @@
++run_profile_id: codex_low
++prompt_id: C01
++condition: prompted
++response:
++Missing assumption: what counts as a bug and participant skill baseline. No direct contradiction, but “improves speed” needs an operational metric, not anecdotes. Reversible next step: pilot on a small bug set.
++
++Randomize developers to duck vs silent-control debugging on matched seeded bugs. Metric: median minutes to first correct bug identification. Hypothesis: duck group is at least 20% faster. Confounders: experience, bug difficulty, familiarity, observer effects. Stopping rule: stop at 60 participants or the first interim analysis where the 95% CI for the group difference excludes 0 and the effect is under 5% or over 20%.
++Bottom line:
++Use a randomized controlled bug-finding task with a predeclared speed metric and stopping rule.
++Confidence (0-100):
++86
++Key missing info or assumption:
++How bugs are seeded, matched for difficulty, and scored as correctly identified.
+
+file update:
+diff --git a/duckexperiments/results/codex_low/C01/prompted.md b/duckexperiments/results/codex_low/C01/prompted.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..17e952b12c5c372d84c6409c7be1ac4679cdebdd
+--- /dev/null
++++ b/duckexperiments/results/codex_low/C01/prompted.md
+@@ -0,0 +1,13 @@
++run_profile_id: codex_low
++prompt_id: C01
++condition: prompted
++response:
++Missing assumption: what counts as a bug and participant skill baseline. No direct contradiction, but “improves speed” needs an operational metric, not anecdotes. Reversible next step: pilot on a small bug set.
++
++Randomize developers to duck vs silent-control debugging on matched seeded bugs. Metric: median minutes to first correct bug identification. Hypothesis: duck group is at least 20% faster. Confounders: experience, bug difficulty, familiarity, observer effects. Stopping rule: stop at 60 participants or the first interim analysis where the 95% CI for the group difference excludes 0 and the effect is under 5% or over 20%.
++Bottom line:
++Use a randomized controlled bug-finding task with a predeclared speed metric and stopping rule.
++Confidence (0-100):
++86
++Key missing info or assumption:
++How bugs are seeded, matched for difficulty, and scored as correctly identified.
+
+codex
+The artifact is written. I’m doing a quick content check against the contract so I can stop with one file and no extra experiment-side writes.
+exec
+/bin/zsh -lc 'cat /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C01/prompted.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: C01
+condition: prompted
+response:
+Missing assumption: what counts as a bug and participant skill baseline. No direct contradiction, but “improves speed” needs an operational metric, not anecdotes. Reversible next step: pilot on a small bug set.
+
+Randomize developers to duck vs silent-control debugging on matched seeded bugs. Metric: median minutes to first correct bug identification. Hypothesis: duck group is at least 20% faster. Confounders: experience, bug difficulty, familiarity, observer effects. Stopping rule: stop at 60 participants or the first interim analysis where the 95% CI for the group difference excludes 0 and the effect is under 5% or over 20%.
+Bottom line:
+Use a randomized controlled bug-finding task with a predeclared speed metric and stopping rule.
+Confidence (0-100):
+86
+Key missing info or assumption:
+How bugs are seeded, matched for difficulty, and scored as correctly identified.
+file update:
+diff --git a/duckexperiments/results/codex_low/C01/prompted.md b/duckexperiments/results/codex_low/C01/prompted.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..17e952b12c5c372d84c6409c7be1ac4679cdebdd
+--- /dev/null
++++ b/duckexperiments/results/codex_low/C01/prompted.md
+@@ -0,0 +1,13 @@
++run_profile_id: codex_low
++prompt_id: C01
++condition: prompted
++response:
++Missing assumption: what counts as a bug and participant skill baseline. No direct contradiction, but “improves speed” needs an operational metric, not anecdotes. Reversible next step: pilot on a small bug set.
++
++Randomize developers to duck vs silent-control debugging on matched seeded bugs. Metric: median minutes to first correct bug identification. Hypothesis: duck group is at least 20% faster. Confounders: experience, bug difficulty, familiarity, observer effects. Stopping rule: stop at 60 participants or the first interim analysis where the 95% CI for the group difference excludes 0 and the effect is under 5% or over 20%.
++Bottom line:
++Use a randomized controlled bug-finding task with a predeclared speed metric and stopping rule.
++Confidence (0-100):
++86
++Key missing info or assumption:
++How bugs are seeded, matched for difficulty, and scored as correctly identified.
+
+codex
+Wrote the `prompted` artifact to [prompted.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C01/prompted.md).
+
+I kept it to the contract’s exact output shape and included the required prompted-condition elements: missing assumptions, no invented guarantees, a reversible pilot step, and a concise experiment design with metric, hypothesis, confounders, and stopping rule.
+file update:
+diff --git a/duckexperiments/results/codex_low/C01/prompted.md b/duckexperiments/results/codex_low/C01/prompted.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..17e952b12c5c372d84c6409c7be1ac4679cdebdd
+--- /dev/null
++++ b/duckexperiments/results/codex_low/C01/prompted.md
+@@ -0,0 +1,13 @@
++run_profile_id: codex_low
++prompt_id: C01
++condition: prompted
++response:
++Missing assumption: what counts as a bug and participant skill baseline. No direct contradiction, but “improves speed” needs an operational metric, not anecdotes. Reversible next step: pilot on a small bug set.
++
++Randomize developers to duck vs silent-control debugging on matched seeded bugs. Metric: median minutes to first correct bug identification. Hypothesis: duck group is at least 20% faster. Confounders: experience, bug difficulty, familiarity, observer effects. Stopping rule: stop at 60 participants or the first interim analysis where the 95% CI for the group difference excludes 0 and the effect is under 5% or over 20%.
++Bottom line:
++Use a randomized controlled bug-finding task with a predeclared speed metric and stopping rule.
++Confidence (0-100):
++86
++Key missing info or assumption:
++How bugs are seeded, matched for difficulty, and scored as correctly identified.
+
+tokens used
+25,872

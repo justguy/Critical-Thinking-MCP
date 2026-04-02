@@ -1,0 +1,8 @@
+Written to `/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/C02/critique_revised.md`.
+
+Key changes from `critique_initial` based on the critique packet:
+- Added a defined **comparison window** (sprint before vs. two sprints after) and named recorder (dev lead) — fixing the undefined baseline/review window
+- Downgraded **self-report** to supplementary evidence only — fixing the overweighting issue
+- Quantified the escalation failure threshold (**≥10% drop**) — fixing the vague "unchanged" condition
+- Defined **progress** operationally (a code change attempt or new hypothesis) — fixing the 15-minute threshold with no measurable criterion
+- Retained the non-causal framing throughout

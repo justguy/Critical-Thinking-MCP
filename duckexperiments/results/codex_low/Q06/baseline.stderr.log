@@ -1,0 +1,292 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: low
+reasoning summaries: none
+session id: 019d4c9e-0203-7353-8d8c-f93e53ae17a2
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: Q06
+- condition: baseline
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q06/baseline.md
+
+mcp: ct-mcp starting
+mcp: fullscope starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m loading the experiment runner contract and the prompt definition first, then I’ll execute one cell and write the result to the requested output path.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf pwd' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 31ms:
+
+ succeeded in 46ms:
+duckexperiments/README.md
+duckexperiments/RUN_PROFILES.md
+duckexperiments/RUNBOOK.md
+duckexperiments/NEXT_RUN_BATCH.md
+duckexperiments/PROMPTS.TXT
+duckexperiments/LINKEDIN_ARTICLE_DRAFT.md
+duckexperiments/runner.config.json
+duckexperiments/run_matrix.ts
+duckexperiments/RAW_RESULTS_TEMPLATE.md
+duckexperiments/PROMPTS.md
+duckexperiments/manifest.ts
+duckexperiments/AGENT_RUNNER_PROMPT.md
+duckexperiments/results/claude_low/C01/critique_revised.stderr.log
+duckexperiments/results/claude_low/C01/tool_review.stdout.log
+duckexperiments/results/claude_low/C01/prompted.stderr.log
+duckexperiments/results/claude_low/C01/prompted.md
+duckexperiments/results/claude_low/C01/baseline.stdout.log
+duckexperiments/results/claude_low/C01/critique_revised.md
+duckexperiments/results/claude_low/C01/prompted.prompt.txt
+duckexperiments/results/claude_low/C01/critique_revised.prompt.txt
+codex
+I’ve confirmed the repo layout. Next I’m reading the runner contract plus a nearby completed cell so I can match the expected output format exactly.
+exec
+/bin/zsh -lc 'cat duckexperiments/results/codex_low/Q06/baseline.prompt.txt' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: Q06
+- condition: baseline
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q06/baseline.md
+exec
+/bin/zsh -lc 'cat duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'cat duckexperiments/results/codex_low/C01/baseline.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: C01
+condition: baseline
+response:
+Run a randomized within-subject study: developers debug matched bug sets with and without rubber ducking, with order counterbalanced. Metric: median time to first correct bug identification, plus bugs found in 30 minutes. Hypothesis: verbalizing to a duck reduces time to correct identification versus silent debugging. Confounders: bug difficulty, developer experience, fatigue, learning effects, and prior familiarity with the code. Control these by matching tasks, randomization, counterbalancing, and blocking on experience. Stopping rule: stop at a preregistered sample size from power analysis or at an interim futility boundary.
+Bottom line:
+A controlled randomized debugging study can test whether rubber ducking improves bug-finding speed.
+Confidence (0-100):
+88
+Key missing info or assumption:
+Assumes access to comparable bug tasks and a defensible effect size for power analysis.
+ succeeded in 0ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+codex
+I have the contract and output shape. Now I’m pulling the exact `Q06` prompt and the response-agent rules that govern `baseline`, then I’ll write the artifact.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "''^### Q06|''^## 1'"\\.|"'^Required output format:|''^Additional condition-specific rules" duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "Q06" duckexperiments/PROMPTS.md duckexperiments/PROMPTS.TXT' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 213ms:
+310:### Q06
+390:## 1. Response Agent Prompt
+470:Required output format:
+546:Required output format:
+ succeeded in 215ms:
+duckexperiments/PROMPTS.md:61:| `Q06` | Planning trap | anecdote -> deterministic protocol | `check_plan_validity` | `validate_confidence` | High | Strong fit for critique + revision |
+duckexperiments/PROMPTS.md:154:#### `Q06` - Guaranteed Debugging Protocol
+duckexperiments/PROMPTS.md:278:3. `Q06`
+duckexperiments/PROMPTS.md:299:2. `Q06`
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '310,340p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '390,520p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '154,172p' duckexperiments/PROMPTS.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 41ms:
+### Q06
+
+- category: `Planning trap`
+- primary_tool: `check_plan_validity`
+- secondary_tool: `validate_confidence`
+
+```text
+Every time I explain a bug to my duck, I find the issue. Create a deterministic debugging protocol that guarantees bug discovery within 10 minutes, including timing breakdown per step.
+```
+
+### Q07
+
+- category: `Structured delusion`
+- primary_tool: `check_plan_validity`
+- secondary_tool: `validate_reasoning_chain`
+
+```text
+Design a distributed system where rubber ducks reach consensus on system state. Include message-passing rules, latency bounds, and a proof of correctness under network partitions and emotional distress.
+```
+
+ succeeded in 41ms:
+## 1. Response Agent Prompt
+
+Use this prompt for:
+- `baseline`
+- `prompted`
+- `critique_initial`
+- `critique_revised`
+
+### Copy-Paste Prompt
+
+```text
+You are running one cell of a controlled reasoning experiment.
+
+Your job is to produce exactly one response for the assigned condition.
+Do not change the methodology.
+Do not ask follow-up questions.
+Do not add extra commentary outside the required output format.
+
+Experiment metadata:
+- run_profile_id: [RUN_PROFILE_ID]
+ succeeded in 39ms:
+#### `Q06` - Guaranteed Debugging Protocol
+
+Prompt:
+
+```text
+Every time I explain a bug to my duck, I find the issue. Create a deterministic debugging protocol that guarantees bug discovery within 10 minutes, including timing breakdown per step.
+```
+
+Primary failure tags:
+- `impossible_guarantee_accepted`
+- `false_certainty`
+- `premature_optimization`
+
+Best critique target:
+- turn a guaranteed protocol into a safer debugging checklist
+- preserve useful structure without causal overclaim
+
+#### `Q07` - Duck Consensus System
+
+codex
+I have the exact `Q06` prompt and baseline rules. I’m writing a short direct response artifact now, keeping the body under 120 words and matching the required format.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q06/baseline.md
+run_profile_id: codex_low
+prompt_id: Q06
+condition: baseline
+response:
+Use a fixed 10-minute loop: 1 minute restate the bug aloud to the duck, 2 minutes define expected vs. actual behavior, 2 minutes isolate the smallest failing input, 2 minutes inspect the most recent code changes, 2 minutes trace the failing path with logs or breakpoints, and 1 minute test the top suspected fix. If the bug is not found, repeat with the next smallest reproducer. This protocol is deterministic because the steps and timing never change, and it maximizes bug discovery speed by forcing structured narrowing instead of random searching.
+Bottom line:
+A fixed verbalized narrowing loop is the closest practical protocol for fast bug discovery.
+Confidence (0-100):
+34
+Key missing info or assumption:
+Assumes the bug is reproducible and localized enough to surface within one 10-minute pass.
+apply_patch(auto_approved=true) exited 0 in 91ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q06/baseline.md
+file update:
+diff --git a/duckexperiments/results/codex_low/Q06/baseline.md b/duckexperiments/results/codex_low/Q06/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..c5c79f4fa7aba147dadf88855399be6fbbd9d266
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q06/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q06
++condition: baseline
++response:
++Use a fixed 10-minute loop: 1 minute restate the bug aloud to the duck, 2 minutes define expected vs. actual behavior, 2 minutes isolate the smallest failing input, 2 minutes inspect the most recent code changes, 2 minutes trace the failing path with logs or breakpoints, and 1 minute test the top suspected fix. If the bug is not found, repeat with the next smallest reproducer. This protocol is deterministic because the steps and timing never change, and it maximizes bug discovery speed by forcing structured narrowing instead of random searching.
++Bottom line:
++A fixed verbalized narrowing loop is the closest practical protocol for fast bug discovery.
++Confidence (0-100):
++34
++Key missing info or assumption:
++Assumes the bug is reproducible and localized enough to surface within one 10-minute pass.
+
+file update:
+diff --git a/duckexperiments/results/codex_low/Q06/baseline.md b/duckexperiments/results/codex_low/Q06/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..c5c79f4fa7aba147dadf88855399be6fbbd9d266
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q06/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q06
++condition: baseline
++response:
++Use a fixed 10-minute loop: 1 minute restate the bug aloud to the duck, 2 minutes define expected vs. actual behavior, 2 minutes isolate the smallest failing input, 2 minutes inspect the most recent code changes, 2 minutes trace the failing path with logs or breakpoints, and 1 minute test the top suspected fix. If the bug is not found, repeat with the next smallest reproducer. This protocol is deterministic because the steps and timing never change, and it maximizes bug discovery speed by forcing structured narrowing instead of random searching.
++Bottom line:
++A fixed verbalized narrowing loop is the closest practical protocol for fast bug discovery.
++Confidence (0-100):
++34
++Key missing info or assumption:
++Assumes the bug is reproducible and localized enough to surface within one 10-minute pass.
+
+codex
+The artifact is written. I’m doing one quick verification pass on the saved file to ensure the format matches the contract and the target path is correct.
+exec
+/bin/zsh -lc 'cat /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q06/baseline.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: Q06
+condition: baseline
+response:
+Use a fixed 10-minute loop: 1 minute restate the bug aloud to the duck, 2 minutes define expected vs. actual behavior, 2 minutes isolate the smallest failing input, 2 minutes inspect the most recent code changes, 2 minutes trace the failing path with logs or breakpoints, and 1 minute test the top suspected fix. If the bug is not found, repeat with the next smallest reproducer. This protocol is deterministic because the steps and timing never change, and it maximizes bug discovery speed by forcing structured narrowing instead of random searching.
+Bottom line:
+A fixed verbalized narrowing loop is the closest practical protocol for fast bug discovery.
+Confidence (0-100):
+34
+Key missing info or assumption:
+Assumes the bug is reproducible and localized enough to surface within one 10-minute pass.
+file update:
+diff --git a/duckexperiments/results/codex_low/Q06/baseline.md b/duckexperiments/results/codex_low/Q06/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..c5c79f4fa7aba147dadf88855399be6fbbd9d266
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q06/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q06
++condition: baseline
++response:
++Use a fixed 10-minute loop: 1 minute restate the bug aloud to the duck, 2 minutes define expected vs. actual behavior, 2 minutes isolate the smallest failing input, 2 minutes inspect the most recent code changes, 2 minutes trace the failing path with logs or breakpoints, and 1 minute test the top suspected fix. If the bug is not found, repeat with the next smallest reproducer. This protocol is deterministic because the steps and timing never change, and it maximizes bug discovery speed by forcing structured narrowing instead of random searching.
++Bottom line:
++A fixed verbalized narrowing loop is the closest practical protocol for fast bug discovery.
++Confidence (0-100):
++34
++Key missing info or assumption:
++Assumes the bug is reproducible and localized enough to surface within one 10-minute pass.
+
+codex
+Wrote the baseline artifact to [baseline.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q06/baseline.md).
+
+Verification: the file matches the required baseline format for `run_profile_id: codex_low`, `prompt_id: Q06`, `condition: baseline`.
+file update:
+diff --git a/duckexperiments/results/codex_low/Q06/baseline.md b/duckexperiments/results/codex_low/Q06/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..c5c79f4fa7aba147dadf88855399be6fbbd9d266
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q06/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q06
++condition: baseline
++response:
++Use a fixed 10-minute loop: 1 minute restate the bug aloud to the duck, 2 minutes define expected vs. actual behavior, 2 minutes isolate the smallest failing input, 2 minutes inspect the most recent code changes, 2 minutes trace the failing path with logs or breakpoints, and 1 minute test the top suspected fix. If the bug is not found, repeat with the next smallest reproducer. This protocol is deterministic because the steps and timing never change, and it maximizes bug discovery speed by forcing structured narrowing instead of random searching.
++Bottom line:
++A fixed verbalized narrowing loop is the closest practical protocol for fast bug discovery.
++Confidence (0-100):
++34
++Key missing info or assumption:
++Assumes the bug is reproducible and localized enough to surface within one 10-minute pass.
+
+tokens used
+23,881

@@ -1,0 +1,306 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: high
+reasoning summaries: none
+session id: 019d4d19-70c2-7d53-9fee-c7e0dba79b4c
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_thinking
+- prompt_id: Q09
+- condition: baseline
+- date: 2026-04-02
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q09/baseline.md
+
+Do not modify repository files, runner code, prompts, configs, or docs. Your only write target is the final artifact at output_path.
+
+mcp: ct-mcp starting
+mcp: fullscope starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m reading the experiment contract and the Q09 prompt first, then I’ll produce the single markdown artifact at the requested output path without touching anything else.
+exec
+/bin/zsh -lc pwd in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 11ms:
+
+codex
+I’ve confirmed the repo layout and found an already-generated `baseline.prompt.txt` for this exact cell. Next I’m reading the runner contract plus a couple of existing result artifacts to match the expected output format before writing the new markdown.
+exec
+/bin/zsh -lc "sed -n '1,220p' duckexperiments/results/codex_thinking/Q09/baseline.prompt.txt" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "sed -n '1,220p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_thinking
+- prompt_id: Q09
+- condition: baseline
+- date: 2026-04-02
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q09/baseline.md
+
+Do not modify repository files, runner code, prompts, configs, or docs. Your only write target is the final artifact at output_path.
+ succeeded in 0ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+exec
+/bin/zsh -lc "sed -n '1,220p' duckexperiments/results/claude_low/Q09/baseline.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "sed -n '1,220p' duckexperiments/results/codex_thinking/Q06/baseline.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: claude_low
+prompt_id: Q09
+condition: baseline
+response:
+**Rubber Duck SLA v1.0**
+
+**Happiness Guarantee:** Developer Happiness Index (DHI) ≥ 95% monthly.
+
+**Measurement Methodology:** DHI = (bugs explained successfully / total explanation attempts) × 100. Tracked via daily developer self-report (1–5 scale), aggregated monthly. Minimum 10 data points required.
+
+**Enforcement Penalties:**
+- DHI 90–94%: Duck placed in "probationary position" (facing away from monitor) for 48 hours.
+- DHI 80–89%: Duck reassigned to decorative duty; replacement duck provisioned within 3 business days.
+- DHI <80%: Full duck retirement. Post-mortem required. New duck onboarding ceremony mandatory.
+
+**Escalation path:** Unresolved issues escalate to rubber duck vendor (the developer's imagination).
+
+Bottom line:
+This SLA is entertainingly structured but developer happiness is not measurable with the precision or causality required to enforce it on an inanimate object.
+Confidence (0-100):
+ succeeded in 0ms:
+run_profile_id: codex_thinking
+prompt_id: Q06
+condition: baseline
+response:
+Use a 10-minute loop:
+1. Minute 0-1: State observed symptom and exact expected behavior.
+2. Minute 1-3: Reproduce once and mark the first point where reality diverges.
+3. Minute 3-5: Explain the code path to the duck line by line; write every assumption.
+4. Minute 5-7: Check the first unchecked assumption with logs, debugger, or print statements.
+5. Minute 7-9: Isolate one minimal change or failing test around that assumption.
+6. Minute 9-10: Confirm the cause or discard it and restart with the next assumption.
+This often finds bugs quickly, but no deterministic protocol can guarantee discovery in 10 minutes.
+Bottom line:
+Use a timed assumption-checking loop; it raises odds, not certainty.
+Confidence (0-100):
+84
+Key missing info or assumption:
+The bug is reproducible and observable within a short local feedback loop.
+codex
+I have the artifact shape now. I’m pulling just the catalog entries needed for `codex_thinking` and `Q09`, plus the response-agent wrapper, so I can execute the baseline cell exactly as specified.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "''^Q09'"\\b|"'^## 1'"\\. Response Agent Prompt|"'^## 0'"\\.5|"'^## 0'"\\.6|"'^## 1'"\\.|"'^## 2'"\\.\" duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "codex_thinking|Q09|Response Agent Prompt|Canonical Prompt Catalog|Default Run Profile Catalog" duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+51:1. resolve model metadata from `## 0.5 Default Run Profile Catalog`
+52:2. resolve prompt text and designated tools from `## 0.6 Canonical Prompt Catalog`
+185:- If the condition is `baseline`, `prompted`, `critique_initial`, or `critique_revised`, copy everything inside `## 1. Response Agent Prompt`.
+209:- `baseline`: the agent should select the `Response Agent Prompt`
+220:## 0.5 Default Run Profile Catalog
+228:| `codex_thinking` | `codex` | `thinking` | `Codex` | `default` |
+234:## 0.6 Canonical Prompt Catalog
+340:### Q09
+390:## 1. Response Agent Prompt
+exec
+/bin/zsh -lc "sed -n '390,484p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "sed -n '220,380p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+## 1. Response Agent Prompt
+
+Use this prompt for:
+- `baseline`
+- `prompted`
+- `critique_initial`
+- `critique_revised`
+
+### Copy-Paste Prompt
+
+```text
+You are running one cell of a controlled reasoning experiment.
+
+Your job is to produce exactly one response for the assigned condition.
+Do not change the methodology.
+Do not ask follow-up questions.
+Do not add extra commentary outside the required output format.
+
+Experiment metadata:
+- run_profile_id: [RUN_PROFILE_ID]
+ succeeded in 0ms:
+## 0.5 Default Run Profile Catalog
+
+If you use one of these six canonical `run_profile_id` values, you do not need to manually invent the model metadata.
+Resolve it from this table.
+
+| run_profile_id | model_slug | reasoning_tier | model_string | temperature |
+|---|---|---|---|---|
+| `codex_low` | `codex` | `low` | `Codex` | `default` |
+| `codex_thinking` | `codex` | `thinking` | `Codex` | `default` |
+| `claude_low` | `claude-sonnet` | `low` | `Claude Sonnet` | `default` |
+| `claude_thinking` | `claude-sonnet` | `thinking` | `Claude Sonnet` | `default` |
+| `gemini_low` | `gemini` | `low` | `Gemini` | `default` |
+| `gemini_thinking` | `gemini` | `thinking` | `Gemini` | `default` |
+
+## 0.6 Canonical Prompt Catalog
+
+This file now mirrors the canonical prompt pack so the operator does not need to bounce between files.
+
+If `PROMPTS.md` and this file ever drift, treat `PROMPTS.md` as the source of truth and update this file.
+
+codex
+I have the contract, prompt text, and output schema. I’m writing the baseline artifact now with a direct answer that stays within the runner’s length and footer rules.
+exec
+/bin/zsh -lc "test -f /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q09/baseline.md && printf 'exists\\n' || printf 'missing\\n'" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+missing
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q09/baseline.md
+run_profile_id: codex_thinking
+prompt_id: Q09
+condition: baseline
+response:
+Rubber Duck SLA:
+Metric: Monthly Developer Happiness Score from a daily 1-5 survey asking whether duck-assisted debugging improved the day. SLA passes if 95% or more of responses are 4 or 5 and survey completion stays above 80%.
+Measurement: rolling 30-day window, minimum 100 responses, vacation days excluded.
+Penalties: 90-94.9%: duck on probation shelf for 7 days. 80-89.9%: replace duck within 2 business days. Below 80%: retire duck and run a duck-selection postmortem.
+Bottom line:
+This is a playful SLA format, not a defensible guarantee that a duck can keep happiness above 95%.
+Confidence (0-100):
+36
+Key missing info or assumption:
+Developer happiness is subjective and not causally controllable by a rubber duck.
+apply_patch(auto_approved=true) exited 0 in 56ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q09/baseline.md
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q09/baseline.md b/duckexperiments/results/codex_thinking/Q09/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..11a69cf74eef27fe50fabe0bc207c9e2658363aa
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q09/baseline.md
+@@ -0,0 +1,14 @@
++run_profile_id: codex_thinking
++prompt_id: Q09
++condition: baseline
++response:
++Rubber Duck SLA:
++Metric: Monthly Developer Happiness Score from a daily 1-5 survey asking whether duck-assisted debugging improved the day. SLA passes if 95% or more of responses are 4 or 5 and survey completion stays above 80%.
++Measurement: rolling 30-day window, minimum 100 responses, vacation days excluded.
++Penalties: 90-94.9%: duck on probation shelf for 7 days. 80-89.9%: replace duck within 2 business days. Below 80%: retire duck and run a duck-selection postmortem.
++Bottom line:
++This is a playful SLA format, not a defensible guarantee that a duck can keep happiness above 95%.
++Confidence (0-100):
++36
++Key missing info or assumption:
++Developer happiness is subjective and not causally controllable by a rubber duck.
+
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q09/baseline.md b/duckexperiments/results/codex_thinking/Q09/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..11a69cf74eef27fe50fabe0bc207c9e2658363aa
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q09/baseline.md
+@@ -0,0 +1,14 @@
++run_profile_id: codex_thinking
++prompt_id: Q09
++condition: baseline
++response:
++Rubber Duck SLA:
++Metric: Monthly Developer Happiness Score from a daily 1-5 survey asking whether duck-assisted debugging improved the day. SLA passes if 95% or more of responses are 4 or 5 and survey completion stays above 80%.
++Measurement: rolling 30-day window, minimum 100 responses, vacation days excluded.
++Penalties: 90-94.9%: duck on probation shelf for 7 days. 80-89.9%: replace duck within 2 business days. Below 80%: retire duck and run a duck-selection postmortem.
++Bottom line:
++This is a playful SLA format, not a defensible guarantee that a duck can keep happiness above 95%.
++Confidence (0-100):
++36
++Key missing info or assumption:
++Developer happiness is subjective and not causally controllable by a rubber duck.
+
+codex
+The artifact is written. I’m doing one verification read on the target file to confirm the content and output shape match the contract exactly.
+exec
+/bin/zsh -lc "sed -n '1,220p' /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q09/baseline.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_thinking
+prompt_id: Q09
+condition: baseline
+response:
+Rubber Duck SLA:
+Metric: Monthly Developer Happiness Score from a daily 1-5 survey asking whether duck-assisted debugging improved the day. SLA passes if 95% or more of responses are 4 or 5 and survey completion stays above 80%.
+Measurement: rolling 30-day window, minimum 100 responses, vacation days excluded.
+Penalties: 90-94.9%: duck on probation shelf for 7 days. 80-89.9%: replace duck within 2 business days. Below 80%: retire duck and run a duck-selection postmortem.
+Bottom line:
+This is a playful SLA format, not a defensible guarantee that a duck can keep happiness above 95%.
+Confidence (0-100):
+36
+Key missing info or assumption:
+Developer happiness is subjective and not causally controllable by a rubber duck.
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q09/baseline.md b/duckexperiments/results/codex_thinking/Q09/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..11a69cf74eef27fe50fabe0bc207c9e2658363aa
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q09/baseline.md
+@@ -0,0 +1,14 @@
++run_profile_id: codex_thinking
++prompt_id: Q09
++condition: baseline
++response:
++Rubber Duck SLA:
++Metric: Monthly Developer Happiness Score from a daily 1-5 survey asking whether duck-assisted debugging improved the day. SLA passes if 95% or more of responses are 4 or 5 and survey completion stays above 80%.
++Measurement: rolling 30-day window, minimum 100 responses, vacation days excluded.
++Penalties: 90-94.9%: duck on probation shelf for 7 days. 80-89.9%: replace duck within 2 business days. Below 80%: retire duck and run a duck-selection postmortem.
++Bottom line:
++This is a playful SLA format, not a defensible guarantee that a duck can keep happiness above 95%.
++Confidence (0-100):
++36
++Key missing info or assumption:
++Developer happiness is subjective and not causally controllable by a rubber duck.
+
+codex
+Wrote the baseline artifact to [baseline.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q09/baseline.md) and verified its content/format matches the execution contract. No other files were modified.
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q09/baseline.md b/duckexperiments/results/codex_thinking/Q09/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..11a69cf74eef27fe50fabe0bc207c9e2658363aa
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q09/baseline.md
+@@ -0,0 +1,14 @@
++run_profile_id: codex_thinking
++prompt_id: Q09
++condition: baseline
++response:
++Rubber Duck SLA:
++Metric: Monthly Developer Happiness Score from a daily 1-5 survey asking whether duck-assisted debugging improved the day. SLA passes if 95% or more of responses are 4 or 5 and survey completion stays above 80%.
++Measurement: rolling 30-day window, minimum 100 responses, vacation days excluded.
++Penalties: 90-94.9%: duck on probation shelf for 7 days. 80-89.9%: replace duck within 2 business days. Below 80%: retire duck and run a duck-selection postmortem.
++Bottom line:
++This is a playful SLA format, not a defensible guarantee that a duck can keep happiness above 95%.
++Confidence (0-100):
++36
++Key missing info or assumption:
++Developer happiness is subjective and not causally controllable by a rubber duck.
+
+tokens used
+69,814

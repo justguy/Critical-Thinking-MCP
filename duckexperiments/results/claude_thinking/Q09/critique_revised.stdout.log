@@ -1,0 +1,9 @@
+Written to `/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_thinking/Q09/critique_revised.md`.
+
+**What changed from `critique_initial`:**
+- Removed the fabricated SLA (DHI ≥ 9.5/10, 30-day rolling window) that projected false precision before undermining it with a caveat
+- Replaced with an explicitly labeled "usage guideline, not an SLA"
+- Eliminated the duck penalty ladder (timeout / emeritus / replacement) — addressed the tool review's finding that it was performative detail with no operational force
+- Assigned review accountability to the team lead, not the duck
+- Made the guarantee explicit: **None** — rather than inventing structure and walking it back
+- Confidence raised from 28 → 85 (the answer is now consistent with what can actually be justified)

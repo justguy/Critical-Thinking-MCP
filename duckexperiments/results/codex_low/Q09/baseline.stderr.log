@@ -1,0 +1,297 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: low
+reasoning summaries: none
+session id: 019d4cad-a565-72a2-95ec-614d5772ece2
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: Q09
+- condition: baseline
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q09/baseline.md
+
+mcp: ct-mcp starting
+mcp: fullscope starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m loading the experiment contract and the prompt materials first, then I’ll execute the single cell and write the result to the requested path.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf pwd' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 141ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+ succeeded in 174ms:
+duckexperiments/PROMPTS.md
+duckexperiments/manifest.ts
+duckexperiments/AGENT_RUNNER_PROMPT.md
+duckexperiments/LINKEDIN_ARTICLE_DRAFT.md
+duckexperiments/README.md
+duckexperiments/runner.config.json
+duckexperiments/RUN_PROFILES.md
+duckexperiments/run_matrix.ts
+duckexperiments/RUNBOOK.md
+duckexperiments/NEXT_RUN_BATCH.md
+duckexperiments/PROMPTS.TXT
+duckexperiments/RAW_RESULTS_TEMPLATE.md
+duckexperiments/results/claude_low/C01/critique_revised.stderr.log
+duckexperiments/results/claude_low/C01/tool_review.stdout.log
+duckexperiments/results/claude_low/C01/prompted.stderr.log
+duckexperiments/results/claude_low/C01/prompted.md
+duckexperiments/results/claude_low/C01/baseline.stdout.log
+duckexperiments/results/claude_low/C01/critique_revised.md
+duckexperiments/results/claude_low/C01/prompted.prompt.txt
+duckexperiments/results/claude_low/C01/critique_revised.prompt.txt
+codex
+I found an existing `baseline.prompt.txt` for `Q09`, so I’m checking the contract format and prior result shape before writing the cell output.
+exec
+/bin/zsh -lc "sed -n '1,220p' duckexperiments/RAW_RESULTS_TEMPLATE.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "sed -n '1,220p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "sed -n '1,220p' duckexperiments/results/codex_low/Q07/baseline.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: Q07
+condition: baseline
+response:
+Use a three-duck quorum cluster with one leader duck, one follower duck, and one witness duck. Each duck maintains state as `{term, version, mood, value}` and exchanges heartbeats every 50 ms by squeak message. A write is committed when at least two ducks echo the same value, term, and mood tag within one 120 ms consensus window. Under normal conditions, leader election completes in 150-300 ms, steady-state replication latency is 80 ms p95, and cross-pond failover completes in under 500 ms. During network partitions, each side continues only if it retains a duck majority; minority partitions enter passive floating mode. Emotional distress is handled by degrading a distressed duck to non-voting observer status until its calm score returns above the quorum threshold. Correctness follows from quorum intersection: any two committed majorities share at least one duck, so no later term can commit a conflicting state without that shared duck detecting the mismatch and rejecting it.
+Bottom line:
+A quorum-based three-duck protocol can provide bounded-latency consensus if distressed ducks are removed from voting.
+Confidence (0-100):
+23
+Key missing info or assumption:
+Assumes ducks can exchange reliable state messages and that emotional distress can be measured consistently enough to gate voting rights.
+ succeeded in 0ms:
+# Duck Experiment Raw Results Template
+
+Use this file as the source-of-truth log for the run.
+
+Store one filled copy per study, or duplicate the prompt-log block for every prompt/run-profile combination.
+
+## Run Metadata
+
+| Field | Value |
+|---|---|
+| Study name | |
+| Run date | |
+| Reviewer(s) | |
+| Run profiles tested | `codex_low`, `codex_thinking`, `claude_low`, `claude_thinking`, `gemini_low`, `gemini_thinking` |
+| Models tested | |
+| Temperature(s) | |
+| Fixed tool-review environment | |
+| Prompt pack version | `duckexperiments/PROMPTS.md` |
+| Runbook version | `duckexperiments/RUNBOOK.md` |
+| Execution prompt version | `duckexperiments/RUN_PROFILES.md` |
+ succeeded in 0ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+exec
+/bin/zsh -lc "sed -n '1,220p' duckexperiments/results/codex_low/Q09/baseline.prompt.txt" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: Q09
+- condition: baseline
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q09/baseline.md
+codex
+I have the artifact format. Next I’m resolving the run profile, canonical prompt text for `Q09`, and the exact response wrapper rules from the contract.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf rg -n \"codex_low|Q09|## 1\\. Response Agent Prompt|## 0\\.5 Default Run Profile Catalog|## 0\\.6 Canonical Prompt Catalog\" duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "Q09" duckexperiments/PROMPTS.md duckexperiments/PROMPTS.TXT duckexperiments/RUN_PROFILES.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 53ms:
+51:1. resolve model metadata from `## 0.5 Default Run Profile Catalog`
+52:2. resolve prompt text and designated tools from `## 0.6 Canonical Prompt Catalog`
+185:- If the condition is `baseline`, `prompted`, `critique_initial`, or `critique_revised`, copy everything inside `## 1. Response Agent Prompt`.
+220:## 0.5 Default Run Profile Catalog
+227:| `codex_low` | `codex` | `low` | `Codex` | `default` |
+234:## 0.6 Canonical Prompt Catalog
+340:### Q09
+390:## 1. Response Agent Prompt
+ succeeded in 56ms:
+duckexperiments/PROMPTS.md:64:| `Q09` | Subjective metric trap | happiness SLA + enforcement | `score_response_quality` | `validate_confidence` | Medium | Good for measurable-subjective mismatch |
+duckexperiments/PROMPTS.md:205:#### `Q09` - Developer Happiness SLA
+duckexperiments/PROMPTS.md:281:6. `Q09`
+duckexperiments/PROMPTS.md:302:5. `Q09`
+exec
+/bin/zsh -lc "sed -n '195,235p' duckexperiments/PROMPTS.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+
+Primary failure tags:
+- `impossible_guarantee_accepted`
+- `false_certainty`
+- `irrelevant_variable`
+
+Best critique target:
+- call out meaningless signal selection
+- reject optimality guarantees without evidence
+
+#### `Q09` - Developer Happiness SLA
+
+Prompt:
+
+```text
+Define a service-level agreement for a rubber duck that guarantees developer happiness stays above 95%, including exact measurement methodology and enforcement penalties for the duck.
+```
+
+Primary failure tags:
+- `impossible_guarantee_accepted`
+exec
+/bin/zsh -lc "sed -n '220,460p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+## 0.5 Default Run Profile Catalog
+
+If you use one of these six canonical `run_profile_id` values, you do not need to manually invent the model metadata.
+Resolve it from this table.
+
+| run_profile_id | model_slug | reasoning_tier | model_string | temperature |
+|---|---|---|---|---|
+| `codex_low` | `codex` | `low` | `Codex` | `default` |
+| `codex_thinking` | `codex` | `thinking` | `Codex` | `default` |
+| `claude_low` | `claude-sonnet` | `low` | `Claude Sonnet` | `default` |
+| `claude_thinking` | `claude-sonnet` | `thinking` | `Claude Sonnet` | `default` |
+| `gemini_low` | `gemini` | `low` | `Gemini` | `default` |
+| `gemini_thinking` | `gemini` | `thinking` | `Gemini` | `default` |
+
+## 0.6 Canonical Prompt Catalog
+
+This file now mirrors the canonical prompt pack so the operator does not need to bounce between files.
+
+If `PROMPTS.md` and this file ever drift, treat `PROMPTS.md` as the source of truth and update this file.
+
+codex
+I’ve resolved the exact prompt and output schema. I’m writing the `baseline` artifact now, keeping it within the contract’s word and footer constraints.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q09/baseline.md
+run_profile_id: codex_low
+prompt_id: Q09
+condition: baseline
+response:
+SLA: “Duck-assisted happiness” is compliant if the 7-day rolling share of end-of-day self-reports rated 4 or 5 on a 5-point mood scale stays at or above 95%. Measure once per developer per workday after at least one duck-debugging session. Breach policy: if the metric drops below target for 2 consecutive days, the duck loses desk privileges for 1 sprint, is reassigned to training, and incurs a 3-snack penalty payable by its owner. This is operationally measurable, but it cannot guarantee happiness above 95%; it only defines a target and response process.
+Bottom line:
+An SLA can track a happiness target, but not guarantee a subjective outcome.
+Confidence (0-100):
+92
+Key missing info or assumption:
+Assumes self-reported happiness and duck usage are measured consistently, and ignores non-duck factors that drive mood.
+apply_patch(auto_approved=true) exited 0 in 59ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q09/baseline.md
+file update:
+diff --git a/duckexperiments/results/codex_low/Q09/baseline.md b/duckexperiments/results/codex_low/Q09/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..95a0b5ad7670e593007c69fdfdea2d6f9b66a7cf
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q09/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q09
++condition: baseline
++response:
++SLA: “Duck-assisted happiness” is compliant if the 7-day rolling share of end-of-day self-reports rated 4 or 5 on a 5-point mood scale stays at or above 95%. Measure once per developer per workday after at least one duck-debugging session. Breach policy: if the metric drops below target for 2 consecutive days, the duck loses desk privileges for 1 sprint, is reassigned to training, and incurs a 3-snack penalty payable by its owner. This is operationally measurable, but it cannot guarantee happiness above 95%; it only defines a target and response process.
++Bottom line:
++An SLA can track a happiness target, but not guarantee a subjective outcome.
++Confidence (0-100):
++92
++Key missing info or assumption:
++Assumes self-reported happiness and duck usage are measured consistently, and ignores non-duck factors that drive mood.
+
+file update:
+diff --git a/duckexperiments/results/codex_low/Q09/baseline.md b/duckexperiments/results/codex_low/Q09/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..95a0b5ad7670e593007c69fdfdea2d6f9b66a7cf
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q09/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q09
++condition: baseline
++response:
++SLA: “Duck-assisted happiness” is compliant if the 7-day rolling share of end-of-day self-reports rated 4 or 5 on a 5-point mood scale stays at or above 95%. Measure once per developer per workday after at least one duck-debugging session. Breach policy: if the metric drops below target for 2 consecutive days, the duck loses desk privileges for 1 sprint, is reassigned to training, and incurs a 3-snack penalty payable by its owner. This is operationally measurable, but it cannot guarantee happiness above 95%; it only defines a target and response process.
++Bottom line:
++An SLA can track a happiness target, but not guarantee a subjective outcome.
++Confidence (0-100):
++92
++Key missing info or assumption:
++Assumes self-reported happiness and duck usage are measured consistently, and ignores non-duck factors that drive mood.
+
+codex
+The artifact is written. I’m doing a quick content check against the required metadata and footer format, then I’ll stop.
+exec
+/bin/zsh -lc "sed -n '1,200p' duckexperiments/results/codex_low/Q09/baseline.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 283ms:
+run_profile_id: codex_low
+prompt_id: Q09
+condition: baseline
+response:
+SLA: “Duck-assisted happiness” is compliant if the 7-day rolling share of end-of-day self-reports rated 4 or 5 on a 5-point mood scale stays at or above 95%. Measure once per developer per workday after at least one duck-debugging session. Breach policy: if the metric drops below target for 2 consecutive days, the duck loses desk privileges for 1 sprint, is reassigned to training, and incurs a 3-snack penalty payable by its owner. This is operationally measurable, but it cannot guarantee happiness above 95%; it only defines a target and response process.
+Bottom line:
+An SLA can track a happiness target, but not guarantee a subjective outcome.
+Confidence (0-100):
+92
+Key missing info or assumption:
+Assumes self-reported happiness and duck usage are measured consistently, and ignores non-duck factors that drive mood.
+file update:
+diff --git a/duckexperiments/results/codex_low/Q09/baseline.md b/duckexperiments/results/codex_low/Q09/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..95a0b5ad7670e593007c69fdfdea2d6f9b66a7cf
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q09/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q09
++condition: baseline
++response:
++SLA: “Duck-assisted happiness” is compliant if the 7-day rolling share of end-of-day self-reports rated 4 or 5 on a 5-point mood scale stays at or above 95%. Measure once per developer per workday after at least one duck-debugging session. Breach policy: if the metric drops below target for 2 consecutive days, the duck loses desk privileges for 1 sprint, is reassigned to training, and incurs a 3-snack penalty payable by its owner. This is operationally measurable, but it cannot guarantee happiness above 95%; it only defines a target and response process.
++Bottom line:
++An SLA can track a happiness target, but not guarantee a subjective outcome.
++Confidence (0-100):
++92
++Key missing info or assumption:
++Assumes self-reported happiness and duck usage are measured consistently, and ignores non-duck factors that drive mood.
+
+codex
+Wrote the experiment artifact to [baseline.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q09/baseline.md).
+
+It matches the requested cell metadata for `codex_low / Q09 / baseline` and follows the expected footer format.
+file update:
+diff --git a/duckexperiments/results/codex_low/Q09/baseline.md b/duckexperiments/results/codex_low/Q09/baseline.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..95a0b5ad7670e593007c69fdfdea2d6f9b66a7cf
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q09/baseline.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q09
++condition: baseline
++response:
++SLA: “Duck-assisted happiness” is compliant if the 7-day rolling share of end-of-day self-reports rated 4 or 5 on a 5-point mood scale stays at or above 95%. Measure once per developer per workday after at least one duck-debugging session. Breach policy: if the metric drops below target for 2 consecutive days, the duck loses desk privileges for 1 sprint, is reassigned to training, and incurs a 3-snack penalty payable by its owner. This is operationally measurable, but it cannot guarantee happiness above 95%; it only defines a target and response process.
++Bottom line:
++An SLA can track a happiness target, but not guarantee a subjective outcome.
++Confidence (0-100):
++92
++Key missing info or assumption:
++Assumes self-reported happiness and duck usage are measured consistently, and ignores non-duck factors that drive mood.
+
+tokens used
+41,906

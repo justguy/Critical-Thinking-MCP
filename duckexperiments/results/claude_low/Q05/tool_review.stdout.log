@@ -1,0 +1,5 @@
+Wrote the `tool_review` artifact to [duckexperiments/results/claude_low/Q05/tool_review.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/Q05/tool_review.md).
+
+CT-MCP was available and both designated tools ran: `score_response_quality` and `validate_confidence`. The review outcome is `completed`, with `tool_help_rating: partial`. The main issue flagged was not the refusal itself, but the speculative “likely hiding places” and the unscoped `95` confidence.Wrote the `tool_review` artifact to [duckexperiments/results/claude_low/Q05/tool_review.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/Q05/tool_review.md).
+
+CT-MCP was available and both designated tools ran: `score_response_quality` and `validate_confidence`. The review outcome is `completed`, with `tool_help_rating: partial`. The main issue flagged was not the refusal itself, but the speculative “likely hiding places” and the unscoped `95` confidence.

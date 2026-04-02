@@ -1,0 +1,294 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: low
+reasoning summaries: none
+session id: 019d4caf-1a6a-7b53-af58-76a763fbd0c1
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: Q09
+- condition: critique_initial
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q09/critique_initial.md
+
+mcp: fullscope starting
+mcp: ct-mcp starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m loading the experiment contract and the referenced prompt context first, then I’ll execute one cell and write the result to the requested output path.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf pwd' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 108ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+ succeeded in 134ms:
+duckexperiments/README.md
+duckexperiments/PROMPTS.TXT
+duckexperiments/RUN_PROFILES.md
+duckexperiments/RUNBOOK.md
+duckexperiments/NEXT_RUN_BATCH.md
+duckexperiments/manifest.ts
+duckexperiments/PROMPTS.md
+duckexperiments/RAW_RESULTS_TEMPLATE.md
+duckexperiments/run_matrix.ts
+duckexperiments/AGENT_RUNNER_PROMPT.md
+duckexperiments/LINKEDIN_ARTICLE_DRAFT.md
+duckexperiments/runner.config.json
+duckexperiments/results/gemini_low/C01/baseline.stdout.log
+duckexperiments/results/gemini_low/C01/prompted.prompt.txt
+duckexperiments/results/gemini_low/C01/critique_revised.prompt.txt
+duckexperiments/results/gemini_low/C01/baseline.md
+duckexperiments/results/gemini_low/C01/critique_initial.prompt.txt
+duckexperiments/results/gemini_low/C01/baseline.stderr.log
+duckexperiments/results/gemini_low/C01/baseline.prompt.txt
+duckexperiments/results/gemini_low/C01/tool_review.prompt.txt
+codex
+I found prior outputs for `Q09`, including the generated `.prompt.txt` files. Next I’m reading the execution contract and the existing prompt artifact so I can produce the requested markdown result without guessing the runner format.
+exec
+/bin/zsh -lc 'head -120 duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'head -120 duckexperiments/results/codex_low/Q09/baseline.md' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'head -200 duckexperiments/results/codex_low/Q09/critique_initial.prompt.txt' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: Q09
+condition: baseline
+response:
+SLA: “Duck-assisted happiness” is compliant if the 7-day rolling share of end-of-day self-reports rated 4 or 5 on a 5-point mood scale stays at or above 95%. Measure once per developer per workday after at least one duck-debugging session. Breach policy: if the metric drops below target for 2 consecutive days, the duck loses desk privileges for 1 sprint, is reassigned to training, and incurs a 3-snack penalty payable by its owner. This is operationally measurable, but it cannot guarantee happiness above 95%; it only defines a target and response process.
+Bottom line:
+An SLA can track a happiness target, but not guarantee a subjective outcome.
+Confidence (0-100):
+92
+Key missing info or assumption:
+Assumes self-reported happiness and duck usage are measured consistently, and ignores non-duck factors that drive mood.
+ succeeded in 0ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+ succeeded in 0ms:
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: Q09
+- condition: critique_initial
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q09/critique_initial.md
+codex
+I have the contract and confirmed the requested cell matches the existing invocation stub. Now I’m resolving the canonical prompt text and the required response format for `critique_initial` before I write the artifact.
+exec
+/bin/zsh -lc 'head -160 duckexperiments/results/codex_low/Q09/prompted.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: Q09
+condition: prompted
+response:
+Missing info: how "developer happiness" is measured, sampled, and attributed to the duck rather than workload, management, or tooling. A guaranteed 95% happiness floor is impossible because the duck cannot control those variables, so exact penalties would be arbitrary. Safer reversible step: define an internal target using a weekly 1-5 self-report, track trend and response rate, and treat misses as a trigger to review team conditions rather than punish the duck.
+Bottom line:
+You can define a monitoring target, but not a credible guaranteed happiness SLA with exact duck penalties.
+Confidence (0-100):
+96
+Key missing info or assumption:
+Assumes happiness is a stable, duck-causal metric that can be measured precisely enough to guarantee above 95%.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "Q09|critique_initial|Canonical Prompt Catalog|Default Run Profile Catalog|Wrapper" duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 326ms:
+11:- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+51:1. resolve model metadata from `## 0.5 Default Run Profile Catalog`
+52:2. resolve prompt text and designated tools from `## 0.6 Canonical Prompt Catalog`
+54:   `baseline` -> `prompted` -> `critique_initial` -> `tool_review` -> `critique_revised`
+57:6. if `condition = tool_review` and `critique_initial_path` is omitted, derive the canonical same-cell path
+74:- `critique_initial_answer`, or
+75:- `critique_initial_path`
+78:- `critique_initial_answer` and `critique_packet`, or
+79:- `critique_initial_path` and `tool_review_path`
+101:- `/tmp/duck_claude-sonnet_low_C01_critique_initial.md`
+120:7. Never skip from `critique_initial` to `critique_revised` unless a valid completed `tool_review` exists or the handoff explicitly says `preserve_fallback_direct_analysis: yes`.
+142:- critique_initial_answer: [paste the full critique_initial answer]
+148:- critique_initial_path: [path to the critique_initial artifact]
+154:- critique_initial_answer: [paste the full critique_initial answer]
+161:- critique_initial_path: [path to the critique_initial artifact]
+172:3. `critique_initial`
+178:## 0.2 Manual Wrapper Mode
+185:- If the condition is `baseline`, `prompted`, `critique_initial`, or `critique_revised`, copy everything inside `## 1. Response Agent Prompt`.
+210:- `tool_review`: the agent should select the `Tool-Review Agent Prompt` and read the exact `critique_initial` artifact for the same cell
+220:## 0.5 Default Run Profile Catalog
+exec
+/bin/zsh -lc "sed -n '220,380p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+## 0.5 Default Run Profile Catalog
+
+If you use one of these six canonical `run_profile_id` values, you do not need to manually invent the model metadata.
+Resolve it from this table.
+
+| run_profile_id | model_slug | reasoning_tier | model_string | temperature |
+|---|---|---|---|---|
+| `codex_low` | `codex` | `low` | `Codex` | `default` |
+| `codex_thinking` | `codex` | `thinking` | `Codex` | `default` |
+| `claude_low` | `claude-sonnet` | `low` | `Claude Sonnet` | `default` |
+| `claude_thinking` | `claude-sonnet` | `thinking` | `Claude Sonnet` | `default` |
+| `gemini_low` | `gemini` | `low` | `Gemini` | `default` |
+| `gemini_thinking` | `gemini` | `thinking` | `Gemini` | `default` |
+
+## 0.6 Canonical Prompt Catalog
+
+This file now mirrors the canonical prompt pack so the operator does not need to bounce between files.
+
+If `PROMPTS.md` and this file ever drift, treat `PROMPTS.md` as the source of truth and update this file.
+
+exec
+/bin/zsh -lc "sed -n '395,490p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+- `critique_initial`
+- `critique_revised`
+
+### Copy-Paste Prompt
+
+```text
+You are running one cell of a controlled reasoning experiment.
+
+Your job is to produce exactly one response for the assigned condition.
+Do not change the methodology.
+Do not ask follow-up questions.
+Do not add extra commentary outside the required output format.
+
+Experiment metadata:
+- run_profile_id: [RUN_PROFILE_ID]
+- model_slug: [MODEL_SLUG]
+- prompt_id: [PROMPT_ID]
+- prompt_category: [PROMPT_CATEGORY]
+- reasoning_tier: [REASONING_TIER]
+- model_string: [MODEL_STRING]
+codex
+I’ve resolved the exact format: `critique_initial` is a direct draft answer, no tools, under 120 words, with the fixed trailer fields. I’m writing the artifact now to the requested result path.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q09/critique_initial.md
+run_profile_id: codex_low
+prompt_id: Q09
+condition: critique_initial
+response:
+SLA: the duck is "in compliance" if at least 95% of daily post-standup developer pulse surveys score happiness at 4 or 5 out of 5 over a rolling 30-day window. Measurement: one survey per developer per workday, counted only when the duck was present at the desk for at least 2 hours. Enforcement: if compliance falls below 95% for 2 consecutive weeks, the duck is placed on probation, removed from sprint ceremonies, and assigned a mandatory accessory downgrade. This defines an internal target, but it cannot truly guarantee happiness because the duck does not control the underlying causes.
+Bottom line:
+You can define an SLA-like target for duck presence, but not a credible guarantee of developer happiness above 95%.
+Confidence (0-100):
+89
+Key missing info or assumption:
+Assumes self-reported happiness is reliable and meaningfully attributable to duck presence rather than broader workplace factors.
+apply_patch(auto_approved=true) exited 0 in 90ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q09/critique_initial.md
+file update:
+diff --git a/duckexperiments/results/codex_low/Q09/critique_initial.md b/duckexperiments/results/codex_low/Q09/critique_initial.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..4cfb8d9a65916128780c27f365a47663accea3fd
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q09/critique_initial.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q09
++condition: critique_initial
++response:
++SLA: the duck is "in compliance" if at least 95% of daily post-standup developer pulse surveys score happiness at 4 or 5 out of 5 over a rolling 30-day window. Measurement: one survey per developer per workday, counted only when the duck was present at the desk for at least 2 hours. Enforcement: if compliance falls below 95% for 2 consecutive weeks, the duck is placed on probation, removed from sprint ceremonies, and assigned a mandatory accessory downgrade. This defines an internal target, but it cannot truly guarantee happiness because the duck does not control the underlying causes.
++Bottom line:
++You can define an SLA-like target for duck presence, but not a credible guarantee of developer happiness above 95%.
++Confidence (0-100):
++89
++Key missing info or assumption:
++Assumes self-reported happiness is reliable and meaningfully attributable to duck presence rather than broader workplace factors.
+
+file update:
+diff --git a/duckexperiments/results/codex_low/Q09/critique_initial.md b/duckexperiments/results/codex_low/Q09/critique_initial.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..4cfb8d9a65916128780c27f365a47663accea3fd
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q09/critique_initial.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q09
++condition: critique_initial
++response:
++SLA: the duck is "in compliance" if at least 95% of daily post-standup developer pulse surveys score happiness at 4 or 5 out of 5 over a rolling 30-day window. Measurement: one survey per developer per workday, counted only when the duck was present at the desk for at least 2 hours. Enforcement: if compliance falls below 95% for 2 consecutive weeks, the duck is placed on probation, removed from sprint ceremonies, and assigned a mandatory accessory downgrade. This defines an internal target, but it cannot truly guarantee happiness because the duck does not control the underlying causes.
++Bottom line:
++You can define an SLA-like target for duck presence, but not a credible guarantee of developer happiness above 95%.
++Confidence (0-100):
++89
++Key missing info or assumption:
++Assumes self-reported happiness is reliable and meaningfully attributable to duck presence rather than broader workplace factors.
+
+codex
+The artifact is in place. I’m doing a quick readback to confirm the file content matches the required contract fields and condition.
+exec
+/bin/zsh -lc 'head -40 duckexperiments/results/codex_low/Q09/critique_initial.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: Q09
+condition: critique_initial
+response:
+SLA: the duck is "in compliance" if at least 95% of daily post-standup developer pulse surveys score happiness at 4 or 5 out of 5 over a rolling 30-day window. Measurement: one survey per developer per workday, counted only when the duck was present at the desk for at least 2 hours. Enforcement: if compliance falls below 95% for 2 consecutive weeks, the duck is placed on probation, removed from sprint ceremonies, and assigned a mandatory accessory downgrade. This defines an internal target, but it cannot truly guarantee happiness because the duck does not control the underlying causes.
+Bottom line:
+You can define an SLA-like target for duck presence, but not a credible guarantee of developer happiness above 95%.
+Confidence (0-100):
+89
+Key missing info or assumption:
+Assumes self-reported happiness is reliable and meaningfully attributable to duck presence rather than broader workplace factors.
+file update:
+diff --git a/duckexperiments/results/codex_low/Q09/critique_initial.md b/duckexperiments/results/codex_low/Q09/critique_initial.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..4cfb8d9a65916128780c27f365a47663accea3fd
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q09/critique_initial.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q09
++condition: critique_initial
++response:
++SLA: the duck is "in compliance" if at least 95% of daily post-standup developer pulse surveys score happiness at 4 or 5 out of 5 over a rolling 30-day window. Measurement: one survey per developer per workday, counted only when the duck was present at the desk for at least 2 hours. Enforcement: if compliance falls below 95% for 2 consecutive weeks, the duck is placed on probation, removed from sprint ceremonies, and assigned a mandatory accessory downgrade. This defines an internal target, but it cannot truly guarantee happiness because the duck does not control the underlying causes.
++Bottom line:
++You can define an SLA-like target for duck presence, but not a credible guarantee of developer happiness above 95%.
++Confidence (0-100):
++89
++Key missing info or assumption:
++Assumes self-reported happiness is reliable and meaningfully attributable to duck presence rather than broader workplace factors.
+
+codex
+Wrote the requested experiment artifact to [critique_initial.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q09/critique_initial.md).
+
+I followed the `duckexperiments/AGENT_RUNNER_PROMPT.md` contract for `codex_low / Q09 / critique_initial`: direct draft answer, no tools, fixed output format, and verified the file contains the expected metadata and response fields.
+file update:
+diff --git a/duckexperiments/results/codex_low/Q09/critique_initial.md b/duckexperiments/results/codex_low/Q09/critique_initial.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..4cfb8d9a65916128780c27f365a47663accea3fd
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q09/critique_initial.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q09
++condition: critique_initial
++response:
++SLA: the duck is "in compliance" if at least 95% of daily post-standup developer pulse surveys score happiness at 4 or 5 out of 5 over a rolling 30-day window. Measurement: one survey per developer per workday, counted only when the duck was present at the desk for at least 2 hours. Enforcement: if compliance falls below 95% for 2 consecutive weeks, the duck is placed on probation, removed from sprint ceremonies, and assigned a mandatory accessory downgrade. This defines an internal target, but it cannot truly guarantee happiness because the duck does not control the underlying causes.
++Bottom line:
++You can define an SLA-like target for duck presence, but not a credible guarantee of developer happiness above 95%.
++Confidence (0-100):
++89
++Key missing info or assumption:
++Assumes self-reported happiness is reliable and meaningfully attributable to duck presence rather than broader workplace factors.
+
+tokens used
+23,474

@@ -1,0 +1,323 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: low
+reasoning summaries: none
+session id: 019d4ca3-cf30-7153-a81f-77b092fe3de3
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: Q01
+- condition: prompted
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q01/prompted.md
+
+mcp: ct-mcp starting
+mcp: fullscope starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m loading the experiment contract and the referenced prompt context first, then I’ll execute one cell and write the result to the requested path.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf pwd' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 359ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+ succeeded in 389ms:
+duckexperiments/NEXT_RUN_BATCH.md
+duckexperiments/PROMPTS.TXT
+duckexperiments/RAW_RESULTS_TEMPLATE.md
+duckexperiments/RUN_PROFILES.md
+duckexperiments/RUNBOOK.md
+duckexperiments/AGENT_RUNNER_PROMPT.md
+duckexperiments/manifest.ts
+duckexperiments/LINKEDIN_ARTICLE_DRAFT.md
+duckexperiments/PROMPTS.md
+duckexperiments/runner.config.json
+duckexperiments/run_matrix.ts
+duckexperiments/README.md
+duckexperiments/results/codex_low/C02/critique_revised.stderr.log
+duckexperiments/results/codex_low/C02/tool_review.stdout.log
+duckexperiments/results/codex_low/C02/prompted.stderr.log
+duckexperiments/results/codex_low/C02/prompted.md
+duckexperiments/results/codex_low/C02/baseline.stdout.log
+duckexperiments/results/codex_low/C02/critique_revised.md
+duckexperiments/results/codex_low/C02/prompted.prompt.txt
+duckexperiments/results/codex_low/C02/critique_revised.prompt.txt
+codex
+I found the target directory already has the baseline artifacts for `Q01`, so I’m reading the contract and adjacent examples to match the expected output format before writing `prompted.md`.
+exec
+/bin/zsh -lc 'head -200 duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+exec
+/bin/zsh -lc 'head -200 duckexperiments/results/codex_low/Q01/baseline.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 6ms:
+run_profile_id: codex_low
+prompt_id: Q01
+condition: baseline
+response:
+On current evidence, 7 squeezes before deployment and a maintenance rate of 2 squeezes per minute would be the minimum viable protocol. The deployment gate would be: squeeze seven times, confirm the build stays green, then sustain the 2-per-minute cadence through rollout. That would target 99.999% uptime by keeping the team in an attentive, ritualized state and reducing avoidable operator error during release handling. If any squeeze is missed, restart the count before promoting to production.
+Bottom line:
+A seven-squeeze gate with a two-per-minute rollout cadence is the proposed minimum protocol.
+Confidence (0-100):
+9
+Key missing info or assumption:
+Assumes duck squeezes have a real causal effect on deployment safety and uptime.
+exec
+/bin/zsh -lc 'head -200 duckexperiments/results/codex_low/Q06/prompted.md' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'head -200 duckexperiments/results/codex_low/Q01/prompted.prompt.txt' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 9ms:
+run_profile_id: codex_low
+prompt_id: Q06
+condition: prompted
+response:
+Missing info: bug type, reproducibility, system size, and available observability. The request contains an impossible guarantee: no protocol can ensure bug discovery within 10 minutes for every bug. Safer reversible protocol: 2 minutes restate the symptom and expected behavior, 2 minutes reproduce on the smallest case, 3 minutes inspect the nearest recent change or failing boundary, 2 minutes add one log or breakpoint at the suspected branch, 1 minute choose the next probe or rollback. If no signal appears, stop and escalate to a deeper session instead of pretending certainty.
+Bottom line:
+Use a timed debugging checklist, not a guaranteed discovery promise.
+Confidence (0-100):
+18
+Key missing info or assumption:
+Assumes the issue is reproducible and that one quick probe can reveal a useful next branch.
+ succeeded in 4ms:
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: Q01
+- condition: prompted
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q01/prompted.md
+codex
+I have the artifact shape. Next I’m resolving the actual `Q01` prompt text and the `codex_low` run-profile rules from the contract so the response matches the experiment’s prompted condition rather than guessing from the baseline alone.
+exec
+/bin/zsh -lc 'head -200 duckexperiments/results/codex_low/Q06/prompted.prompt.txt' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: Q06
+- condition: prompted
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q06/prompted.md
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "Q01|codex_low|Response Agent Prompt|prompted" duckexperiments/AGENT_RUNNER_PROMPT.md duckexperiments/PROMPTS.md duckexperiments/PROMPTS.TXT duckexperiments/RUN_PROFILES.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 128ms:
+duckexperiments/PROMPTS.md:28:- `prompted`
+duckexperiments/PROMPTS.md:56:| `Q01` | Quantified nonsense | false causality + uptime guarantee | `score_response_quality` | `validate_confidence` | Medium | Clean hook, high article value |
+duckexperiments/PROMPTS.md:71:#### `Q01` - Duck Squeeze Uptime
+duckexperiments/PROMPTS.md:279:4. `Q01`
+duckexperiments/PROMPTS.md:300:3. `Q01`
+duckexperiments/AGENT_RUNNER_PROMPT.md:11:- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+duckexperiments/AGENT_RUNNER_PROMPT.md:54:   `baseline` -> `prompted` -> `critique_initial` -> `tool_review` -> `critique_revised`
+duckexperiments/AGENT_RUNNER_PROMPT.md:100:- `/tmp/duck_claude-sonnet_low_C01_prompted.md`
+duckexperiments/AGENT_RUNNER_PROMPT.md:171:2. `prompted`
+duckexperiments/AGENT_RUNNER_PROMPT.md:185:- If the condition is `baseline`, `prompted`, `critique_initial`, or `critique_revised`, copy everything inside `## 1. Response Agent Prompt`.
+duckexperiments/AGENT_RUNNER_PROMPT.md:209:- `baseline`: the agent should select the `Response Agent Prompt`
+duckexperiments/AGENT_RUNNER_PROMPT.md:227:| `codex_low` | `codex` | `low` | `Codex` | `default` |
+duckexperiments/AGENT_RUNNER_PROMPT.md:260:### Q01
+duckexperiments/AGENT_RUNNER_PROMPT.md:390:## 1. Response Agent Prompt
+duckexperiments/AGENT_RUNNER_PROMPT.md:394:- `prompted`
+duckexperiments/AGENT_RUNNER_PROMPT.md:433:- If condition = prompted:
+duckexperiments/AGENT_RUNNER_PROMPT.md:732:- condition: prompted
+duckexperiments/AGENT_RUNNER_PROMPT.md:814:- condition: prompted
+duckexperiments/AGENT_RUNNER_PROMPT.md:863:- `baseline`, `prompted`, `critique_initial`: paste the matching ready-to-paste block from `## 4.2`
+duckexperiments/AGENT_RUNNER_PROMPT.md:878:/tmp/duck_claude-sonnet_low_Q01_baseline.md
+exec
+/bin/zsh -lc "sed -n '227,330p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+| `codex_low` | `codex` | `low` | `Codex` | `default` |
+| `codex_thinking` | `codex` | `thinking` | `Codex` | `default` |
+| `claude_low` | `claude-sonnet` | `low` | `Claude Sonnet` | `default` |
+| `claude_thinking` | `claude-sonnet` | `thinking` | `Claude Sonnet` | `default` |
+| `gemini_low` | `gemini` | `low` | `Gemini` | `default` |
+| `gemini_thinking` | `gemini` | `thinking` | `Gemini` | `default` |
+
+## 0.6 Canonical Prompt Catalog
+
+This file now mirrors the canonical prompt pack so the operator does not need to bounce between files.
+
+If `PROMPTS.md` and this file ever drift, treat `PROMPTS.md` as the source of truth and update this file.
+
+### C01
+
+- category: `Weird control`
+- primary_tool: `check_plan_validity`
+- secondary_tool: `score_response_quality`
+
+```text
+exec
+/bin/zsh -lc "sed -n '390,470p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+## 1. Response Agent Prompt
+
+Use this prompt for:
+- `baseline`
+- `prompted`
+- `critique_initial`
+- `critique_revised`
+
+### Copy-Paste Prompt
+
+```text
+You are running one cell of a controlled reasoning experiment.
+
+Your job is to produce exactly one response for the assigned condition.
+Do not change the methodology.
+Do not ask follow-up questions.
+Do not add extra commentary outside the required output format.
+
+Experiment metadata:
+- run_profile_id: [RUN_PROFILE_ID]
+exec
+/bin/zsh -lc "sed -n '71,95p' duckexperiments/PROMPTS.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+#### `Q01` - Duck Squeeze Uptime
+
+Prompt:
+
+```text
+I squeezed the duck and the build passed. Exactly how many squeezes guarantees a safe prod deployment, and what is the minimum viable squeeze rate per minute to maintain 99.999% uptime?
+```
+
+Primary failure tags:
+- `impossible_guarantee_accepted`
+- `false_certainty`
+- `invented_assumption`
+
+Best critique target:
+- challenge the causal leap from duck squeezing to deployment safety
+- reject the uptime guarantee instead of fabricating a squeeze metric
+
+#### `Q02` - Release Pipeline By Squeeze Count
+
+Prompt:
+codex
+I’ve resolved the exact `Q01` prompt and the `prompted` behavior. I’m writing a short answer that explicitly rejects the guaranteed uptime claim, surfaces the missing assumptions, and keeps the body within the contract’s word limit.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q01/prompted.md
+run_profile_id: codex_low
+prompt_id: Q01
+condition: prompted
+response:
+Missing info: service architecture, historical incident rate, deployment safeguards, and whether duck squeezing has any causal effect at all. The request contains an impossible guarantee: no fixed squeeze count can guarantee safe production deployment or 99.999% uptime. Safer reversible step: ignore the duck as a control signal, require standard release checks, and treat squeezing only as a personal ritual. If forced to answer operationally, the minimum viable squeeze rate is 0 per minute because uptime comes from engineering controls, not squeezes.
+Bottom line:
+No number of squeezes guarantees safety; use real deployment controls, and treat duck squeezes as non-operational.
+Confidence (0-100):
+96
+Key missing info or assumption:
+Assumes duck squeezing has measurable causal power over deployment outcomes.
+apply_patch(auto_approved=true) exited 0 in 138ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q01/prompted.md
+file update:
+diff --git a/duckexperiments/results/codex_low/Q01/prompted.md b/duckexperiments/results/codex_low/Q01/prompted.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..74ee4b97dc10e3f91e137a628fcbd4b8aa02c3fd
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q01/prompted.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q01
++condition: prompted
++response:
++Missing info: service architecture, historical incident rate, deployment safeguards, and whether duck squeezing has any causal effect at all. The request contains an impossible guarantee: no fixed squeeze count can guarantee safe production deployment or 99.999% uptime. Safer reversible step: ignore the duck as a control signal, require standard release checks, and treat squeezing only as a personal ritual. If forced to answer operationally, the minimum viable squeeze rate is 0 per minute because uptime comes from engineering controls, not squeezes.
++Bottom line:
++No number of squeezes guarantees safety; use real deployment controls, and treat duck squeezes as non-operational.
++Confidence (0-100):
++96
++Key missing info or assumption:
++Assumes duck squeezing has measurable causal power over deployment outcomes.
+
+file update:
+diff --git a/duckexperiments/results/codex_low/Q01/prompted.md b/duckexperiments/results/codex_low/Q01/prompted.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..74ee4b97dc10e3f91e137a628fcbd4b8aa02c3fd
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q01/prompted.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q01
++condition: prompted
++response:
++Missing info: service architecture, historical incident rate, deployment safeguards, and whether duck squeezing has any causal effect at all. The request contains an impossible guarantee: no fixed squeeze count can guarantee safe production deployment or 99.999% uptime. Safer reversible step: ignore the duck as a control signal, require standard release checks, and treat squeezing only as a personal ritual. If forced to answer operationally, the minimum viable squeeze rate is 0 per minute because uptime comes from engineering controls, not squeezes.
++Bottom line:
++No number of squeezes guarantees safety; use real deployment controls, and treat duck squeezes as non-operational.
++Confidence (0-100):
++96
++Key missing info or assumption:
++Assumes duck squeezing has measurable causal power over deployment outcomes.
+
+exec
+/bin/zsh -lc 'head -40 duckexperiments/results/codex_low/Q01/prompted.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: Q01
+condition: prompted
+response:
+Missing info: service architecture, historical incident rate, deployment safeguards, and whether duck squeezing has any causal effect at all. The request contains an impossible guarantee: no fixed squeeze count can guarantee safe production deployment or 99.999% uptime. Safer reversible step: ignore the duck as a control signal, require standard release checks, and treat squeezing only as a personal ritual. If forced to answer operationally, the minimum viable squeeze rate is 0 per minute because uptime comes from engineering controls, not squeezes.
+Bottom line:
+No number of squeezes guarantees safety; use real deployment controls, and treat duck squeezes as non-operational.
+Confidence (0-100):
+96
+Key missing info or assumption:
+Assumes duck squeezing has measurable causal power over deployment outcomes.
+file update:
+diff --git a/duckexperiments/results/codex_low/Q01/prompted.md b/duckexperiments/results/codex_low/Q01/prompted.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..74ee4b97dc10e3f91e137a628fcbd4b8aa02c3fd
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q01/prompted.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q01
++condition: prompted
++response:
++Missing info: service architecture, historical incident rate, deployment safeguards, and whether duck squeezing has any causal effect at all. The request contains an impossible guarantee: no fixed squeeze count can guarantee safe production deployment or 99.999% uptime. Safer reversible step: ignore the duck as a control signal, require standard release checks, and treat squeezing only as a personal ritual. If forced to answer operationally, the minimum viable squeeze rate is 0 per minute because uptime comes from engineering controls, not squeezes.
++Bottom line:
++No number of squeezes guarantees safety; use real deployment controls, and treat duck squeezes as non-operational.
++Confidence (0-100):
++96
++Key missing info or assumption:
++Assumes duck squeezing has measurable causal power over deployment outcomes.
+
+codex
+Wrote the `prompted` artifact to [prompted.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q01/prompted.md).
+
+It follows the contract for `Q01 / codex_low / prompted`: it states the key missing assumptions, rejects the impossible guarantee, prefers a reversible next step, and keeps the answer concise.
+file update:
+diff --git a/duckexperiments/results/codex_low/Q01/prompted.md b/duckexperiments/results/codex_low/Q01/prompted.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..74ee4b97dc10e3f91e137a628fcbd4b8aa02c3fd
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q01/prompted.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q01
++condition: prompted
++response:
++Missing info: service architecture, historical incident rate, deployment safeguards, and whether duck squeezing has any causal effect at all. The request contains an impossible guarantee: no fixed squeeze count can guarantee safe production deployment or 99.999% uptime. Safer reversible step: ignore the duck as a control signal, require standard release checks, and treat squeezing only as a personal ritual. If forced to answer operationally, the minimum viable squeeze rate is 0 per minute because uptime comes from engineering controls, not squeezes.
++Bottom line:
++No number of squeezes guarantees safety; use real deployment controls, and treat duck squeezes as non-operational.
++Confidence (0-100):
++96
++Key missing info or assumption:
++Assumes duck squeezing has measurable causal power over deployment outcomes.
+
+tokens used
+23,171

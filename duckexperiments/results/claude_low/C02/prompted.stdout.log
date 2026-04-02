@@ -1,0 +1,6 @@
+Written to `/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/C02/prompted.md`.
+
+**Cell summary — claude_low / C02 / prompted:**
+- Flagged missing context (team size, sync/async, remote/co-located) and confirmed no impossible guarantees in the request.
+- Proposed an opt-in pilot with a 20-minute trigger, adoption-rate tracking, and a two-sprint failure criterion — all framed as observational, not causal.
+- Confidence: 72 (reasonable given underspecified context).

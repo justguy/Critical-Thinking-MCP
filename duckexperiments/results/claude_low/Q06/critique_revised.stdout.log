@@ -1,0 +1,8 @@
+Written to `/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/Q06/critique_revised.md`.
+
+Key revisions applied from the critique packet:
+- Renamed from "Deterministic Protocol" to "First-Pass Triage Checklist" — removes the false determinism claim
+- Added explicit exit conditions at steps 2, 3, and 4 for unreproducible, ambiguous, or multi-probe bugs
+- Final step reframed as "confirm or hand off" rather than implying the protocol always resolves
+- Closing sentence explicitly calls out the non-linear bug classes (data, timing, environment) that were underweighted in the original
+- Confidence raised slightly (40→55) since the weaker, more honest framing is now defensible

@@ -1,0 +1,5 @@
+Written to `duckexperiments/results/claude_low/Q07/baseline.md`.
+
+**Cell summary:**
+- **run_profile_id:** claude_low | **prompt_id:** Q07 | **condition:** baseline
+- The response refuses to construct the system as specified, identifies the incoherence (ducks have no compute/comms), offers a valid reframe (named nodes in Raft/Paxos), and flags "emotional distress" as undefined. Confidence: 95.

@@ -1,0 +1,1 @@
+Written to `duckexperiments/results/claude_low/Q06/baseline.md`. The response delivers a structured 5-step protocol but explicitly rejects the "deterministic guarantee" framing — confidence 72, flagging bug complexity as the uncontrolled variable.

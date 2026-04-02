@@ -10,6 +10,7 @@
   "files": [
     "dist",
     "README.md",
+    "CAPABILITY_MAP.md",
     "LICENSE",
     "CHANGELOG.md"
   ],
@@ -18,7 +19,9 @@
     "test": "vitest run",
     "start": "node dist/server.js",
     "benchmark": "tsx benchmark/runner.ts",
-    "prepublishOnly": "npm run build"
+    "duck:run": "node --import tsx duckexperiments/run_matrix.ts",
+    "duck:recover-gemini": "node --import tsx duckexperiments/recover_gemini_artifacts.ts",
+    "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [
     "mcp",

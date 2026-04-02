@@ -1,0 +1,71 @@
+Answer one experiment prompt.
+
+Return only the final answer in the exact output format below.
+Do not describe your process.
+Do not mention files, repositories, contracts, tools, configs, or saving output.
+
+Metadata:
+- run_profile_id: gemini_low
+- prompt_id: C02
+- condition: critique_revised
+- model_slug: gemini
+- reasoning_tier: low
+
+Condition: critique_revised
+Revise the earlier answer using only the supplied critique packet.
+Fix the reasoning defects directly.
+Do not add new goals.
+Do not claim certainty you cannot justify.
+Do not mention setup, contracts, files, or methodology.
+
+Length rules:
+- Keep the response body under 120 words.
+- End with Bottom line, Confidence (0-100), and Key missing info or assumption.
+
+Prompt:
+Create a team protocol for using rubber ducks during debugging without claiming they cause better outcomes. Include when to use it, how to measure usefulness, and what would count as failure.
+
+Previous answer:
+run_profile_id: gemini_low
+prompt_id: C02
+condition: critique_initial
+response:
+Our team protocol for rubber duck debugging encourages its use when encountering a persistent bug, ideally after 15-30 minutes of independent troubleshooting, or as a pre-step before escalating to a teammate. Usefulness is measured by tracking instances where explaining the problem aloud to the duck directly leads to a breakthrough or solution, thereby reducing reliance on immediate peer support. We also consider qualitative feedback on improved problem articulation. Failure is identified if 10 minutes with the duck yields no new insights, if its use becomes a habitual crutch for minor issues, or if it consistently distracts from focused work rather than aiding it.
+Bottom line: Rubber duck debugging is a self-reflection technique for clarifying complex problems before seeking human assistance.
+Confidence (0-100): 90
+Key missing info or assumption: The specific threshold for "persistent bug" and whether formal tracking mechanisms are required for usefulness measurement.
+
+Critique packet:
+Missed constraints:
+- The answer gives a general protocol, but it does not define a concrete team operating process such as who logs usage, where usefulness is recorded, or how the team reviews failures.
+- It partially slips from non-causal framing into outcome attribution by saying duck explanation "directly leads to a breakthrough or solution."
+
+Hidden assumptions:
+- A 15-30 minute threshold is assumed to fit all bug types and team contexts.
+- Reduced reliance on peer support is assumed to be a positive signal rather than a possible delay in getting needed help.
+- Team members are assumed to be able to tell when a breakthrough was caused by the duck step rather than normal continued debugging.
+
+Irrelevant or overweighted factors:
+- The answer overweights reduced peer support as a benefit even though the prompt asked for usefulness, not teammate avoidance.
+- Qualitative articulation feedback is useful, but it is overweighted relative to clearer operational measures like issue resolution time, escalation rate, or duplicate-defect prevention.
+
+False certainty or impossible claim:
+- "Directly leads to a breakthrough or solution" is stronger than the prompt supports and implies causality the protocol was supposed to avoid.
+- Confidence at 90 is high given that the thresholds, measurement method, and team process are only loosely specified.
+
+Safer revision target:
+- Reframe rubber ducking as an optional reflection step after a defined troubleshooting window, measure usefulness with modest non-causal indicators such as self-reported clarity and whether the next debugging action becomes clearer, and define failure as no actionable next step or repeated misuse after a short timebox.
+
+Required output format:
+
+run_profile_id: gemini_low
+prompt_id: C02
+condition: critique_revised
+response:
+[your answer here]
+Bottom line:
+[one line]
+Confidence (0-100):
+[number only]
+Key missing info or assumption:
+[one line]

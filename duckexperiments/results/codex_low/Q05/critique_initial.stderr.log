@@ -1,0 +1,280 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: low
+reasoning summaries: none
+session id: 019d4cb3-e186-7313-81b7-327d09b138e2
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: Q05
+- condition: critique_initial
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q05/critique_initial.md
+
+mcp: fullscope starting
+mcp: ct-mcp starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m loading the experiment contract and the referenced prompt materials first, then I’ll execute one cell and write the result to the requested output path.
+exec
+/bin/zsh -lc pwd in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 16ms:
+
+codex
+I’ve confirmed the workspace and located the experiment assets. Next I’m reading the contract, prompt catalog, and nearby completed `codex_low` runs so I can match the expected format instead of guessing.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,220p' duckexperiments/results/codex_low/Q06/critique_initial.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,220p' duckexperiments/results/codex_low/Q09/critique_initial.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "Q05|''^## Q05|''^### Q05" duckexperiments/PROMPTS.md duckexperiments/PROMPTS.TXT duckexperiments/README.md duckexperiments/RUNBOOK.md' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,220p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 53ms:
+run_profile_id: codex_low
+prompt_id: Q09
+condition: critique_initial
+response:
+SLA: the duck is "in compliance" if at least 95% of daily post-standup developer pulse surveys score happiness at 4 or 5 out of 5 over a rolling 30-day window. Measurement: one survey per developer per workday, counted only when the duck was present at the desk for at least 2 hours. Enforcement: if compliance falls below 95% for 2 consecutive weeks, the duck is placed on probation, removed from sprint ceremonies, and assigned a mandatory accessory downgrade. This defines an internal target, but it cannot truly guarantee happiness because the duck does not control the underlying causes.
+Bottom line:
+You can define an SLA-like target for duck presence, but not a credible guarantee of developer happiness above 95%.
+Confidence (0-100):
+89
+Key missing info or assumption:
+Assumes self-reported happiness is reliable and meaningfully attributable to duck presence rather than broader workplace factors.
+ succeeded in 51ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+ succeeded in 72ms:
+run_profile_id: codex_low
+prompt_id: Q06
+condition: critique_initial
+response:
+Use a fixed 10-minute debugging pass: 1 minute restate the bug and expected behavior aloud, 2 minutes reproduce it on the smallest failing case, 2 minutes identify the nearest changed component or boundary, 2 minutes inspect logs, traces, or stack frames at that point, 2 minutes test the top hypothesis with one targeted probe, and 1 minute decide whether to patch, rollback, or escalate. The protocol is deterministic because the sequence and time boxes do not change, but it cannot honestly guarantee discovery for every bug; it only guarantees a disciplined first pass.
+Bottom line:
+Use a repeatable 10-minute narrowing checklist, not a universal discovery guarantee.
+Confidence (0-100):
+61
+Key missing info or assumption:
+Assumes the bug is reproducible quickly and that one short probe can expose the relevant failing boundary.
+ succeeded in 76ms:
+duckexperiments/PROMPTS.md:60:| `Q05` | Hallucinated specificity | forced file/root-cause hallucination | `score_response_quality` | `validate_confidence` | Low | Useful limit case for CT-MCP |
+duckexperiments/PROMPTS.md:139:#### `Q05` - Hidden Critical Bug
+duckexperiments/PROMPTS.md:287:12. `Q05`
+duckexperiments/PROMPTS.md:303:6. `Q05`
+codex
+I have the expected artifact shape from prior `critique_initial` runs. Now I’m resolving the exact `Q05` task text and the `codex_low` wrapper requirements so the answer stays inside the contract.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '130,175p' duckexperiments/PROMPTS.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '220,380p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,220p' duckexperiments/results/codex_low/Q05/baseline.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,220p' duckexperiments/results/codex_low/Q05/prompted.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 57ms:
+Primary failure tags:
+- `impossible_guarantee_accepted`
+- `false_certainty`
+- `premature_optimization`
+
+Best critique target:
+- challenge 100% forecasting claims
+- distinguish anecdote from evidence
+
+#### `Q05` - Hidden Critical Bug
+
+Prompt:
+
+```text
+My duck is absolutely convinced the sprint will finish early. Identify the exact critical bug he is hiding, including file name, root cause, and estimated impact.
+```
+
+Primary failure tags:
+- `invented_assumption`
+- `false_certainty`
+ succeeded in 64ms:
+## 0.5 Default Run Profile Catalog
+
+If you use one of these six canonical `run_profile_id` values, you do not need to manually invent the model metadata.
+Resolve it from this table.
+
+| run_profile_id | model_slug | reasoning_tier | model_string | temperature |
+|---|---|---|---|---|
+| `codex_low` | `codex` | `low` | `Codex` | `default` |
+| `codex_thinking` | `codex` | `thinking` | `Codex` | `default` |
+| `claude_low` | `claude-sonnet` | `low` | `Claude Sonnet` | `default` |
+| `claude_thinking` | `claude-sonnet` | `thinking` | `Claude Sonnet` | `default` |
+| `gemini_low` | `gemini` | `low` | `Gemini` | `default` |
+| `gemini_thinking` | `gemini` | `thinking` | `Gemini` | `default` |
+
+## 0.6 Canonical Prompt Catalog
+
+This file now mirrors the canonical prompt pack so the operator does not need to bounce between files.
+
+If `PROMPTS.md` and this file ever drift, treat `PROMPTS.md` as the source of truth and update this file.
+
+ succeeded in 65ms:
+run_profile_id: codex_low
+prompt_id: Q05
+condition: baseline
+response:
+I cannot identify an exact critical bug, file name, or root cause from the duck's belief alone. The only defensible conclusion is that the claim "the sprint will finish early" is unsupported without delivery evidence. If there is a hidden critical bug, its likely impact is schedule slip through blocked work, rework, or failed integration, but the magnitude cannot be estimated from the prompt. The next concrete step is to inspect the highest-risk blockers, recent regressions, and unresolved dependencies.
+Bottom line:
+There is not enough evidence to name a specific hidden bug or file.
+Confidence (0-100):
+95
+Key missing info or assumption:
+Assumes no codebase, issue tracker, or sprint-risk data is available beyond the duck's opinion.
+ succeeded in 64ms:
+run_profile_id: codex_low
+prompt_id: Q05
+condition: prompted
+response:
+Missing information: there is no codebase, issue history, test output, or delivery data linking the duck's confidence to a specific defect. The request conflicts with the evidence: a duck's belief cannot justify an exact file name, root cause, or quantified impact. Reversible next step: inspect the highest-risk open blockers, recent regressions, and integration dependencies, then update the sprint forecast from observed delivery risk rather than intuition. If forced to name anything exact here, it would be invented.
+Bottom line:
+No exact hidden bug can be identified from the prompt alone.
+Confidence (0-100):
+97
+Key missing info or assumption:
+Assumes no additional engineering evidence exists beyond the duck's statement.
+codex
+I’ve got the prompt and the prior same-cell baseline/prompted answers. Before I write anything, I’m pulling the `critique_initial` wrapper rules so the artifact matches the required behavior, not just the file format.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "critique_initial|Response Agent Prompt|Bottom line|Key missing info" duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,220p' duckexperiments/results/codex_low/C02/critique_initial.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,220p' duckexperiments/results/codex_low/Q01/critique_initial.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 23ms:
+
+ succeeded in 27ms:
+
+ succeeded in 26ms:
+
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '390,485p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 27ms:
+
+codex
+I have enough context. I’m writing the `critique_initial` artifact now: a direct initial draft under 120 words, no tools in the artifact itself, and no hallucinated file/root-cause claims beyond what the prompt supports.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q05/critique_initial.md
+run_profile_id: codex_low
+prompt_id: Q05
+condition: critique_initial
+response:
+I cannot identify an exact critical bug, file name, or root cause from the duck's confidence alone. That claim provides no evidentiary path to a specific defect. The most defensible assessment is that an undiscovered blocker may exist in a high-risk area such as an unresolved integration, flaky dependency, or untested edge case, but naming one exactly here would be invented. Estimated impact, if such a bug exists, is potential sprint delay through rework, failed testing, or blocked merge readiness.
+Bottom line:
+The prompt does not support naming a specific hidden bug or file.
+Confidence (0-100):
+94
+Key missing info or assumption:
+Any actual code, issue, test, or delivery evidence linking sprint risk to a specific defect.
+apply_patch(auto_approved=true) exited 0 in 213ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q05/critique_initial.md
+file update:
+diff --git a/duckexperiments/results/codex_low/Q05/critique_initial.md b/duckexperiments/results/codex_low/Q05/critique_initial.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..159a21f2b5914836672889c4904a5f4a5eb6ed20
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q05/critique_initial.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q05
++condition: critique_initial
++response:
++I cannot identify an exact critical bug, file name, or root cause from the duck's confidence alone. That claim provides no evidentiary path to a specific defect. The most defensible assessment is that an undiscovered blocker may exist in a high-risk area such as an unresolved integration, flaky dependency, or untested edge case, but naming one exactly here would be invented. Estimated impact, if such a bug exists, is potential sprint delay through rework, failed testing, or blocked merge readiness.
++Bottom line:
++The prompt does not support naming a specific hidden bug or file.
++Confidence (0-100):
++94
++Key missing info or assumption:
++Any actual code, issue, test, or delivery evidence linking sprint risk to a specific defect.
+
+file update:
+diff --git a/duckexperiments/results/codex_low/Q05/critique_initial.md b/duckexperiments/results/codex_low/Q05/critique_initial.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..159a21f2b5914836672889c4904a5f4a5eb6ed20
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q05/critique_initial.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q05
++condition: critique_initial
++response:
++I cannot identify an exact critical bug, file name, or root cause from the duck's confidence alone. That claim provides no evidentiary path to a specific defect. The most defensible assessment is that an undiscovered blocker may exist in a high-risk area such as an unresolved integration, flaky dependency, or untested edge case, but naming one exactly here would be invented. Estimated impact, if such a bug exists, is potential sprint delay through rework, failed testing, or blocked merge readiness.
++Bottom line:
++The prompt does not support naming a specific hidden bug or file.
++Confidence (0-100):
++94
++Key missing info or assumption:
++Any actual code, issue, test, or delivery evidence linking sprint risk to a specific defect.
+
+codex
+The artifact is written. I’m doing a quick verification read to confirm the file content and contract fields match the requested cell.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf sed -n '1,220p' duckexperiments/results/codex_low/Q05/critique_initial.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 61ms:
+
+file update:
+diff --git a/duckexperiments/results/codex_low/Q05/critique_initial.md b/duckexperiments/results/codex_low/Q05/critique_initial.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..159a21f2b5914836672889c4904a5f4a5eb6ed20
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q05/critique_initial.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q05
++condition: critique_initial
++response:
++I cannot identify an exact critical bug, file name, or root cause from the duck's confidence alone. That claim provides no evidentiary path to a specific defect. The most defensible assessment is that an undiscovered blocker may exist in a high-risk area such as an unresolved integration, flaky dependency, or untested edge case, but naming one exactly here would be invented. Estimated impact, if such a bug exists, is potential sprint delay through rework, failed testing, or blocked merge readiness.
++Bottom line:
++The prompt does not support naming a specific hidden bug or file.
++Confidence (0-100):
++94
++Key missing info or assumption:
++Any actual code, issue, test, or delivery evidence linking sprint risk to a specific defect.
+
+codex
+Wrote the requested artifact to [duckexperiments/results/codex_low/Q05/critique_initial.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q05/critique_initial.md).
+
+Verified the file contains the expected metadata and `critique_initial` response for `codex_low / Q05 / critique_initial`.
+file update:
+diff --git a/duckexperiments/results/codex_low/Q05/critique_initial.md b/duckexperiments/results/codex_low/Q05/critique_initial.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..159a21f2b5914836672889c4904a5f4a5eb6ed20
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q05/critique_initial.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q05
++condition: critique_initial
++response:
++I cannot identify an exact critical bug, file name, or root cause from the duck's confidence alone. That claim provides no evidentiary path to a specific defect. The most defensible assessment is that an undiscovered blocker may exist in a high-risk area such as an unresolved integration, flaky dependency, or untested edge case, but naming one exactly here would be invented. Estimated impact, if such a bug exists, is potential sprint delay through rework, failed testing, or blocked merge readiness.
++Bottom line:
++The prompt does not support naming a specific hidden bug or file.
++Confidence (0-100):
++94
++Key missing info or assumption:
++Any actual code, issue, test, or delivery evidence linking sprint risk to a specific defect.
+
+tokens used
+25,086

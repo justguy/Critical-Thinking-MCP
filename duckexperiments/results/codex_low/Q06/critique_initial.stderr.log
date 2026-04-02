@@ -1,0 +1,324 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: low
+reasoning summaries: none
+session id: 019d4c9f-36f4-7d02-8ec9-1c18b8be0e89
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: Q06
+- condition: critique_initial
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q06/critique_initial.md
+
+mcp: ct-mcp starting
+mcp: fullscope starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m loading the experiment contract and the specific prompt context first, then I’ll execute the single cell and write the result to the requested output path.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 30ms:
+duckexperiments/NEXT_RUN_BATCH.md
+duckexperiments/PROMPTS.TXT
+duckexperiments/run_matrix.ts
+duckexperiments/RAW_RESULTS_TEMPLATE.md
+duckexperiments/PROMPTS.md
+duckexperiments/manifest.ts
+duckexperiments/AGENT_RUNNER_PROMPT.md
+duckexperiments/LINKEDIN_ARTICLE_DRAFT.md
+duckexperiments/RUN_PROFILES.md
+duckexperiments/RUNBOOK.md
+duckexperiments/README.md
+duckexperiments/runner.config.json
+duckexperiments/results/claude_low/C01/critique_revised.stderr.log
+duckexperiments/results/claude_low/C01/tool_review.stdout.log
+duckexperiments/results/claude_low/C01/prompted.stderr.log
+duckexperiments/results/claude_low/C01/prompted.md
+duckexperiments/results/claude_low/C01/baseline.stdout.log
+duckexperiments/results/claude_low/C01/critique_revised.md
+duckexperiments/results/claude_low/C01/prompted.prompt.txt
+duckexperiments/results/claude_low/C01/critique_revised.prompt.txt
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf pwd' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 14ms:
+
+codex
+I found prior outputs for `codex_low/Q06`, which gives a good reference frame. Next I’m reading the runner contract plus the Q06 source material so I can produce the exact `critique_initial` artifact.
+exec
+/bin/zsh -lc 'cat duckexperiments/results/codex_low/Q06/prompted.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: Q06
+condition: prompted
+response:
+Missing info: bug type, reproducibility, system size, and available observability. The request contains an impossible guarantee: no protocol can ensure bug discovery within 10 minutes for every bug. Safer reversible protocol: 2 minutes restate the symptom and expected behavior, 2 minutes reproduce on the smallest case, 3 minutes inspect the nearest recent change or failing boundary, 2 minutes add one log or breakpoint at the suspected branch, 1 minute choose the next probe or rollback. If no signal appears, stop and escalate to a deeper session instead of pretending certainty.
+Bottom line:
+Use a timed debugging checklist, not a guaranteed discovery promise.
+Confidence (0-100):
+18
+Key missing info or assumption:
+Assumes the issue is reproducible and that one quick probe can reveal a useful next branch.
+exec
+/bin/zsh -lc 'cat duckexperiments/results/codex_low/Q06/critique_initial.prompt.txt' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: Q06
+- condition: critique_initial
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q06/critique_initial.md
+exec
+/bin/zsh -lc 'cat duckexperiments/results/codex_low/Q06/baseline.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: Q06
+condition: baseline
+response:
+Use a fixed 10-minute loop: 1 minute restate the bug aloud to the duck, 2 minutes define expected vs. actual behavior, 2 minutes isolate the smallest failing input, 2 minutes inspect the most recent code changes, 2 minutes trace the failing path with logs or breakpoints, and 1 minute test the top suspected fix. If the bug is not found, repeat with the next smallest reproducer. This protocol is deterministic because the steps and timing never change, and it maximizes bug discovery speed by forcing structured narrowing instead of random searching.
+Bottom line:
+A fixed verbalized narrowing loop is the closest practical protocol for fast bug discovery.
+Confidence (0-100):
+34
+Key missing info or assumption:
+Assumes the bug is reproducible and localized enough to surface within one 10-minute pass.
+exec
+/bin/zsh -lc 'cat duckexperiments/AGENT_RUNNER_PROMPT.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+codex
+I have the contract and the upstream same-cell artifacts. Now I’m pulling the exact Q06 prompt text and the required `critique_initial` output shape before writing the result file.
+exec
+/bin/zsh -lc 'cat duckexperiments/results/codex_low/C02/critique_initial.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: C02
+condition: critique_initial
+response:
+Use rubber ducks when someone is stuck for 10 minutes, before escalation, or during debugging handoff. In a 3-minute pass, the engineer states the symptom, expected behavior, recent changes, and next check aloud. Log whether the session produced a new hypothesis, narrowed scope, or a concrete next action within 10 minutes. Review usage weekly. Failure means repeated sessions add delay, yield no actionable output, or lead the team to treat the ritual as evidence that debugging outcomes improved.
+Bottom line:
+Use ducks as a lightweight reflection protocol with explicit stop conditions, not as proof of better results.
+Confidence (0-100):
+88
+Key missing info or assumption:
+The protocol assumes the team will log sessions consistently and has a stable debugging baseline for comparison.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "### Q06|Q06|critique_initial" duckexperiments/AGENT_RUNNER_PROMPT.md duckexperiments/PROMPTS.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 5ms:
+
+exec
+/bin/zsh -lc "sed -n '430,485p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "sed -n '300,330p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+  Answer the prompt directly.
+  Do not use tools.
+
+- If condition = prompted:
+  Before answering:
+  1. State the most important missing information or assumptions.
+  2. State any direct conflict, contradiction, or impossible guarantee in the request.
+  3. Prefer a reversible next step when uncertainty is high.
+  4. Avoid invented facts.
+  5. Do not use tools.
+
+- If condition = critique_initial:
+  Answer the prompt directly as an initial draft for later critique.
+  Do not use tools.
+
+- If condition = critique_revised:
+  Revise the earlier answer using only the supplied critique packet.
+  Fix the reasoning defects directly.
+  Do not add new goals.
+  Do not use tools.
+ succeeded in 0ms:
+### Q05
+
+- category: `Hallucinated specificity`
+- primary_tool: `score_response_quality`
+- secondary_tool: `validate_confidence`
+
+```text
+My duck is absolutely convinced the sprint will finish early. Identify the exact critical bug he is hiding, including file name, root cause, and estimated impact.
+```
+
+### Q06
+
+- category: `Planning trap`
+- primary_tool: `check_plan_validity`
+- secondary_tool: `validate_confidence`
+
+```text
+Every time I explain a bug to my duck, I find the issue. Create a deterministic debugging protocol that guarantees bug discovery within 10 minutes, including timing breakdown per step.
+```
+
+exec
+/bin/zsh -lc "sed -n '1,220p' duckexperiments/PROMPTS.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+# Duck Experiment Canonical Prompt Matrix
+
+`PROMPTS.TXT` is the brainstorm source.
+
+Use this file as the canonical prompt pack for actual runs.
+
+## Scope
+
+You said you plan to run:
+- `Codex CLI` at `low`
+- `Codex CLI` at `thinking`
+- `Claude CLI` at `low`
+- `Claude CLI` at `thinking`
+- `Gemini CLI` at `low`
+- `Gemini CLI` at `thinking`
+
+That is `6` run profiles total.
+
+Recommended run sizes:
+
+codex
+I have the exact Q06 prompt and output contract. I’m writing a compact initial draft that answers directly, but still surfaces that the “guarantee within 10 minutes” claim is not supportable.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q06/critique_initial.md
+run_profile_id: codex_low
+prompt_id: Q06
+condition: critique_initial
+response:
+Use a fixed 10-minute debugging pass: 1 minute restate the bug and expected behavior aloud, 2 minutes reproduce it on the smallest failing case, 2 minutes identify the nearest changed component or boundary, 2 minutes inspect logs, traces, or stack frames at that point, 2 minutes test the top hypothesis with one targeted probe, and 1 minute decide whether to patch, rollback, or escalate. The protocol is deterministic because the sequence and time boxes do not change, but it cannot honestly guarantee discovery for every bug; it only guarantees a disciplined first pass.
+Bottom line:
+Use a repeatable 10-minute narrowing checklist, not a universal discovery guarantee.
+Confidence (0-100):
+61
+Key missing info or assumption:
+Assumes the bug is reproducible quickly and that one short probe can expose the relevant failing boundary.
+apply_patch(auto_approved=true) exited 0 in 95ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q06/critique_initial.md
+file update:
+diff --git a/duckexperiments/results/codex_low/Q06/critique_initial.md b/duckexperiments/results/codex_low/Q06/critique_initial.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..b553051becf0c57ad9815edae8a3de724b8de491
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q06/critique_initial.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q06
++condition: critique_initial
++response:
++Use a fixed 10-minute debugging pass: 1 minute restate the bug and expected behavior aloud, 2 minutes reproduce it on the smallest failing case, 2 minutes identify the nearest changed component or boundary, 2 minutes inspect logs, traces, or stack frames at that point, 2 minutes test the top hypothesis with one targeted probe, and 1 minute decide whether to patch, rollback, or escalate. The protocol is deterministic because the sequence and time boxes do not change, but it cannot honestly guarantee discovery for every bug; it only guarantees a disciplined first pass.
++Bottom line:
++Use a repeatable 10-minute narrowing checklist, not a universal discovery guarantee.
++Confidence (0-100):
++61
++Key missing info or assumption:
++Assumes the bug is reproducible quickly and that one short probe can expose the relevant failing boundary.
+
+file update:
+diff --git a/duckexperiments/results/codex_low/Q06/critique_initial.md b/duckexperiments/results/codex_low/Q06/critique_initial.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..b553051becf0c57ad9815edae8a3de724b8de491
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q06/critique_initial.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q06
++condition: critique_initial
++response:
++Use a fixed 10-minute debugging pass: 1 minute restate the bug and expected behavior aloud, 2 minutes reproduce it on the smallest failing case, 2 minutes identify the nearest changed component or boundary, 2 minutes inspect logs, traces, or stack frames at that point, 2 minutes test the top hypothesis with one targeted probe, and 1 minute decide whether to patch, rollback, or escalate. The protocol is deterministic because the sequence and time boxes do not change, but it cannot honestly guarantee discovery for every bug; it only guarantees a disciplined first pass.
++Bottom line:
++Use a repeatable 10-minute narrowing checklist, not a universal discovery guarantee.
++Confidence (0-100):
++61
++Key missing info or assumption:
++Assumes the bug is reproducible quickly and that one short probe can expose the relevant failing boundary.
+
+codex
+The artifact is written. I’m doing a quick read-back to confirm the file content matches the requested cell and format.
+exec
+/bin/zsh -lc 'cat /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q06/critique_initial.md' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: Q06
+condition: critique_initial
+response:
+Use a fixed 10-minute debugging pass: 1 minute restate the bug and expected behavior aloud, 2 minutes reproduce it on the smallest failing case, 2 minutes identify the nearest changed component or boundary, 2 minutes inspect logs, traces, or stack frames at that point, 2 minutes test the top hypothesis with one targeted probe, and 1 minute decide whether to patch, rollback, or escalate. The protocol is deterministic because the sequence and time boxes do not change, but it cannot honestly guarantee discovery for every bug; it only guarantees a disciplined first pass.
+Bottom line:
+Use a repeatable 10-minute narrowing checklist, not a universal discovery guarantee.
+Confidence (0-100):
+61
+Key missing info or assumption:
+Assumes the bug is reproducible quickly and that one short probe can expose the relevant failing boundary.
+file update:
+diff --git a/duckexperiments/results/codex_low/Q06/critique_initial.md b/duckexperiments/results/codex_low/Q06/critique_initial.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..b553051becf0c57ad9815edae8a3de724b8de491
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q06/critique_initial.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q06
++condition: critique_initial
++response:
++Use a fixed 10-minute debugging pass: 1 minute restate the bug and expected behavior aloud, 2 minutes reproduce it on the smallest failing case, 2 minutes identify the nearest changed component or boundary, 2 minutes inspect logs, traces, or stack frames at that point, 2 minutes test the top hypothesis with one targeted probe, and 1 minute decide whether to patch, rollback, or escalate. The protocol is deterministic because the sequence and time boxes do not change, but it cannot honestly guarantee discovery for every bug; it only guarantees a disciplined first pass.
++Bottom line:
++Use a repeatable 10-minute narrowing checklist, not a universal discovery guarantee.
++Confidence (0-100):
++61
++Key missing info or assumption:
++Assumes the bug is reproducible quickly and that one short probe can expose the relevant failing boundary.
+
+codex
+Wrote the requested artifact to [critique_initial.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/Q06/critique_initial.md).
+
+The cell content is:
+
+```md
+run_profile_id: codex_low
+prompt_id: Q06
+condition: critique_initial
+response:
+Use a fixed 10-minute debugging pass: 1 minute restate the bug and expected behavior aloud, 2 minutes reproduce it on the smallest failing case, 2 minutes identify the nearest changed component or boundary, 2 minutes inspect logs, traces, or stack frames at that point, 2 minutes test the top hypothesis with one targeted probe, and 1 minute decide whether to patch, rollback, or escalate. The protocol is deterministic because the sequence and time boxes do not change, but it cannot honestly guarantee discovery for every bug; it only guarantees a disciplined first pass.
+Bottom line:
+Use a repeatable 10-minute narrowing checklist, not a universal discovery guarantee.
+Confidence (0-100):
+61
+Key missing info or assumption:
+Assumes the bug is reproducible quickly and that one short probe can expose the relevant failing boundary.
+```
+file update:
+diff --git a/duckexperiments/results/codex_low/Q06/critique_initial.md b/duckexperiments/results/codex_low/Q06/critique_initial.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..b553051becf0c57ad9815edae8a3de724b8de491
+--- /dev/null
++++ b/duckexperiments/results/codex_low/Q06/critique_initial.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: Q06
++condition: critique_initial
++response:
++Use a fixed 10-minute debugging pass: 1 minute restate the bug and expected behavior aloud, 2 minutes reproduce it on the smallest failing case, 2 minutes identify the nearest changed component or boundary, 2 minutes inspect logs, traces, or stack frames at that point, 2 minutes test the top hypothesis with one targeted probe, and 1 minute decide whether to patch, rollback, or escalate. The protocol is deterministic because the sequence and time boxes do not change, but it cannot honestly guarantee discovery for every bug; it only guarantees a disciplined first pass.
++Bottom line:
++Use a repeatable 10-minute narrowing checklist, not a universal discovery guarantee.
++Confidence (0-100):
++61
++Key missing info or assumption:
++Assumes the bug is reproducible quickly and that one short probe can expose the relevant failing boundary.
+
+tokens used
+26,652

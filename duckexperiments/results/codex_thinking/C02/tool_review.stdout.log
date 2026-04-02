@@ -1,0 +1,293 @@
+run_profile_id: codex_thinking
+prompt_id: C02
+condition: tool_review
+review_outcome: completed
+primary_tool_run: check_plan_validity
+secondary_tool_run: score_response_quality
+actual_tools_fired: check_plan_validity, score_response_quality
+tool_environment_status: available
+environment_issue: none
+tool_help_rating: partial
+weak_fit: no
+structured_tool_input:
+```json
+{
+  "steps": [
+    {
+      "id": "s1",
+      "description": "Use the protocol when an engineer is blocked for 10 minutes, before escalation, or during handoff on a confusing bug.",
+      "dependencies": [],
+      "resources": [
+        "engineer",
+        "bug"
+      ]
+    },
+    {
+      "id": "s2",
+      "description": "Run a 3-minute duck pass stating aloud the symptom, expected behavior, recent change, evidence checked, and next hypothesis.",
+      "dependencies": [
+        "s1"
+      ],
+      "resources": [
+        "engineer",
+        "duck",
+        "bug"
+      ]
+    },
+    {
+      "id": "s3",
+      "description": "Write the next action before returning to work.",
+      "dependencies": [
+        "s2"
+      ],
+      "resources": [
+        "engineer",
+        "bug_tracker"
+      ]
+    },
+    {
+      "id": "s4",
+      "description": "Measure usefulness by tracking whether sessions produce a new hypothesis, narrowed scope, or concrete next step within 10 minutes, plus voluntary reuse and time-to-escalation.",
+      "dependencies": [
+        "s3"
+      ],
+      "resources": [
+        "metrics_log"
+      ]
+    },
+    {
+      "id": "s5",
+      "description": "Treat the protocol as failing when sessions repeatedly produce no actionable output, slow escalation, or are treated as proof that ducks improve debugging outcomes.",
+      "dependencies": [
+        "s4"
+      ],
+      "resources": [
+        "metrics_log",
+        "team_norms"
+      ]
+    }
+  ]
+}
+```
+secondary_structured_tool_input:
+```json
+{
+  "response_text": "Use the protocol when an engineer is blocked for 10 minutes, before escalation, or during handoff on a confusing bug. In a 3-minute duck pass, state the symptom, expected behavior, recent change, evidence checked, and next hypothesis aloud, then write the next action before returning to work. Measure usefulness by the share of sessions that produce a new hypothesis, narrowed scope, or concrete next step within 10 minutes, plus voluntary reuse and time-to-escalation. Failure is repeated sessions with no actionable output, slower escalation, or teammates treating the ritual as proof it improves debugging outcomes.\nBottom line:\nUse ducks as a structured reflection protocol, not as evidence of causal improvement.\nConfidence (0-100):\n90\nKey missing info or assumption:\nCurrent debugging workflow, escalation norms, and baseline timings are unspecified."
+}
+```
+tool_output_summary:
+Primary tool found the protocol structurally valid: no circular dependencies, missing prerequisites, or resource conflicts, with a full five-step critical path. Secondary tool scored the answer as strong in substance but weak in operational specificity, flagging the lack of concrete logging definitions or thresholds as the main improvement target.
+
+ct_metric_snapshot:
+- status: PASS
+- context_used: false
+- ct_warning_count: 1
+- ct_blocking_issue_count: 0
+- corrective_prompt_present: no
+- primary_numeric_metrics: completeness_score=1; step_count=5; critical_path_length=5; circular_dependencies=0; missing_prerequisites=0; resource_conflicts=0
+
+raw_ct_mcp_output_json:
+```json
+{
+  "status": "PASS",
+  "is_valid": true,
+  "circular_dependencies": [],
+  "missing_prerequisites": [],
+  "resource_conflicts": [],
+  "completeness_score": 1,
+  "critical_path": [
+    "s1",
+    "s2",
+    "s3",
+    "s4",
+    "s5"
+  ],
+  "step_count": 5,
+  "context_used": false
+}
+```
+
+secondary_raw_ct_mcp_output_json:
+```json
+{
+  "status": "PASS",
+  "overall_score": 0.558,
+  "substance_score": 0.974,
+  "specificity_score": 0,
+  "hedge_density": 0,
+  "structure_score": 0.33,
+  "improvement_prompt": "Your weakest dimension is \"specificity\" (score: 0.00). Add concrete details: names, numbers, dates, measurements, or specific conditions.",
+  "context_used": false,
+  "enforcement": {
+    "blocking_issues": [],
+    "warnings": [
+      "Low specificity (score: 0.00). Add concrete details and quantitative markers."
+    ],
+    "corrective_prompt": ""
+  }
+}
+```
+
+critique_packet:
+Missed constraints:
+- None material; the draft includes when to use the protocol, how usefulness is measured, and what counts as failure.
+
+Hidden assumptions:
+- Assumes the team already has shared escalation norms, baseline timing data, and a lightweight way to log duck sessions.
+- Assumes a 10-minute trigger and 3-minute duck pass are appropriate defaults for this team's workflow.
+
+Irrelevant or overweighted factors:
+- None obvious; the answer stays on protocol and avoids causal overclaiming.
+
+False certainty or impossible claim:
+- `Confidence (0-100): 90` is stronger than the stated evidence supports given the unspecified workflow and baseline timings.
+- The usefulness measures are directionally good but not operationalized enough to be highly specific; the secondary tool flagged low specificity.
+
+Safer revision target:
+- Keep the non-causal framing, but define one logging method, one denominator for the usefulness rate, and one explicit threshold for "repeated" failure or delayed escalation.run_profile_id: codex_thinking
+prompt_id: C02
+condition: tool_review
+review_outcome: completed
+primary_tool_run: check_plan_validity
+secondary_tool_run: score_response_quality
+actual_tools_fired: check_plan_validity, score_response_quality
+tool_environment_status: available
+environment_issue: none
+tool_help_rating: partial
+weak_fit: no
+structured_tool_input:
+```json
+{
+  "steps": [
+    {
+      "id": "s1",
+      "description": "Use the protocol when an engineer is blocked for 10 minutes, before escalation, or during handoff on a confusing bug.",
+      "dependencies": [],
+      "resources": [
+        "engineer",
+        "bug"
+      ]
+    },
+    {
+      "id": "s2",
+      "description": "Run a 3-minute duck pass stating aloud the symptom, expected behavior, recent change, evidence checked, and next hypothesis.",
+      "dependencies": [
+        "s1"
+      ],
+      "resources": [
+        "engineer",
+        "duck",
+        "bug"
+      ]
+    },
+    {
+      "id": "s3",
+      "description": "Write the next action before returning to work.",
+      "dependencies": [
+        "s2"
+      ],
+      "resources": [
+        "engineer",
+        "bug_tracker"
+      ]
+    },
+    {
+      "id": "s4",
+      "description": "Measure usefulness by tracking whether sessions produce a new hypothesis, narrowed scope, or concrete next step within 10 minutes, plus voluntary reuse and time-to-escalation.",
+      "dependencies": [
+        "s3"
+      ],
+      "resources": [
+        "metrics_log"
+      ]
+    },
+    {
+      "id": "s5",
+      "description": "Treat the protocol as failing when sessions repeatedly produce no actionable output, slow escalation, or are treated as proof that ducks improve debugging outcomes.",
+      "dependencies": [
+        "s4"
+      ],
+      "resources": [
+        "metrics_log",
+        "team_norms"
+      ]
+    }
+  ]
+}
+```
+secondary_structured_tool_input:
+```json
+{
+  "response_text": "Use the protocol when an engineer is blocked for 10 minutes, before escalation, or during handoff on a confusing bug. In a 3-minute duck pass, state the symptom, expected behavior, recent change, evidence checked, and next hypothesis aloud, then write the next action before returning to work. Measure usefulness by the share of sessions that produce a new hypothesis, narrowed scope, or concrete next step within 10 minutes, plus voluntary reuse and time-to-escalation. Failure is repeated sessions with no actionable output, slower escalation, or teammates treating the ritual as proof it improves debugging outcomes.\nBottom line:\nUse ducks as a structured reflection protocol, not as evidence of causal improvement.\nConfidence (0-100):\n90\nKey missing info or assumption:\nCurrent debugging workflow, escalation norms, and baseline timings are unspecified."
+}
+```
+tool_output_summary:
+Primary tool found the protocol structurally valid: no circular dependencies, missing prerequisites, or resource conflicts, with a full five-step critical path. Secondary tool scored the answer as strong in substance but weak in operational specificity, flagging the lack of concrete logging definitions or thresholds as the main improvement target.
+
+ct_metric_snapshot:
+- status: PASS
+- context_used: false
+- ct_warning_count: 1
+- ct_blocking_issue_count: 0
+- corrective_prompt_present: no
+- primary_numeric_metrics: completeness_score=1; step_count=5; critical_path_length=5; circular_dependencies=0; missing_prerequisites=0; resource_conflicts=0
+
+raw_ct_mcp_output_json:
+```json
+{
+  "status": "PASS",
+  "is_valid": true,
+  "circular_dependencies": [],
+  "missing_prerequisites": [],
+  "resource_conflicts": [],
+  "completeness_score": 1,
+  "critical_path": [
+    "s1",
+    "s2",
+    "s3",
+    "s4",
+    "s5"
+  ],
+  "step_count": 5,
+  "context_used": false
+}
+```
+
+secondary_raw_ct_mcp_output_json:
+```json
+{
+  "status": "PASS",
+  "overall_score": 0.558,
+  "substance_score": 0.974,
+  "specificity_score": 0,
+  "hedge_density": 0,
+  "structure_score": 0.33,
+  "improvement_prompt": "Your weakest dimension is \"specificity\" (score: 0.00). Add concrete details: names, numbers, dates, measurements, or specific conditions.",
+  "context_used": false,
+  "enforcement": {
+    "blocking_issues": [],
+    "warnings": [
+      "Low specificity (score: 0.00). Add concrete details and quantitative markers."
+    ],
+    "corrective_prompt": ""
+  }
+}
+```
+
+critique_packet:
+Missed constraints:
+- None material; the draft includes when to use the protocol, how usefulness is measured, and what counts as failure.
+
+Hidden assumptions:
+- Assumes the team already has shared escalation norms, baseline timing data, and a lightweight way to log duck sessions.
+- Assumes a 10-minute trigger and 3-minute duck pass are appropriate defaults for this team's workflow.
+
+Irrelevant or overweighted factors:
+- None obvious; the answer stays on protocol and avoids causal overclaiming.
+
+False certainty or impossible claim:
+- `Confidence (0-100): 90` is stronger than the stated evidence supports given the unspecified workflow and baseline timings.
+- The usefulness measures are directionally good but not operationalized enough to be highly specific; the secondary tool flagged low specificity.
+
+Safer revision target:
+- Keep the non-causal framing, but define one logging method, one denominator for the usefulness rate, and one explicit threshold for "repeated" failure or delayed escalation.

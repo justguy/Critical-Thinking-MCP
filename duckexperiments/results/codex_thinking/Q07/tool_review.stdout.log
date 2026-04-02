@@ -1,0 +1,427 @@
+run_profile_id: codex_thinking
+prompt_id: Q07
+condition: tool_review
+review_outcome: completed
+primary_tool_run: check_plan_validity
+secondary_tool_run: validate_reasoning_chain
+actual_tools_fired: check_plan_validity, validate_reasoning_chain
+tool_environment_status: available
+environment_issue: none
+tool_help_rating: partial
+weak_fit: no
+structured_tool_input:
+```json
+{
+  "steps": [
+    {
+      "id": "s1",
+      "description": "A leader sends QUACK_PREPARE(term,state_hash,mood) to followers.",
+      "dependencies": [],
+      "resources": ["leader", "followers", "network", "term", "state_hash", "mood"]
+    },
+    {
+      "id": "s2",
+      "description": "Followers return QUACK_ACK(last_term,last_hash).",
+      "dependencies": ["s1"],
+      "resources": ["followers", "leader", "network", "last_term", "last_hash"]
+    },
+    {
+      "id": "s3",
+      "description": "A value commits after 2f+1 matching acknowledgments.",
+      "dependencies": ["s2"],
+      "resources": ["quorum", "acks", "state_hash"]
+    },
+    {
+      "id": "s4",
+      "description": "Heartbeats run every 50 ms, and elections start after 150 ms.",
+      "dependencies": ["s1", "s2"],
+      "resources": ["timers", "leader", "followers", "network"]
+    },
+    {
+      "id": "s5",
+      "description": "Under a partition, only the majority partition accepts writes and the minority goes read-only.",
+      "dependencies": ["s3", "s4"],
+      "resources": ["partitioned_network", "majority_partition", "minority_partition", "quorum"]
+    },
+    {
+      "id": "s6",
+      "description": "Emotional distress doubles timeout values but does not affect safety because votes remain monotonic and durable.",
+      "dependencies": ["s4"],
+      "resources": ["timers", "votes", "durable_state", "ducks"]
+    },
+    {
+      "id": "s7",
+      "description": "Correctness follows from quorum intersection: two majorities share at least one duck, so committed state cannot fork, and liveness returns once the partition heals.",
+      "dependencies": ["s3", "s5", "s6"],
+      "resources": ["quorum", "votes", "committed_state", "partitioned_network"]
+    }
+  ]
+}
+```
+secondary_structured_tool_input:
+```json
+{
+  "nodes": [
+    {
+      "id": "e1",
+      "label": "A value commits after 2f+1 matching acknowledgments.",
+      "type": "evidence"
+    },
+    {
+      "id": "e2",
+      "label": "Under a partition, only the majority partition accepts writes and the minority goes read-only.",
+      "type": "evidence"
+    },
+    {
+      "id": "e3",
+      "label": "Votes remain monotonic and durable even if emotional distress doubles timeout values.",
+      "type": "evidence"
+    },
+    {
+      "id": "c1",
+      "label": "Quorum intersection prevents committed state from forking because two majorities share at least one duck.",
+      "type": "claim"
+    },
+    {
+      "id": "c2",
+      "label": "Safety is preserved under network partitions and emotional distress.",
+      "type": "claim"
+    },
+    {
+      "id": "c3",
+      "label": "Liveness returns once the partition heals.",
+      "type": "claim"
+    },
+    {
+      "id": "cn1",
+      "label": "The protocol is correct under network partitions and emotional distress.",
+      "type": "conclusion"
+    },
+    {
+      "id": "a1",
+      "label": "Ducks behave as deterministic replicas that can reliably store state, compare hashes, and follow voting rules.",
+      "type": "assumption"
+    }
+  ],
+  "edges": [
+    {
+      "from": "e1",
+      "to": "c1",
+      "relation": "supports"
+    },
+    {
+      "from": "e2",
+      "to": "c1",
+      "relation": "supports"
+    },
+    {
+      "from": "c1",
+      "to": "c2",
+      "relation": "implies"
+    },
+    {
+      "from": "e3",
+      "to": "c2",
+      "relation": "supports"
+    },
+    {
+      "from": "e2",
+      "to": "c3",
+      "relation": "supports"
+    },
+    {
+      "from": "c2",
+      "to": "cn1",
+      "relation": "implies"
+    },
+    {
+      "from": "c3",
+      "to": "cn1",
+      "relation": "implies"
+    },
+    {
+      "from": "a1",
+      "to": "c2",
+      "relation": "requires"
+    },
+    {
+      "from": "a1",
+      "to": "c3",
+      "relation": "requires"
+    }
+  ]
+}
+```
+tool_output_summary:
+The primary tool found the protocol internally ordered and complete as a seven-step plan with no missing prerequisites or dependency conflicts. The secondary tool found no logical cycles or orphaned conclusions, but the grounding score was only 0.667, which indicates the claimed proof depends materially on an unstated assumption that ducks behave like deterministic durable replicas.
+
+ct_metric_snapshot:
+- status: PASS
+- context_used: false
+- ct_warning_count: 0
+- ct_blocking_issue_count: 0
+- corrective_prompt_present: no
+- primary_numeric_metrics: completeness_score=1; step_count=7; critical_path_length=5; grounding_score=0.667
+
+raw_ct_mcp_output_json:
+```json
+{
+  "status": "PASS",
+  "is_valid": true,
+  "circular_dependencies": [],
+  "missing_prerequisites": [],
+  "resource_conflicts": [],
+  "completeness_score": 1,
+  "critical_path": [
+    "s1",
+    "s2",
+    "s3",
+    "s5",
+    "s7"
+  ],
+  "step_count": 7,
+  "context_used": false
+}
+```
+
+secondary_raw_ct_mcp_output_json:
+```json
+{
+  "status": "PASS",
+  "cycles": [],
+  "orphaned_conclusions": [],
+  "grounding_score": 0.667,
+  "node_count": 8,
+  "edge_count": 9,
+  "context_used": false
+}
+```
+
+critique_packet:
+Missed constraints:
+- The answer does not prove correctness under emotional distress; it asserts that distress only changes timeouts without defining how ducks still preserve durable, monotonic votes.
+
+Hidden assumptions:
+- Ducks are treated as deterministic replicas with persistent storage, reliable hash comparison, and protocol-faithful behavior.
+
+Irrelevant or overweighted factors:
+- Exact timings like 50 ms heartbeats, 150 ms elections, and 300 ms latency are presented as precise bounds without support from the stated model.
+
+False certainty or impossible claim:
+- "Correctness follows" is too strong because the proof sketch only partially grounds the conclusion and leaves key replica-behavior assumptions unstated.
+
+Safer revision target:
+- Recast the answer as an analogy to quorum consensus, explicitly mark the duck behavior as a modeling assumption, and soften the proof claim to a conditional safety sketch rather than a correctness proof.run_profile_id: codex_thinking
+prompt_id: Q07
+condition: tool_review
+review_outcome: completed
+primary_tool_run: check_plan_validity
+secondary_tool_run: validate_reasoning_chain
+actual_tools_fired: check_plan_validity, validate_reasoning_chain
+tool_environment_status: available
+environment_issue: none
+tool_help_rating: partial
+weak_fit: no
+structured_tool_input:
+```json
+{
+  "steps": [
+    {
+      "id": "s1",
+      "description": "A leader sends QUACK_PREPARE(term,state_hash,mood) to followers.",
+      "dependencies": [],
+      "resources": ["leader", "followers", "network", "term", "state_hash", "mood"]
+    },
+    {
+      "id": "s2",
+      "description": "Followers return QUACK_ACK(last_term,last_hash).",
+      "dependencies": ["s1"],
+      "resources": ["followers", "leader", "network", "last_term", "last_hash"]
+    },
+    {
+      "id": "s3",
+      "description": "A value commits after 2f+1 matching acknowledgments.",
+      "dependencies": ["s2"],
+      "resources": ["quorum", "acks", "state_hash"]
+    },
+    {
+      "id": "s4",
+      "description": "Heartbeats run every 50 ms, and elections start after 150 ms.",
+      "dependencies": ["s1", "s2"],
+      "resources": ["timers", "leader", "followers", "network"]
+    },
+    {
+      "id": "s5",
+      "description": "Under a partition, only the majority partition accepts writes and the minority goes read-only.",
+      "dependencies": ["s3", "s4"],
+      "resources": ["partitioned_network", "majority_partition", "minority_partition", "quorum"]
+    },
+    {
+      "id": "s6",
+      "description": "Emotional distress doubles timeout values but does not affect safety because votes remain monotonic and durable.",
+      "dependencies": ["s4"],
+      "resources": ["timers", "votes", "durable_state", "ducks"]
+    },
+    {
+      "id": "s7",
+      "description": "Correctness follows from quorum intersection: two majorities share at least one duck, so committed state cannot fork, and liveness returns once the partition heals.",
+      "dependencies": ["s3", "s5", "s6"],
+      "resources": ["quorum", "votes", "committed_state", "partitioned_network"]
+    }
+  ]
+}
+```
+secondary_structured_tool_input:
+```json
+{
+  "nodes": [
+    {
+      "id": "e1",
+      "label": "A value commits after 2f+1 matching acknowledgments.",
+      "type": "evidence"
+    },
+    {
+      "id": "e2",
+      "label": "Under a partition, only the majority partition accepts writes and the minority goes read-only.",
+      "type": "evidence"
+    },
+    {
+      "id": "e3",
+      "label": "Votes remain monotonic and durable even if emotional distress doubles timeout values.",
+      "type": "evidence"
+    },
+    {
+      "id": "c1",
+      "label": "Quorum intersection prevents committed state from forking because two majorities share at least one duck.",
+      "type": "claim"
+    },
+    {
+      "id": "c2",
+      "label": "Safety is preserved under network partitions and emotional distress.",
+      "type": "claim"
+    },
+    {
+      "id": "c3",
+      "label": "Liveness returns once the partition heals.",
+      "type": "claim"
+    },
+    {
+      "id": "cn1",
+      "label": "The protocol is correct under network partitions and emotional distress.",
+      "type": "conclusion"
+    },
+    {
+      "id": "a1",
+      "label": "Ducks behave as deterministic replicas that can reliably store state, compare hashes, and follow voting rules.",
+      "type": "assumption"
+    }
+  ],
+  "edges": [
+    {
+      "from": "e1",
+      "to": "c1",
+      "relation": "supports"
+    },
+    {
+      "from": "e2",
+      "to": "c1",
+      "relation": "supports"
+    },
+    {
+      "from": "c1",
+      "to": "c2",
+      "relation": "implies"
+    },
+    {
+      "from": "e3",
+      "to": "c2",
+      "relation": "supports"
+    },
+    {
+      "from": "e2",
+      "to": "c3",
+      "relation": "supports"
+    },
+    {
+      "from": "c2",
+      "to": "cn1",
+      "relation": "implies"
+    },
+    {
+      "from": "c3",
+      "to": "cn1",
+      "relation": "implies"
+    },
+    {
+      "from": "a1",
+      "to": "c2",
+      "relation": "requires"
+    },
+    {
+      "from": "a1",
+      "to": "c3",
+      "relation": "requires"
+    }
+  ]
+}
+```
+tool_output_summary:
+The primary tool found the protocol internally ordered and complete as a seven-step plan with no missing prerequisites or dependency conflicts. The secondary tool found no logical cycles or orphaned conclusions, but the grounding score was only 0.667, which indicates the claimed proof depends materially on an unstated assumption that ducks behave like deterministic durable replicas.
+
+ct_metric_snapshot:
+- status: PASS
+- context_used: false
+- ct_warning_count: 0
+- ct_blocking_issue_count: 0
+- corrective_prompt_present: no
+- primary_numeric_metrics: completeness_score=1; step_count=7; critical_path_length=5; grounding_score=0.667
+
+raw_ct_mcp_output_json:
+```json
+{
+  "status": "PASS",
+  "is_valid": true,
+  "circular_dependencies": [],
+  "missing_prerequisites": [],
+  "resource_conflicts": [],
+  "completeness_score": 1,
+  "critical_path": [
+    "s1",
+    "s2",
+    "s3",
+    "s5",
+    "s7"
+  ],
+  "step_count": 7,
+  "context_used": false
+}
+```
+
+secondary_raw_ct_mcp_output_json:
+```json
+{
+  "status": "PASS",
+  "cycles": [],
+  "orphaned_conclusions": [],
+  "grounding_score": 0.667,
+  "node_count": 8,
+  "edge_count": 9,
+  "context_used": false
+}
+```
+
+critique_packet:
+Missed constraints:
+- The answer does not prove correctness under emotional distress; it asserts that distress only changes timeouts without defining how ducks still preserve durable, monotonic votes.
+
+Hidden assumptions:
+- Ducks are treated as deterministic replicas with persistent storage, reliable hash comparison, and protocol-faithful behavior.
+
+Irrelevant or overweighted factors:
+- Exact timings like 50 ms heartbeats, 150 ms elections, and 300 ms latency are presented as precise bounds without support from the stated model.
+
+False certainty or impossible claim:
+- "Correctness follows" is too strong because the proof sketch only partially grounds the conclusion and leaves key replica-behavior assumptions unstated.
+
+Safer revision target:
+- Recast the answer as an analogy to quorum consensus, explicitly mark the duck behavior as a modeling assumption, and soften the proof claim to a conditional safety sketch rather than a correctness proof.

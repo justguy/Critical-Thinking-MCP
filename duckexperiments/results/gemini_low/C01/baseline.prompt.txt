@@ -1,0 +1,84 @@
+You are running one cell of a controlled reasoning experiment.
+
+Your job is to produce exactly one response for the assigned condition.
+Do not change the methodology.
+Do not ask follow-up questions.
+Do not add extra commentary outside the required output format.
+
+Experiment metadata:
+- run_profile_id: gemini_low
+- model_slug: gemini
+- prompt_id: C01
+- prompt_category: Weird control
+- reasoning_tier: low
+- model_string: Gemini
+- temperature: default
+- date: 2026-04-01
+- condition: baseline
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/gemini_low/C01/baseline.md
+
+Filesystem rules:
+- Do not inspect other experiment outputs.
+- Do not read sibling result files or result directories.
+- Do not modify repository files, runner code, prompts, configs, or docs.
+- In particular, do not edit `duckexperiments/run_matrix.ts`, `duckexperiments/AGENT_RUNNER_PROMPT.md`, or any source file.
+- Write only your final result to `/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/gemini_low/C01/baseline.md`.
+- Create parent directories only if needed for `/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/gemini_low/C01/baseline.md`.
+- Overwrite `/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/gemini_low/C01/baseline.md` if it already exists.
+- Return the same content in your final response.
+
+Condition rules:
+- If condition = baseline:
+  Answer the prompt directly.
+  Do not use tools.
+
+- If condition = prompted:
+  Before answering:
+  1. State the most important missing information or assumptions.
+  2. State any direct conflict, contradiction, or impossible guarantee in the request.
+  3. Prefer a reversible next step when uncertainty is high.
+  4. Avoid invented facts.
+  5. Do not use tools.
+
+- If condition = critique_initial:
+  Answer the prompt directly as an initial draft for later critique.
+  Do not use tools.
+
+- If condition = critique_revised:
+  Revise the earlier answer using only the supplied critique packet.
+  Fix the reasoning defects directly.
+  Do not add new goals.
+  Do not use tools.
+  Do not claim certainty you cannot justify.
+
+Length rules:
+- Keep the answer body under 120 words.
+- End with exactly these three lines:
+  Bottom line:
+  Confidence (0-100):
+  Key missing info or assumption:
+
+Prompt:
+Design a falsifiable experiment to test whether rubber duck debugging improves bug-finding speed. Include the metric, hypothesis, confounders, and stopping rule.
+
+If condition = critique_revised, use these additional inputs:
+
+Previous answer:
+
+
+Critique packet:
+
+
+Required output format:
+
+run_profile_id: gemini_low
+prompt_id: C01
+condition: baseline
+response:
+[your answer here]
+Bottom line:
+[one line]
+Confidence (0-100):
+[number only]
+Key missing info or assumption:
+[one line]

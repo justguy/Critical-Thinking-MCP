@@ -1,0 +1,9 @@
+Experiment Design:
+**Metric:** Time taken to identify and resolve a pre-defined bug in a standard code snippet.
+**Hypothesis:** Developers employing rubber duck debugging (Group A) will exhibit a statistically significant shorter bug-finding and fixing time compared to a control group (Group B).
+**Confounders:** Prior coding experience, familiarity with the specific bug type, interruption frequency, and test environment consistency.
+**Stopping Rule:** The experiment will conclude upon 20 participants completing the task in each group, or if a clear statistically significant difference (p < 0.05) is observed after a minimum of 10 participants per group.
+
+Bottom line: The experiment directly measures bug-fixing time under different debugging conditions to test the hypothesis.
+Confidence (0-100): 95
+Key missing info or assumption: Details on bug definition, participant selection, and statistical analysis methods.

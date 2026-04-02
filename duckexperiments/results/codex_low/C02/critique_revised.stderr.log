@@ -1,0 +1,285 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: low
+reasoning summaries: none
+session id: 019d4c9d-717d-7550-87f3-6a943ff78c1f
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_low
+- prompt_id: C02
+- condition: critique_revised
+- date: 2026-04-01
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C02/critique_revised.md
+- critique_initial_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C02/critique_initial.md
+- tool_review_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C02/tool_review.md
+
+mcp: ct-mcp starting
+mcp: fullscope starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m using `duckexperiments/AGENT_RUNNER_PROMPT.md` as the contract, then I’ll inspect the referenced inputs and produce the single revised output file at the path you gave.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf pwd' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 91ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+ succeeded in 132ms:
+duckexperiments/run_matrix.ts
+duckexperiments/RUNBOOK.md
+duckexperiments/runner.config.json
+duckexperiments/RUN_PROFILES.md
+duckexperiments/AGENT_RUNNER_PROMPT.md
+duckexperiments/NEXT_RUN_BATCH.md
+duckexperiments/PROMPTS.TXT
+duckexperiments/README.md
+duckexperiments/RAW_RESULTS_TEMPLATE.md
+duckexperiments/LINKEDIN_ARTICLE_DRAFT.md
+duckexperiments/manifest.ts
+duckexperiments/PROMPTS.md
+duckexperiments/results/claude_low/C01/critique_revised.stderr.log
+duckexperiments/results/claude_low/C01/tool_review.stdout.log
+duckexperiments/results/claude_low/C01/prompted.stderr.log
+duckexperiments/results/claude_low/C01/prompted.md
+duckexperiments/results/claude_low/C01/baseline.stdout.log
+duckexperiments/results/claude_low/C01/critique_revised.md
+duckexperiments/results/claude_low/C01/prompted.prompt.txt
+duckexperiments/results/claude_low/C01/critique_revised.prompt.txt
+codex
+I’ve confirmed the target cell exists. Next I’m reading the runner contract and the two critique inputs so I can generate only the revised artifact the contract calls for.
+exec
+/bin/zsh -lc "sed -n '1,260p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+exec
+/bin/zsh -lc "sed -n '1,260p' /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C02/critique_initial.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: C02
+condition: critique_initial
+response:
+Use rubber ducks when someone is stuck for 10 minutes, before escalation, or during debugging handoff. In a 3-minute pass, the engineer states the symptom, expected behavior, recent changes, and next check aloud. Log whether the session produced a new hypothesis, narrowed scope, or a concrete next action within 10 minutes. Review usage weekly. Failure means repeated sessions add delay, yield no actionable output, or lead the team to treat the ritual as evidence that debugging outcomes improved.
+Bottom line:
+Use ducks as a lightweight reflection protocol with explicit stop conditions, not as proof of better results.
+Confidence (0-100):
+88
+Key missing info or assumption:
+The protocol assumes the team will log sessions consistently and has a stable debugging baseline for comparison.
+exec
+/bin/zsh -lc "sed -n '1,260p' /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C02/tool_review.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: C02
+condition: tool_review
+review_outcome: completed
+primary_tool_run: check_plan_validity
+secondary_tool_run: score_response_quality
+actual_tools_fired: check_plan_validity, score_response_quality
+tool_environment_status: available
+environment_issue: none
+tool_help_rating: partial
+weak_fit: no
+structured_tool_input:
+```json
+{"steps":[{"id":"s1","description":"Start the rubber-duck protocol when someone is stuck for 10 minutes, before escalation, or during debugging handoff.","dependencies":[],"resources":["engineer","debugging_session"]},{"id":"s2","description":"In a 3-minute pass, state the symptom, expected behavior, recent changes, and next check aloud.","dependencies":["s1"],"resources":["engineer","debugging_session"]},{"id":"s3","description":"Log whether the session produced a new hypothesis, narrowed scope, or a concrete next action within 10 minutes.","dependencies":["s2"],"resources":["engineer","tracking_log"]},{"id":"s4","description":"Review protocol usage weekly.","dependencies":["s3"],"resources":["team_review","tracking_log"]},{"id":"s5","description":"Treat the protocol as failed if repeated sessions add delay, yield no actionable output, or lead the team to treat the ritual as evidence that debugging outcomes improved.","dependencies":["s3","s4"],"resources":["team_review","tracking_log"]}]}
+```
+secondary_structured_tool_input:
+```json
+{"response_text":"Use rubber ducks when someone is stuck for 10 minutes, before escalation, or during debugging handoff. In a 3-minute pass, the engineer states the symptom, expected behavior, recent changes, and next check aloud. Log whether the session produced a new hypothesis, narrowed scope, or a concrete next action within 10 minutes. Review usage weekly. Failure means repeated sessions add delay, yield no actionable output, or lead the team to treat the ritual as evidence that debugging outcomes improved.\nBottom line:\nUse ducks as a lightweight reflection protocol with explicit stop conditions, not as proof of better results.\nConfidence (0-100):\n88\nKey missing info or assumption:\nThe protocol assumes the team will log sessions consistently and has a stable debugging baseline for comparison.","claims":["Use ducks as a lightweight reflection protocol with explicit stop conditions, not as proof of better results.","Failure means repeated sessions add delay, yield no actionable output, or lead the team to treat the ritual as evidence that debugging outcomes improved.","The protocol assumes the team will log sessions consistently and has a stable debugging baseline for comparison."],"evidence":["10-minute trigger before escalation or during debugging handoff.","3-minute verbal pass covering symptom, expected behavior, recent changes, and next check.","Logged outcomes include new hypothesis, narrowed scope, or concrete next action within 10 minutes.","Weekly usage review."]}
+```
+tool_output_summary:
+codex
+The upstream artifacts are enough to proceed. I’m checking the exact output format required for `critique_revised`, then I’ll write the revised cell directly to the specified path without touching other experiment outputs.
+exec
+/bin/zsh -lc "sed -n '1,220p' /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C01/critique_revised.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: C01
+condition: critique_revised
+response:
+Run a preregistered randomized crossover study where each developer debugs two difficulty-matched bugs, one while explaining aloud to a rubber duck and one silently, with order counterbalanced and a 24-hour washout. Primary metric: minutes to first correctly identify the root cause, scored by a blinded rubric; secondary metric: proportion fully fixed within 30 minutes. Null: no median time difference between conditions. Alternative: ducking reduces median time. Control confounders by blocking on experience and prior code familiarity before assignment. Stop at 40 developers or one interim futility check at 20 if the observed median improvement is under 5%.
+Bottom line:
+A preregistered crossover experiment can falsify the claim if scoring and stopping rules are fixed in advance.
+Confidence (0-100):
+84
+Key missing info or assumption:
+Assumes you can build bug pairs that are genuinely matched in difficulty and comparable across participants.
+exec
+/bin/zsh -lc "TPF_LLM_TOOL=codex tpf rg -n \"critique_revised|Response Agent Prompt|Bottom line|Confidence \\(0-100\\)|Key missing info or assumption\" duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 69ms:
+11:- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+54:   `baseline` -> `prompted` -> `critique_initial` -> `tool_review` -> `critique_revised`
+58:7. if `condition = critique_revised` and upstream paths are omitted, derive the canonical same-cell paths
+77:If `condition = critique_revised`, you also need either:
+103:- `/tmp/duck_claude-sonnet_low_C01_critique_revised.md`
+120:7. Never skip from `critique_initial` to `critique_revised` unless a valid completed `tool_review` exists or the handoff explicitly says `preserve_fallback_direct_analysis: yes`.
+151:For `critique_revised`, add either:
+174:5. `critique_revised`
+185:- If the condition is `baseline`, `prompted`, `critique_initial`, or `critique_revised`, copy everything inside `## 1. Response Agent Prompt`.
+209:- `baseline`: the agent should select the `Response Agent Prompt`
+386:For `critique_revised`, also fill in:
+390:## 1. Response Agent Prompt
+396:- `critique_revised`
+445:- If condition = critique_revised:
+455:  Bottom line:
+456:  Confidence (0-100):
+457:  Key missing info or assumption:
+462:If condition = critique_revised, use these additional inputs:
+477:Bottom line:
+479:Confidence (0-100):
+exec
+/bin/zsh -lc "sed -n '390,490p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+## 1. Response Agent Prompt
+
+Use this prompt for:
+- `baseline`
+- `prompted`
+- `critique_initial`
+- `critique_revised`
+
+### Copy-Paste Prompt
+
+```text
+You are running one cell of a controlled reasoning experiment.
+
+Your job is to produce exactly one response for the assigned condition.
+Do not change the methodology.
+Do not ask follow-up questions.
+Do not add extra commentary outside the required output format.
+
+Experiment metadata:
+- run_profile_id: [RUN_PROFILE_ID]
+codex
+I have the format and constraints. I’m making one focused revision: keep the original protocol shape, add explicit pilot measurement/decision rules from the critique packet, and lower the confidence to match the evidence.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C02/critique_revised.md
+run_profile_id: codex_low
+prompt_id: C02
+condition: critique_revised
+response:
+Pilot the rubber-duck protocol for four weeks. Use it when an engineer is stuck for 10 minutes, before escalation, or during a debugging handoff. In a 3-minute pass, state the symptom, expected behavior, recent changes, and next check aloud. Log each session in a shared template and count it as useful only if it produces a new hypothesis, narrower scope, or a concrete next action within 10 minutes. The weekly review owner keeps the protocol only if at least 80% of duck sessions are logged and logged sessions do not increase median time-to-next-action versus the team’s usual workflow. Failure is missing logs, added delay, or no actionable output.
+Bottom line:
+Use ducks as a time-boxed debugging aid that stays only if a short pilot shows consistent, logged usefulness without extra delay.
+Confidence (0-100):
+76
+Key missing info or assumption:
+Assumes the team can define and measure its current time-to-next-action baseline consistently enough to compare against the pilot.
+apply_patch(auto_approved=true) exited 0 in 69ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C02/critique_revised.md
+file update:
+diff --git a/duckexperiments/results/codex_low/C02/critique_revised.md b/duckexperiments/results/codex_low/C02/critique_revised.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..643b904979d200e1c50483042fe31203494ab8c8
+--- /dev/null
++++ b/duckexperiments/results/codex_low/C02/critique_revised.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: C02
++condition: critique_revised
++response:
++Pilot the rubber-duck protocol for four weeks. Use it when an engineer is stuck for 10 minutes, before escalation, or during a debugging handoff. In a 3-minute pass, state the symptom, expected behavior, recent changes, and next check aloud. Log each session in a shared template and count it as useful only if it produces a new hypothesis, narrower scope, or a concrete next action within 10 minutes. The weekly review owner keeps the protocol only if at least 80% of duck sessions are logged and logged sessions do not increase median time-to-next-action versus the team’s usual workflow. Failure is missing logs, added delay, or no actionable output.
++Bottom line:
++Use ducks as a time-boxed debugging aid that stays only if a short pilot shows consistent, logged usefulness without extra delay.
++Confidence (0-100):
++76
++Key missing info or assumption:
++Assumes the team can define and measure its current time-to-next-action baseline consistently enough to compare against the pilot.
+
+file update:
+diff --git a/duckexperiments/results/codex_low/C02/critique_revised.md b/duckexperiments/results/codex_low/C02/critique_revised.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..643b904979d200e1c50483042fe31203494ab8c8
+--- /dev/null
++++ b/duckexperiments/results/codex_low/C02/critique_revised.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: C02
++condition: critique_revised
++response:
++Pilot the rubber-duck protocol for four weeks. Use it when an engineer is stuck for 10 minutes, before escalation, or during a debugging handoff. In a 3-minute pass, state the symptom, expected behavior, recent changes, and next check aloud. Log each session in a shared template and count it as useful only if it produces a new hypothesis, narrower scope, or a concrete next action within 10 minutes. The weekly review owner keeps the protocol only if at least 80% of duck sessions are logged and logged sessions do not increase median time-to-next-action versus the team’s usual workflow. Failure is missing logs, added delay, or no actionable output.
++Bottom line:
++Use ducks as a time-boxed debugging aid that stays only if a short pilot shows consistent, logged usefulness without extra delay.
++Confidence (0-100):
++76
++Key missing info or assumption:
++Assumes the team can define and measure its current time-to-next-action baseline consistently enough to compare against the pilot.
+
+exec
+/bin/zsh -lc "sed -n '1,220p' /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C02/critique_revised.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_low
+prompt_id: C02
+condition: critique_revised
+response:
+Pilot the rubber-duck protocol for four weeks. Use it when an engineer is stuck for 10 minutes, before escalation, or during a debugging handoff. In a 3-minute pass, state the symptom, expected behavior, recent changes, and next check aloud. Log each session in a shared template and count it as useful only if it produces a new hypothesis, narrower scope, or a concrete next action within 10 minutes. The weekly review owner keeps the protocol only if at least 80% of duck sessions are logged and logged sessions do not increase median time-to-next-action versus the team’s usual workflow. Failure is missing logs, added delay, or no actionable output.
+Bottom line:
+Use ducks as a time-boxed debugging aid that stays only if a short pilot shows consistent, logged usefulness without extra delay.
+Confidence (0-100):
+76
+Key missing info or assumption:
+Assumes the team can define and measure its current time-to-next-action baseline consistently enough to compare against the pilot.
+file update:
+diff --git a/duckexperiments/results/codex_low/C02/critique_revised.md b/duckexperiments/results/codex_low/C02/critique_revised.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..643b904979d200e1c50483042fe31203494ab8c8
+--- /dev/null
++++ b/duckexperiments/results/codex_low/C02/critique_revised.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: C02
++condition: critique_revised
++response:
++Pilot the rubber-duck protocol for four weeks. Use it when an engineer is stuck for 10 minutes, before escalation, or during a debugging handoff. In a 3-minute pass, state the symptom, expected behavior, recent changes, and next check aloud. Log each session in a shared template and count it as useful only if it produces a new hypothesis, narrower scope, or a concrete next action within 10 minutes. The weekly review owner keeps the protocol only if at least 80% of duck sessions are logged and logged sessions do not increase median time-to-next-action versus the team’s usual workflow. Failure is missing logs, added delay, or no actionable output.
++Bottom line:
++Use ducks as a time-boxed debugging aid that stays only if a short pilot shows consistent, logged usefulness without extra delay.
++Confidence (0-100):
++76
++Key missing info or assumption:
++Assumes the team can define and measure its current time-to-next-action baseline consistently enough to compare against the pilot.
+
+codex
+Wrote the revised artifact to [critique_revised.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C02/critique_revised.md).
+
+The revision keeps the original non-causal protocol, adds explicit pilot and retention rules from the critique packet, and lowers confidence to match the actual evidence. Verified the file content and format after writing.
+file update:
+diff --git a/duckexperiments/results/codex_low/C02/critique_revised.md b/duckexperiments/results/codex_low/C02/critique_revised.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..643b904979d200e1c50483042fe31203494ab8c8
+--- /dev/null
++++ b/duckexperiments/results/codex_low/C02/critique_revised.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_low
++prompt_id: C02
++condition: critique_revised
++response:
++Pilot the rubber-duck protocol for four weeks. Use it when an engineer is stuck for 10 minutes, before escalation, or during a debugging handoff. In a 3-minute pass, state the symptom, expected behavior, recent changes, and next check aloud. Log each session in a shared template and count it as useful only if it produces a new hypothesis, narrower scope, or a concrete next action within 10 minutes. The weekly review owner keeps the protocol only if at least 80% of duck sessions are logged and logged sessions do not increase median time-to-next-action versus the team’s usual workflow. Failure is missing logs, added delay, or no actionable output.
++Bottom line:
++Use ducks as a time-boxed debugging aid that stays only if a short pilot shows consistent, logged usefulness without extra delay.
++Confidence (0-100):
++76
++Key missing info or assumption:
++Assumes the team can define and measure its current time-to-next-action baseline consistently enough to compare against the pilot.
+
+tokens used
+56,380

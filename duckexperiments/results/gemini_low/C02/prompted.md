@@ -1,0 +1,14 @@
+run_profile_id: gemini_low
+prompt_id: C02
+condition: prompted
+response:
+Team Protocol for Rubber Duck Debugging:
+
+**When to Use:** Engage the 'duck' when encountering a persistent bug or logic puzzle, especially after 15 minutes of individual effort. This is a pre-escalation step, ideal before involving colleagues or deeper investigation.
+
+**Measuring Usefulness:** Usefulness is assessed through self-reflection: did verbalizing the issue clarify your understanding or reveal a blind spot? Track instances where speaking aloud helped formulate a solution or a clear next action. This focuses on process improvement, not guaranteed outcomes.
+
+**What Constitutes Failure:** Failure occurs if explaining the problem consistently yields no new insights, or if it becomes a substitute for necessary deeper investigation, external resources, or collaboration. If the process does not facilitate clearer problem articulation, it is not being used effectively.
+Bottom line: A structured approach to rubber duck debugging can aid problem articulation and self-reflection, focusing on process utility rather than outcome guarantees.
+Confidence (0-100): 95
+Key missing info or assumption: Specific team context (size, location, existing tools) and desired reporting methods for usefulness.

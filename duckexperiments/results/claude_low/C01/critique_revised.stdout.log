@@ -1,0 +1,8 @@
+Written to `/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_low/C01/critique_revised.md`.
+
+Key changes from `critique_initial`:
+- **Metric narrowed**: detection time only, separated from fix/verification time
+- **Carryover addressed**: washout gap added, order × condition interaction check required before interpreting results
+- **Stopping rule conditioned**: now contingent on passing the order-effect check
+- **Colleague presence deprioritized** in favor of diagnosability variance and carryover as the real threats
+- Confidence bumped slightly to 76 (design is tighter, but task bank validation remains the gating assumption)

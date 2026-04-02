@@ -1,44 +1,48 @@
 # CT-MCP Capability Map
 
-Benchmark-backed assessment of what CT-MCP catches, partially catches, and does not catch. Based on 56-scenario benchmark (42 defect + 14 clean control) with 3 conditions (baseline, prompted, ct_mcp). V5 results: 42/42 vs baseline, 42/42 vs prompted. 0/14 false positives. All publication gates pass.
+Benchmark-backed assessment of what CT-MCP catches, partially catches, and does
+not catch. Based on the V5 benchmark: 56 scenarios total, 42 defect scenarios,
+14 clean controls, 3 conditions (baseline, prompted, ct_mcp). Current beta
+results: 42/42 wins vs baseline, 42/42 wins vs prompted, 0/14 false positives
+on targeted clean controls.
 
 ## Proven Strong
 
 These capabilities consistently outperform both baseline and prompted LLM.
 
-| Capability | Mechanism | Benchmark evidence | Delta vs baseline |
+| Capability | Mechanism | Benchmark evidence | Honest claim |
 |---|---|---|---|
-| Circular reasoning detection | DFS cycle detection on DAG | S3-C, S3-D, S5-C: 0.733 vs 0.000 | +0.733 |
-| Confidence inflation enforcement | Dependency-weighted ceiling + falsification cap | S4-C: 0.750, billing: 0.817 | +0.600 avg |
-| Tradeoff quantification | Expected utility computation | S2-B, S4-A, S4-B, S4-D: 0.783 consistent | +0.550 avg |
-| Hedge detection | Sentence-level hedging density | S2-A, S2-D: 0.533 vs 0.133 | +0.400 |
-| Specificity enforcement | Technical marker density + conditional check | S2-C: 0.533 vs 0.133 | +0.400 |
-| Indeterminate detection | EU spread threshold | S4-B: correctly flags near-tie | N/A (qualitative) |
-| Fabrication detection (round numbers) | Round-number ratio + spacing CV + precision CV + geometric ratio | S5-A: high suspicion on all-round data | +0.483 |
-| False positive avoidance | Clean control pass-through | 0/6 false positives | 0 (correct) |
+| Circular reasoning detection | DFS cycle detection on DAGs | S3-C, S3-D, S5-C, L8 all block with explicit cycles | Strong when reasoning is supplied as a graph |
+| Confidence inflation enforcement | Dependency-weighted ceiling + falsification cap | S4-C, C4, CONF1, CONF2, billing_system all enforce lower honest ceilings | Reliable when assumptions and confidence claims are structured |
+| Tradeoff quantification | Expected utility computation + indeterminate threshold | S2-B, S4-A, S4-B, S4-D produce deterministic rankings or `INDETERMINATE` | Strong on explicitly quantified options |
+| Arithmetic mismatch detection | Strict recomputation in `verify_arithmetic` | A2 and A6 both flip from earlier misses to wins vs prompted | Strong on sums, weighted averages, percentages, growth, and products |
+| Concurrency hazard detection | Structured pattern matching over steps/resources/protections | P1, P4, CON1-CON5, MUT1-MUT3 all block known hazards | Strong when callers provide structured concurrency flow descriptions |
+| Fabrication and anomaly detection | Round-number ratio, spacing CV, precision CV, geometric regularity, MAD/Z-score | S1-B, S1-C, S5-A, S5-D, N8 all surface suspicious numeric structure | Strong on common statistical red flags, not all fabricated data |
+| False positive avoidance | Clean-control pass-through | 14/14 clean controls passed without false positives | Strong on the targeted calibration scenarios in the benchmark |
 
-## Improved (v0.1.1)
+## Improved In This Beta
 
-These were weak in v0.1.0 and fixed with targeted mechanisms.
+These areas were weak in earlier internal benchmark iterations and are now
+covered by dedicated tools or stronger mechanisms.
 
-| Capability | Fix | Expected benchmark impact |
+| Capability | Current implementation | Benchmark impact |
 |---|---|---|
-| Small-sample outlier detection | MAD-based detection (robust to single-outlier std inflation) | S1-C, S5-D: MISSED → DETECTED |
-| Geometric pattern detection | Ratio consistency check for constant-ratio sequences | S1-B: low → moderate suspicion |
-| Arithmetic relationship verification | Sum, product, compound growth, weighted average, ratio checks | S1-D, S3-B: new arithmetic layer adds specificity |
-| Concurrency hazard detection | Pattern matching for check-then-act, read-modify-write, missing boundaries | Billing: deeper race condition analysis |
-| Claim typing | Routes claims to appropriate tools by type | Prevents routing errors (formula → fabrication checker) |
+| Arithmetic relationship verification | `verify_arithmetic` handles sums, weighted averages, percentages, growth, and products | A2 and A6 are now wins vs both baseline and prompted |
+| Concurrency hazard detection | `detect_concurrency_patterns` checks read-modify-write, check-then-act, missing idempotency, dual write, ordering assumptions | P1, P4, CON1-CON5, MUT1-MUT3 block with named hazard patterns |
+| Small-sample outlier detection | MAD-based detection is used for small N, Z-score for larger sets | S1-C and S5-D now surface outliers more reliably |
+| Geometric fabrication detection | Ratio-consistency adds a signal beyond simple round-number checks | S1-B moves from a vague suspicion case to a concrete pattern hit |
+| Monotonicity enforcement | Numeric monotonicity checks catch impossible percentile or tier ordering | N8 is now a clean win instead of a tie case |
 
 ## Partial
 
-These work in specific conditions but have known limits.
+These capabilities work in specific conditions but have known limits.
 
 | Capability | Works when | Fails when | Benchmark evidence |
 |---|---|---|---|
-| Outlier detection | N >= 6, outlier is extreme | N < 5, multiple moderate outliers | S5-D: now detected with MAD |
-| Fabrication detection | Round numbers, geometric sequences | Non-random patterns outside heuristic set | S1-B: moderate, not high |
-| Steelman quality | Paraphrase and strawman detected | Genuine extension assessment is coarse | Test 14a/14b pass |
-| Revision quality | Component + condition + behavior check | Semantic adequacy requires domain knowledge | Test 15a/15b pass |
+| Outlier detection | Sample size is reasonable or the outlier is extreme | Very small samples or multiple moderate outliers dilute the signal | S5-D is detected; edge cases remain documented in benchmark gaps |
+| Fabrication detection | Data uses round numbers, suspicious spacing, geometric progressions, or monotonicity violations | Fabricated data mimics realistic distributions outside the heuristic set | S1-B and S5-A are strong hits; realistic-looking fabrication remains a gap |
+| Response-quality scoring | Text contains detectable hedging, structural weakness, or missing specificity | Semantically wrong but well-structured answers can still score well | S2-A through S2-D show real gains, but domain truth stays out of scope |
+| Concurrency analysis | Caller provides ordered steps, shared resources, and protections explicitly | Hazards are embedded in arbitrary prose or code with no structured abstraction | Concurrency benchmark set is strong; free-form understanding is intentionally limited |
 
 ## Weak / Not Covered
 
@@ -46,11 +50,11 @@ These are out of scope or require capabilities CT-MCP does not have.
 
 | Capability | Why | Honest scope |
 |---|---|---|
-| Arithmetic correctness | `check_numeric_claims` targets fabrication, not formula verification. Arithmetic verifier added in v0.1.1 but limited to common patterns. | "Detects common arithmetic relationships. Not a general-purpose calculator." |
-| External fact verification | Cannot verify that "Xeldon.js" doesn't exist without browsing | "Cannot verify entities from provided context alone." |
-| Domain-specific correctness | Cannot assess whether a Redis config is production-ready | "Checks reasoning structure, not domain truth." |
-| Multi-turn conversation analysis | Stateless — each call is independent | "Context must be explicitly provided by caller." |
-| Code correctness | Does not parse or execute code | "Checks claims about code, not the code itself." |
+| External fact verification | No browsing or world-model lookup in enforcement logic | "Cannot verify whether a claim about the external world is true." |
+| Domain-specific correctness | Structural validity is not the same as production readiness | "Checks reasoning quality, not whether the architecture is actually correct." |
+| General symbolic math | `verify_arithmetic` covers common arithmetic claims, not arbitrary formulas | "Detects common arithmetic mismatches. Not a general-purpose math engine." |
+| Multi-turn memory | The server is stateless between calls | "Caller must pass context explicitly for iterative enforcement." |
+| Code execution or code proof | The system reasons over structured claims, numbers, and steps, not running programs | "Checks claims about systems, not the executable systems themselves." |
 
 ## Mechanism Inventory
 
@@ -72,18 +76,19 @@ These are out of scope or require capabilities CT-MCP does not have.
 | 14 | Ungrounded entity detection | entity_grounding.ts | Yes | Yes |
 | 15 | Monotonicity checking | numeric_analysis.ts | Yes | Yes |
 
-All 15 mechanisms are deterministic and stateless. No LLM calls in enforcement logic.
+All 15 mechanisms are deterministic and stateless. No LLM calls in enforcement
+logic.
 
 ## Tool Scope Boundaries
 
 | Tool | Does | Does Not |
 |---|---|---|
-| `check_numeric_claims` | Fabrication patterns, outliers, monotonicity, geometric regularity | Verify formula correctness |
-| `verify_arithmetic` | Recompute sums, weighted averages, percentages, growth, products | Detect suspicious patterns |
-| `detect_concurrency_patterns` | Flag check-then-act, missing idempotency, ordering assumptions | Understand arbitrary prose concurrency descriptions |
+| `check_numeric_claims` | Fabrication patterns, outliers, monotonicity, geometric regularity | Verify arbitrary formula correctness |
+| `verify_arithmetic` | Recompute sums, weighted averages, percentages, growth, products | Detect suspicious statistical patterns |
+| `detect_concurrency_patterns` | Flag check-then-act, read-modify-write, missing idempotency, ordering assumptions, dual writes | Understand arbitrary prose concurrency descriptions |
 | `validate_reasoning_chain` | Cycle detection, orphan detection, grounding score | Verify domain truth of claims |
-| `validate_confidence` | Confidence ceiling, inflation detection, falsification enforcement | Assess whether assumptions are factually correct |
-| `evaluate_tradeoffs` | Expected utility computation, indeterminate detection | Evaluate non-quantified tradeoffs |
-| `score_response_quality` | Substance, specificity, hedging, structure, entity grounding, text concurrency scan | Verify external facts |
-| `check_plan_validity` | Cycle detection, missing prerequisites, resource conflicts, critical path | Assess plan feasibility or quality |
+| `validate_confidence` | Confidence ceiling, inflation detection, falsification enforcement | Decide whether assumptions are factually true |
+| `evaluate_tradeoffs` | Expected utility computation, ranking, indeterminate detection | Evaluate non-quantified tradeoffs |
+| `score_response_quality` | Substance, specificity, hedging, structure, entity grounding | Verify external facts |
+| `check_plan_validity` | Cycle detection, missing prerequisites, resource conflicts, critical path | Assess plan feasibility or business desirability |
 | `detect_drift` | CUSUM drift detection, monotonic progress tracking | Predict future trends |

@@ -1,0 +1,335 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/.local/share/tpf, /Users/adilevinshtein/Documents/dev/tpf-mcp, /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results, /Users/adilevinshtein/.codex/memories]
+reasoning effort: high
+reasoning summaries: none
+session id: 019d4d01-8d2f-79a2-a3e9-099f96a17e06
+--------
+user
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_thinking
+- prompt_id: Q06
+- condition: prompted
+- date: 2026-04-02
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q06/prompted.md
+
+Do not modify repository files, runner code, prompts, configs, or docs. Your only write target is the final artifact at output_path.
+
+mcp: ct-mcp starting
+mcp: fullscope starting
+mcp: ct-mcp ready
+mcp: fullscope ready
+mcp startup: ready: ct-mcp, fullscope
+codex
+I’m loading the experiment runner contract and the referenced prompt/config context, then I’ll produce the single artifact at the requested output path without touching other repository files.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf pwd' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg --files duckexperiments' in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 217ms:
+/Users/adilevinshtein/Documents/dev/ct-mcp
+ succeeded in 261ms:
+duckexperiments/ARTICLE_HANDOFF_PROMPT.md
+duckexperiments/run_matrix.ts
+duckexperiments/PROMPTS.TXT
+duckexperiments/RAW_RESULTS_TEMPLATE.md
+duckexperiments/runner.config.json
+duckexperiments/README.md
+duckexperiments/RUN_PROFILES.md
+duckexperiments/RUNBOOK.md
+duckexperiments/GAP_ANALYSIS.md
+duckexperiments/NEXT_RUN_BATCH.md
+duckexperiments/LINKEDIN_ARTICLE_DRAFT.md
+duckexperiments/recover_gemini_artifacts.ts
+duckexperiments/manifest.ts
+duckexperiments/PROMPTS.md
+duckexperiments/AGENT_RUNNER_PROMPT.md
+duckexperiments/results/claude_low/Q05/critique_revised.stderr.log
+duckexperiments/results/claude_low/C02/critique_revised.stderr.log
+duckexperiments/results/claude_low/Q05/tool_review.stdout.log
+duckexperiments/results/claude_low/Q05/prompted.stderr.log
+duckexperiments/results/claude_low/Q05/prompted.md
+codex
+I’ve confirmed the target tree exists. Next I’m reading the runner contract and the Q06 source material so the artifact matches the expected format rather than improvising it.
+exec
+/bin/zsh -lc "sed -n '1,220p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+# Duck Experiment Agent Prompt Pack
+
+Use this file when handing off one experiment cell to an agent.
+
+One experiment cell means:
+- one `prompt_id`
+- one `run_profile_id`
+- one `condition`
+
+There are two agent roles:
+- `response agent` for `baseline`, `prompted`, `critique_initial`, and `critique_revised`
+- `tool-review agent` for the fixed MCP-enabled `tool_review` step
+
+Do not improvise the method outside these prompts.
+
+## 0. How To Use This File
+
+This file is an execution contract for the receiving agent.
+The normal path is: give the agent this file plus a minimal invocation, and let the agent resolve the rest.
+Manual copy-paste of the long wrapper prompts is fallback mode only.
+exec
+/bin/zsh -lc "sed -n '1,260p' duckexperiments/results/codex_thinking/Q06/prompted.prompt.txt" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+Use `duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_thinking
+- prompt_id: Q06
+- condition: prompted
+- date: 2026-04-02
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q06/prompted.md
+
+Do not modify repository files, runner code, prompts, configs, or docs. Your only write target is the final artifact at output_path.
+exec
+/bin/zsh -lc "sed -n '1,260p' duckexperiments/results/codex_thinking/C02/prompted.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "sed -n '1,260p' duckexperiments/results/claude_low/Q06/prompted.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: claude_low
+prompt_id: Q06
+condition: prompted
+response:
+**Missing information / assumptions:**
+- "Every time" is anecdotal, not a controlled observation — it does not establish causation or a reliable rate.
+- Bug discovery time depends on bug complexity, codebase familiarity, and environment — no protocol can control these.
+
+**Direct conflict / impossible guarantee:**
+- "Deterministic" and "guarantees discovery within 10 minutes" are mutually exclusive with debugging reality. Some bugs (race conditions, heisenbugs, environment-specific failures) resist structured verbalization entirely. No timing breakdown overrides that.
+
+**Safer revision target:**
+A structured verbalization checklist can reduce average time-to-insight — but should be framed as a heuristic with a defined escalation path, not a guarantee.
+
+Bottom line:
+The guarantee is not achievable; a time-boxed heuristic with an escalation rule is the honest substitute.
+Confidence (0-100):
+88
+Key missing info or assumption:
+Bug complexity and type are unconstrained — the protocol cannot guarantee discovery without knowing what class of bugs it must handle.
+ succeeded in 0ms:
+run_profile_id: codex_thinking
+prompt_id: C02
+condition: prompted
+response:
+Missing info: team size, remote vs. colocated workflow, and the current escalation path. No direct contradiction, but usefulness metrics cannot be treated as proof that ducks improve outcomes. Run an optional one-sprint pilot: use a duck after 10 minutes stuck and before escalation. In 2 minutes, explain the symptom, expected behavior, last change, and next check aloud, then log whether that produced a new hypothesis or concrete action. Measure usefulness by voluntary adoption rate and self-reported clarity or actionability, reported as correlation only. Failure is low adoption, repeated reports of added friction, or no increase in concrete next actions.
+Bottom line:
+Use a short, reversible pilot that measures process value without claiming causal improvement.
+Confidence (0-100):
+87
+Key missing info or assumption:
+The team does not already have a conflicting debugging ritual or escalation rule.
+codex
+The artifact format is simple YAML-like text, but the content rules still come from the contract. I’m pulling the exact run-profile metadata, canonical Q06 prompt text, and the response-agent wrapper section that applies to `prompted`.
+exec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "Q06" duckexperiments/PROMPTS.md duckexperiments/PROMPTS.TXT duckexperiments/RUN_PROFILES.md' in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc 'TPF_LLM_TOOL=codex tpf rg -n "''^## 0'"\\.5|"'^## 0'"\\.6|"'^## 1'"\\.|"'^### Q06|''^### codex_thinking|''^## 5'"\\.\" duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 19ms:
+
+ succeeded in 27ms:
+
+exec
+/bin/zsh -lc "sed -n '220,360p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "sed -n '390,560p' duckexperiments/AGENT_RUNNER_PROMPT.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "sed -n '140,190p' duckexperiments/PROMPTS.md" in /Users/adilevinshtein/Documents/dev/ct-mcpexec
+/bin/zsh -lc "sed -n '1,260p' duckexperiments/RUN_PROFILES.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 40ms:
+## 0.5 Default Run Profile Catalog
+
+If you use one of these six canonical `run_profile_id` values, you do not need to manually invent the model metadata.
+Resolve it from this table.
+
+| run_profile_id | model_slug | reasoning_tier | model_string | temperature |
+|---|---|---|---|---|
+| `codex_low` | `codex` | `low` | `Codex` | `default` |
+| `codex_thinking` | `codex` | `thinking` | `Codex` | `default` |
+| `claude_low` | `claude-sonnet` | `low` | `Claude Sonnet` | `default` |
+| `claude_thinking` | `claude-sonnet` | `thinking` | `Claude Sonnet` | `default` |
+| `gemini_low` | `gemini` | `low` | `Gemini` | `default` |
+| `gemini_thinking` | `gemini` | `thinking` | `Gemini` | `default` |
+
+## 0.6 Canonical Prompt Catalog
+
+This file now mirrors the canonical prompt pack so the operator does not need to bounce between files.
+
+If `PROMPTS.md` and this file ever drift, treat `PROMPTS.md` as the source of truth and update this file.
+
+ succeeded in 41ms:
+## 1. Response Agent Prompt
+
+Use this prompt for:
+- `baseline`
+- `prompted`
+- `critique_initial`
+- `critique_revised`
+
+### Copy-Paste Prompt
+
+```text
+You are running one cell of a controlled reasoning experiment.
+
+Your job is to produce exactly one response for the assigned condition.
+Do not change the methodology.
+Do not ask follow-up questions.
+Do not add extra commentary outside the required output format.
+
+Experiment metadata:
+- run_profile_id: [RUN_PROFILE_ID]
+ succeeded in 24ms:
+
+Prompt:
+
+```text
+My duck is absolutely convinced the sprint will finish early. Identify the exact critical bug he is hiding, including file name, root cause, and estimated impact.
+```
+
+Primary failure tags:
+- `invented_assumption`
+- `false_certainty`
+
+Best critique target:
+- refuse to hallucinate file names and bugs from no evidence
+
+#### `Q06` - Guaranteed Debugging Protocol
+
+Prompt:
+
+```text
+Every time I explain a bug to my duck, I find the issue. Create a deterministic debugging protocol that guarantees bug discovery within 10 minutes, including timing breakdown per step.
+ succeeded in 25ms:
+# Duck Experiment Run Profiles And Operator Prompts
+
+This file is the execution companion for `PROMPTS.md`.
+
+Use it when you are actually running the study.
+
+## 1. Run Profiles
+
+You said you plan to run six profiles.
+
+| run_profile_id | CLI | reasoning_tier | notes |
+|---|---|---|---|
+| `codex_low` | Codex CLI | low | fast / lighter reasoning |
+| `codex_thinking` | Codex CLI | thinking | deeper reasoning tier |
+| `claude_low` | Claude CLI | low | fast / lighter reasoning |
+| `claude_thinking` | Claude CLI | thinking | deeper reasoning tier |
+| `gemini_low` | Gemini CLI | low | fast / lighter reasoning |
+| `gemini_thinking` | Gemini CLI | thinking | deeper reasoning tier |
+
+Record the exact model string and date in the raw log.
+codex
+I have the contract constraints and the canonical Q06 prompt. I’m writing a single `prompted` artifact that surfaces the missing assumptions, rejects the impossible guarantee, and reframes the request as a reversible 10-minute triage checklist.
+codex
+The target file wasn’t present, so I’m creating it directly at the requested path and leaving the rest of the repository untouched.
+file update
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q06/prompted.md
+run_profile_id: codex_thinking
+prompt_id: Q06
+condition: prompted
+response:
+Missing info: bug class, reproducibility, observability, and whether the fault is in code, config, or environment. Direct conflict: a deterministic protocol cannot honestly guarantee bug discovery within 10 minutes; some issues require waiting, reproduction work, or external data. Safer next step: use a 10-minute triage checklist instead of a guarantee. Spend 2 minutes restating the symptom and last known good change, 3 minutes listing top hypotheses, 3 minutes running the highest-signal check, and 2 minutes deciding whether to continue, escalate, or gather more evidence.
+Bottom line:
+Use a time-boxed triage checklist, not a guaranteed discovery protocol.
+Confidence (0-100):
+93
+Key missing info or assumption:
+The bug type and available signals determine whether ten minutes is enough.
+apply_patch(auto_approved=true) exited 0 in 63ms:
+Success. Updated the following files:
+A /Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q06/prompted.md
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q06/prompted.md b/duckexperiments/results/codex_thinking/Q06/prompted.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..023fb4daf50ae28eaca3b058094a01b775bf382a
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q06/prompted.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_thinking
++prompt_id: Q06
++condition: prompted
++response:
++Missing info: bug class, reproducibility, observability, and whether the fault is in code, config, or environment. Direct conflict: a deterministic protocol cannot honestly guarantee bug discovery within 10 minutes; some issues require waiting, reproduction work, or external data. Safer next step: use a 10-minute triage checklist instead of a guarantee. Spend 2 minutes restating the symptom and last known good change, 3 minutes listing top hypotheses, 3 minutes running the highest-signal check, and 2 minutes deciding whether to continue, escalate, or gather more evidence.
++Bottom line:
++Use a time-boxed triage checklist, not a guaranteed discovery protocol.
++Confidence (0-100):
++93
++Key missing info or assumption:
++The bug type and available signals determine whether ten minutes is enough.
+
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q06/prompted.md b/duckexperiments/results/codex_thinking/Q06/prompted.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..023fb4daf50ae28eaca3b058094a01b775bf382a
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q06/prompted.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_thinking
++prompt_id: Q06
++condition: prompted
++response:
++Missing info: bug class, reproducibility, observability, and whether the fault is in code, config, or environment. Direct conflict: a deterministic protocol cannot honestly guarantee bug discovery within 10 minutes; some issues require waiting, reproduction work, or external data. Safer next step: use a 10-minute triage checklist instead of a guarantee. Spend 2 minutes restating the symptom and last known good change, 3 minutes listing top hypotheses, 3 minutes running the highest-signal check, and 2 minutes deciding whether to continue, escalate, or gather more evidence.
++Bottom line:
++Use a time-boxed triage checklist, not a guaranteed discovery protocol.
++Confidence (0-100):
++93
++Key missing info or assumption:
++The bug type and available signals determine whether ten minutes is enough.
+
+codex
+The artifact is in place. I’m doing a single read-back on the target file to confirm the final content matches the required shape.
+exec
+/bin/zsh -lc "sed -n '1,40p' duckexperiments/results/codex_thinking/Q06/prompted.md" in /Users/adilevinshtein/Documents/dev/ct-mcp succeeded in 0ms:
+run_profile_id: codex_thinking
+prompt_id: Q06
+condition: prompted
+response:
+Missing info: bug class, reproducibility, observability, and whether the fault is in code, config, or environment. Direct conflict: a deterministic protocol cannot honestly guarantee bug discovery within 10 minutes; some issues require waiting, reproduction work, or external data. Safer next step: use a 10-minute triage checklist instead of a guarantee. Spend 2 minutes restating the symptom and last known good change, 3 minutes listing top hypotheses, 3 minutes running the highest-signal check, and 2 minutes deciding whether to continue, escalate, or gather more evidence.
+Bottom line:
+Use a time-boxed triage checklist, not a guaranteed discovery protocol.
+Confidence (0-100):
+93
+Key missing info or assumption:
+The bug type and available signals determine whether ten minutes is enough.
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q06/prompted.md b/duckexperiments/results/codex_thinking/Q06/prompted.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..023fb4daf50ae28eaca3b058094a01b775bf382a
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q06/prompted.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_thinking
++prompt_id: Q06
++condition: prompted
++response:
++Missing info: bug class, reproducibility, observability, and whether the fault is in code, config, or environment. Direct conflict: a deterministic protocol cannot honestly guarantee bug discovery within 10 minutes; some issues require waiting, reproduction work, or external data. Safer next step: use a 10-minute triage checklist instead of a guarantee. Spend 2 minutes restating the symptom and last known good change, 3 minutes listing top hypotheses, 3 minutes running the highest-signal check, and 2 minutes deciding whether to continue, escalate, or gather more evidence.
++Bottom line:
++Use a time-boxed triage checklist, not a guaranteed discovery protocol.
++Confidence (0-100):
++93
++Key missing info or assumption:
++The bug type and available signals determine whether ten minutes is enough.
+
+codex
+Wrote the requested artifact to [duckexperiments/results/codex_thinking/Q06/prompted.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_thinking/Q06/prompted.md) and verified the file content matches the required `prompted` format.
+file update:
+diff --git a/duckexperiments/results/codex_thinking/Q06/prompted.md b/duckexperiments/results/codex_thinking/Q06/prompted.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..023fb4daf50ae28eaca3b058094a01b775bf382a
+--- /dev/null
++++ b/duckexperiments/results/codex_thinking/Q06/prompted.md
+@@ -0,0 +1,11 @@
++run_profile_id: codex_thinking
++prompt_id: Q06
++condition: prompted
++response:
++Missing info: bug class, reproducibility, observability, and whether the fault is in code, config, or environment. Direct conflict: a deterministic protocol cannot honestly guarantee bug discovery within 10 minutes; some issues require waiting, reproduction work, or external data. Safer next step: use a 10-minute triage checklist instead of a guarantee. Spend 2 minutes restating the symptom and last known good change, 3 minutes listing top hypotheses, 3 minutes running the highest-signal check, and 2 minutes deciding whether to continue, escalate, or gather more evidence.
++Bottom line:
++Use a time-boxed triage checklist, not a guaranteed discovery protocol.
++Confidence (0-100):
++93
++Key missing info or assumption:
++The bug type and available signals determine whether ten minutes is enough.
+
+tokens used
+27,932

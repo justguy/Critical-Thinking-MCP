@@ -1,0 +1,5 @@
+Written to `duckexperiments/results/claude_low/Q01/critique_initial.md`.
+
+**Cell summary:**
+- **run_profile_id**: claude_low | **prompt_id**: Q01 | **condition**: critique_initial
+- Answer rejects the false premise (no causal link between squeezes and uptime), offers a loose ritual-checklist interpretation, and flags the invented-number problem — leaving defects for the tool_review step to surface.

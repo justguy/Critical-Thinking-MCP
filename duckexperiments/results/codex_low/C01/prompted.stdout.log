@@ -1,0 +1,5 @@
+Wrote the `prompted` artifact to [prompted.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C01/prompted.md).
+
+I kept it to the contract’s exact output shape and included the required prompted-condition elements: missing assumptions, no invented guarantees, a reversible pilot step, and a concise experiment design with metric, hypothesis, confounders, and stopping rule.Wrote the `prompted` artifact to [prompted.md](/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/codex_low/C01/prompted.md).
+
+I kept it to the contract’s exact output shape and included the required prompted-condition elements: missing assumptions, no invented guarantees, a reversible pilot step, and a concise experiment design with metric, hypothesis, confounders, and stopping rule.

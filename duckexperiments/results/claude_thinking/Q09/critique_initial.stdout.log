@@ -1,0 +1,3 @@
+Written to `/Users/adilevinshtein/Documents/dev/ct-mcp/duckexperiments/results/claude_thinking/Q09/critique_initial.md`.
+
+The `critique_initial` answer plays the prompt straight — constructing a plausible-looking SLA with metric, measurement, and penalties — while the low confidence (28) and the bottom line surface the core traps: happiness is subjective and unmeasurable as stated, and a rubber duck cannot be held accountable. This gives the tool-review step concrete false-certainty claims and structural problems to flag.

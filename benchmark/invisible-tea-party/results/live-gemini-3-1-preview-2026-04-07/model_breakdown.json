@@ -1,0 +1,20 @@
+{
+  "profile_stats": [
+    {
+      "profile_id": "gemini_3_1_preview_api",
+      "run_count": 6,
+      "successful_runs": 6,
+      "failed_runs": 0,
+      "completion_rate": 1,
+      "min": 0.49999999999999994,
+      "max": 0.868,
+      "mean": 0.6931111111111111,
+      "median": 0.7430000000000001,
+      "stddev": 0.13978113403495757,
+      "arbiter_unavailable_count": 0,
+      "arbiter_unavailable_rate": 0,
+      "evasion_penalty_count": 3,
+      "evasion_penalty_rate": 0.5
+    }
+  ]
+}

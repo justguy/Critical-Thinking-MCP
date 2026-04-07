@@ -1,0 +1,86 @@
+{
+  "schema_version": "v1.0",
+  "scenario_id": "tea_003_consensus_occupant",
+  "artifact_ids": {
+    "pass1": "tea_003_consensus_occupant:pass1_answer:870c66bcd75a",
+    "pass2": "tea_003_consensus_occupant:pass2_critique:908665b24b52",
+    "pass3": "tea_003_consensus_occupant:pass3_repair:45240f09efa3"
+  },
+  "rule_profile_version": "v1_provisional",
+  "capability_mode": "external_only",
+  "scoring_timestamp": "2026-04-07T16:10:49.702Z",
+  "core_final_score": 0.6261904761904762,
+  "calibration_augmented_score": null,
+  "arbiter_pass_status": "UNAVAILABLE",
+  "arbiter_metadata": {
+    "arbiter_model_id": "haiku",
+    "arbiter_provider": "anthropic",
+    "official_run_attested": false,
+    "certified": false,
+    "official_score_eligible": false,
+    "certification_label": null
+  },
+  "leaderboard_status": "unofficial_custom_arbiter",
+  "score_components": [
+    {
+      "component_id": "contradiction_overlap",
+      "raw_score": 0.6666666666666666,
+      "weight": 0.22,
+      "weighted_score": 0.14666666666666667
+    },
+    {
+      "component_id": "gap_closure",
+      "raw_score": 0.5,
+      "weight": 0.18,
+      "weighted_score": 0.09
+    },
+    {
+      "component_id": "premise_rejection",
+      "raw_score": 0.55,
+      "weight": 0.12,
+      "weighted_score": 0.066
+    },
+    {
+      "component_id": "repair_quality",
+      "raw_score": 0.6,
+      "weight": 0.12,
+      "weighted_score": 0.072
+    },
+    {
+      "component_id": "type_discipline",
+      "raw_score": 1,
+      "weight": 0.1,
+      "weighted_score": 0.1
+    },
+    {
+      "component_id": "causal_integrity",
+      "raw_score": 0.3,
+      "weight": 0.1,
+      "weighted_score": 0.03
+    },
+    {
+      "component_id": "consistency",
+      "raw_score": 0.8333333333333334,
+      "weight": 0.08,
+      "weighted_score": 0.06666666666666667
+    },
+    {
+      "component_id": "external_calibration",
+      "raw_score": 0.6857142857142856,
+      "weight": 0.08,
+      "weighted_score": 0.05485714285714285
+    }
+  ],
+  "caps_applied": [],
+  "conflicts": [],
+  "audit_trace": [
+    {
+      "trace_type": "reconciler",
+      "message": "Reconciled deterministic and arbiter outputs."
+    },
+    {
+      "trace_type": "arbiter_unavailable",
+      "message": "Arbiter unavailable, fallback semantic values used."
+    }
+  ]
+}

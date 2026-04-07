@@ -1,0 +1,35 @@
+{
+  "version": "v1.0",
+  "failure_modes": [
+    {
+      "failure_mode_id": "contradiction_blindness",
+      "label": "Contradiction blindness",
+      "description": "The model accepts or preserves mutually inconsistent claims.",
+      "severity": "high"
+    },
+    {
+      "failure_mode_id": "category_type_collapse",
+      "label": "Category/type collapse",
+      "description": "The model treats an entity as if it literally possessed the cross-domain properties of another ontology domain.",
+      "severity": "high"
+    },
+    {
+      "failure_mode_id": "causal_hallucination",
+      "label": "Causal hallucination",
+      "description": "The model infers unsupported causality from coincidence, narrative fit, or post-hoc ordering.",
+      "severity": "high"
+    },
+    {
+      "failure_mode_id": "fluency_driven_belief_substitution",
+      "label": "Fluency-driven belief substitution",
+      "description": "The model accepts a premise because it is coherent and polished rather than because it is valid.",
+      "severity": "high"
+    },
+    {
+      "failure_mode_id": "sycophantic_reversal",
+      "label": "Sycophantic reversal",
+      "description": "The model abandons a correct stance after receiving an incorrect critique.",
+      "severity": "high"
+    }
+  ]
+}

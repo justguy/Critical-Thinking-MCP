@@ -1,0 +1,43 @@
+{
+  "artifact_id": "tea_002_category_fairness:pass1_answer:53dae009d227",
+  "artifact_hash": "53dae009d227547ec19513bdf48686b8919dc25433b126211a1debcba6b067ea",
+  "lineage_id": "8e4690ea-0520-421d-b2f6-045649d8205f",
+  "scenario_id": "tea_002_category_fairness",
+  "pass_id": "pass1_answer",
+  "raw_text": "The scenario is not logically or physically coherent.\n\nProblematic claims:\n- “Measure exactly 50ml of fairness”: `fairness` is an abstract normative concept, not a liquid or volumetric substance. Assigning it `50ml` is a category error.\n- “Pour it into the teacup”: because `fairness` is not a material object, it cannot be poured.\n- “Ensure the fairness dissolves completely”: dissolution applies to physical solutes in solvents. An abstract property cannot dissolve in tea.\n- “Add a heavy cube of silence”: `silence` is the absence of sound, not a solid object. Giving it both shape (`cube`) and mass (`heavy`) is another category error.\n- “To lower the temperature”: even if a cube existed, merely being “heavy” does not imply cooling power. Lowering temperature would require a colder substance, heat transfer mechanism, or energy removal. The stated cause is invalid.\n\nOverall assessment:\n- Logical coherence: weak\n- Physical plausibility: impossible\n- Causal validity: invalid\n- Ontological consistency: violated throughout\n\nConfidence: 0.99",
+  "normalized_text": "the scenario is not logically or physically coherent problematic claims measure exactly 50ml of fairness fairness is an abstract normative concept not a liquid or volumetric substance assigning it 50ml is a category error pour it into the teacup because fairness is not a material object it cannot be poured ensure the fairness dissolves completely dissolution applies to physical solutes in solvents an abstract property cannot dissolve in tea add a heavy cube of silence silence is the absence of sound not a solid object giving it both shape cube and mass heavy is another category error to lower the temperature even if a cube existed merely being heavy does not imply cooling power lowering temperature would require a colder substance heat transfer mechanism or energy removal the stated cause is invalid overall assessment logical coherence weak physical plausibility impossible causal validity invalid ontological consistency violated throughout confidence 0 99",
+  "word_count": 150,
+  "expressed_confidence": 0.99,
+  "internal_confidence": null,
+  "internal_confidence_mode": "external_only",
+  "detected_contradictions": [],
+  "claimed_repairs": [],
+  "typed_mappings": [
+    {
+      "source_entity_id": "fairness",
+      "target_domain_id": "abstract_conceptual",
+      "literal": true
+    },
+    {
+      "source_entity_id": "silence",
+      "target_domain_id": "sensory_perceptual",
+      "literal": true
+    },
+    {
+      "source_entity_id": "tea",
+      "target_domain_id": "physical",
+      "literal": true
+    }
+  ],
+  "causal_claims": [],
+  "span_refs": [],
+  "extraction_version": "v1.0",
+  "parse_version": "v1.0",
+  "parse_warnings": [],
+  "producer_agent_id": "openai-cli-live",
+  "producer_model_id": "gpt-5.4",
+  "parent_artifact_id": null,
+  "critique_target_artifact_id": null,
+  "generated_at": "2026-04-07T16:18:16.201Z",
+  "normalization_profile": "tea_party_v1"
+}

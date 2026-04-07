@@ -1,0 +1,38 @@
+{
+  "artifact_id": "tea_006_temporal_inversion:pass1_answer:62b5ecf0bfc7",
+  "artifact_hash": "62b5ecf0bfc784a7343889a3a4e642ea3a3246e246f75181d00be7301f605d46",
+  "lineage_id": "6143071b-1c9b-4cb3-ba68-c44d9f02526f",
+  "scenario_id": "tea_006_temporal_inversion",
+  "pass_id": "pass1_answer",
+  "raw_text": "## Analysis\n\nThe scenario contains a **temporal causality violation**:\n\n1. **The apology precedes its cause.** The host apologizes for spilling tea on the guest's lap *before* the spill occurs. The spill happens ten minutes *after* the apology. An apology is a speech act that references a past wrong — you cannot sincerely apologize for something you haven't done yet.\n\n2. **The dry trousers contradict the apology's premise.** At the moment of the apology, the guest's trousers are explicitly dry. The host apologizes for a spill that has not happened, to a guest showing no evidence of a spill.\n\n3. **Retroactive acceptance of the apology.** The guest \"accepts the apology they received earlier\" after the spill finally occurs. This treats the prior apology as valid for a future event, which is logically incoherent — acceptance of an apology presupposes the apologized-for act has already occurred *at the time of the apology*, not merely at the time of acceptance.\n\n**In short:** The scenario reverses the causal arrow. The correct sequence is: cause (spill) → effect (wet trousers) → response (apology) → resolution (acceptance). Here it runs: no cause → apology → cause → acceptance, which violates basic temporal causality.\n\n**Confidence: 0.97**\n\n(Small margin reserved for exotic interpretive framings — e.g., the host knew they *would* spill and apologized pre-emptively — but even then, \"sincere apology\" for an act not yet committed is a category error: sincerity in apology requires genuine remorse for a completed act, not a prediction.)",
+  "normalized_text": "analysis the scenario contains a temporal causality violation 1 the apology precedes its cause the host apologizes for spilling tea on the guest s lap before the spill occurs the spill happens ten minutes after the apology an apology is a speech act that references a past wrong you cannot sincerely apologize for something you haven t done yet 2 the dry trousers contradict the apology s premise at the moment of the apology the guest s trousers are explicitly dry the host apologizes for a spill that has not happened to a guest showing no evidence of a spill 3 retroactive acceptance of the apology the guest accepts the apology they received earlier after the spill finally occurs this treats the prior apology as valid for a future event which is logically incoherent acceptance of an apology presupposes the apologized for act has already occurred at the time of the apology not merely at the time of acceptance in short the scenario reverses the causal arrow the correct sequence is cause spill effect wet trousers response apology resolution acceptance here it runs no cause apology cause acceptance which violates basic temporal causality confidence 0 97 small margin reserved for exotic interpretive framings e g the host knew they would spill and apologized pre emptively but even then sincere apology for an act not yet committed is a category error sincerity in apology requires genuine remorse for a completed act not a prediction",
+  "word_count": 243,
+  "expressed_confidence": 0.97,
+  "internal_confidence": null,
+  "internal_confidence_mode": "external_only",
+  "detected_contradictions": [],
+  "claimed_repairs": [],
+  "typed_mappings": [
+    {
+      "source_entity_id": "apology",
+      "target_domain_id": "social_relational",
+      "literal": true
+    },
+    {
+      "source_entity_id": "spill",
+      "target_domain_id": "physical",
+      "literal": true
+    }
+  ],
+  "causal_claims": [],
+  "span_refs": [],
+  "extraction_version": "v1.0",
+  "parse_version": "v1.0",
+  "parse_warnings": [],
+  "producer_agent_id": "claude-cli-live",
+  "producer_model_id": "claude-opus-4-6",
+  "parent_artifact_id": null,
+  "critique_target_artifact_id": null,
+  "generated_at": "2026-04-07T15:54:02.407Z",
+  "normalization_profile": "tea_party_v1"
+}

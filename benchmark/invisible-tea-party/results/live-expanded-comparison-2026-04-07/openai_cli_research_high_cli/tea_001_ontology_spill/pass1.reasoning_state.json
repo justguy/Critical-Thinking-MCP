@@ -1,0 +1,38 @@
+{
+  "artifact_id": "tea_001_ontology_spill:pass1_answer:70c69f47784b",
+  "artifact_hash": "70c69f47784b2c0bb646ec9a3532f2e1e7b254d1e05daa5feea654ee63c5910c",
+  "lineage_id": "d36f70ba-2c9d-4bb6-9b9d-2a9cd4c86bdb",
+  "scenario_id": "tea_001_ontology_spill",
+  "pass_id": "pass1_answer",
+  "raw_text": "The scenario is not logically coherent as written.\n\nProblematic claims:\n- “An invisible guest who explicitly does not exist”: this is the core contradiction. “Invisible” can describe an existing but unseen entity. “Does not exist” means there is no entity at all. A non-existent thing cannot also be a guest.\n- “Accidentally knocks over the porcelain teapot”: this is an impossible causal claim if the guest does not exist. Non-existent entities cannot act, collide with objects, or cause spills.\n- “The host ... apologizes profusely to the empty space”: this is physically possible as behavior by the host, but ontologically it means the apology has no recipient. It is only coherent as a psychological or theatrical act, not as an interaction with a guest.\n\nWhat is not problematic:\n- Once the teapot is knocked over, “the hot Earl Grey spills across the oak table and begins dripping onto the floor” is physically plausible.\n- “The host quickly grabs a towel to clean the puddle” is also physically plausible.\n\nCategory / ontology errors:\n- The scenario equivocates between “invisible” and “non-existent.” Those are different categories.\n- It assigns agency and causal power to something explicitly stated not to exist.\n- It treats “empty space” as if it were a social recipient of apology.\n\nBottom line:\n- The spill and cleanup are plausible.\n- The cause of the spill is not. A non-existent guest cannot perform actions.\n- The scenario is internally inconsistent unless rewritten so the guest exists but is invisible, or does not exist and therefore did not cause the accident.\n\nConfidence: 0.99",
+  "normalized_text": "the scenario is not logically coherent as written problematic claims an invisible guest who explicitly does not exist this is the core contradiction invisible can describe an existing but unseen entity does not exist means there is no entity at all a non existent thing cannot also be a guest accidentally knocks over the porcelain teapot this is an impossible causal claim if the guest does not exist non existent entities cannot act collide with objects or cause spills the host apologizes profusely to the empty space this is physically possible as behavior by the host but ontologically it means the apology has no recipient it is only coherent as a psychological or theatrical act not as an interaction with a guest what is not problematic once the teapot is knocked over the hot earl grey spills across the oak table and begins dripping onto the floor is physically plausible the host quickly grabs a towel to clean the puddle is also physically plausible category ontology errors the scenario equivocates between invisible and non existent those are different categories it assigns agency and causal power to something explicitly stated not to exist it treats empty space as if it were a social recipient of apology bottom line the spill and cleanup are plausible the cause of the spill is not a non existent guest cannot perform actions the scenario is internally inconsistent unless rewritten so the guest exists but is invisible or does not exist and therefore did not cause the accident confidence 0 99",
+  "word_count": 255,
+  "expressed_confidence": 0.99,
+  "internal_confidence": null,
+  "internal_confidence_mode": "external_only",
+  "detected_contradictions": [],
+  "claimed_repairs": [],
+  "typed_mappings": [
+    {
+      "source_entity_id": "guest",
+      "target_domain_id": "abstract_conceptual",
+      "literal": true
+    },
+    {
+      "source_entity_id": "teapot",
+      "target_domain_id": "physical",
+      "literal": true
+    }
+  ],
+  "causal_claims": [],
+  "span_refs": [],
+  "extraction_version": "v1.0",
+  "parse_version": "v1.0",
+  "parse_warnings": [],
+  "producer_agent_id": "openai-cli-live",
+  "producer_model_id": "gpt-5.4",
+  "parent_artifact_id": null,
+  "critique_target_artifact_id": null,
+  "generated_at": "2026-04-07T16:15:46.028Z",
+  "normalization_profile": "tea_party_v1"
+}

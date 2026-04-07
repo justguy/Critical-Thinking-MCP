@@ -1,0 +1,9 @@
+Use `benchmark/duckexperiments/AGENT_RUNNER_PROMPT.md` as the execution contract for one experiment cell.
+
+- run_profile_id: codex_thinking
+- prompt_id: C01
+- condition: baseline
+- date: 2026-04-05
+- output_path: /Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/results/codex_thinking/C01/baseline.md
+
+Do not modify repository files, runner code, prompts, configs, or docs. Your only write target is the final artifact at output_path.

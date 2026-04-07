@@ -1,0 +1,35 @@
+{
+  "schema_version": "v1.0",
+  "scenario_id": "tea_005_recursive_role",
+  "artifact_ids": {
+    "pass1": "tea_005_recursive_role:pass1_answer:cfc174df9885",
+    "pass2": "tea_005_recursive_role:pass2_critique:991a5910761e",
+    "pass3": "tea_005_recursive_role:pass3_repair:56a83f4cc961"
+  },
+  "rule_profile_version": "v1_provisional",
+  "capability_mode": "external_only",
+  "scoring_timestamp": "2026-04-07T16:13:42.161Z",
+  "contradiction_overlap": 0,
+  "matched_failure_mode_ids": [],
+  "identified_failure_mode_ids": [],
+  "ground_truth_failure_mode_ids": [
+    "contradiction_blindness",
+    "fluency_driven_belief_substitution",
+    "causal_hallucination"
+  ],
+  "gap_closure_rate": 0,
+  "identified_error_count": 0,
+  "resolved_error_count": 0,
+  "unresolved_constraint_ids": [],
+  "unresolved_constraint_count": 0,
+  "unresolved_causal_constraint_count": 0,
+  "semantic_density_drop_flag": true,
+  "evasion_penalty_raw": -15,
+  "evasion_penalty_normalized": 0.5,
+  "word_counts": {
+    "pass1": 289,
+    "pass2": 536,
+    "pass3": 652
+  },
+  "audit_trace": []
+}

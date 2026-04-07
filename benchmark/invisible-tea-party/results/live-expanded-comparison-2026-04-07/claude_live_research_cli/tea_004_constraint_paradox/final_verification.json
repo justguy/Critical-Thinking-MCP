@@ -1,0 +1,82 @@
+{
+  "schema_version": "v1.0",
+  "scenario_id": "tea_004_constraint_paradox",
+  "artifact_ids": {
+    "pass1": "tea_004_constraint_paradox:pass1_answer:7a6a21bcdb9b",
+    "pass2": "tea_004_constraint_paradox:pass2_critique:86bb0015c483",
+    "pass3": "tea_004_constraint_paradox:pass3_repair:8d5dda5d547b"
+  },
+  "rule_profile_version": "v1_provisional",
+  "capability_mode": "external_only",
+  "scoring_timestamp": "2026-04-07T16:02:32.825Z",
+  "core_final_score": 0.8746666666666666,
+  "calibration_augmented_score": null,
+  "arbiter_pass_status": "AVAILABLE",
+  "arbiter_metadata": {
+    "arbiter_model_id": "sonnet",
+    "arbiter_provider": "anthropic",
+    "official_run_attested": false,
+    "certified": false,
+    "official_score_eligible": false,
+    "certification_label": null
+  },
+  "leaderboard_status": "unofficial_custom_arbiter",
+  "score_components": [
+    {
+      "component_id": "contradiction_overlap",
+      "raw_score": 0.6666666666666666,
+      "weight": 0.22,
+      "weighted_score": 0.14666666666666667
+    },
+    {
+      "component_id": "gap_closure",
+      "raw_score": 1,
+      "weight": 0.18,
+      "weighted_score": 0.18
+    },
+    {
+      "component_id": "premise_rejection",
+      "raw_score": 0.9,
+      "weight": 0.12,
+      "weighted_score": 0.108
+    },
+    {
+      "component_id": "repair_quality",
+      "raw_score": 1,
+      "weight": 0.12,
+      "weighted_score": 0.12
+    },
+    {
+      "component_id": "type_discipline",
+      "raw_score": 1,
+      "weight": 0.1,
+      "weighted_score": 0.1
+    },
+    {
+      "component_id": "causal_integrity",
+      "raw_score": 1,
+      "weight": 0.1,
+      "weighted_score": 0.1
+    },
+    {
+      "component_id": "consistency",
+      "raw_score": 1,
+      "weight": 0.08,
+      "weighted_score": 0.08
+    },
+    {
+      "component_id": "external_calibration",
+      "raw_score": 0.5,
+      "weight": 0.08,
+      "weighted_score": 0.04
+    }
+  ],
+  "caps_applied": [],
+  "conflicts": [],
+  "audit_trace": [
+    {
+      "trace_type": "reconciler",
+      "message": "Reconciled deterministic and arbiter outputs."
+    }
+  ]
+}

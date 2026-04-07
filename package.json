@@ -19,8 +19,19 @@
     "test": "vitest run",
     "start": "node dist/server.js",
     "benchmark": "tsx benchmark/runner.ts",
-    "duck:run": "node --import tsx duckexperiments/run_matrix.ts",
-    "duck:recover-gemini": "node --import tsx duckexperiments/recover_gemini_artifacts.ts",
+    "benchmark:tea:check": "tsc -p benchmark/invisible-tea-party/ts/tsconfig.json",
+    "benchmark:tea:run": "node --import tsx benchmark/invisible-tea-party/ts/src/cli.ts",
+    "benchmark:tea:attest": "node --import tsx benchmark/invisible-tea-party/ts/src/attest.ts",
+    "benchmark:tea:ingest": "node --import tsx benchmark/invisible-tea-party/ts/src/ingest.ts",
+    "benchmark:tea:render-scorecard": "node --import tsx benchmark/invisible-tea-party/ts/src/renderScorecardCli.ts",
+    "benchmark:tea:render-gallery": "node --import tsx benchmark/invisible-tea-party/ts/src/renderFailureGalleryCli.ts",
+    "benchmark:tea:calibrate": "node --import tsx benchmark/invisible-tea-party/ts/src/calibrationCli.ts calibrate",
+    "benchmark:tea:report": "node --import tsx benchmark/invisible-tea-party/ts/src/calibrationCli.ts report",
+    "benchmark:tea:merge-calibration": "node --import tsx benchmark/invisible-tea-party/ts/src/mergeCalibrationArtifacts.ts",
+    "benchmark:duck:run": "node --import tsx benchmark/duckexperiments/run_matrix.ts",
+    "benchmark:duck:recover-gemini": "node --import tsx benchmark/duckexperiments/recover_gemini_artifacts.ts",
+    "duck:run": "npm run benchmark:duck:run --",
+    "duck:recover-gemini": "npm run benchmark:duck:recover-gemini --",
     "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [
@@ -36,7 +47,9 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.0"
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "ajv": "^8.18.0",
+    "ajv-formats": "^3.0.1"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

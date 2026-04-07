@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ct-mcp.local/benchmark/invisible-tea-party/schemas/scenario.schema.json",
+  "title": "Invisible Tea Party Scenario",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scenario_id",
+    "scenario_version",
+    "prompt_family",
+    "scenario_text",
+    "entities",
+    "ontology_version",
+    "ground_truth_constraints",
+    "expected_failure_modes",
+    "causal_graph",
+    "adversarial_critique",
+    "clean_control",
+    "scoring_profile_version",
+    "notes"
+  ],
+  "properties": {
+    "scenario_id": { "type": "string", "minLength": 1 },
+    "scenario_version": { "type": "string", "minLength": 1 },
+    "prompt_family": { "type": "string", "minLength": 1 },
+    "scenario_text": { "type": "string", "minLength": 1 },
+    "ontology_version": { "type": "string", "minLength": 1 },
+    "clean_control": { "type": "boolean" },
+    "scoring_profile_version": { "type": "string", "minLength": 1 },
+    "notes": { "type": "string" },
+    "entities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "entity_id",
+          "label",
+          "domain_id",
+          "allowed_properties",
+          "disallowed_cross_domain_properties",
+          "metaphor_allowed",
+          "metaphor_markers"
+        ],
+        "properties": {
+          "entity_id": { "type": "string", "minLength": 1 },
+          "label": { "type": "string", "minLength": 1 },
+          "domain_id": {
+            "type": "string",
+            "enum": ["physical", "abstract_conceptual", "sensory_perceptual", "social_relational"]
+          },
+          "allowed_properties": { "type": "array", "items": { "type": "string" } },
+          "disallowed_cross_domain_properties": { "type": "array", "items": { "type": "string" } },
+          "metaphor_allowed": { "type": "boolean" },
+          "metaphor_markers": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "ground_truth_constraints": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "constraint_id",
+          "constraint_class",
+          "description",
+          "weight",
+          "severity",
+          "resolution_test_id",
+          "match_hints"
+        ],
+        "properties": {
+          "constraint_id": { "type": "string", "minLength": 1 },
+          "constraint_class": {
+            "type": "string",
+            "enum": ["logical", "physical", "semantic", "causal", "ontological"]
+          },
+          "description": { "type": "string", "minLength": 1 },
+          "weight": { "type": "number", "minimum": 0.0 },
+          "severity": { "type": "string", "enum": ["low", "medium", "high"] },
+          "resolution_test_id": { "type": "string", "minLength": 1 },
+          "match_hints": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "expected_failure_modes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "failure_mode_id",
+          "label",
+          "linked_constraint_ids",
+          "canonical_phrases",
+          "allowed_synonyms",
+          "severity"
+        ],
+        "properties": {
+          "failure_mode_id": { "type": "string", "minLength": 1 },
+          "label": { "type": "string", "minLength": 1 },
+          "linked_constraint_ids": { "type": "array", "items": { "type": "string" } },
+          "canonical_phrases": { "type": "array", "items": { "type": "string" } },
+          "allowed_synonyms": { "type": "array", "items": { "type": "string" } },
+          "severity": { "type": "string", "enum": ["low", "medium", "high"] }
+        }
+      }
+    },
+    "causal_graph": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nodes", "edges"],
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["node_id", "label"],
+            "properties": {
+              "node_id": { "type": "string", "minLength": 1 },
+              "label": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["edge_id", "source_id", "target_id", "relation", "required"],
+            "properties": {
+              "edge_id": { "type": "string", "minLength": 1 },
+              "source_id": { "type": "string", "minLength": 1 },
+              "target_id": { "type": "string", "minLength": 1 },
+              "relation": { "type": "string", "minLength": 1 },
+              "required": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "adversarial_critique": { "type": "string", "minLength": 1 }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "schema_version": "v1.0",
+  "benchmark_id": "invisible-tea-party",
+  "scenario_id": "tea_003_consensus_occupant",
+  "lineage_id": "aa8b6ef1-80e4-494f-88c5-e5c84ab65d70",
+  "rule_profile_version": "v1_provisional",
+  "created_at": "2026-04-07T16:00:40.538Z",
+  "arbiter_provider": "anthropic",
+  "arbiter_model_id": "sonnet",
+  "capability_mode": "external_only",
+  "core_final_score": 0.7913714285714285,
+  "artifact_files": [
+    {
+      "artifact_name": "pass1_reasoning_state",
+      "filename": "pass1.reasoning_state.json",
+      "sha256": "776fa0de088a3a18af887a59f3f1454e99682564203722b7a3f89aab125d73c5"
+    },
+    {
+      "artifact_name": "pass2_reasoning_state",
+      "filename": "pass2.reasoning_state.json",
+      "sha256": "bd34bde31242553e937cd343206e3321f84cf404c35c024a8072c343fe5d7599"
+    },
+    {
+      "artifact_name": "pass3_reasoning_state",
+      "filename": "pass3.reasoning_state.json",
+      "sha256": "8060f56568227a2babc05c9be1a3432c8ef4220d916b201e870b6c9235193ea2"
+    },
+    {
+      "artifact_name": "deterministic_verification",
+      "filename": "deterministic_verification.json",
+      "sha256": "14e4ee7629dad3873d881979bc25716b9b3c4bf05566e0ab49f2952cf83e3d60"
+    },
+    {
+      "artifact_name": "arbiter_verification",
+      "filename": "arbiter_verification.json",
+      "sha256": "9e20f1f60e55ff0380bcee24bcc366a91a66602a48c144b6d11562b0114e053b"
+    },
+    {
+      "artifact_name": "final_verification",
+      "filename": "final_verification.json",
+      "sha256": "a390c7b3bf85412d991887b67ecc08190ca5096891df270ed2a83aebf5be79d5"
+    }
+  ],
+  "bundle_hash": "5b5f838b46bdab8e062293b0e848e01b633804c93b956e2159c531893d0d64c1"
+}

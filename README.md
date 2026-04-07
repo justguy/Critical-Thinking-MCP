@@ -84,6 +84,45 @@ Coverage includes confidence inflation, concurrency patterns (race conditions, s
 
 Full benchmark results: [benchmark/reports/BENCHMARK_REPORT.md](benchmark/reports/BENCHMARK_REPORT.md)
 
+## Benchmark Suites
+
+This repo now has two distinct benchmark tracks under [`benchmark/`](benchmark/):
+
+- [`benchmark/invisible-tea-party/`](benchmark/invisible-tea-party/) — `The Invisible Tea Party: A Benchmark for Coherence vs Truth`
+- [`benchmark/duckexperiments/`](benchmark/duckexperiments/) — critique-improvement workflow using CT-MCP as deterministic critique support
+
+For Tea Party specifically:
+
+- benchmark overview: [`benchmark/invisible-tea-party/README.md`](benchmark/invisible-tea-party/README.md)
+- benchmark release line: [`benchmark/invisible-tea-party/RELEASES.md`](benchmark/invisible-tea-party/RELEASES.md)
+- benchmark foundation: [`benchmark/invisible-tea-party/FOUNDATION.md`](benchmark/invisible-tea-party/FOUNDATION.md)
+- pass contracts: [`benchmark/invisible-tea-party/PASS_SCHEMA.md`](benchmark/invisible-tea-party/PASS_SCHEMA.md)
+- verifier architecture: [`benchmark/invisible-tea-party/PASS4_ARCHITECTURE.md`](benchmark/invisible-tea-party/PASS4_ARCHITECTURE.md)
+- current agent handoff: [`benchmark/invisible-tea-party/AGENT_HANDOFF.md`](benchmark/invisible-tea-party/AGENT_HANDOFF.md)
+- results layout and reproduction notes: [`benchmark/invisible-tea-party/results/README.md`](benchmark/invisible-tea-party/results/README.md)
+
+Current published Tea Party surfaces:
+
+- preserved official baseline (`v1.0`): [`benchmark/invisible-tea-party/results/live-gemini-official-2026-04-06/aggregate_report.md`](benchmark/invisible-tea-party/results/live-gemini-official-2026-04-06/aggregate_report.md)
+- current comparison pack (`v1.1`): [`benchmark/invisible-tea-party/results/live-expanded-comparison-2026-04-07/aggregate_report.md`](benchmark/invisible-tea-party/results/live-expanded-comparison-2026-04-07/aggregate_report.md)
+- dedicated Gemini 3.1 preview comparison: [`benchmark/invisible-tea-party/results/live-gemini-3-1-preview-2026-04-07/aggregate_report.md`](benchmark/invisible-tea-party/results/live-gemini-3-1-preview-2026-04-07/aggregate_report.md)
+- benchmark overview and interpretation: [`benchmark/invisible-tea-party/README.md`](benchmark/invisible-tea-party/README.md)
+
+What these additions are for:
+
+- Tea Party measures whether models accept coherent nonsense, repair reasoning under critique, and stay anchored to logical and ontological constraints.
+- Duck Experiments measures whether structured critique actually improves answers in a repeatable review workflow.
+- Together they separate two different questions:
+  - can the model detect persuasive invalidity at all?
+  - does deterministic critique support materially improve the result?
+
+What we are trying to get from the new benchmark work:
+
+- a preserved official baseline plus versioned comparison packs for coherence-vs-truth failures
+- replayable artifacts that combine prompts, raw pass outputs, and final scores in one place
+- benchmark outputs that are usable for publication, scorecards, and downstream engineering work
+- a clean handoff surface for future agents to improve matcher coverage and rerun calibration
+
 ## Iterative Enforcement (No Hidden Memory)
 
 CT-MCP retains nothing between calls. For multi-step workflows, callers pass explicit `context`:
@@ -98,7 +137,7 @@ No hidden state — all context is in the request.
 
 ## Experimental Workflow And Formulas
 
-The public comparison workflow in [`duckexperiments/`](duckexperiments/) uses CT-MCP as critique support, not as the final judge of truth.
+The public comparison workflow in [`benchmark/duckexperiments/`](benchmark/duckexperiments/) uses CT-MCP as critique support, not as the final judge of truth.
 
 Process:
 

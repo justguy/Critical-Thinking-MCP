@@ -1,0 +1,15 @@
+{
+  "schema_version": "v1.0",
+  "benchmark_id": "invisible-tea-party",
+  "started_at": "2026-04-07T18:35:01.483Z",
+  "updated_at": "2026-04-07T18:45:43.466Z",
+  "total_runs": 6,
+  "completed_runs": 6,
+  "successful_runs": 6,
+  "failed_runs": 0,
+  "active_profile_id": null,
+  "active_scenario_id": null,
+  "active_step": null,
+  "active_state": "done",
+  "last_event": "Calibration finished: 6 successful, 0 failed."
+}

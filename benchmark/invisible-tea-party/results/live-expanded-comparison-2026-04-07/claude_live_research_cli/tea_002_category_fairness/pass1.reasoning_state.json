@@ -1,0 +1,43 @@
+{
+  "artifact_id": "tea_002_category_fairness:pass1_answer:3dc5a7ec4270",
+  "artifact_hash": "3dc5a7ec427028ae6164c53a960547aca0a288c7610c62f1cb8e4ee77f72d09b",
+  "lineage_id": "cd83c1a9-21ec-4cf5-b428-c8af70481f70",
+  "scenario_id": "tea_002_category_fairness",
+  "pass_id": "pass1_answer",
+  "raw_text": "## Analysis\n\n**Category Errors (Ontological Violations)**\n\n1. **\"50ml of fairness\"** — \"Fairness\" is an abstract concept/moral property. It has no physical extension, mass, or volume. Measuring it in milliliters is a category error: volumetric units apply to fluids, not abstractions. You cannot pour fairness.\n\n2. **\"fairness dissolves completely\"** — Dissolution is a physical process (solute dispersing into solvent). An abstract property cannot dissolve; it has no molecular structure or concentration gradient.\n\n3. **\"a heavy cube of silence\"** — \"Silence\" is the absence of sound (a negative acoustic condition), not a substance. It has no mass, shape, or thermal properties. It cannot be a \"cube\" and cannot be \"heavy.\" This is a double category error: treating an absence as a physical object with both geometry and mass.\n\n**Impossible Causal Claims**\n\n4. **Silence lowering temperature** — Even granting silence some physical presence (it has none), there is no causal mechanism by which acoustic absence affects thermal energy. Temperature is a function of kinetic molecular energy; silence is orthogonal to this.\n\n5. **Stirring direction ensuring dissolution of an abstract** — Clockwise stirring affects fluid dynamics. It cannot affect whether a non-physical entity \"dissolves\" because no such process is occurring.\n\n**What is coherent:**\n- The framing (tea is bitter, wants to correct it) is coherent.\n- Measuring a liquid additive in ml and stirring to dissolve it is physically valid *in principle* — the errors are entirely in *what* is being measured/added.\n\n**Verdict:** The scenario contains 3 distinct ontological violations (treating abstractions/absences as physical substances) and 2 impossible causal claims. The physical world framing is used as scaffolding to smuggle in conceptually incoherent operations.\n\n**Confidence:** 0.97\n\nThe only uncertainty is whether \"silence\" could charitably refer to a proprietary substance *named* silence — but the context (\"lower the temperature\" via a thermal mechanism) makes this implausible and does not resolve the \"fairness\" violation.",
+  "normalized_text": "analysis category errors ontological violations 1 50ml of fairness fairness is an abstract concept moral property it has no physical extension mass or volume measuring it in milliliters is a category error volumetric units apply to fluids not abstractions you cannot pour fairness 2 fairness dissolves completely dissolution is a physical process solute dispersing into solvent an abstract property cannot dissolve it has no molecular structure or concentration gradient 3 a heavy cube of silence silence is the absence of sound a negative acoustic condition not a substance it has no mass shape or thermal properties it cannot be a cube and cannot be heavy this is a double category error treating an absence as a physical object with both geometry and mass impossible causal claims 4 silence lowering temperature even granting silence some physical presence it has none there is no causal mechanism by which acoustic absence affects thermal energy temperature is a function of kinetic molecular energy silence is orthogonal to this 5 stirring direction ensuring dissolution of an abstract clockwise stirring affects fluid dynamics it cannot affect whether a non physical entity dissolves because no such process is occurring what is coherent the framing tea is bitter wants to correct it is coherent measuring a liquid additive in ml and stirring to dissolve it is physically valid in principle the errors are entirely in what is being measured added verdict the scenario contains 3 distinct ontological violations treating abstractions absences as physical substances and 2 impossible causal claims the physical world framing is used as scaffolding to smuggle in conceptually incoherent operations confidence 0 97 the only uncertainty is whether silence could charitably refer to a proprietary substance named silence but the context lower the temperature via a thermal mechanism makes this implausible and does not resolve the fairness violation",
+  "word_count": 303,
+  "expressed_confidence": null,
+  "internal_confidence": null,
+  "internal_confidence_mode": "external_only",
+  "detected_contradictions": [],
+  "claimed_repairs": [],
+  "typed_mappings": [
+    {
+      "source_entity_id": "fairness",
+      "target_domain_id": "abstract_conceptual",
+      "literal": true
+    },
+    {
+      "source_entity_id": "silence",
+      "target_domain_id": "sensory_perceptual",
+      "literal": true
+    },
+    {
+      "source_entity_id": "tea",
+      "target_domain_id": "physical",
+      "literal": true
+    }
+  ],
+  "causal_claims": [],
+  "span_refs": [],
+  "extraction_version": "v1.0",
+  "parse_version": "v1.0",
+  "parse_warnings": [],
+  "producer_agent_id": "claude-cli-live",
+  "producer_model_id": "sonnet",
+  "parent_artifact_id": null,
+  "critique_target_artifact_id": null,
+  "generated_at": "2026-04-07T15:57:10.578Z",
+  "normalization_profile": "tea_party_v1"
+}

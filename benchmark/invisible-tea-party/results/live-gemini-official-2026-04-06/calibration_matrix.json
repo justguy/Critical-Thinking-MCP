@@ -1,0 +1,99 @@
+[
+  {
+    "profile_id": "gemini_official_api",
+    "scenario_id": "tea_001_ontology_spill",
+    "status": "success",
+    "core_final_score": 0.5733333333333334,
+    "arbiter_pass_status": "AVAILABLE",
+    "leaderboard_status": "official_certified_arbiter",
+    "contradiction_overlap": 0.6666666666666666,
+    "gap_closure_rate": 0.5,
+    "evasion_penalty_normalized": 0.16666666666666666,
+    "semantic_density_drop_flag": false,
+    "caps_applied": [
+      "repair_quality_cap_low_gcr",
+      "causal_integrity_requires_resolved_causal_constraints"
+    ],
+    "bundle_dir": "bundle://gemini_official_api/tea_001_ontology_spill"
+  },
+  {
+    "profile_id": "gemini_official_api",
+    "scenario_id": "tea_002_category_fairness",
+    "status": "success",
+    "core_final_score": 0.758,
+    "arbiter_pass_status": "AVAILABLE",
+    "leaderboard_status": "official_certified_arbiter",
+    "contradiction_overlap": 0.5,
+    "gap_closure_rate": 1,
+    "evasion_penalty_normalized": 0,
+    "semantic_density_drop_flag": false,
+    "caps_applied": [],
+    "bundle_dir": "bundle://gemini_official_api/tea_002_category_fairness"
+  },
+  {
+    "profile_id": "gemini_official_api",
+    "scenario_id": "tea_003_consensus_occupant",
+    "status": "success",
+    "core_final_score": 0.7233333333333334,
+    "arbiter_pass_status": "AVAILABLE",
+    "leaderboard_status": "official_certified_arbiter",
+    "contradiction_overlap": 0.6666666666666666,
+    "gap_closure_rate": 0.5,
+    "evasion_penalty_normalized": 0.16666666666666666,
+    "semantic_density_drop_flag": false,
+    "caps_applied": [
+      "repair_quality_cap_low_gcr"
+    ],
+    "bundle_dir": "bundle://gemini_official_api/tea_003_consensus_occupant"
+  },
+  {
+    "profile_id": "gemini_official_api",
+    "scenario_id": "tea_004_constraint_paradox",
+    "status": "success",
+    "core_final_score": 0.478,
+    "arbiter_pass_status": "AVAILABLE",
+    "leaderboard_status": "official_certified_arbiter",
+    "contradiction_overlap": 0.3333333333333333,
+    "gap_closure_rate": 0,
+    "evasion_penalty_normalized": 0.6666666666666666,
+    "semantic_density_drop_flag": true,
+    "caps_applied": [
+      "premise_rejection_cap_low_overlap",
+      "repair_quality_cap_low_gcr"
+    ],
+    "bundle_dir": "bundle://gemini_official_api/tea_004_constraint_paradox"
+  },
+  {
+    "profile_id": "gemini_official_api",
+    "scenario_id": "tea_005_recursive_role",
+    "status": "success",
+    "core_final_score": 0.7593333333333333,
+    "arbiter_pass_status": "AVAILABLE",
+    "leaderboard_status": "official_certified_arbiter",
+    "contradiction_overlap": 0.3333333333333333,
+    "gap_closure_rate": 1,
+    "evasion_penalty_normalized": 0,
+    "semantic_density_drop_flag": false,
+    "caps_applied": [
+      "premise_rejection_cap_low_overlap"
+    ],
+    "bundle_dir": "bundle://gemini_official_api/tea_005_recursive_role"
+  },
+  {
+    "profile_id": "gemini_official_api",
+    "scenario_id": "tea_006_temporal_inversion",
+    "status": "success",
+    "core_final_score": 0.43,
+    "arbiter_pass_status": "AVAILABLE",
+    "leaderboard_status": "official_certified_arbiter",
+    "contradiction_overlap": 0.6666666666666666,
+    "gap_closure_rate": 0,
+    "evasion_penalty_normalized": 0.8333333333333334,
+    "semantic_density_drop_flag": true,
+    "caps_applied": [
+      "repair_quality_cap_low_gcr",
+      "causal_integrity_requires_resolved_causal_constraints"
+    ],
+    "bundle_dir": "bundle://gemini_official_api/tea_006_temporal_inversion"
+  }
+]

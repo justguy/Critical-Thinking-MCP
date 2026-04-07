@@ -1,0 +1,63 @@
+2026-04-07T18:35:01.486Z Calibration initialized.
+2026-04-07T18:35:01.487Z Starting profile gemini_3_1_preview_api.
+2026-04-07T18:35:01.488Z Running gemini_3_1_preview_api/tea_001_ontology_spill.
+2026-04-07T18:35:01.498Z Running gemini_3_1_preview_api/tea_001_ontology_spill (executor metadata).
+2026-04-07T18:35:01.499Z Running gemini_3_1_preview_api/tea_001_ontology_spill (pass1).
+2026-04-07T18:35:21.062Z Running gemini_3_1_preview_api/tea_001_ontology_spill (pass2).
+2026-04-07T18:35:55.761Z Running gemini_3_1_preview_api/tea_001_ontology_spill (pass3).
+2026-04-07T18:36:23.159Z Running gemini_3_1_preview_api/tea_001_ontology_spill (deterministic verification).
+2026-04-07T18:36:23.168Z Running gemini_3_1_preview_api/tea_001_ontology_spill (arbiter verification).
+2026-04-07T18:36:51.508Z Running gemini_3_1_preview_api/tea_001_ontology_spill (reconciliation).
+2026-04-07T18:36:51.511Z Running gemini_3_1_preview_api/tea_001_ontology_spill (writing artifacts).
+2026-04-07T18:36:51.538Z Completed gemini_3_1_preview_api/tea_001_ontology_spill with score 0.7593.
+2026-04-07T18:36:51.539Z Running gemini_3_1_preview_api/tea_002_category_fairness.
+2026-04-07T18:36:51.543Z Running gemini_3_1_preview_api/tea_002_category_fairness (executor metadata).
+2026-04-07T18:36:51.544Z Running gemini_3_1_preview_api/tea_002_category_fairness (pass1).
+2026-04-07T18:37:15.117Z Running gemini_3_1_preview_api/tea_002_category_fairness (pass2).
+2026-04-07T18:37:47.429Z Running gemini_3_1_preview_api/tea_002_category_fairness (pass3).
+2026-04-07T18:38:14.431Z Running gemini_3_1_preview_api/tea_002_category_fairness (deterministic verification).
+2026-04-07T18:38:14.432Z Running gemini_3_1_preview_api/tea_002_category_fairness (arbiter verification).
+2026-04-07T18:38:27.404Z Running gemini_3_1_preview_api/tea_002_category_fairness (reconciliation).
+2026-04-07T18:38:27.405Z Running gemini_3_1_preview_api/tea_002_category_fairness (writing artifacts).
+2026-04-07T18:38:27.413Z Completed gemini_3_1_preview_api/tea_002_category_fairness with score 0.8680.
+2026-04-07T18:38:27.414Z Running gemini_3_1_preview_api/tea_003_consensus_occupant.
+2026-04-07T18:38:27.417Z Running gemini_3_1_preview_api/tea_003_consensus_occupant (executor metadata).
+2026-04-07T18:38:27.417Z Running gemini_3_1_preview_api/tea_003_consensus_occupant (pass1).
+2026-04-07T18:38:44.351Z Running gemini_3_1_preview_api/tea_003_consensus_occupant (pass2).
+2026-04-07T18:39:11.329Z Running gemini_3_1_preview_api/tea_003_consensus_occupant (pass3).
+2026-04-07T18:39:41.717Z Running gemini_3_1_preview_api/tea_003_consensus_occupant (deterministic verification).
+2026-04-07T18:39:41.719Z Running gemini_3_1_preview_api/tea_003_consensus_occupant (arbiter verification).
+2026-04-07T18:39:56.846Z Running gemini_3_1_preview_api/tea_003_consensus_occupant (reconciliation).
+2026-04-07T18:39:56.847Z Running gemini_3_1_preview_api/tea_003_consensus_occupant (writing artifacts).
+2026-04-07T18:39:56.858Z Completed gemini_3_1_preview_api/tea_003_consensus_occupant with score 0.7267.
+2026-04-07T18:39:56.858Z Running gemini_3_1_preview_api/tea_004_constraint_paradox.
+2026-04-07T18:39:56.862Z Running gemini_3_1_preview_api/tea_004_constraint_paradox (executor metadata).
+2026-04-07T18:39:56.863Z Running gemini_3_1_preview_api/tea_004_constraint_paradox (pass1).
+2026-04-07T18:40:14.269Z Running gemini_3_1_preview_api/tea_004_constraint_paradox (pass2).
+2026-04-07T18:40:46.517Z Running gemini_3_1_preview_api/tea_004_constraint_paradox (pass3).
+2026-04-07T18:41:19.594Z Running gemini_3_1_preview_api/tea_004_constraint_paradox (deterministic verification).
+2026-04-07T18:41:19.595Z Running gemini_3_1_preview_api/tea_004_constraint_paradox (arbiter verification).
+2026-04-07T18:41:31.773Z Running gemini_3_1_preview_api/tea_004_constraint_paradox (reconciliation).
+2026-04-07T18:41:31.775Z Running gemini_3_1_preview_api/tea_004_constraint_paradox (writing artifacts).
+2026-04-07T18:41:31.785Z Completed gemini_3_1_preview_api/tea_004_constraint_paradox with score 0.5000.
+2026-04-07T18:41:31.786Z Running gemini_3_1_preview_api/tea_005_recursive_role.
+2026-04-07T18:41:31.791Z Running gemini_3_1_preview_api/tea_005_recursive_role (executor metadata).
+2026-04-07T18:41:31.791Z Running gemini_3_1_preview_api/tea_005_recursive_role (pass1).
+2026-04-07T18:41:54.133Z Running gemini_3_1_preview_api/tea_005_recursive_role (pass2).
+2026-04-07T18:42:30.307Z Running gemini_3_1_preview_api/tea_005_recursive_role (pass3).
+2026-04-07T18:43:19.913Z Running gemini_3_1_preview_api/tea_005_recursive_role (deterministic verification).
+2026-04-07T18:43:19.915Z Running gemini_3_1_preview_api/tea_005_recursive_role (arbiter verification).
+2026-04-07T18:43:34.540Z Running gemini_3_1_preview_api/tea_005_recursive_role (reconciliation).
+2026-04-07T18:43:34.541Z Running gemini_3_1_preview_api/tea_005_recursive_role (writing artifacts).
+2026-04-07T18:43:34.568Z Completed gemini_3_1_preview_api/tea_005_recursive_role with score 0.7947.
+2026-04-07T18:43:34.569Z Running gemini_3_1_preview_api/tea_006_temporal_inversion.
+2026-04-07T18:43:34.574Z Running gemini_3_1_preview_api/tea_006_temporal_inversion (executor metadata).
+2026-04-07T18:43:34.575Z Running gemini_3_1_preview_api/tea_006_temporal_inversion (pass1).
+2026-04-07T18:44:31.693Z Running gemini_3_1_preview_api/tea_006_temporal_inversion (pass2).
+2026-04-07T18:45:03.033Z Running gemini_3_1_preview_api/tea_006_temporal_inversion (pass3).
+2026-04-07T18:45:31.955Z Running gemini_3_1_preview_api/tea_006_temporal_inversion (deterministic verification).
+2026-04-07T18:45:31.957Z Running gemini_3_1_preview_api/tea_006_temporal_inversion (arbiter verification).
+2026-04-07T18:45:43.450Z Running gemini_3_1_preview_api/tea_006_temporal_inversion (reconciliation).
+2026-04-07T18:45:43.451Z Running gemini_3_1_preview_api/tea_006_temporal_inversion (writing artifacts).
+2026-04-07T18:45:43.465Z Completed gemini_3_1_preview_api/tea_006_temporal_inversion with score 0.5100.
+2026-04-07T18:45:43.466Z Calibration finished: 6 successful, 0 failed.

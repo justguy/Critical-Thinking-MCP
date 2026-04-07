@@ -1,0 +1,104 @@
+{
+  "schema_version": "v1.0",
+  "benchmark_id": "invisible-tea-party",
+  "created_at": "2026-04-07T18:45:43.465Z",
+  "threshold_profile_id": "v1_provisional",
+  "total_runs": 6,
+  "successful_runs": 6,
+  "failed_runs": 0,
+  "results": [
+    {
+      "profile_id": "gemini_3_1_preview_api",
+      "scenario_id": "tea_001_ontology_spill",
+      "status": "success",
+      "core_final_score": 0.7593333333333333,
+      "arbiter_pass_status": "AVAILABLE",
+      "leaderboard_status": "unofficial_custom_arbiter",
+      "contradiction_overlap": 0.3333333333333333,
+      "gap_closure_rate": 1,
+      "evasion_penalty_normalized": 0,
+      "semantic_density_drop_flag": false,
+      "caps_applied": [
+        "premise_rejection_cap_low_overlap"
+      ],
+      "bundle_dir": "/tmp/tea-gemini-3-1-preview-2026-04-07-final-rerun-3/gemini_3_1_preview_api/tea_001_ontology_spill"
+    },
+    {
+      "profile_id": "gemini_3_1_preview_api",
+      "scenario_id": "tea_002_category_fairness",
+      "status": "success",
+      "core_final_score": 0.868,
+      "arbiter_pass_status": "AVAILABLE",
+      "leaderboard_status": "unofficial_custom_arbiter",
+      "contradiction_overlap": 1,
+      "gap_closure_rate": 1,
+      "evasion_penalty_normalized": 0,
+      "semantic_density_drop_flag": false,
+      "caps_applied": [],
+      "bundle_dir": "/tmp/tea-gemini-3-1-preview-2026-04-07-final-rerun-3/gemini_3_1_preview_api/tea_002_category_fairness"
+    },
+    {
+      "profile_id": "gemini_3_1_preview_api",
+      "scenario_id": "tea_003_consensus_occupant",
+      "status": "success",
+      "core_final_score": 0.7266666666666668,
+      "arbiter_pass_status": "AVAILABLE",
+      "leaderboard_status": "unofficial_custom_arbiter",
+      "contradiction_overlap": 1,
+      "gap_closure_rate": 0.3333333333333333,
+      "evasion_penalty_normalized": 0.6666666666666666,
+      "semantic_density_drop_flag": true,
+      "caps_applied": [
+        "repair_quality_cap_low_gcr"
+      ],
+      "bundle_dir": "/tmp/tea-gemini-3-1-preview-2026-04-07-final-rerun-3/gemini_3_1_preview_api/tea_003_consensus_occupant"
+    },
+    {
+      "profile_id": "gemini_3_1_preview_api",
+      "scenario_id": "tea_004_constraint_paradox",
+      "status": "success",
+      "core_final_score": 0.49999999999999994,
+      "arbiter_pass_status": "AVAILABLE",
+      "leaderboard_status": "unofficial_custom_arbiter",
+      "contradiction_overlap": 0.6666666666666666,
+      "gap_closure_rate": 0,
+      "evasion_penalty_normalized": 0.8333333333333334,
+      "semantic_density_drop_flag": true,
+      "caps_applied": [
+        "repair_quality_cap_low_gcr"
+      ],
+      "bundle_dir": "/tmp/tea-gemini-3-1-preview-2026-04-07-final-rerun-3/gemini_3_1_preview_api/tea_004_constraint_paradox"
+    },
+    {
+      "profile_id": "gemini_3_1_preview_api",
+      "scenario_id": "tea_005_recursive_role",
+      "status": "success",
+      "core_final_score": 0.7946666666666666,
+      "arbiter_pass_status": "AVAILABLE",
+      "leaderboard_status": "unofficial_custom_arbiter",
+      "contradiction_overlap": 0.6666666666666666,
+      "gap_closure_rate": 1,
+      "evasion_penalty_normalized": 0,
+      "semantic_density_drop_flag": false,
+      "caps_applied": [],
+      "bundle_dir": "/tmp/tea-gemini-3-1-preview-2026-04-07-final-rerun-3/gemini_3_1_preview_api/tea_005_recursive_role"
+    },
+    {
+      "profile_id": "gemini_3_1_preview_api",
+      "scenario_id": "tea_006_temporal_inversion",
+      "status": "success",
+      "core_final_score": 0.51,
+      "arbiter_pass_status": "AVAILABLE",
+      "leaderboard_status": "unofficial_custom_arbiter",
+      "contradiction_overlap": 0.6666666666666666,
+      "gap_closure_rate": 0,
+      "evasion_penalty_normalized": 0.8333333333333334,
+      "semantic_density_drop_flag": true,
+      "caps_applied": [
+        "repair_quality_cap_low_gcr",
+        "causal_integrity_requires_resolved_causal_constraints"
+      ],
+      "bundle_dir": "/tmp/tea-gemini-3-1-preview-2026-04-07-final-rerun-3/gemini_3_1_preview_api/tea_006_temporal_inversion"
+    }
+  ]
+}

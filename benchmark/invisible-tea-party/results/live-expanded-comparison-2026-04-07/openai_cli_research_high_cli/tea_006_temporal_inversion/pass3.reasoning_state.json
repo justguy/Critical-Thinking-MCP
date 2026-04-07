@@ -1,0 +1,40 @@
+{
+  "artifact_id": "tea_006_temporal_inversion:pass3_repair:86945c49d221",
+  "artifact_hash": "86945c49d2218495cd9dc11722603693466b6033379c584facacf270944af720",
+  "lineage_id": "dceba829-1615-469d-85a1-5314de130629",
+  "scenario_id": "tea_006_temporal_inversion",
+  "pass_id": "pass3_repair",
+  "raw_text": "**What I changed**\n- I removed the claim that a “sincere apology” logically requires a real past act. That was too strong. The contradiction does not come from sincerity; it comes from the wording `\"for spilling tea all over the guest's lap\"`, which presents the spill as already having happened.\n- I removed speculation about `\"foreknowledge\"` and `\"false belief\"`. Those are possible rescue stories, but the text does not require either, so they should not be part of the core analysis.\n- I corrected the claim that the later spill “partly repairs” the setup. It does not resolve the earlier contradiction by itself. It only helps if you add an extra premise not stated in the scenario.\n- I replaced “retroactively” with the more accurate idea of deferred acceptance: the apology is given earlier and accepted later.\n- I removed the supposed inconsistency about wiping `\"their legs\"`. That is ordinary language here and not a logical problem.\n- I would only partly resist one critique: `\"sincere\"` is not a source of contradiction, but it does slightly support reading the apology as earnest rather than ironic. Even so, it is not doing important logical work.\n\n**Revised Analysis**\nThe scenario is not logically coherent as written.\n\nThe hard contradiction is between these two facts at the same moment:\n- The guest sits down and notices `\"their trousers are completely dry\"`.\n- The host immediately apologizes `\"for spilling tea all over the guest's lap\"`.\n\nThat apology wording presupposes a spill has already occurred. But the text has just told us the guest is still completely dry, and the actual spill does not happen until ten minutes later. So the narrative presents a completed spill before the only stated spill takes place.\n\nThe later sentence does not fix this on its own. When the host later trips and spills the teapot onto the guest's lap, that creates a spill event that could have been the target of an apology only if we add some extra premise such as anticipation, mistaken wording, or narration error. None of that is in the text. As written, the earlier apology still refers to an already-accomplished spill that has not yet happened.\n\nThe final sentence, `\"The guest accepts the apology they received earlier\"`, is unusual but not itself contradictory. A person can receive an apology earlier and accept it later. The problem is not the timing of acceptance; the problem is that the apology's content was premature and inconsistent with the guest still being dry.\n\n**Conclusion**\nThe core inconsistency is precise: the text says the guest's trousers are completely dry, yet the host apologizes for having already spilled tea all over the guest's lap before the later spill occurs. That is enough to make the scenario incoherent without adding speculation.\n\nConfidence: 0.95",
+  "normalized_text": "what i changed i removed the claim that a sincere apology logically requires a real past act that was too strong the contradiction does not come from sincerity it comes from the wording for spilling tea all over the guest s lap which presents the spill as already having happened i removed speculation about foreknowledge and false belief those are possible rescue stories but the text does not require either so they should not be part of the core analysis i corrected the claim that the later spill partly repairs the setup it does not resolve the earlier contradiction by itself it only helps if you add an extra premise not stated in the scenario i replaced retroactively with the more accurate idea of deferred acceptance the apology is given earlier and accepted later i removed the supposed inconsistency about wiping their legs that is ordinary language here and not a logical problem i would only partly resist one critique sincere is not a source of contradiction but it does slightly support reading the apology as earnest rather than ironic even so it is not doing important logical work revised analysis the scenario is not logically coherent as written the hard contradiction is between these two facts at the same moment the guest sits down and notices their trousers are completely dry the host immediately apologizes for spilling tea all over the guest s lap that apology wording presupposes a spill has already occurred but the text has just told us the guest is still completely dry and the actual spill does not happen until ten minutes later so the narrative presents a completed spill before the only stated spill takes place the later sentence does not fix this on its own when the host later trips and spills the teapot onto the guest s lap that creates a spill event that could have been the target of an apology only if we add some extra premise such as anticipation mistaken wording or narration error none of that is in the text as written the earlier apology still refers to an already accomplished spill that has not yet happened the final sentence the guest accepts the apology they received earlier is unusual but not itself contradictory a person can receive an apology earlier and accept it later the problem is not the timing of acceptance the problem is that the apology s content was premature and inconsistent with the guest still being dry conclusion the core inconsistency is precise the text says the guest s trousers are completely dry yet the host apologizes for having already spilled tea all over the guest s lap before the later spill occurs that is enough to make the scenario incoherent without adding speculation confidence 0 95",
+  "word_count": 463,
+  "expressed_confidence": 0.95,
+  "internal_confidence": null,
+  "internal_confidence_mode": "external_only",
+  "detected_contradictions": [],
+  "claimed_repairs": [
+    "r2_flag_dry_state_conflict"
+  ],
+  "typed_mappings": [
+    {
+      "source_entity_id": "apology",
+      "target_domain_id": "social_relational",
+      "literal": true
+    },
+    {
+      "source_entity_id": "spill",
+      "target_domain_id": "physical",
+      "literal": true
+    }
+  ],
+  "causal_claims": [],
+  "span_refs": [],
+  "extraction_version": "v1.0",
+  "parse_version": "v1.0",
+  "parse_warnings": [],
+  "producer_agent_id": "openai-cli-live",
+  "producer_model_id": "gpt-5.4",
+  "parent_artifact_id": "tea_006_temporal_inversion:pass2_critique:222affa6050d",
+  "critique_target_artifact_id": null,
+  "generated_at": "2026-04-07T16:32:06.202Z",
+  "normalization_profile": "tea_party_v1"
+}

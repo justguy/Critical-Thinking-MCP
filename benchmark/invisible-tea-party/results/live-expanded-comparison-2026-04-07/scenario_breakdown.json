@@ -1,0 +1,57 @@
+{
+  "family_stats": [
+    {
+      "family": "ontology",
+      "scenario_count": 4,
+      "mean_score": 0.6659142857142857,
+      "score_spread": 0.24072380952380945
+    },
+    {
+      "family": "category_error",
+      "scenario_count": 4,
+      "mean_score": 0.7754238095238095,
+      "score_spread": 0.5129333333333332
+    },
+    {
+      "family": "social_consensus",
+      "scenario_count": 4,
+      "mean_score": 0.7488761904761905,
+      "score_spread": 0.16518095238095232
+    },
+    {
+      "family": "constraint_paradox",
+      "scenario_count": 4,
+      "mean_score": 0.6625285714285714,
+      "score_spread": 0.391447619047619
+    },
+    {
+      "family": "recursive_role",
+      "scenario_count": 4,
+      "mean_score": 0.4219047619047619,
+      "score_spread": 0.1494476190476191
+    },
+    {
+      "family": "temporal_inversion",
+      "scenario_count": 4,
+      "mean_score": 0.587397619047619,
+      "score_spread": 0.185104761904762
+    }
+  ],
+  "tier_stats": [
+    {
+      "tier": 2,
+      "scenario_count": 8,
+      "mean_score": 0.6266559523809523
+    },
+    {
+      "tier": 3,
+      "scenario_count": 8,
+      "mean_score": 0.5986642857142858
+    },
+    {
+      "tier": 4,
+      "scenario_count": 8,
+      "mean_score": 0.7057023809523808
+    }
+  ]
+}

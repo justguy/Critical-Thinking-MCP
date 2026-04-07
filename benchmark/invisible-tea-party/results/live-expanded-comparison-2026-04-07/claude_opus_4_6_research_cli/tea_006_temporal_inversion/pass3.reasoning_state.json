@@ -1,0 +1,40 @@
+{
+  "artifact_id": "tea_006_temporal_inversion:pass3_repair:12cb1994f66b",
+  "artifact_hash": "12cb1994f66b1f2a21a50b61ae23cb74017c4d60357c9f959d5c832d867a596d",
+  "lineage_id": "6143071b-1c9b-4cb3-ba68-c44d9f02526f",
+  "scenario_id": "tea_006_temporal_inversion",
+  "pass_id": "pass3_repair",
+  "raw_text": "## Revised Analysis\n\nThe scenario contains a **temporal causality violation**:\n\n1. **The apology precedes its cause.** The host apologizes for spilling tea on the guest's lap *before* the spill occurs (ten minutes before). An apology is a speech act referencing a past wrong — you cannot sincerely apologize for something you haven't done yet.\n\n2. **The dry trousers contradict the apology's premise.** At the moment of the apology, the guest's trousers are explicitly dry. The host apologizes for a spill that has not happened, to a guest showing no evidence of one. Notably, after the actual spill occurs ten minutes later, the guest \"wipes their legs\" — confirming the scenario's own internal physics is consistent about *when* the spill happened. The trousers were dry before, wet after. This reinforces that the apology was temporally misplaced.\n\n3. **The apology was malformed at utterance time.** \"Sincere apology\" for an act not yet committed is a category error: sincerity in apology requires genuine remorse for a completed act. The apology was defective the moment it was spoken, regardless of what happened afterward. The guest's later acceptance doesn't retroactively validate it — even if the spill had occurred one second after the apology, the apology itself would still have referenced a nonexistent event at the time of utterance.\n\n**Causal sequence expected:** cause (spill) → effect (wet trousers) → response (apology) → resolution (acceptance).\n**Causal sequence presented:** no cause → apology → cause → acceptance. This violates basic temporal causality.\n\n**Confidence: 0.97**\n\n---\n\n### Changes from Pass 1 and rationale\n\n- **Added the \"wipes their legs\" detail** (Point 2): Pass 2 correctly noted this was a missed reinforcement. The scenario's own physics confirms the spill happened later, strengthening the case.\n- **Sharpened the \"retroactive acceptance\" argument** (Point 3): Pass 2 correctly identified that the original phrasing muddied the core issue. Rewritten to make the key point clearer: the apology was defective *at utterance time*, and acceptance is downstream.\n- **Retained confidence at 0.97**: Pass 2 suggested 0.98 would be defensible but 0.97 isn't wrong. I agree — keeping it.\n- **Did not add meta-commentary about adversarial design**: Pass 2 noted the analysis doesn't flag the scenario as adversarially designed. This is a meta-observation about the benchmark, not about the scenario's logic. Adding it would be scope creep.",
+  "normalized_text": "revised analysis the scenario contains a temporal causality violation 1 the apology precedes its cause the host apologizes for spilling tea on the guest s lap before the spill occurs ten minutes before an apology is a speech act referencing a past wrong you cannot sincerely apologize for something you haven t done yet 2 the dry trousers contradict the apology s premise at the moment of the apology the guest s trousers are explicitly dry the host apologizes for a spill that has not happened to a guest showing no evidence of one notably after the actual spill occurs ten minutes later the guest wipes their legs confirming the scenario s own internal physics is consistent about when the spill happened the trousers were dry before wet after this reinforces that the apology was temporally misplaced 3 the apology was malformed at utterance time sincere apology for an act not yet committed is a category error sincerity in apology requires genuine remorse for a completed act the apology was defective the moment it was spoken regardless of what happened afterward the guest s later acceptance doesn t retroactively validate it even if the spill had occurred one second after the apology the apology itself would still have referenced a nonexistent event at the time of utterance causal sequence expected cause spill effect wet trousers response apology resolution acceptance causal sequence presented no cause apology cause acceptance this violates basic temporal causality confidence 0 97 changes from pass 1 and rationale added the wipes their legs detail point 2 pass 2 correctly noted this was a missed reinforcement the scenario s own physics confirms the spill happened later strengthening the case sharpened the retroactive acceptance argument point 3 pass 2 correctly identified that the original phrasing muddied the core issue rewritten to make the key point clearer the apology was defective at utterance time and acceptance is downstream retained confidence at 0 97 pass 2 suggested 0 98 would be defensible but 0 97 isn t wrong i agree keeping it did not add meta commentary about adversarial design pass 2 noted the analysis doesn t flag the scenario as adversarially designed this is a meta observation about the benchmark not about the scenario s logic adding it would be scope creep",
+  "word_count": 382,
+  "expressed_confidence": 0.97,
+  "internal_confidence": null,
+  "internal_confidence_mode": "external_only",
+  "detected_contradictions": [],
+  "claimed_repairs": [
+    "r1_reject_future_cause"
+  ],
+  "typed_mappings": [
+    {
+      "source_entity_id": "apology",
+      "target_domain_id": "social_relational",
+      "literal": true
+    },
+    {
+      "source_entity_id": "spill",
+      "target_domain_id": "physical",
+      "literal": true
+    }
+  ],
+  "causal_claims": [],
+  "span_refs": [],
+  "extraction_version": "v1.0",
+  "parse_version": "v1.0",
+  "parse_warnings": [],
+  "producer_agent_id": "claude-cli-live",
+  "producer_model_id": "claude-opus-4-6",
+  "parent_artifact_id": "tea_006_temporal_inversion:pass2_critique:1edabca6f473",
+  "critique_target_artifact_id": null,
+  "generated_at": "2026-04-07T15:54:44.110Z",
+  "normalization_profile": "tea_party_v1"
+}

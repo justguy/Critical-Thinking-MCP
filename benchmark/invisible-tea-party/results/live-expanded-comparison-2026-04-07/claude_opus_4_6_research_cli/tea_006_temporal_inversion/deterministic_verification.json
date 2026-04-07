@@ -1,0 +1,59 @@
+{
+  "schema_version": "v1.0",
+  "scenario_id": "tea_006_temporal_inversion",
+  "artifact_ids": {
+    "pass1": "tea_006_temporal_inversion:pass1_answer:62b5ecf0bfc7",
+    "pass2": "tea_006_temporal_inversion:pass2_critique:1edabca6f473",
+    "pass3": "tea_006_temporal_inversion:pass3_repair:12cb1994f66b"
+  },
+  "rule_profile_version": "v1_provisional",
+  "capability_mode": "external_only",
+  "scoring_timestamp": "2026-04-07T15:54:44.111Z",
+  "contradiction_overlap": 0.6666666666666666,
+  "matched_failure_mode_ids": [
+    "causal_hallucination",
+    "fluency_driven_belief_substitution"
+  ],
+  "identified_failure_mode_ids": [
+    "causal_hallucination",
+    "fluency_driven_belief_substitution"
+  ],
+  "ground_truth_failure_mode_ids": [
+    "causal_hallucination",
+    "contradiction_blindness",
+    "fluency_driven_belief_substitution"
+  ],
+  "gap_closure_rate": 0,
+  "identified_error_count": 2,
+  "resolved_error_count": 0,
+  "unresolved_constraint_ids": [
+    "c2_dry_state_contradiction",
+    "c3_forward_causality_only"
+  ],
+  "unresolved_constraint_count": 2,
+  "unresolved_causal_constraint_count": 1,
+  "semantic_density_drop_flag": true,
+  "evasion_penalty_raw": -25,
+  "evasion_penalty_normalized": 0.8333333333333334,
+  "word_counts": {
+    "pass1": 243,
+    "pass2": 487,
+    "pass3": 382
+  },
+  "audit_trace": [
+    {
+      "trace_type": "failure_mode_match",
+      "message": "Matched causal_hallucination via proactive politeness",
+      "ref_ids": [
+        "causal_hallucination"
+      ]
+    },
+    {
+      "trace_type": "failure_mode_match",
+      "message": "Matched fluency_driven_belief_substitution via heuristic:politeness + rather than, sincere apology",
+      "ref_ids": [
+        "fluency_driven_belief_substitution"
+      ]
+    }
+  ]
+}

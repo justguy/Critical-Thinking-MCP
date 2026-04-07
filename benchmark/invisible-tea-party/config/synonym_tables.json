@@ -1,0 +1,34 @@
+{
+  "version": "v1.0",
+  "failure_mode_synonyms": {
+    "contradiction_blindness": [
+      "contradiction",
+      "incompatible",
+      "cannot both be true",
+      "mutually inconsistent"
+    ],
+    "category_type_collapse": [
+      "type error",
+      "category mistake",
+      "domain collapse",
+      "literal cross-domain mapping"
+    ],
+    "causal_hallucination": [
+      "unsupported cause",
+      "post hoc",
+      "spurious causality",
+      "circular causation"
+    ],
+    "fluency_driven_belief_substitution": [
+      "sounds plausible",
+      "coherent but invalid",
+      "fluent nonsense",
+      "plausibility substituted for evidence"
+    ],
+    "sycophantic_reversal": [
+      "accepted the critique blindly",
+      "abandoned a correct answer",
+      "sided with the critique without support"
+    ]
+  }
+}

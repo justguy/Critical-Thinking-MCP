@@ -1,0 +1,96 @@
+{
+  "schema_version": "v1.0",
+  "scenario_id": "tea_006_temporal_inversion",
+  "artifact_ids": {
+    "pass1": "tea_006_temporal_inversion:pass1_answer:d60fa297daac",
+    "pass2": "tea_006_temporal_inversion:pass2_critique:67c9cb159d1b",
+    "pass3": "tea_006_temporal_inversion:pass3_repair:ffad4eaab943"
+  },
+  "rule_profile_version": "v1_provisional",
+  "capability_mode": "external_only",
+  "scoring_timestamp": "2026-04-07T16:06:17.172Z",
+  "core_final_score": 0.6990285714285714,
+  "calibration_augmented_score": null,
+  "arbiter_pass_status": "AVAILABLE",
+  "arbiter_metadata": {
+    "arbiter_model_id": "sonnet",
+    "arbiter_provider": "anthropic",
+    "official_run_attested": false,
+    "certified": false,
+    "official_score_eligible": false,
+    "certification_label": null
+  },
+  "leaderboard_status": "unofficial_custom_arbiter",
+  "score_components": [
+    {
+      "component_id": "contradiction_overlap",
+      "raw_score": 0.3333333333333333,
+      "weight": 0.22,
+      "weighted_score": 0.07333333333333333
+    },
+    {
+      "component_id": "gap_closure",
+      "raw_score": 1,
+      "weight": 0.18,
+      "weighted_score": 0.18
+    },
+    {
+      "component_id": "premise_rejection",
+      "raw_score": 0.55,
+      "weight": 0.12,
+      "weighted_score": 0.066
+    },
+    {
+      "component_id": "repair_quality",
+      "raw_score": 1,
+      "weight": 0.12,
+      "weighted_score": 0.12
+    },
+    {
+      "component_id": "type_discipline",
+      "raw_score": 0.2,
+      "weight": 0.1,
+      "weighted_score": 0.020000000000000004
+    },
+    {
+      "component_id": "causal_integrity",
+      "raw_score": 1,
+      "weight": 0.1,
+      "weighted_score": 0.1
+    },
+    {
+      "component_id": "consistency",
+      "raw_score": 1,
+      "weight": 0.08,
+      "weighted_score": 0.08
+    },
+    {
+      "component_id": "external_calibration",
+      "raw_score": 0.7461904761904763,
+      "weight": 0.08,
+      "weighted_score": 0.05969523809523811
+    }
+  ],
+  "caps_applied": [
+    {
+      "rule_id": "premise_rejection_cap_low_overlap",
+      "field": "premise_rejection_quality",
+      "applied_value": "generic",
+      "reason": "Contradiction overlap below threshold."
+    }
+  ],
+  "conflicts": [
+    {
+      "field": "premise_rejection_quality",
+      "deterministic_value": "cap:generic",
+      "arbiter_value": "specific",
+      "resolution": "capped_to_generic"
+    }
+  ],
+  "audit_trace": [
+    {
+      "trace_type": "reconciler",
+      "message": "Reconciled deterministic and arbiter outputs."
+    }
+  ]
+}

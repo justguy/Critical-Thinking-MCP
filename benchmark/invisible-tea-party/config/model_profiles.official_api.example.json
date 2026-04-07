@@ -1,0 +1,25 @@
+{
+  "_note": "Gemini API example for official pinned-model runs. Requires GEMINI_API_KEY in the environment and assumes the certified arbiter list matches the pinned Gemini model ID below.",
+  "profiles": [
+    {
+      "profile_id": "gemini_official_api",
+      "description": "Pinned Gemini API executor + certified Gemini arbiter path for official runs.",
+      "pass_executor_module": "benchmark/invisible-tea-party/ts/src/adapters/geminiApi.ts",
+      "arbiter_module": "benchmark/invisible-tea-party/ts/src/adapters/geminiApi.ts",
+      "executor_args": {
+        "model": "gemini-2.5-pro",
+        "api_key_env": "GEMINI_API_KEY",
+        "producer_agent_id": "gemini-api",
+        "producer_model_id": "gemini-2.5-pro"
+      },
+      "arbiter_args": {
+        "model": "gemini-2.5-pro",
+        "api_key_env": "GEMINI_API_KEY",
+        "arbiter_model_id": "gemini-2.5-pro",
+        "arbiter_provider": "gemini"
+      },
+      "attempt_ingest": true,
+      "expected_official": true
+    }
+  ]
+}

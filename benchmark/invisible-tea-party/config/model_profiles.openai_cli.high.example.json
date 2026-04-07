@@ -1,0 +1,25 @@
+{
+  "_note": "OpenAI CLI high-reasoning example for research-only local runs. This path is intentionally unofficial because it relies on a local CLI session rather than a certified attested API transport.",
+  "profiles": [
+    {
+      "profile_id": "openai_cli_research_high_cli",
+      "description": "Local OpenAI CLI executor and arbiter for high-reasoning research calibration runs.",
+      "pass_executor_module": "benchmark/invisible-tea-party/ts/src/adapters/openaiCli.ts",
+      "arbiter_module": "benchmark/invisible-tea-party/ts/src/adapters/openaiCli.ts",
+      "executor_args": {
+        "model": "gpt-5.4",
+        "reasoning_effort": "high",
+        "producer_agent_id": "openai-cli-live",
+        "producer_model_id": "gpt-5.4"
+      },
+      "arbiter_args": {
+        "model": "gpt-5.4",
+        "reasoning_effort": "high",
+        "arbiter_model_id": "gpt-5.4",
+        "arbiter_provider": "openai"
+      },
+      "attempt_ingest": false,
+      "expected_official": false
+    }
+  ]
+}

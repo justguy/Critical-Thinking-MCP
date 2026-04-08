@@ -1,11 +1,11 @@
 {
-  "name": "critical-thinking-mcp",
+  "name": "ct-mcp",
   "version": "0.1.0-beta.1",
   "description": "Deterministic mathematical enforcement for LLM reasoning quality. Nine tools that catch confidence inflation, circular logic, fabricated numbers, arithmetic errors, and concurrency hazards — before they reach production.",
   "type": "module",
   "main": "dist/server.js",
   "bin": {
-    "critical-thinking-mcp": "dist/server.js"
+    "ct-mcp": "dist/server.js"
   },
   "files": [
     "dist",

@@ -69,8 +69,8 @@ This is one scenario from a 56-scenario benchmark (42 defect + 14 clean control)
 
 ## Replicate This
 
-1. Install: `npm install -g critical-thinking-mcp`
-2. Configure your MCP client with `{"mcpServers": {"critical-thinking": {"command": "critical-thinking-mcp"}}}`
+1. Install: `npm install -g ct-mcp`
+2. Configure your MCP client with `{"mcpServers": {"ct-mcp": {"command": "ct-mcp"}}}`
 3. Ask the billing prompt above without CT-MCP — note what it catches
 4. Ask the same prompt with CT-MCP enabled — compare the enforcement output
 5. The full benchmark scenarios are in `benchmark/scenarios.json`

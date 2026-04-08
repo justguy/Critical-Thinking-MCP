@@ -1,4 +1,4 @@
-# critical-thinking-mcp
+# ct-mcp
 
 > **BETA** — Under active development. Interfaces may change between versions.
 
@@ -9,7 +9,7 @@ No LLM calls in enforcement logic. No configuration. No API keys. Runs locally.
 ## Install
 
 ```bash
-npm install -g critical-thinking-mcp
+npm install -g ct-mcp
 ```
 
 Add to Claude Desktop, Cursor, or any MCP client:
@@ -17,8 +17,8 @@ Add to Claude Desktop, Cursor, or any MCP client:
 ```json
 {
   "mcpServers": {
-    "critical-thinking": {
-      "command": "critical-thinking-mcp"
+    "ct-mcp": {
+      "command": "ct-mcp"
     }
   }
 }

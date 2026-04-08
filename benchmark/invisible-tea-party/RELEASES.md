@@ -1,6 +1,6 @@
 # Invisible Tea Party Release Line
 
-This benchmark now has a release line separate from the npm package version for `critical-thinking-mcp`.
+This benchmark now has a release line separate from the npm package version for `ct-mcp`.
 
 That split is intentional:
 

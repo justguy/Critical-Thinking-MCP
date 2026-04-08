@@ -1,6 +1,6 @@
 #!/usr/bin/env npx tsx
 /**
- * Benchmark runner for critical-thinking-mcp.
+ * Benchmark runner for ct-mcp.
  *
  * Runs all scenarios across 4 conditions and writes results to
  * benchmark/results/BENCHMARK_RESULTS.json.

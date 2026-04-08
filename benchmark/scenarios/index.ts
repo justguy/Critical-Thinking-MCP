@@ -1,5 +1,5 @@
 /**
- * Benchmark scenarios for critical-thinking-mcp.
+ * Benchmark scenarios for ct-mcp.
  *
  * 20 defect scenarios (expected to trigger enforcement failures or warnings)
  * + 6 clean controls (expected to PASS without issues).

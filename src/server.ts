@@ -18,7 +18,7 @@ import { TOOLS } from './mcp/tool-definitions.js';
 const server = new Server(
   {
     name: 'critical-thinking-mcp',
-    version: '0.1.0-beta.1',
+    version: '0.1.0-beta.2',
   },
   {
     capabilities: {

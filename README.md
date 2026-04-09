@@ -24,6 +24,15 @@ Add to Claude Desktop, Cursor, or any MCP client:
 }
 ```
 
+## Roadmap
+
+The repo-wide roadmap is consolidated in [`ROADMAP.md`](ROADMAP.md).
+
+That document separates:
+
+- `ct-mcp` package milestones and beta-exit criteria
+- `Invisible Tea Party` benchmark release milestones and calibration goals
+
 ## What Changes
 
 A billing system claims 90% confidence. Three assumptions support it — but two can't state what would prove them wrong.

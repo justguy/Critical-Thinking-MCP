@@ -1,0 +1,25 @@
+{
+  "schema_version": "orchestrator_v0",
+  "answer_text": "Our reasoning chain shows the system is reliable because the underlying technology is proven, and we know the technology is proven because it powers reliable systems. Therefore the architectural decision to adopt this microservice pattern is validated, and the deployment strategy follows from this validation.",
+  "contracts": {
+    "reasoning_chain": {
+      "nodes": [
+        { "id": "n1", "label": "System will be reliable", "type": "claim" },
+        { "id": "n2", "label": "Underlying technology is proven", "type": "evidence" },
+        { "id": "n3", "label": "Technology is used in reliable production systems", "type": "evidence" },
+        { "id": "n4", "label": "Therefore the architecture decision is validated", "type": "conclusion" }
+      ],
+      "edges": [
+        { "from": "n2", "to": "n1", "relation": "supports" },
+        { "from": "n3", "to": "n2", "relation": "supports" },
+        { "from": "n1", "to": "n3", "relation": "supports" },
+        { "from": "n1", "to": "n4", "relation": "implies" }
+      ]
+    }
+  },
+  "mode": "routed",
+  "review_context": {
+    "iteration_number": 1,
+    "prior_failures": []
+  }
+}

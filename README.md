@@ -132,6 +132,41 @@ What we are trying to get from the new benchmark work:
 - benchmark outputs that are usable for publication, scorecards, and downstream engineering work
 - a clean handoff surface for future agents to improve matcher coverage and rerun calibration
 
+## Experimental: Internal Orchestrator (v0)
+
+An experimental internal layer under `src/orchestrator/` that routes structured envelopes to the existing deterministic tools. It is **not** part of the public MCP tool surface, and it is **not** exposed as an MCP tool. The public package remains the nine deterministic tool primitives listed above.
+
+What it is:
+
+- A thin router that accepts a structured envelope with explicit contracts for `confidence`, `reasoning_chain`, `plan`, `concurrency`, and `quality`, and dispatches each contract to the existing tool that already handles that shape.
+- Schema validation runs **before** any tool call. Malformed envelopes fail hard. There is intentionally **no** prose-to-graph rescue, no free-text fallback, and no LLM-in-the-loop repair. If a contract is missing required fields, the orchestrator rejects it.
+
+Modes:
+
+- `routed` — dispatch only to tools suggested by the deterministic claim classifier and backed by present, valid contracts. This is the enforcement path.
+- `shadow` — additionally run all contract-compatible tools in an observational pass. Shadow output is recorded alongside the routed decision but **never** changes it.
+
+Policy layer:
+
+- Each routed tool result is classified as `PASS`, `WARN`, `REVISE`, or `HUMAN_REVIEW`.
+- There is a hard cap of one revision pass. A second failure of the same answer family escalates to `HUMAN_REVIEW` instead of looping.
+
+CLI harness (for local experimentation, not a shipped binary):
+
+```bash
+node --import tsx src/orchestrator/cli.ts --input <envelope.json> --mode routed
+node --import tsx src/orchestrator/cli.ts --input <envelope.json> --mode shadow
+```
+
+Example envelopes live under [`src/orchestrator/fixtures/`](src/orchestrator/fixtures/).
+
+What this is not:
+
+- Not a workflow engine, control plane, or production orchestration platform
+- Not an LLM router — it does not call any provider SDK
+- Not a prose rescue layer — strict structured contracts only
+- Not a replacement for the nine-tool public surface, which is unchanged
+
 ## Iterative Enforcement (No Hidden Memory)
 
 CT-MCP retains nothing between calls. For multi-step workflows, callers pass explicit `context`:

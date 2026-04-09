@@ -1,0 +1,45 @@
+{
+  "schema_version": "orchestrator_v0",
+  "answer_text": "Our deployment migration plan moves traffic from the legacy system to the new cluster in five sequential phases. Each phase has explicit dependencies and resource requirements.",
+  "contracts": {
+    "plan": {
+      "steps": [
+        {
+          "id": "s1",
+          "description": "Provision new database cluster in target region",
+          "dependencies": [],
+          "resources": ["database_team", "cloud_infra"]
+        },
+        {
+          "id": "s2",
+          "description": "Configure replication from legacy primary to new cluster",
+          "dependencies": ["s1"],
+          "resources": ["database_team"]
+        },
+        {
+          "id": "s3",
+          "description": "Migrate application connection strings via feature flag",
+          "dependencies": ["s2"],
+          "resources": ["app_team"]
+        },
+        {
+          "id": "s4",
+          "description": "Switch read traffic, then write traffic, to the new cluster",
+          "dependencies": ["s3"],
+          "resources": ["database_team", "app_team"]
+        },
+        {
+          "id": "s5",
+          "description": "Decommission legacy database after 7-day soak period",
+          "dependencies": ["s4"],
+          "resources": ["database_team"]
+        }
+      ]
+    }
+  },
+  "mode": "routed",
+  "review_context": {
+    "iteration_number": 1,
+    "prior_failures": []
+  }
+}

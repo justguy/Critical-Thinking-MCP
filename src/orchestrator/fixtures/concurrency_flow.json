@@ -1,0 +1,23 @@
+{
+  "schema_version": "orchestrator_v0",
+  "answer_text": "The payment processing path reads the account balance, verifies sufficient funds, deducts the transaction amount, and writes the new balance. Multiple worker instances process payment requests in parallel against the same account.",
+  "contracts": {
+    "concurrency": {
+      "steps": [
+        "Worker reads current account balance from accounts table",
+        "Worker verifies that the balance is sufficient for this transaction",
+        "Worker calculates new balance after deducting the transaction amount",
+        "Worker writes the updated balance back to the accounts table",
+        "Worker emits a confirmation event to the payment gateway"
+      ],
+      "shared_resources": ["accounts_table", "payment_gateway"],
+      "delivery_model": "at_least_once",
+      "retry_behavior": "automatic"
+    }
+  },
+  "mode": "routed",
+  "review_context": {
+    "iteration_number": 1,
+    "prior_failures": []
+  }
+}

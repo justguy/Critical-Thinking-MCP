@@ -40,6 +40,14 @@ These are the clearest next improvements for the MCP server itself:
 
 The most important gate is independent human scoring. That is the explicit blocker for stronger non-beta benchmark claims.
 
+#### Experimental: orchestrator v0 (internal only)
+
+An internal routing layer under `src/orchestrator/` has landed as an experiment. It is explicitly out of scope for the public MCP tool surface in `0.1.x-beta`.
+
+- what is in: strict structured envelopes routed to existing deterministic tools, `routed` and `shadow` modes, a PASS / WARN / REVISE / HUMAN_REVIEW policy layer with a one-revision cap, and a local CLI harness
+- what is intentionally out of scope: no provider SDK integrations, no LLM routing, no prose-to-graph rescue, no exposure as a public MCP tool
+- status: experimental, subject to change, not a gating item for `v1.0`
+
 ### Track B: `Invisible Tea Party`
 
 The benchmark core is already built, so the next work is hardening and release discipline:

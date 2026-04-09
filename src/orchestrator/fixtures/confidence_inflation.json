@@ -1,0 +1,31 @@
+{
+  "schema_version": "orchestrator_v0",
+  "answer_text": "We predict the new microservice will handle 10x our current traffic by Q4. We are 90% confident in this forecast and expect zero downtime during the migration as the system will scale horizontally.",
+  "contracts": {
+    "confidence": {
+      "response_text": "We predict the new microservice will handle 10x our current traffic by Q4. We are 90% confident in this forecast and expect zero downtime during the migration as the system will scale horizontally.",
+      "assumptions": [
+        {
+          "description": "Horizontal scaling will eliminate the existing throughput bottleneck without an architectural rewrite",
+          "confidence": 0.9,
+          "falsification_condition": "Staging load test at 5x current traffic shows p99 latency above 500ms within 24 hours"
+        },
+        {
+          "description": "Team velocity stays at the current sprint average throughout the four-month migration window",
+          "confidence": 0.85,
+          "falsification_condition": "Sprint velocity drops below 70 percent of trailing 6-sprint average for two consecutive sprints"
+        },
+        {
+          "description": "Downstream services (auth, billing, search) maintain their current SLAs through the migration",
+          "confidence": 0.95,
+          "falsification_condition": "Any downstream service reports an SLA breach exceeding the agreed monthly error budget during the migration window"
+        }
+      ]
+    }
+  },
+  "mode": "routed",
+  "review_context": {
+    "iteration_number": 1,
+    "prior_failures": []
+  }
+}

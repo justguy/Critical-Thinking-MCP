@@ -115,6 +115,7 @@ The current Beta 2 release-gate benchmark is a control-plane benchmark, not a pr
 
 - Release-gate run: `2 providers x 1 model each x A/B x 8 core prompts`
 - Current report: [`docs/reports/ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md`](docs/reports/ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md)
+- Human semantic audit packet: [`docs/ct_mcp_beta2_semantic_audit_packet.md`](docs/ct_mcp_beta2_semantic_audit_packet.md)
 - B-arm accepted: `15/16`
 - Final B-arm split: `PASS=5`, `WARN=10`, `HUMAN_REVIEW=1`
 - `claude_sonnet_high`: `7/8` accepted, `3` revisions triggered, `2` salvaged, `1` escalated, average `revision_bloat_ratio = 1.44x`
@@ -130,6 +131,13 @@ That is the Beta 2 result: one deterministic control plane, two different provid
 ## Publication Surfaces
 
 The repo now includes a static publication surface under [`html/`](html/) for public sharing and GitHub Pages style hosting:
+
+- Publish branch: `html`
+- Recommended Pages setting: `html / root`
+- Expected Pages URLs once enabled:
+  `https://justguy.github.io/Critical-Thinking-MCP/`
+  `https://justguy.github.io/Critical-Thinking-MCP/cost-of-not-using-ct-simulator.html`
+  `https://justguy.github.io/Critical-Thinking-MCP/ct-beta2-benchmark-review.html`
 
 - [`html/index.html`](html/index.html) — landing page for the publication bundle
 - [`html/cost-of-not-using-ct-simulator.html`](html/cost-of-not-using-ct-simulator.html) — interactive cost simulator with real release-gate evidence cases

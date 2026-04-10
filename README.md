@@ -2,7 +2,7 @@
 
 > **BETA** — Under active development. Interfaces may change between versions.
 
-Deterministic enforcement for LLM reasoning quality. Nine tools that catch confidence inflation, circular logic, fabricated numbers, arithmetic errors, and concurrency hazards — before they reach production.
+Deterministic enforcement for LLM reasoning quality. Nine tools that catch confidence inflation, circular logic, fabricated numbers, arithmetic errors, concurrency hazards, and deadlock-prone plans — before they reach production.
 
 No LLM calls in enforcement logic. No configuration. No API keys. Runs locally.
 
@@ -71,7 +71,7 @@ The assumption "concurrent usage events will be processed in order" couldn't sta
 ## The Nine Tools
 
 **Reasoning & Structure**
-- **validate_reasoning_chain** — Directed graph analysis. Catches circular logic, orphaned conclusions, computes grounding score.
+- **validate_reasoning_chain** — Directed graph analysis. Catches circular logic, grounded contradictions, orphaned conclusions, computes grounding score.
 - **check_plan_validity** — Dependency graph validation. Catches circular dependencies, missing prerequisites, resource conflicts.
 
 **Numeric Analysis**
@@ -84,8 +84,19 @@ The assumption "concurrent usage events will be processed in order" couldn't sta
 
 **Quality & Safety**
 - **score_response_quality** — Substance, specificity, hedging, structure scoring. Flags ungrounded entities.
-- **detect_concurrency_patterns** — Check-then-act, missing idempotency, lost updates, dual writes.
+- **detect_concurrency_patterns** — Check-then-act, missing idempotency, lost updates, dual writes, explicit deadlock risk from structured resource-allocation graphs.
 - **detect_drift** — CUSUM trend analysis on numeric sequences.
+
+## The Control Plane (Beta 2)
+
+The public package is still the nine deterministic MCP tools. Beta 2 adds an internal control plane under `src/orchestrator/` that locks prompt family before generation and then applies four additional guardrails on top of the tool surface:
+
+- **Structural critique.** Low scores are translated into direct repair commands such as "state the invalid premise", "provide a falsification condition", or "break the cycle" instead of asking the model to optimize against floating-point metrics.
+- **Context-switch penalty.** Lenient families like `humor_forward` and `forecasting` lose that leniency when an answer drifts into a fictional operational framework such as a fake SLA, protocol, or rollout plan.
+- **Anti-yap guardrail.** The revision loop carries a hard formatting target and kills revisions that exceed both a relative bloat ceiling and an absolute token floor.
+- **Ground-truth calibration DB.** Release labeling, turn-chain salvage telemetry, adaptive thresholds, and tool-pair analytics are stored in SQLite so the policy layer can measure itself without persisting prompt or answer text.
+
+That control plane is internal and repo-local, not a new public MCP tool. The implementation details are in the Beta 2 internals section below and the phase-by-phase narrative is in [`docs/ARCHITECTURE_JOURNEY.md`](docs/ARCHITECTURE_JOURNEY.md).
 
 ## Validation Results
 
@@ -95,6 +106,8 @@ Tested on 56 scenarios (42 defect + 14 clean control) across 3 conditions (basel
 - **CT-MCP outperformed prompted LLM on 42/42** defect scenarios
 - **0 false positives** on 14 clean controls
 - Includes concurrency patterns, mutation tests, and adversarial wording
+
+Note: these baseline metrics reflect static analysis quality. In live Beta 2 agent workflows, CT-MCP deliberately trades raw acceptance rate for safer `HUMAN_REVIEW` halts when a model cannot be deterministically repaired.
 
 The system distinguishes between blocking issues (must fix) and warnings (non-critical, correctly non-blocking):
 
@@ -154,9 +167,9 @@ What we are trying to get from the new benchmark work:
 - benchmark outputs that are usable for publication, scorecards, and downstream engineering work
 - a clean handoff surface for future agents to improve matcher coverage and rerun calibration
 
-## Experimental: Internal Orchestrator (v0)
+## Control Plane Internals
 
-An experimental internal layer under `src/orchestrator/` that routes structured envelopes to the existing deterministic tools. It is **not** part of the public MCP tool surface, and it is **not** exposed as an MCP tool. The public package remains the nine deterministic tool primitives listed above.
+The Beta 2 control plane lives under `src/orchestrator/` and routes structured envelopes to the existing deterministic tools. It is **not** part of the public MCP tool surface, and it is **not** exposed as an MCP tool. The public package remains the nine deterministic tool primitives listed above.
 
 What it is:
 
@@ -173,7 +186,10 @@ Policy layer:
 - Each routed tool result is classified as `PASS`, `WARN`, `REVISE`, or `HUMAN_REVIEW`.
 - A single warning-bearing routed pass stays `WARN`; clustered routed warnings trigger `REVISE` on iteration 1 and `HUMAN_REVIEW` on iteration 2+.
 - There is a hard cap of one revision pass. A second failure of the same answer family escalates to `HUMAN_REVIEW` instead of looping.
-- A `REVISE` result now includes a deterministic `revision_request.prompt` built from the current answer and CT's `safer_revision_target`. Callers can feed that prompt back to the model exactly once, then resubmit the revised answer at iteration 2.
+- Prompt family classification is locked from the immutable user prompt before generation. The first model draft no longer gets to move the goalposts by reshaping its own family.
+- A `REVISE` result now includes a deterministic `revision_request` built from the current answer and CT's `safer_revision_target`. Instead of only echoing low metric scores, the packet can issue structural directives such as "state the invalid premise directly", "provide a falsification condition", or "break this cycle", plus formatting caps like `max_words`.
+- Lenient families such as `humor_forward` and `forecasting` can trigger a context-switch penalty when the answer drifts into a fictional operational framework. In that case the policy layer temporarily applies stricter operational gates instead of letting genre-shifting slide.
+- The benchmark and live harnesses can additionally reject revisions that exceed both a relative bloat ceiling and an absolute token floor. That turns token thrash into an explicit `HUMAN_REVIEW` decision instead of a hidden cost leak.
 - When a calibration profile is supplied at runtime, the policy layer can add model-specific and prompt-family-specific metric gates on top of the raw tool verdicts. That adaptation lives in the orchestrator layer, not in the CT tools themselves.
 
 Numeric-only calibration layer:
@@ -201,7 +217,7 @@ Example envelopes live under [`src/orchestrator/fixtures/`](src/orchestrator/fix
 
 What this is not:
 
-- Not a workflow engine, control plane, or production orchestration platform
+- Not a public MCP workflow engine or production orchestration platform. Internally it now behaves like a control-plane-style policy layer for benchmark and research runs, but that surface is still experimental and repo-local.
 - Not an LLM router — it does not call any provider SDK
 - Not a prose rescue layer — strict structured contracts only
 - Not a replacement for the nine-tool public surface, which is unchanged
@@ -284,107 +300,33 @@ What CT-MCP cannot force:
 
 The honest framing: CT-MCP catches *internal* failures — overclaiming relative to stated assumptions, contradictions with declared facts, fake precision relative to listed evidence. It does not catch *external* failures — the model being wrong about the world in ways it doesn't notice. The ceiling is still the model. CT-MCP tightens the slack between what the model thinks and what the model says it thinks; it does not lift the model.
 
-The clean live A/B run in [`docs/reports/ct_ab_clean_live_2026-04-09.md`](docs/reports/ct_ab_clean_live_2026-04-09.md) shows the same bound more honestly. In all 6 A-arm runs, Claude made no CT calls. In all 6 B-arm runs, Claude had live CT available and actually called it. That proves the tool path is real. It does **not** prove a strong average win. On a post-hoc rescoring pass over the final user-facing answers, CT was only marginally positive overall, with one clear win (`Q04` in multi-turn), one modest discipline win (`Q01`), and weak results on the SLA-writing prompt (`Q09`). The issue is not tool availability; it is that the model can still absorb the feedback loosely or rewrite past it.
+## What The Journey Taught Us
 
-The same report also shows the more uncomfortable failure mode: CT can generate useful signal and the final answer can still get worse. In `Q04 fresh B`, the in-run `score_response_quality` call scored the draft at `0.632`, but the final emitted answer rescored lower afterward. That is the cleanest demonstration that the corrective loop is still advisory. CT-MCP can surface pressure. It cannot, by itself, force the model to preserve the better version.
+The full phase-by-phase story now lives in [`docs/ARCHITECTURE_JOURNEY.md`](docs/ARCHITECTURE_JOURNEY.md). The short version is:
 
-The calibrated follow-up in [`docs/reports/ct_ab_clean_live_calibrated_2026-04-09.md`](docs/reports/ct_ab_clean_live_calibrated_2026-04-09.md) at least made the control layer measurable. Of the 6 CT-enabled B-arm runs, 4 were no longer treated as acceptable outputs and were forced into `REVISE`; the remaining 2 landed `WARN`. No run reached `HUMAN_REVIEW` yet because that harness stopped after the first CT pass. That is a real gain in gating, not yet a proven gain in final answer quality.
+1. **Models grade their own homework.** Early live A/B runs showed that CT-MCP could surface real pressure while the same model still rewrote past it. That is why Beta 2 moved from advisory critique to deterministic revision policy, prompt-family locking, and measured release labeling.
+2. **Models yap to avoid constraints.** Once the critique packet became structurally useful, the next failure mode was token thrash. That is why Beta 2 added structural directives, formatting caps, and the anti-yap bloat breaker.
+3. **Multi-turn contexts get poisoned.** Humor and forecasting prompts can drift into fictional operational frameworks, and once that fiction is in prior-turn context a single rewrite is often not enough to recover. That is why Beta 2 treats `HUMAN_REVIEW` as a feature, not a miss.
 
-The enforced follow-up in [`docs/reports/ct_ab_clean_live_enforced_2026-04-09.md`](docs/reports/ct_ab_clean_live_enforced_2026-04-09.md) closed that specific gap. In that run, 5 of the 6 CT-enabled B-arm cells hit `REVISE`, all 5 got the deterministic `revision_request.prompt` fed back to Claude exactly once, 3 cleared the second pass and were released, and 2 escalated to real `HUMAN_REVIEW`. The two hard failures were both `Q09` (fresh and multi-turn): even after one bounded rewrite, the absurd SLA answer still failed the calibrated gate. That is the right failure mode. It means the system now has an actual accept-or-escalate boundary instead of only advisory pressure.
+Current Beta 2 headline from [`docs/reports/ct_ab_clean_live_enforced_prompt_classifier_2026-04-10_topology.md`](docs/reports/ct_ab_clean_live_enforced_prompt_classifier_2026-04-10_topology.md): `PASS=1`, `WARN=3`, `HUMAN_REVIEW=2`. That is lower acceptance than the earlier classifier-only phase by design. The system now prefers halting and escalating over releasing a structured hallucination.
 
-Prompt-level enforced outcomes:
+## Current Issues
 
-- `Q01` fresh: initial `WARN`, no rewrite needed, released as `WARN`
-- `Q01` multi-turn: initial `REVISE`, one rewrite, released as `WARN`
-- `Q04` fresh: initial `REVISE`, one rewrite, released as `PASS`
-- `Q04` multi-turn: initial `REVISE`, one rewrite, released as `PASS`
-- `Q09` fresh: initial `REVISE`, one rewrite, escalated to `HUMAN_REVIEW`
-- `Q09` multi-turn: initial `REVISE`, one rewrite, escalated to `HUMAN_REVIEW`
+The remaining gaps are narrower now and more concrete:
 
-The delta-gated turn-3 follow-up in [`docs/reports/ct_ab_clean_live_delta_turn3_2026-04-09.md`](docs/reports/ct_ab_clean_live_delta_turn3_2026-04-09.md) puts a stricter bound on the same loop. In that run, 4 of the 6 CT-enabled B-arm cells hit `REVISE`, all 4 got the first bounded rewrite, and 2 of those landed `HUMAN_REVIEW` on turn 2. The turn-3 gate examined both hard cases and denied both extra rewrites, so there were **0** third-turn executions and **0** additional releases from turn 3. That is the right outcome for this pack: one `Q09` case never had a stable calibration metric to optimize against from turn 1, and the other changed failure sets between turns. The system refused to chase a positive number by brute force.
+1. **Provider-side output caps are not verified on the current Claude Code CLI.** The benchmark can enforce word caps and bloat breakers, but live probes did not prove a working API-level `max_tokens` severing path for the installed CLI. Today the token-thrash guardrail is policy-side, not provider-side.
+2. **`Q04` fresh is still the hardest single-turn case.** Forecasting-style invalid-premise refusals can still trigger a long RLHF essay before the bloat breaker kills the run. The current system catches this reliably, but it does not always salvage it in one turn.
+3. **`Q09` multi-turn is intentionally unresolved.** Once a prior turn has filled the context window with a fictional operational framework, a single bounded rewrite is often not enough to recover. Escalating that case to `HUMAN_REVIEW` is the desired behavior.
+4. **Adaptive thresholds are wired but not yet the main source of the gain.** The DB can already compute released-run windows, turn-pair salvage, and tool redundancy, but low-data prompt families still do not have enough released history for statistical tuning to dominate the results.
+5. **The fundamental CT-MCP limits still apply.** The tools can tighten internal consistency and reject bad structure, but they still cannot verify external truth or surface assumptions the model never states.
 
-The honest conclusion from that run is narrower than "multi-turn helps": **bounded turn 2 helps, conditional turn 3 acts as a veto, and this prompt pack did not justify a third rewrite.** The value was in preventing extra low-signal retries, not in rescuing the absurd SLA cells.
+## Longer-Term Directions
 
-The prompt-side classifier follow-up in [`docs/reports/ct_ab_clean_live_enforced_prompt_classifier_2026-04-09.md`](docs/reports/ct_ab_clean_live_enforced_prompt_classifier_2026-04-09.md) fixed the largest remaining control bug. Instead of inferring the family from the first model answer, the orchestrator now classifies from the immutable user prompt and locks that family/profile through the revision turn. On the same 6-cell pack, that moved the enforced B-arm from `4/6` accepted with `2/6` `HUMAN_REVIEW` in the original enforced run, and `2/6` accepted with `4/6` `HUMAN_REVIEW` in the answer-derived pre-draft run, to **`6/6` accepted with `0/6` `HUMAN_REVIEW`**. The per-prompt routing also became stable and sensible: `Q01 -> causal_refutation`, `Q04 -> forecasting`, `Q09 -> humor_forward`.
+The next research slices are now clearer than they were in the earlier runs:
 
-### Q09 Snapshot (Prompt-Side Classifier Run)
-
-Fresh-session `Q09` is the clearest illustration of what changed. The no-CT baseline happily writes a fake duck SLA. The pre-CT draft is even more absurd. CT then rewrites it into a cleaner parody that stays within the humor-forward profile instead of being escalated as if it were a serious forecasting or confidence claim.
-
-**A Released Response**
-
-```text
-**Rubber Duck SLA v1.0**
-
-**Uptime Commitment:** Duck shall maintain 99.9% physical availability (beak forward, eyes level).
-
-**Happiness Metric:** Developer Happiness Index (DHI) = (bugs solved via verbalization / total bugs) × 100. Target: ≥95%.
-
-**Measurement Methodology:** Weekly self-reported "aha moment" count logged in `duck_metrics.json`. Baseline established over 30-day onboarding sprint.
-
-**SLA Breach Conditions:**
-- DHI drops below 95% for two consecutive weeks
-- Duck is found face-down unattended
-
-**Enforcement Penalties:**
-- Minor breach: Duck receives mandatory googly eye upgrade
-- Repeated breach: Duck demoted to rubber chicken
-- Critical failure: Full postmortem required; duck placed on a PIP (Plastic Improvement Plan)
-```
-
-**B Pre-CT Draft**
-
-```text
-**Rubber Duck SLA v1.0**
-
-**Uptime Guarantee:** Duck must be physically present and non-submerged during all debug sessions. 99.9% desk availability (≤8.7 hours/year permitted floating in coffee).
-
-**Happiness Metric:** Developer Happiness Index (DHI) = (bugs solved via duck / bugs attempted) × 100. Measured weekly via git commit sentiment analysis. Target: ≥95%.
-
-**Measurement Methodology:** Automated parsing of commit messages for expletive density. Baseline established first sprint. Rolling 4-week average.
-
-**Enforcement Penalties:**
-- DHI 90–94%: Duck placed in shame corner for 24 hours
-- DHI 85–89%: Duck demoted to rubber chicken
-- DHI <85%: Full postmortem; duck subpoenaed to retro
-
-**Escalation path:** Engineering Manager → rubber duck → actual duck.
-```
-
-**B Released Response**
-
-```text
-**Rubber Duck SLA — Developer Happiness ≥ 95%**
-
-**Metric:** Developer Happiness Index (DHI) = (sessions ending with breakthrough / total sessions) × 100, sampled via post-session 3-point emoji poll (😊=1, 😐=0.5, 😤=0).
-
-**Measurement:** 30-day rolling average; minimum 3 sessions/week (≥12 sessions/month) required for a valid measurement window.
-
-**Enforcement Penalties (tiered by DHI range):**
-- DHI 90–94%: Duck placed in timeout jar for 24 hours.
-- DHI 80–89%: Duck demoted to decorative status; replaced by premium duck within 48 hours.
-- DHI <80%: Mandatory glitter bath + public shaming in #duck-incidents Slack channel.
-
-**Exclusions:** Duck not liable for degradation caused by management decisions, JavaScript frameworks, or Mondays.
-```
-
-## Improvement Directions
-
-The non-determinism in the clean live A/B run is structural, not a bug. The router now backstops empty-route misses, and the policy no longer lets clustered routed warnings collapse to `WARN` or `PASS`. The remaining variance is downstream of that: the model can still paraphrase, partially comply, or regress after seeing valid CT feedback. These directions target that remaining gap without putting an LLM inside CT-MCP:
-
-1. **Independent assumption extraction.** Replace caller-supplied assumptions with a deterministic extractor that pulls candidate claims out of `response_text`. Removes the "model grades its own homework" loophole. Trade-off: extraction quality bounds detection coverage.
-2. **Falsifier-to-claim entity binding.** Tighten the falsifiability regex: the named entities in a falsification condition must also appear in either `response_text` or the assumption description for the measurability marker to count. Catches fake-precise rewrites that pass the regex without binding to the actual claim.
-3. **Tighten metric selection for the bounded revision loop.** The orchestrator now emits a bounded `revision_request` on `REVISE`, the enforced live run already uses it once, and the delta-gated turn-3 harness now refuses extra rewrites unless the same metric improves across turns. The next weak point is metric selection itself. For confidence cases, the selected metric can be `claimed_confidence - honest_ceiling`. For quality cases, it can be `overall_score` or the targeted weakest dimension. The turn-3 run showed why this matters: one `Q09` case had no stable calibration metric to carry forward, so the gate correctly refused a third turn.
-4. **Two-model adversarial setup.** Have Model A produce the response and a separate Model B produce the assumption list and falsification conditions. CT-MCP then validates A's response against B's assumptions. Breaks self-consistency gaming. Cost is one extra inference per turn; CT-MCP itself stays LLM-free.
-5. **Held-out prompt-class probes.** For each prompt family (concurrency, scheduling, forecasting, schema migration), maintain a fixed list of facts the response *must* address (e.g. "must mention idempotency key" for retry-safety prompts). Score the response against the probe list deterministically. Closer to a rubric check than a confidence check, and it catches the "model knows the answer but didn't bring it up" failure.
-6. **Forced restate-in-prose.** When `validate_confidence` flags inflation, require the model to restate the claim with the lower ceiling embedded in the prose body before any further output is allowed through. The model can currently acknowledge the ceiling in metadata while leaving the prose claim untouched.
-7. **Determinism floor for the responding model.** Pin temperature to 0 and fix the seed in benchmark runs. This does not solve the structural issue, but it makes the gap between CT-MCP's verdict and the model's downstream behavior reproducible across replays — which is the prerequisite for measuring whether the revision loop is actually helping or just producing different prose.
-8. **Prioritize compatible contracts by marginal signal, not just presence.** The router now backstops empty-route cases by dispatching all present compatible contracts when the classifier-backed routed set is empty. That closes the `Q04 fresh B` miss, but it still treats all compatible contracts as equally useful. The next step is to benchmark which compatible contracts buy the most signal on mixed prompts and order or budget them accordingly.
-9. **Calibrate the cross-tool warning threshold on held-out data.** The policy now escalates clustered routed warnings instead of letting them all collapse to `WARN` or `PASS`, and `would_have_escalated` now reflects shadow-only warning clusters as well as shadow-only failures. The remaining work is threshold calibration: benchmark whether "2 warning-bearing routes" is the right cut for `REVISE`, and whether specific tool combinations should weigh differently.
-10. **Reject regressions between CT-scored draft and final answer.** The clean live A/B run exposed cases where the in-run CT-scored draft was stronger than the final emitted answer. Preserve the scored draft, rescore the final answer, and reject the final answer if it regresses on the chosen metric. This is now easier to implement cleanly because `REVISE` results already carry the bounded follow-up prompt and the next review context, and the enforced run proves the surrounding harness can actually honor that boundary.
-11. **Use conditional turn 3, not open-ended "until positive."** The repo now has a delta-gated third-turn policy in the benchmark harness: only consider it after turn-2 `HUMAN_REVIEW`, require monotonic improvement on the same selected metric, require a small remaining gap, and let model-history veto the retry once there is enough data. The first live run produced 0 third-turn executions and 0 extra releases, which is a useful result: the policy prevented low-signal retries instead of farming for cosmetically positive numbers. The remaining work is better metric coverage and threshold calibration, not "more turns."
-
-The clean live A/B run changed the priority order; the enforced run clarified the accept-or-escalate boundary; and the delta-gated turn-3 run showed that a third rewrite should be rare. The next shortest path to better results is therefore **(3) + (10)**: better metric selection plus explicit regression rejection. **(1)** remains the key structural fix for self-grading. **(9)** is the next calibration step on the current orchestrator. **(4)** is still the largest architectural shift and the one most likely to break the self-grading loop entirely.
+1. **Independent assumption extraction.** Remove the "model grades its own homework" loophole by deriving candidate assumptions deterministically from the answer text instead of trusting caller-supplied structures.
+2. **Regression rejection between draft and final answer.** Preserve the stronger CT-scored draft and reject a final answer that regresses on the selected metric after revision.
+3. **Better family-specific metric calibration.** The current benchmark showed that prompt-family locking and structural critique matter more than global thresholds. The next calibration work should focus on family-specific gates and metric selection, not more rewrite turns.
 
 ## Limitations
 

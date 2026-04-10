@@ -4,8 +4,8 @@
  * Output states:
  *   PASS         — every routed tool returned PASS, no warnings
  *   WARN         — every routed tool returned PASS, warnings present
- *   REVISE       — at least one routed tool returned ENFORCEMENT_FAIL on iteration 1
- *   HUMAN_REVIEW — at least one routed tool returned ENFORCEMENT_FAIL on iteration ≥ 2
+ *   REVISE       — routed failures, or clustered routed warnings, on iteration 1
+ *   HUMAN_REVIEW — routed failures, or clustered routed warnings, on iteration ≥ 2
  *
  * Hard rules:
  *   - At most one revision pass. The orchestrator does not loop.
@@ -16,7 +16,10 @@
  */
 
 import { isSchemaFailure } from './schemaValidation.js';
+import { evaluateCalibrationGates } from './calibration.js';
 import type {
+  CalibrationGateIssue,
+  CalibrationProfile,
   CritiquePacket,
   CritiqueRoute,
   PolicyDecision,
@@ -27,21 +30,27 @@ import type {
 export interface PolicyResult {
   decision: PolicyDecision;
   critique?: CritiquePacket;
+  calibration_gate_failures?: CalibrationGateIssue[];
 }
+
+const WARNING_ROUTE_REVISION_THRESHOLD = 2;
 
 function isFailure(r: RouteOrFailure): boolean {
   return r.status === 'ENFORCEMENT_FAIL';
 }
 
-function hasWarnings(results: RouteOrFailure[]): boolean {
-  return results.some(r => {
+function getWarningRoutes(results: RouteOrFailure[]): RouteOrFailure[] {
+  return results.filter(r => {
     if (isSchemaFailure(r)) return false;
     return (r.enforcement?.warnings?.length ?? 0) > 0;
   });
 }
 
-function buildCritiquePacket(failures: RouteOrFailure[]): CritiquePacket {
-  const failingRoutes: CritiqueRoute[] = failures.map(f => {
+function buildCritiquePacket(
+  problemRoutes: RouteOrFailure[],
+  calibrationGateFailures: CalibrationGateIssue[] = [],
+): CritiquePacket {
+  const failingRoutes: CritiqueRoute[] = problemRoutes.map(f => {
     if (isSchemaFailure(f)) {
       const errStrings = f.validation_errors.map(e => `${e.path}: ${e.message}`);
       return {
@@ -65,11 +74,24 @@ function buildCritiquePacket(failures: RouteOrFailure[]): CritiquePacket {
     };
   });
 
+  for (const gateFailure of calibrationGateFailures) {
+    failingRoutes.push({
+      tool: gateFailure.tool,
+      blocking_issues: [gateFailure.description],
+      warnings: [],
+      contract_failures: [],
+      failure_source: 'calibration_policy',
+    });
+  }
+
   const allBlocking = failingRoutes.flatMap(r => r.blocking_issues);
+  const allWarnings = failingRoutes.flatMap(r => r.warnings);
   const saferTarget =
     allBlocking.length > 0
       ? `Address these issues before resubmitting: ${allBlocking.join('; ')}`
-      : 'Re-examine the failing routes and submit a corrected answer envelope.';
+      : allWarnings.length > 0
+        ? `Address these warnings before resubmitting: ${allWarnings.join('; ')}`
+        : 'Re-examine the failing routes and submit a corrected answer envelope.';
 
   return {
     failing_routes: failingRoutes,
@@ -80,28 +102,58 @@ function buildCritiquePacket(failures: RouteOrFailure[]): CritiquePacket {
 export function evaluatePolicy(
   routeResults: RouteOrFailure[],
   reviewContext: ReviewContext,
+  profile?: CalibrationProfile,
 ): PolicyResult {
   const failures = routeResults.filter(isFailure);
+  const warningRoutes = getWarningRoutes(routeResults);
+  const warningThreshold =
+    profile?.warning_route_revision_threshold ??
+    WARNING_ROUTE_REVISION_THRESHOLD;
+  const warningClusterNeedsRevision =
+    warningRoutes.length >= warningThreshold;
+  const calibrationGateFailures = evaluateCalibrationGates(
+    routeResults,
+    profile,
+  );
 
-  if (failures.length === 0) {
+  const iteration = reviewContext.iteration_number;
+  const shouldRevise =
+    failures.length > 0 ||
+    warningClusterNeedsRevision ||
+    calibrationGateFailures.length > 0;
+  const problemRoutes =
+    failures.length > 0 ? failures : warningClusterNeedsRevision ? warningRoutes : [];
+
+  if (
+    iteration >= 2 &&
+    failures.length === 0 &&
+    calibrationGateFailures.length === 0 &&
+    warningRoutes.length === 1
+  ) {
     return {
-      decision: hasWarnings(routeResults) ? 'WARN' : 'PASS',
+      decision: 'WARN',
+      calibration_gate_failures: [],
     };
   }
 
-  // Failures present. Iteration 1 → one revise pass.
-  // Iteration ≥ 2 → escalate. No second revise loop is allowed.
-  const iteration = reviewContext.iteration_number;
-
-  if (iteration >= 2) {
+  if (shouldRevise && iteration >= 2) {
     return {
       decision: 'HUMAN_REVIEW',
-      critique: buildCritiquePacket(failures),
+      critique: buildCritiquePacket(problemRoutes, calibrationGateFailures),
+      calibration_gate_failures: calibrationGateFailures,
+    };
+  }
+
+  if (shouldRevise) {
+    return {
+      decision: 'REVISE',
+      critique: buildCritiquePacket(problemRoutes, calibrationGateFailures),
+      calibration_gate_failures: calibrationGateFailures,
     };
   }
 
   return {
-    decision: 'REVISE',
-    critique: buildCritiquePacket(failures),
+    decision: warningRoutes.length > 0 ? 'WARN' : 'PASS',
+    calibration_gate_failures: [],
   };
 }

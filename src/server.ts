@@ -4,41 +4,25 @@
  * critical-thinking-mcp — MCP server providing 9 deterministic reasoning
  * enforcement tools. No LLM calls; all checks are mathematical/structural.
  *
- * Transport: stdio (StdioServerTransport).
+ * Default transport: stdio.
+ * Optional transport: Streamable HTTP via --transport http.
  */
 
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
-
-import { registerResourceHandlers } from './mcp/resources.js';
-import { registerToolHandlers } from './mcp/tool-call.js';
-import { TOOLS } from './mcp/tool-definitions.js';
-
-const server = new Server(
-  {
-    name: 'critical-thinking-mcp',
-    version: '0.1.0-beta.2',
-  },
-  {
-    capabilities: {
-      tools: {},
-      resources: {},
-    },
-  },
-);
-
-server.setRequestHandler(ListToolsRequestSchema, async () => {
-  return { tools: TOOLS };
-});
-
-registerResourceHandlers(server);
-registerToolHandlers(server);
+import {
+  parseRuntimeConfig,
+  startHttpServer,
+  startStdioServer,
+} from './server-runtime.js';
 
 async function main(): Promise<void> {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error('critical-thinking-mcp server running on stdio');
+  const config = parseRuntimeConfig(process.argv.slice(2));
+
+  if (config.transport === 'http') {
+    await startHttpServer(config);
+    return;
+  }
+
+  await startStdioServer();
 }
 
 main().catch((err) => {

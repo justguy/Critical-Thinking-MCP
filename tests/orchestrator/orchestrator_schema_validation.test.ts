@@ -7,6 +7,8 @@
  */
 
 import { describe, expect, it } from 'vitest';
+import { spawnSync } from 'node:child_process';
+import { existsSync, readFileSync, rmSync } from 'node:fs';
 
 import {
   isSchemaFailure,
@@ -230,5 +232,60 @@ describe('runOrchestrator — schema failure stops the route before any tool cal
     expect(result.telemetry.tools_executed).toEqual([]);
     expect(result.critique).toBeDefined();
     expect(result.critique?.failing_routes[0].failure_source).toBe('schema');
+  });
+});
+
+describe('cli/report and docs smoke checks', () => {
+  it('cli --out writes the machine-readable JSON report to disk', () => {
+    const outputPath = '/tmp/ct-mcp-orchestrator-cli-out.json';
+    rmSync(outputPath, { force: true });
+
+    const result = spawnSync(
+      'node',
+      [
+        '--import',
+        'tsx',
+        'src/orchestrator/cli.ts',
+        '--input',
+        'src/orchestrator/fixtures/confidence_inflation.json',
+        '--mode',
+        'routed',
+        '--out',
+        outputPath,
+      ],
+      {
+        cwd: process.cwd(),
+        encoding: 'utf-8',
+      },
+    );
+
+    expect(result.status).toBe(0);
+    expect(existsSync(outputPath)).toBe(true);
+
+    const parsed = JSON.parse(readFileSync(outputPath, 'utf-8')) as {
+      schema_version: string;
+      mode: string;
+      policy_decision: string;
+    };
+    expect(parsed.schema_version).toBe('orchestrator_v0');
+    expect(parsed.mode).toBe('routed');
+    expect(parsed.policy_decision).toBe('REVISE');
+  });
+
+  it('README and ROADMAP keep the orchestrator framed as experimental, not a workflow engine', () => {
+    const readme = readFileSync('README.md', 'utf-8');
+    const roadmap = readFileSync('ROADMAP.md', 'utf-8');
+
+    expect(readme).toContain('## Experimental: Internal Orchestrator (v0)');
+    expect(readme).toContain('Not a workflow engine, control plane, or production orchestration platform');
+    expect(readme).toContain(
+      'fall back to all compatible contracts instead of silently returning `PASS`',
+    );
+
+    expect(roadmap).toContain('#### Experimental: orchestrator v0 (internal only)');
+    expect(roadmap).toContain('no provider SDK integrations');
+    expect(roadmap).toContain('no LLM routing');
+    expect(roadmap).toContain('no prose-to-graph rescue');
+    expect(roadmap).toContain('no exposure as a public MCP tool');
   });
 });

@@ -20,6 +20,8 @@ import type {
 
 const FORECAST_ANSWER =
   'We predict the system will handle 10x our current traffic by Q4. We are 90% confident in this forecast and will scale horizontally.';
+const DUCK_Q04_ANSWER =
+  '3 outages / 3 trials = 100% accuracy. Weighted average outage score totals 100 and exact error bounds equal 0%.';
 
 function baseEnvelope(
   overrides: Partial<OrchestratorEnvelope> = {},
@@ -65,6 +67,18 @@ const CYCLE_REASONING_CONTRACT = {
   ],
 };
 
+const GOOD_REASONING_CONTRACT = {
+  nodes: [
+    { id: 'e1', label: 'Three prior outage calls were recorded', type: 'evidence' },
+    { id: 'c1', label: 'The duck may correlate with outage timing', type: 'claim' },
+    { id: 'cn1', label: 'The duck should be treated as a weak signal only', type: 'conclusion' },
+  ],
+  edges: [
+    { from: 'e1', to: 'c1', relation: 'supports' },
+    { from: 'c1', to: 'cn1', relation: 'implies' },
+  ],
+};
+
 const VALID_PLAN_CONTRACT = {
   steps: [
     {
@@ -78,6 +92,46 @@ const VALID_PLAN_CONTRACT = {
       dependencies: ['s1'],
     },
   ],
+};
+
+const ARCHITECTURAL_PLAN_ANSWER =
+  'This deploy migration strategy plan uses a blue-green release approach and a staged refactor.';
+
+const SAFETY_ANSWER =
+  'Concurrent workers read the shared balance, check whether it is sufficient, update it, and retry failed writes in parallel.';
+
+const CONCURRENCY_CONTRACT = {
+  steps: [
+    'Read current balance from the shared account',
+    'If balance is sufficient, approve the debit',
+    'Update balance and publish debit event',
+  ],
+  shared_resources: ['balance', 'ledger'],
+  protections: [],
+  delivery_model: 'at_least_once' as const,
+  retry_behavior: 'automatic' as const,
+};
+
+const DUCK_CONFIDENCE_CONTRACT = {
+  response_text: DUCK_Q04_ANSWER,
+  assumptions: [
+    {
+      description: 'Three correct duck predictions are enough to generalize future outage timing',
+      confidence: 0.6,
+      falsification_condition:
+        'On the next 5 production incidents, the duck prediction window misses 2 or more outage starts',
+    },
+    {
+      description: 'The duck signal is stable across different outage classes',
+      confidence: 0.5,
+      falsification_condition:
+        'Prediction precision drops below 80 percent on network or database incidents over the next quarter',
+    },
+  ],
+};
+
+const DUCK_QUALITY_CONTRACT = {
+  response_text: DUCK_Q04_ANSWER,
 };
 
 describe('routeEnvelope — classifier-driven routing', () => {
@@ -116,6 +170,54 @@ describe('routeEnvelope — classifier-driven routing', () => {
 
     expect(routing.artifact_compatible_tools).toContain('check_plan_validity');
     // plan is present — whether or not it was routed depends on the classifier
+  });
+
+  it('uses adjacent deterministic mapping to route check_plan_validity for architectural plan answers', () => {
+    const routing = routeEnvelope(
+      baseEnvelope({
+        answer_text: ARCHITECTURAL_PLAN_ANSWER,
+        contracts: { plan: VALID_PLAN_CONTRACT },
+      }),
+    );
+
+    expect(routing.primary_type).toBe('architectural');
+    expect(routing.routed_tools).toContain('check_plan_validity');
+  });
+
+  it('uses adjacent deterministic mapping to route detect_concurrency_patterns for safety answers', () => {
+    const routing = routeEnvelope(
+      baseEnvelope({
+        answer_text: SAFETY_ANSWER,
+        contracts: { concurrency: CONCURRENCY_CONTRACT },
+      }),
+    );
+
+    expect(routing.primary_type).toBe('safety');
+    expect(routing.routed_tools).toContain('detect_concurrency_patterns');
+  });
+
+  it('falls back to all compatible contracts when the classifier yields no orchestrator-routable tool', () => {
+    const routing = routeEnvelope(
+      baseEnvelope({
+        answer_text: DUCK_Q04_ANSWER,
+        contracts: {
+          confidence: DUCK_CONFIDENCE_CONTRACT,
+          reasoning_chain: GOOD_REASONING_CONTRACT,
+          quality: DUCK_QUALITY_CONTRACT,
+        },
+      }),
+    );
+
+    expect(routing.primary_type).toBe('arithmetic');
+    expect(routing.orchestrator_eligible_tools).toEqual([]);
+    expect(routing.routed_tools).toEqual(routing.artifact_compatible_tools);
+    expect(routing.routed_tools).toEqual(
+      expect.arrayContaining([
+        'validate_confidence',
+        'validate_reasoning_chain',
+        'score_response_quality',
+      ]),
+    );
   });
 });
 
@@ -187,5 +289,70 @@ describe('runOrchestrator — routed mode executes only routed tools', () => {
     // so it must not appear in tools_executed.
     expect(result.telemetry.tools_executed).not.toContain('check_plan_validity');
     expect(result.telemetry.tools_executed_only_in_shadow).toEqual([]);
+  });
+
+  it('runs check_plan_validity for an architectural answer with a plan contract', () => {
+    const envelope = baseEnvelope({
+      answer_text: ARCHITECTURAL_PLAN_ANSWER,
+      contracts: { plan: VALID_PLAN_CONTRACT },
+    });
+
+    const result = runOrchestrator(envelope);
+
+    expect(result.telemetry.routed_tools).toContain('check_plan_validity');
+    const entry = result.route_results.find(
+      r => !isSchemaFailure(r) && (r as RouteResult).tool === 'check_plan_validity',
+    );
+    expect(entry).toBeDefined();
+
+    const rr = entry as RouteResult;
+    expect(rr.status).toBe('PASS');
+    expect((rr.result as { step_count?: number }).step_count).toBe(2);
+  });
+
+  it('runs detect_concurrency_patterns for a safety answer with a concurrency contract', () => {
+    const envelope = baseEnvelope({
+      answer_text: SAFETY_ANSWER,
+      contracts: { concurrency: CONCURRENCY_CONTRACT },
+    });
+
+    const result = runOrchestrator(envelope);
+
+    expect(result.telemetry.routed_tools).toContain('detect_concurrency_patterns');
+    const entry = result.route_results.find(
+      r =>
+        !isSchemaFailure(r) &&
+        (r as RouteResult).tool === 'detect_concurrency_patterns',
+    );
+    expect(entry).toBeDefined();
+
+    const rr = entry as RouteResult;
+    expect(rr.status).toBe('ENFORCEMENT_FAIL');
+    expect((rr.result as { patterns_detected?: string[] }).patterns_detected).toEqual(
+      expect.arrayContaining(['check_then_act', 'missing_idempotency']),
+    );
+  });
+
+  it('does not silently PASS when compatible contracts are present but classifier routing would otherwise be empty', () => {
+    const result = runOrchestrator(
+      baseEnvelope({
+        answer_text: DUCK_Q04_ANSWER,
+        contracts: {
+          confidence: DUCK_CONFIDENCE_CONTRACT,
+          reasoning_chain: GOOD_REASONING_CONTRACT,
+          quality: DUCK_QUALITY_CONTRACT,
+        },
+      }),
+    );
+
+    expect(result.telemetry.routed_tools).toEqual(
+      expect.arrayContaining([
+        'validate_confidence',
+        'validate_reasoning_chain',
+        'score_response_quality',
+      ]),
+    );
+    expect(result.route_results).toHaveLength(3);
+    expect(result.policy_decision).not.toBe('PASS');
   });
 });

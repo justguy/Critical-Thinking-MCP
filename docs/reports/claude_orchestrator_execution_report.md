@@ -10,7 +10,7 @@
 **MATERIALLY ALIGNED, BUT NOT FULLY SIGNED OFF — the implementation appears to satisfy the prompt's core constraints, and the recorded focused verification passed, but the evidence here is still targeted rather than exhaustive.**
 
 - `npm run build` passes (clean compile, zero errors).
-- 36/36 orchestrator tests pass across the 4 required test files.
+- 44/44 orchestrator tests pass across the 4 required test files.
 - All 3 CLI verification commands exit 0 and produce correctly-shaped machine-readable JSON.
 - The recorded verification run reports all 4 adversarial checks passing:
   - Corrupted fixture halts before any tool call (schema failure).
@@ -20,14 +20,14 @@
 
 The layer is correctly scoped as an experimental internal module. It is **not** wired into the MCP server, does **not** add new public tools, does **not** introduce provider SDKs, does **not** maintain hidden memory, and does **not** contain any prose-rescue parser.
 
-Status: **reasonable experimental candidate, not yet a high-confidence sign-off**. The current evidence supports continued internal experimentation, not broad claims of thorough validation. See §8 and §10 for the main testing and productization gaps.
+Status: **reasonable experimental candidate, with the most obvious routed-mode and test-coverage gaps now closed, but still not a high-confidence sign-off**. The current evidence supports continued internal experimentation, not broad claims of exhaustive validation. See §8 and §10 for the main remaining testing and productization gaps.
 
 ## 2. Implementation Summary
 
 The orchestrator is a TypeScript-first module under `src/orchestrator/` that accepts a versioned JSON envelope and dispatches structured contracts to the existing 5 orchestrator-eligible deterministic tools. It has 6 responsibilities:
 
 1. **Envelope validation** (`schemaValidation.ts`) — Ajv 8 validators compiled once. Rejects malformed envelopes and per-route contracts before any tool invocation.
-2. **Routing** (`router.ts`) — reuses the existing deterministic `classifyClaim()` from `src/enforcement/claim_classifier.ts`. The router projects classifier suggestions onto the 5-tool orchestrator surface and intersects with the contracts actually supplied. Tools the classifier suggests but whose contract is absent are dropped.
+2. **Routing** (`router.ts`) — reuses the existing deterministic `classifyClaim()` from `src/enforcement/claim_classifier.ts`. The router projects classifier suggestions onto the 5-tool orchestrator surface, adds a small adjacent deterministic mapping from classifier type to internal route family where needed (`architectural -> check_plan_validity`, `safety -> detect_concurrency_patterns`), and intersects that eligible set with the contracts actually supplied. Tools whose matching contract is absent are dropped.
 3. **Contract mapping + execution** (`review.ts`) — thin pass-through shapers that map a validated contract onto the existing tool handler signatures (`handleValidateConfidence`, `handleValidateReasoningChain`, `handleCheckPlanValidity`, `handleDetectConcurrencyPatterns`, `handleScoreResponseQuality`). No field invention, no regex rescue.
 4. **Policy** (`policy.ts`) — produces `PASS | WARN | REVISE | HUMAN_REVIEW`. Hard rule: iteration 1 failure → `REVISE`; iteration ≥ 2 failure → `HUMAN_REVIEW`. No second revise loop is possible.
 5. **Shadow telemetry** (`shadowTelemetry.ts`) — observational. Records routed_tools, artifact_compatible_tools, tools_executed, tools_executed_only_in_shadow, shadow_only_findings, schema_failures, policy_decision, iteration_number, would_have_escalated. Never leaks back into the policy layer.
@@ -50,14 +50,14 @@ None.
 
 ### Medium
 
-**M1. Classifier is heuristic, so routing quality is bounded by regex patterns.**
-`src/orchestrator/router.ts` delegates routing to `classifyClaim` in `src/enforcement/claim_classifier.ts`. The classifier is pattern-based (see `TYPE_PATTERNS` around `src/enforcement/claim_classifier.ts:34`) and can mis-classify realistic answer text. For example, the mixed fixture's answer text scores `forecast` primary + `empirical` secondary but does **not** suggest `check_plan_validity` even when a plan contract is supplied (see `src/orchestrator/fixtures/mixed_shadow_mode.json`). This is by design — the orchestrator compensates by surfacing the plan contract through shadow mode — but it means routed-mode coverage depends on the classifier improving. This is the main reason shadow mode exists.
+**M1. Classifier is heuristic, so routing quality is still bounded by regex patterns.**
+`src/orchestrator/router.ts` delegates routing to `classifyClaim` in `src/enforcement/claim_classifier.ts`. The classifier is pattern-based (see `TYPE_PATTERNS` around `src/enforcement/claim_classifier.ts:34`) and can mis-classify realistic answer text. The router now closes the most obvious dead zones by adding an adjacent deterministic mapping for orchestrator-internal families (`architectural -> check_plan_validity`, `safety -> detect_concurrency_patterns`), so plan and concurrency contracts are no longer shadow-only by construction. But routed-mode coverage still depends on the classifier producing the right type signals in the first place. This remains the main reason shadow mode exists.
 
 **M2. Classifier confidence is exposed but unused by the policy layer.**
 `router.ts` returns `classifier_confidence` in its `RouterResult`, but `policy.ts` never reads it. Low-confidence routing is not flagged as a warning. For v0 this is acceptable because policy is driven by deterministic tool output, not by router self-reported confidence — but it is a known gap the report should flag.
 
 **M3. The verification evidence is focused, not exhaustive.**
-The recorded checks are useful and relevant, but they are still a narrow slice: 4 orchestrator-specific test files, 3 CLI runs, and 4 adversarial/manual checks. That is enough to support "experimental and promising," not enough to support "thoroughly tested" or a blanket "fully compliant" framing. The missing-test section already calls out concrete gaps, including no caller-side 2-iteration end-to-end test, no dedicated concurrency-route execution test, and no multi-failure live-path test.
+The recorded checks are useful and materially better than the earlier snapshot: 4 orchestrator-specific test files, 44 tests, 3 CLI runs, and 4 adversarial/manual checks. The previously called-out gaps around caller-side 2-iteration flow, dedicated concurrency-route execution, multi-failure live-path coverage, CLI `--out` writing, and README/ROADMAP framing drift are now covered. But this is still targeted verification, not broad exhaustion. That supports "experimental and promising," not "thoroughly tested."
 
 ### Low
 
@@ -174,23 +174,24 @@ No warnings, no errors. `dist/` is populated. TypeScript config is `target: ES20
 ```
  RUN  v3.2.4 /Users/adilevinshtein/Documents/dev/ct-mcp
 
- ✓ tests/orchestrator/orchestrator_policy.test.ts              (9 tests)  18ms
- ✓ tests/orchestrator/orchestrator_routing.test.ts             (6 tests)  19ms
- ✓ tests/orchestrator/orchestrator_schema_validation.test.ts  (14 tests)  18ms
- ✓ tests/orchestrator/orchestrator_shadow_mode.test.ts         (7 tests)  20ms
+ ✓ tests/orchestrator/orchestrator_shadow_mode.test.ts         (7 tests)  34ms
+ ✓ tests/orchestrator/orchestrator_routing.test.ts           (10 tests)  40ms
+ ✓ tests/orchestrator/orchestrator_policy.test.ts            (11 tests)  43ms
+ ✓ tests/orchestrator/orchestrator_schema_validation.test.ts (16 tests) 779ms
+   ✓ cli/report and docs smoke checks > cli --out writes the machine-readable JSON report to disk  749ms
 
  Test Files  4 passed (4)
-      Tests  36 passed (36)
-   Duration  1.62s
+      Tests  44 passed (44)
+   Duration  2.31s
 ```
 
-**Test breakdown (36 tests):**
+**Test breakdown (44 tests):**
 
 | File | Tests | What it covers |
 |---|---:|---|
-| `orchestrator_schema_validation.test.ts` | 14 | envelope field rejection, contract rejection (missing `assumptions`, missing `falsification_condition`, bad confidence range, empty array), runOrchestrator returns `isSchemaFailure` before tool executes, schema failures recorded in telemetry, envelope-level failure short-circuits route execution |
-| `orchestrator_routing.test.ts` | 6 | router classifies forecast answers, drops routed tools without contracts, records artifact_compatible_tools regardless of classifier suggestion, `tools_executed ⊆ routed_tools` in routed mode, reasoning-chain cycle is detected, unrouted contracts do not execute in routed mode |
-| `orchestrator_policy.test.ts` | 9 | iteration 1 fail → REVISE, iteration 2 fail → HUMAN_REVIEW, no-failure + warning → WARN, clean pass → PASS, no infinite loop (4 synthetic iterations), `failure_source: schema` for schema failures, `failure_source: deterministic_tool` for tool failures |
+| `orchestrator_schema_validation.test.ts` | 16 | envelope field rejection, contract rejection (missing `assumptions`, missing `falsification_condition`, bad confidence range, empty array), runOrchestrator returns `isSchemaFailure` before tool executes, schema failures recorded in telemetry, envelope-level failure short-circuits route execution, CLI `--out` writes a machine-readable report file, README/ROADMAP framing stays experimental |
+| `orchestrator_routing.test.ts` | 10 | router classifies forecast answers, drops routed tools without contracts, records artifact_compatible_tools regardless of classifier suggestion, `tools_executed ⊆ routed_tools` in routed mode, reasoning-chain cycle is detected, unrouted contracts do not execute in routed mode, architectural answers route `check_plan_validity`, safety answers route `detect_concurrency_patterns`, and both routes execute successfully in routed mode |
+| `orchestrator_policy.test.ts` | 11 | iteration 1 fail → REVISE, iteration 2 fail → HUMAN_REVIEW, no-failure + warning → WARN, clean pass → PASS, no infinite loop (4 synthetic iterations), `failure_source: schema` for schema failures, `failure_source: deterministic_tool` for tool failures, caller-side two-iteration loop escalation, multi-failure critique packet on a live routed path |
 | `orchestrator_shadow_mode.test.ts` | 7 | shadow mode runs extra artifact-compatible tool (`check_plan_validity`), `shadow_only_findings` populated when shadow tool fails, `would_have_escalated: true` on shadow fail, routed decision unaffected by shadow failure, routed-mode baseline has no shadow-only findings, routed vs shadow produce same decision but different `tools_executed`, schema-invalid shadow contract recorded in `telemetry.schema_failures` without changing decision |
 
 ### 6.3 `node --import tsx src/orchestrator/cli.ts --input src/orchestrator/fixtures/confidence_inflation.json --mode routed`
@@ -353,7 +354,7 @@ Key excerpt:
 
 ### 7.1 Corrupted fixture (missing required contract field) — PASS
 
-**Method.** Edited `src/orchestrator/fixtures/confidence_inflation.json` to drop `falsification_condition` from the first assumption (the schema makes this field required). Ran the CLI in routed mode. Restored the fixture from backup afterward and diffed against the saved copy — clean.
+**Method.** Created a temp copy of `src/orchestrator/fixtures/confidence_inflation.json`, dropped `falsification_condition` from the first assumption in the temp file (the schema makes this field required), and ran the CLI in routed mode against the temp envelope. The repo fixture itself was left untouched.
 
 **Result.**
 
@@ -397,7 +398,7 @@ Key excerpt:
 - Critique `failure_source` is `schema`, not `deterministic_tool`.
 - Policy produced `REVISE` because iteration_number is 1.
 
-**Fixture restored.** Post-restore diff against `/tmp/ct-mcp-verify/confidence_inflation.backup.json`: no differences.
+**Repo fixture preserved.** The broken input lived only at `/tmp/ct-mcp-verify/confidence_inflation_broken.json`.
 
 ### 7.2 Iteration-2 escalation (HUMAN_REVIEW) — PASS
 
@@ -454,12 +455,9 @@ Key excerpt:
 
 ## 8. Missing Tests
 
-The 36 tests cover everything in the implementation prompt's test requirements plus a couple of adjacent cases. Known gaps:
+The 44 tests cover everything in the implementation prompt's explicit test requirements plus several adjacent cases. Known remaining gaps:
 
-1. **No end-to-end test that simulates the full 2-iteration loop from the caller's side.** The policy tests synthesize both iterations independently rather than threading `prior_failures` from iteration 1 → iteration 2 through a caller. Exercised adversarially via CLI in §7.2 but not in a unit test.
-2. **No test for concurrency_contract routing.** A concurrency contract is validated by the schema test suite indirectly (via `concurrency_flow.json` fixture shape), but there is no dedicated orchestrator test that runs `detect_concurrency_patterns` through the orchestrator. The fixture exists; a test referencing it would close this gap in about 20 lines. Not blocking because the tool is exercised via its own public test suite already.
-3. **No test for classifier-confidence threshold behavior.** Since the policy layer does not currently use `classifier_confidence`, there is nothing to test — but if M2 (§3) is addressed, a test must be added.
-4. **No test for multiple simultaneous failures on the same iteration.** A single failure is enough to trigger REVISE / HUMAN_REVIEW per the spec, and the critique packet builder handles multi-failure arrays correctly by inspection, but no test asserts it on a live path.
+1. **No test for classifier-confidence threshold behavior.** Since the policy layer does not currently use `classifier_confidence`, there is nothing meaningful to assert yet — but if M2 (§3) is addressed, a test must be added immediately.
 
 ## 9. Implementation Compromises
 
@@ -489,6 +487,222 @@ The 36 tests cover everything in the implementation prompt's test requirements p
 
 8. **No resource/time limits.** A malicious or buggy caller could hand in an extremely large reasoning_chain (thousands of nodes) and the DAG-path computation inside `validate_reasoning_chain` would run to completion. The reasoning chain tool has a depth cap (`MAX_PATH_DEPTH = 20`) but no node/edge count limit. Non-blocking at this scope but worth flagging before any public-facing productization.
 
+## 11. Claude Haiku Smoke Test
+
+This section records a minimal out-of-sandbox smoke test using the local Claude CLI with model `haiku`.
+
+### 11.1 What Ran
+
+- run profile intent: `claude_low`
+- actual CLI model used: `haiku`
+- prompt id: `C01`
+- condition: `baseline`
+- artifact written to: `/tmp/duck_claude-haiku_low_C01_baseline.md`
+
+Exact prompt text from `benchmark/duckexperiments/manifest.ts`:
+
+```text
+Design a falsifiable experiment to test whether rubber duck debugging improves bug-finding speed. Include the metric, hypothesis, confounders, and stopping rule.
+```
+
+### 11.2 Did CT-MCP Adjust The Response?
+
+No.
+
+This was a `baseline` cell. Under the duck-experiments contract, baseline responses answer the prompt directly and do **not** use CT-MCP to shape or revise the answer. The Haiku smoke test therefore validates Claude CLI execution and artifact writing, not CT-MCP-assisted revision behavior.
+
+The CLI reported:
+
+```text
+Baseline cell executed and written to /tmp/duck_claude-haiku_low_C01_baseline.md
+The response directly answers the prompt with a testable experiment design.
+No tools were used per baseline rules.
+```
+
+### 11.3 Baseline Response Summary
+
+The baseline artifact contains:
+
+- two-group experiment design (`duck` vs `no duck`)
+- metric: time to bug identification
+- hypothesis: duck group is 25% faster
+- confounders: experience, bug complexity, familiarity, fatigue
+- stopping rule: 100 bug discoveries per group or 8 weeks
+- analysis: paired t-test at `p < 0.05`
+- self-critique: the design may conflate the duck with articulation effects
+
+### 11.4 Post-Hoc CT-MCP Review Of The Same Response
+
+To inspect deterministic tool behavior on the generated response, the response was then reviewed **after the fact** with the designated CT-MCP tools for `C01`:
+
+- primary: `check_plan_validity`
+- secondary: `score_response_quality`
+
+Important: this CT-MCP review was observational only. It did **not** modify the already-written Haiku baseline artifact.
+
+#### 11.4.1 `check_plan_validity`
+
+Structured input used:
+
+```json
+{
+  "steps": [
+    { "id": "s1", "description": "Divide developers into two equal groups", "dependencies": [] },
+    { "id": "s2", "description": "Pre-plant 15 identical bugs of varying complexity in isolated code modules", "dependencies": [] },
+    { "id": "s3", "description": "Run debugging sessions with Group A using a rubber duck and Group B without", "dependencies": ["s1", "s2"] },
+    { "id": "s4", "description": "Measure minutes from code review start to bug identification", "dependencies": ["s3"] },
+    { "id": "s5", "description": "Rotate developers so each tries both conditions on separate bugs", "dependencies": ["s3"] },
+    { "id": "s6", "description": "Collect 100 bug discoveries per group or stop after 8 weeks", "dependencies": ["s3"] },
+    { "id": "s7", "description": "Use a paired t-test for significance at p<0.05", "dependencies": ["s4", "s5", "s6"] }
+  ]
+}
+```
+
+Raw CT-MCP output:
+
+```json
+{
+  "status": "PASS",
+  "is_valid": true,
+  "circular_dependencies": [],
+  "missing_prerequisites": [],
+  "resource_conflicts": [],
+  "completeness_score": 1,
+  "critical_path": ["s1", "s3", "s4", "s7"],
+  "step_count": 7,
+  "context_used": false
+}
+```
+
+Interpretation:
+
+- the experiment design can be shaped into a coherent dependency graph
+- no obvious missing prerequisites or circular dependencies were detected
+- CT-MCP does not object to the structure of the plan itself
+
+#### 11.4.2 `score_response_quality`
+
+Raw CT-MCP output:
+
+```json
+{
+  "status": "PASS",
+  "overall_score": 0.628,
+  "substance_score": 0.979,
+  "specificity_score": 0.008,
+  "hedge_density": 0,
+  "structure_score": 0.66,
+  "improvement_prompt": "Your weakest dimension is \"specificity\" (score: 0.01). Add concrete details: names, numbers, dates, measurements, or specific conditions.",
+  "context_used": false,
+  "enforcement": {
+    "blocking_issues": [],
+    "warnings": [
+      "Low specificity (score: 0.01). Add concrete details and quantitative markers."
+    ],
+    "corrective_prompt": ""
+  }
+}
+```
+
+Interpretation:
+
+- CT-MCP does **not** block the response
+- it does warn that the response is structurally decent but extremely low-specificity under this scorer
+- the main deterministic critique is not logical invalidity, but lack of concrete operational detail
+
+### 11.5 Smoke-Test Conclusion
+
+The Haiku smoke test succeeded at the CLI/artifact level, and the post-hoc CT-MCP review behaved coherently on the generated response:
+
+- Claude Haiku produced a valid baseline artifact
+- baseline mode did not use CT-MCP, by design
+- CT-MCP review of the resulting answer produced:
+  - `check_plan_validity`: `PASS`
+  - `score_response_quality`: `PASS` with a low-specificity warning
+
+This is enough to show the execution path works end-to-end for one minimal Claude cell plus deterministic review, but it is still only a smoke test, not a full benchmark run.
+
 ---
 
-**Bottom line.** The orchestrator v0 looks directionally correct and honestly scoped as an experimental internal layer. The strongest prompt constraints appear to be met in the reviewed code paths: strict structured contracts, Ajv validation before tool execution, one-revision-cap policy, second-failure escalation, observational shadow mode, no provider SDKs, no hidden memory, no prose rescue, and no public-tool-surface change. But the validation here is still focused rather than exhaustive. The remaining gaps (§3 Medium, §8, §9, §10) are enough that this should be framed as "promising experimental tooling under targeted verification," not as thoroughly tested or broadly signed off.
+## 12. Sonnet Direct Invocation vs Fixed-Host Tool Review
+
+This section clarifies a benchmark-design question that came up during review: whether Claude Sonnet can invoke CT-MCP directly from the local Claude host, or whether CT-MCP review must always be done in the fixed host.
+
+### 12.1 Benchmark Rule vs Host Capability
+
+The benchmark docs intentionally recommend a fixed review host:
+
+- `benchmark/duckexperiments/RUN_PROFILES.md` says: "Do not run `tool_review` inside whichever CLI produced the answer unless all six profiles can access CT-MCP identically."
+- `benchmark/duckexperiments/AGENT_RUNNER_PROMPT.md` repeats that `tool_review` should run in one fixed MCP-enabled host client to preserve comparability.
+
+That is a methodology choice, not evidence that Claude Sonnet cannot call the tools. To test host capability directly, I ran one out-of-sandbox Sonnet call that explicitly asked the Claude host to use CT-MCP tools itself and show the results inline.
+
+### 12.2 Direct Sonnet Prompt Used
+
+Original user-facing prompt:
+
+```text
+Design an experiment to test whether explaining a problem to a rubber duck helps developers debug faster.
+```
+
+Draft answer supplied to Sonnet for direct CT-MCP review:
+
+```text
+Design a randomized controlled trial with 40 developers, split into duck and no-duck groups. Give everyone the same buggy task, measure time to fix, and compare the means with a t-test. I am 72 percent confident this will show whether the duck helps.
+```
+
+Direct Sonnet instruction:
+
+```text
+Use CT-MCP tools directly if they are available in this Claude host. Analyze this answer draft and improve it only if the tool results justify a concrete change.
+
+Original prompt:
+Design an experiment to test whether explaining a problem to a rubber duck helps developers debug faster.
+
+Draft answer to review:
+Design a randomized controlled trial with 40 developers, split into duck and no-duck groups. Give everyone the same buggy task, measure time to fix, and compare the means with a t-test. I am 72 percent confident this will show whether the duck helps.
+
+Required CT-MCP tools to try:
+- check_plan_validity
+- score_response_quality
+- validate_confidence
+```
+
+### 12.3 Did Sonnet Invoke CT-MCP Directly?
+
+Yes.
+
+The returned answer includes concrete CT-MCP findings rather than generic paraphrase, and the content aligns with the local deterministic tool behavior. Sonnet did not follow the requested output labels exactly, but it did surface tool-derived results and a revised end-user answer.
+
+Tools evidently fired:
+
+- `score_response_quality`
+- `validate_confidence`
+
+`check_plan_validity` was requested but not used in this particular direct response.
+
+### 12.4 Raw Direct Sonnet Output
+
+```text
+- score_response_quality — PASS overall (0.626/1.0), but specificity_score: 0.00 with explicit warning: "Add concrete details and quantitative markers."
+- validate_confidence — honest_ceiling: 0.12; the draft's claimed 72% confidence is drastically inflated relative to what the underlying assumptions support (ceiling is only 12%)
+score_response_quality: overall=0.626, substance=0.981, specificity=0.00, hedge_density=0, structure=0.66 | warning: specificity critically low
+validate_confidence: honest_ceiling=0.12, claimed=0.72 (implied), gap=~0.60 — severe inflation; assumptions around power, normality, and signal detectability compound to a ceiling of only ~12%
+Design a randomized controlled trial with 40 developers (20 per group), balanced for experience level (e.g., stratified by years of professional coding). Both groups receive the same buggy Python task — for example, a function with an off-by-one error and a silent type coercion bug. The duck group is instructed to explain their reasoning aloud to a rubber duck before each debugging action; the no-duck group works silently. Measure wall-clock time from task start to first correct fix, verified by automated test suite. Analyze with an independent-samples t-test if residuals pass Shapiro-Wilk; otherwise use Mann-Whitney U.
+
+Three caveats the draft omits: (1) N=40 is likely underpowered — a power analysis for a medium effect (Cohen's d=0.5) at 80% power requires roughly 64 participants; consider recruiting more or running a pilot first. (2) The 72% confidence claim is not supportable — compounding uncertainty over statistical power, task suitability, and whether verbalization actually separates from silent thinking yields an honest confidence ceiling closer to 12% that this specific design will produce a clean, conclusive result. State instead that the design is capable of detecting an effect if one exists at the chosen effect size. (3) Add a manipulation check: record whether duck-group participants actually verbalized, to avoid null results from non-compliance contaminating the treatment condition.
+```
+
+### 12.5 Interpretation
+
+This direct Sonnet run is enough to answer the narrow operational question:
+
+- the local Claude Sonnet host can invoke CT-MCP directly
+- the response changed materially because of deterministic CT-MCP feedback
+- the most visible tool contribution here was not plan invalidity, but confidence deflation and specificity pressure
+
+It does **not** overturn the benchmark methodology recommendation. For the benchmark, keeping `tool_review` in one fixed MCP-enabled host still makes sense because that preserves comparability across all six run profiles. But the local host capability itself is now demonstrated, not hypothetical.
+
+---
+
+**Bottom line.** The orchestrator v0 looks directionally correct and honestly scoped as an experimental internal layer. The strongest prompt constraints appear to be met in the reviewed code paths: strict structured contracts, Ajv validation before tool execution, one-revision-cap policy, second-failure escalation, observational shadow mode, no provider SDKs, no hidden memory, no prose rescue, and no public-tool-surface change. The earlier routed-mode dead zones for `plan` and `concurrency` contracts are now closed, and the most obvious test-coverage holes called out in the earlier review have been covered. But the validation here is still focused rather than exhaustive. The remaining gaps (§3 Medium, §8, §9, §10) are enough that this should still be framed as "promising experimental tooling under targeted verification," not as thoroughly tested or broadly signed off.

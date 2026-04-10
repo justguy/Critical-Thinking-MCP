@@ -8,10 +8,16 @@
  * The router never invents missing structure. If the classifier suggests a
  * tool but the matching contract is absent from the envelope, that tool is
  * dropped from the routed set. The router does not synthesize a contract
- * from the answer text.
+ * from the answer text. If the classifier-backed routed set is empty but
+ * valid compatible contracts are present, the router falls back to running
+ * every compatible contract rather than silently passing an unreviewed answer.
  */
 
-import { classifyClaim, type ClaimClassification } from '../enforcement/claim_classifier.js';
+import {
+  classifyClaim,
+  type ClaimClassification,
+  type ClaimType,
+} from '../enforcement/claim_classifier.js';
 import {
   CONTRACT_KEY_TO_TYPE,
   CONTRACT_TO_TOOL,
@@ -40,6 +46,17 @@ const CLASSIFIER_TO_ORCHESTRATOR_TOOL: Record<string, OrchestratorToolName | und
   verify_arithmetic: undefined,
 };
 
+// The existing classifier emits broad claim types plus public-tool suggestions.
+// Some orchestrator-specific families (plan / concurrency) are better expressed
+// as contract-backed internal routes than as public tool suggestions, so the
+// router adds these deterministic adjacent mappings from claim type.
+const TYPE_TO_ADJACENT_ORCHESTRATOR_TOOLS: Partial<
+  Record<ClaimType, OrchestratorToolName[]>
+> = {
+  architectural: ['check_plan_validity'],
+  safety: ['detect_concurrency_patterns'],
+};
+
 export interface RouterResult {
   primary_type: string;
   secondary_type: string | null;
@@ -60,11 +77,22 @@ export function routeEnvelope(envelope: OrchestratorEnvelope): RouterResult {
   const classification: ClaimClassification = classifyClaim(envelope.answer_text);
 
   // 2. Project classifier suggestions onto the orchestrator's routable set.
-  const eligible = dedupe(
+  //    Then add adjacent deterministic mappings for internal route families
+  //    the base classifier describes by type but does not name explicitly.
+  const projectedSuggestions = dedupe(
     classification.suggested_tools
       .map(t => CLASSIFIER_TO_ORCHESTRATOR_TOOL[t])
       .filter((t): t is OrchestratorToolName => t !== undefined),
   );
+  const adjacentTypeMappings = dedupe(
+    [classification.primary_type, classification.secondary_type]
+      .filter((t): t is ClaimType => t !== null)
+      .flatMap(t => TYPE_TO_ADJACENT_ORCHESTRATOR_TOOLS[t] ?? []),
+  );
+  const eligible = dedupe([
+    ...projectedSuggestions,
+    ...adjacentTypeMappings,
+  ]);
 
   // 3. Determine which contracts the caller actually supplied.
   const presentContracts: ContractType[] = [];
@@ -75,15 +103,22 @@ export function routeEnvelope(envelope: OrchestratorEnvelope): RouterResult {
   }
   const presentSet = new Set(presentContracts);
 
-  // 4. Routed tools = eligible ∩ (tools whose contract is present).
-  //    No contract → no route, even if the classifier suggested it.
-  const routed = eligible.filter(tool => presentSet.has(TOOL_TO_CONTRACT[tool]));
-
-  // 5. Artifact-compatible tools = every tool whose contract is present,
+  // 4. Artifact-compatible tools = every tool whose contract is present,
   //    regardless of classifier suggestion. Shadow mode runs all of these.
   const artifactCompatible = dedupe(
     presentContracts.map(ct => CONTRACT_TO_TOOL[ct]),
   );
+
+  // 5. Routed tools = eligible ∩ (tools whose contract is present).
+  //    No contract → no route, even if the classifier suggested it.
+  //    If the routed set is empty but compatible contracts are present,
+  //    fall back to all compatible contracts so the answer does not pass
+  //    without any deterministic review.
+  const routedIntersection = eligible.filter(tool =>
+    presentSet.has(TOOL_TO_CONTRACT[tool]),
+  );
+  const routed =
+    routedIntersection.length > 0 ? routedIntersection : artifactCompatible;
 
   return {
     primary_type: classification.primary_type,

@@ -18,6 +18,7 @@
     "build": "tsc",
     "test": "vitest run",
     "start": "node dist/server.js",
+    "start:http": "node dist/server.js --transport http --host 127.0.0.1 --port 3000",
     "benchmark": "tsx benchmark/runner.ts",
     "benchmark:tea:check": "tsc -p benchmark/invisible-tea-party/ts/tsconfig.json",
     "benchmark:tea:run": "node --import tsx benchmark/invisible-tea-party/ts/src/cli.ts",

@@ -85,6 +85,24 @@ function goodEnvelope(
   };
 }
 
+function extractPriorFailures(
+  result: ReturnType<typeof runOrchestrator>,
+): Array<{
+  tool: string;
+  failure_type: string;
+  blocking_issues: string[];
+}> {
+  return result.route_results
+    .filter((r): r is RouteResult => 'result' in r)
+    .filter(r => r.status === 'ENFORCEMENT_FAIL')
+    .map(r => ({
+      tool: r.tool,
+      failure_type: r.enforcement?.blocking_issues[0]?.mechanism ?? 'unknown_failure',
+      blocking_issues:
+        r.enforcement?.blocking_issues.map(issue => issue.description) ?? [],
+    }));
+}
+
 describe('policy layer — REVISE → HUMAN_REVIEW escalation', () => {
   it('iteration 1 with a failing routed tool returns REVISE and a critique', () => {
     const result = runOrchestrator(cycleEnvelope(1));
@@ -139,6 +157,17 @@ describe('policy layer — REVISE → HUMAN_REVIEW escalation', () => {
       expect(decisions[i]).toBe('HUMAN_REVIEW');
     }
   });
+
+  it('supports a caller-side two-iteration loop by escalating after prior failure context is carried forward', () => {
+    const first = runOrchestrator(cycleEnvelope(1));
+    expect(first.policy_decision).toBe('REVISE');
+
+    const second = runOrchestrator(
+      cycleEnvelope(2, extractPriorFailures(first)),
+    );
+    expect(second.policy_decision).toBe('HUMAN_REVIEW');
+    expect(second.critique).toBeDefined();
+  });
 });
 
 describe('evaluatePolicy — direct unit tests', () => {
@@ -172,6 +201,108 @@ describe('evaluatePolicy — direct unit tests', () => {
     ];
     const r = evaluatePolicy(results, { iteration_number: 1, prior_failures: [] });
     expect(r.decision).toBe('WARN');
+  });
+
+  it('returns REVISE when multiple routed tools pass with warnings on iteration 1', () => {
+    const results: RouteResult[] = [
+      {
+        tool: 'validate_confidence',
+        contract_type: 'confidence_contract',
+        status: 'PASS',
+        result: { honest_ceiling: 0.5 },
+        enforcement: {
+          blocking_issues: [],
+          warnings: ['Low falsifiability score'],
+          corrective_prompt: '',
+        },
+      },
+      {
+        tool: 'score_response_quality',
+        contract_type: 'quality_contract',
+        status: 'PASS',
+        result: { overall_score: 0.61 },
+        enforcement: {
+          blocking_issues: [],
+          warnings: ['Low specificity'],
+          corrective_prompt: '',
+        },
+      },
+    ];
+
+    const r = evaluatePolicy(results, { iteration_number: 1, prior_failures: [] });
+    expect(r.decision).toBe('REVISE');
+    expect(r.critique).toBeDefined();
+    expect(r.critique!.failing_routes).toHaveLength(2);
+  });
+
+  it('returns HUMAN_REVIEW when multiple routed warnings recur on iteration 2', () => {
+    const results: RouteResult[] = [
+      {
+        tool: 'validate_confidence',
+        contract_type: 'confidence_contract',
+        status: 'PASS',
+        result: { honest_ceiling: 0.5 },
+        enforcement: {
+          blocking_issues: [],
+          warnings: ['Low falsifiability score'],
+          corrective_prompt: '',
+        },
+      },
+      {
+        tool: 'validate_reasoning_chain',
+        contract_type: 'reasoning_chain_contract',
+        status: 'PASS',
+        result: { grounding_score: 0.2 },
+        enforcement: {
+          blocking_issues: [],
+          warnings: ['Low grounding score'],
+          corrective_prompt: '',
+        },
+      },
+    ];
+
+    const r = evaluatePolicy(results, {
+      iteration_number: 2,
+      prior_failures: [
+        {
+          tool: 'validate_confidence',
+          failure_type: 'warning_cluster',
+          blocking_issues: ['Low falsifiability score'],
+        },
+      ],
+    });
+    expect(r.decision).toBe('HUMAN_REVIEW');
+    expect(r.critique).toBeDefined();
+  });
+
+  it('returns WARN on iteration 2 for a single soft warning route when there are no hard or calibration failures', () => {
+    const results: RouteResult[] = [
+      {
+        tool: 'score_response_quality',
+        contract_type: 'quality_contract',
+        status: 'PASS',
+        result: { overall_score: 0.6, structure_score: 0.33 },
+        enforcement: {
+          blocking_issues: [],
+          warnings: ['Low specificity'],
+          corrective_prompt: '',
+        },
+      },
+    ];
+
+    const r = evaluatePolicy(
+      results,
+      { iteration_number: 2, prior_failures: [] },
+      {
+        profile_id: 'test.warning-threshold.v1',
+        selectors: {},
+        warning_route_revision_threshold: 1,
+        metric_gates: {},
+      },
+    );
+
+    expect(r.decision).toBe('WARN');
+    expect(r.critique).toBeUndefined();
   });
 
   it('critique packet for a schema failure has failure_source = schema', () => {
@@ -242,5 +373,46 @@ describe('evaluatePolicy — direct unit tests', () => {
       ],
     });
     expect(r.decision).toBe('HUMAN_REVIEW');
+  });
+
+  it('builds a critique packet that includes multiple failing routes on a live orchestrator path', () => {
+    const result = runOrchestrator({
+      schema_version: 'orchestrator_v0',
+      answer_text:
+        'We predict the system will handle 10x current traffic by Q4 and we are 95% confident.',
+      contracts: {
+        confidence: {
+          response_text:
+            'We predict the system will handle 10x current traffic by Q4 and we are 95% confident.',
+          assumptions: [
+            {
+              description: 'Traffic growth stays smooth',
+              confidence: 0.6,
+              falsification_condition:
+                'Observed growth exceeds plan by 30 percent for two consecutive weeks',
+            },
+            {
+              description: 'Horizontal scaling solves the bottleneck',
+              confidence: 0.6,
+              falsification_condition:
+                'Load test at 5x current traffic shows p99 latency above 500ms for 10 minutes',
+            },
+          ],
+        },
+        quality: {
+          response_text:
+            'Maybe maybe maybe maybe maybe maybe maybe maybe maybe maybe.',
+        },
+      },
+      mode: 'routed',
+      review_context: { iteration_number: 1, prior_failures: [] },
+    });
+
+    expect(result.policy_decision).toBe('REVISE');
+    expect(result.critique).toBeDefined();
+    expect(result.critique!.failing_routes.length).toBe(2);
+    expect(result.critique!.failing_routes.map(route => route.tool)).toEqual(
+      expect.arrayContaining(['validate_confidence', 'score_response_quality']),
+    );
   });
 });

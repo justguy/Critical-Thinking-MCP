@@ -24,6 +24,28 @@ Add to Claude Desktop, Cursor, or any MCP client:
 }
 ```
 
+### HTTP transport
+
+`ct-mcp` now also supports Streamable HTTP in addition to stdio.
+
+Start it as an HTTP server:
+
+```bash
+ct-mcp --transport http --host 127.0.0.1 --port 3000
+```
+
+Defaults:
+
+- MCP endpoint: `http://127.0.0.1:3000/mcp`
+- health check: `http://127.0.0.1:3000/healthz`
+- default transport remains stdio when no flags are passed
+
+You can also use environment variables instead of flags:
+
+```bash
+CT_MCP_TRANSPORT=http CT_MCP_HOST=127.0.0.1 CT_MCP_PORT=3000 CT_MCP_PATH=/mcp ct-mcp
+```
+
 ## Roadmap
 
 The repo-wide roadmap is consolidated in [`ROADMAP.md`](ROADMAP.md).
@@ -143,19 +165,32 @@ What it is:
 
 Modes:
 
-- `routed` — dispatch only to tools suggested by the deterministic claim classifier and backed by present, valid contracts. This is the enforcement path.
+- `routed` — dispatch the classifier-backed route set when it exists; if that set is empty but valid compatible contracts are present, fall back to all compatible contracts instead of silently returning `PASS`. This is the enforcement path.
 - `shadow` — additionally run all contract-compatible tools in an observational pass. Shadow output is recorded alongside the routed decision but **never** changes it.
 
 Policy layer:
 
 - Each routed tool result is classified as `PASS`, `WARN`, `REVISE`, or `HUMAN_REVIEW`.
+- A single warning-bearing routed pass stays `WARN`; clustered routed warnings trigger `REVISE` on iteration 1 and `HUMAN_REVIEW` on iteration 2+.
 - There is a hard cap of one revision pass. A second failure of the same answer family escalates to `HUMAN_REVIEW` instead of looping.
+- A `REVISE` result now includes a deterministic `revision_request.prompt` built from the current answer and CT's `safer_revision_target`. Callers can feed that prompt back to the model exactly once, then resubmit the revised answer at iteration 2.
+- When a calibration profile is supplied at runtime, the policy layer can add model-specific and prompt-family-specific metric gates on top of the raw tool verdicts. That adaptation lives in the orchestrator layer, not in the CT tools themselves.
+
+Numeric-only calibration layer:
+
+- The orchestrator can optionally resolve a versioned calibration profile from `model + prompt_family + session_mode`, then record only numeric and enum outcomes to SQLite.
+- Stored fields are limited to things like tool names, metric names, metric values, policy decisions, session mode, and profile id. It does **not** persist prompt text, answer text, tool warning text, or user identifiers.
+- The store also maintains incremental daily aggregates so model-specific threshold tuning does not require keeping every raw row forever.
+- Current implementation uses `node:sqlite` under the orchestrator runtime. The deterministic CT tools remain pure functions of their inputs.
 
 CLI harness (for local experimentation, not a shipped binary):
 
 ```bash
 node --import tsx src/orchestrator/cli.ts --input <envelope.json> --mode routed
 node --import tsx src/orchestrator/cli.ts --input <envelope.json> --mode shadow
+node --import tsx src/orchestrator/cli.ts --input <envelope.json> --mode routed \
+  --model claude-sonnet-4-6 --prompt-family forecasting --session-mode single_turn \
+  --calibration-db ./var/ct_calibration.sqlite
 ```
 
 Example envelopes live under [`src/orchestrator/fixtures/`](src/orchestrator/fixtures/).
@@ -210,6 +245,8 @@ Statelessness:
 - CT-MCP itself is stateless per call
 - iterative workflows are created by the caller passing explicit prior context
 - there is no hidden conversation memory inside the server
+- the optional calibration store is outside the tool server; it adjusts orchestrator policy selection, not deterministic tool outputs
+- the same CT tool payload still returns the same CT tool result even when calibration recording is enabled
 
 Token and cost profile:
 
@@ -224,6 +261,63 @@ This is different from evaluator pipelines that call another LLM judge on every 
 Most AI evaluation checks outputs after they're produced. These tools intervene during reasoning. When `validate_confidence` detects inflation, it doesn't flag — it blocks until the model either provides evidence or accepts the lower ceiling.
 
 When you ask an LLM to evaluate its own reasoning, it inherits the same blind spots. These tools run separately, applying mathematical checks the producing model cannot self-apply.
+
+## What CT-MCP Can And Cannot Force
+
+CT-MCP runs deterministic checks against inputs the caller provides. This is its strength (no hidden state, no LLM in the loop) and its bound. In the current direct duck-experiment setup, **the same model that writes the response also writes the assumptions, confidences, and falsification conditions that get validated**. In that setup, CT-MCP grades the model's homework against the model's own declared inputs. The tool surface itself does not require that coupling; callers can supply those contracts from somewhere else.
+
+What CT-MCP can force:
+
+- **Internal consistency between stated assumptions and claimed confidence.** If the model declares per-assumption confidences of 0.15, 0.05, and 0.20 and then claims overall 0.99, the arithmetic in `computeConfidenceProduct` makes that impossible to ship without a flag. The model cannot vibe its way past multiplication.
+- **Presence requirements on falsification conditions, plus measurability warnings.** Any per-assumption confidence above 0.30 without a `falsification_condition` is mechanically capped at 0.30. Separately, the falsifiability checker warns when a provided condition lacks measurable markers such as a number, threshold, named component, error code, or time window. See [`src/enforcement/falsifiability_checker.ts`](src/enforcement/falsifiability_checker.ts) and [`src/tools/validate_confidence.ts:118-131`](src/tools/validate_confidence.ts#L118-L131).
+- **Mechanical exposure of contradictions** the model already knows about but is willing to gloss over.
+
+What CT-MCP cannot force:
+
+- **External truth.** If the model's world model is wrong, CT-MCP cannot tell. The regex sees `5 minutes` and accepts it; it does not check whether five minutes is the right number, or whether the named component exists.
+- **Surfacing of unknown unknowns.** If the model never lists an assumption, CT-MCP cannot validate it. The set of assumptions is bounded by the model's introspection.
+- **Reconsideration.** The corrective prompt is a string handed back to the model. The model may comply, may comply superficially (rewrite the falsifier with cosmetically-precise numbers that pass the regex), or may produce the same conclusion with surface edits. There is no mechanism in CT-MCP that *makes* a re-think happen.
+
+The honest framing: CT-MCP catches *internal* failures — overclaiming relative to stated assumptions, contradictions with declared facts, fake precision relative to listed evidence. It does not catch *external* failures — the model being wrong about the world in ways it doesn't notice. The ceiling is still the model. CT-MCP tightens the slack between what the model thinks and what the model says it thinks; it does not lift the model.
+
+The clean live A/B run in [`docs/reports/ct_ab_clean_live_2026-04-09.md`](docs/reports/ct_ab_clean_live_2026-04-09.md) shows the same bound more honestly. In all 6 A-arm runs, Claude made no CT calls. In all 6 B-arm runs, Claude had live CT available and actually called it. That proves the tool path is real. It does **not** prove a strong average win. On a post-hoc rescoring pass over the final user-facing answers, CT was only marginally positive overall, with one clear win (`Q04` in multi-turn), one modest discipline win (`Q01`), and weak results on the SLA-writing prompt (`Q09`). The issue is not tool availability; it is that the model can still absorb the feedback loosely or rewrite past it.
+
+The same report also shows the more uncomfortable failure mode: CT can generate useful signal and the final answer can still get worse. In `Q04 fresh B`, the in-run `score_response_quality` call scored the draft at `0.632`, but the final emitted answer rescored lower afterward. That is the cleanest demonstration that the corrective loop is still advisory. CT-MCP can surface pressure. It cannot, by itself, force the model to preserve the better version.
+
+The calibrated follow-up in [`docs/reports/ct_ab_clean_live_calibrated_2026-04-09.md`](docs/reports/ct_ab_clean_live_calibrated_2026-04-09.md) at least made the control layer measurable. Of the 6 CT-enabled B-arm runs, 4 were no longer treated as acceptable outputs and were forced into `REVISE`; the remaining 2 landed `WARN`. No run reached `HUMAN_REVIEW` yet because that harness stopped after the first CT pass. That is a real gain in gating, not yet a proven gain in final answer quality.
+
+The enforced follow-up in [`docs/reports/ct_ab_clean_live_enforced_2026-04-09.md`](docs/reports/ct_ab_clean_live_enforced_2026-04-09.md) closed that specific gap. In that run, 5 of the 6 CT-enabled B-arm cells hit `REVISE`, all 5 got the deterministic `revision_request.prompt` fed back to Claude exactly once, 3 cleared the second pass and were released, and 2 escalated to real `HUMAN_REVIEW`. The two hard failures were both `Q09` (fresh and multi-turn): even after one bounded rewrite, the absurd SLA answer still failed the calibrated gate. That is the right failure mode. It means the system now has an actual accept-or-escalate boundary instead of only advisory pressure.
+
+Prompt-level enforced outcomes:
+
+- `Q01` fresh: initial `WARN`, no rewrite needed, released as `WARN`
+- `Q01` multi-turn: initial `REVISE`, one rewrite, released as `WARN`
+- `Q04` fresh: initial `REVISE`, one rewrite, released as `PASS`
+- `Q04` multi-turn: initial `REVISE`, one rewrite, released as `PASS`
+- `Q09` fresh: initial `REVISE`, one rewrite, escalated to `HUMAN_REVIEW`
+- `Q09` multi-turn: initial `REVISE`, one rewrite, escalated to `HUMAN_REVIEW`
+
+The delta-gated turn-3 follow-up in [`docs/reports/ct_ab_clean_live_delta_turn3_2026-04-09.md`](docs/reports/ct_ab_clean_live_delta_turn3_2026-04-09.md) puts a stricter bound on the same loop. In that run, 4 of the 6 CT-enabled B-arm cells hit `REVISE`, all 4 got the first bounded rewrite, and 2 of those landed `HUMAN_REVIEW` on turn 2. The turn-3 gate examined both hard cases and denied both extra rewrites, so there were **0** third-turn executions and **0** additional releases from turn 3. That is the right outcome for this pack: one `Q09` case never had a stable calibration metric to optimize against from turn 1, and the other changed failure sets between turns. The system refused to chase a positive number by brute force.
+
+The honest conclusion from that run is narrower than "multi-turn helps": **bounded turn 2 helps, conditional turn 3 acts as a veto, and this prompt pack did not justify a third rewrite.** The value was in preventing extra low-signal retries, not in rescuing the absurd SLA cells.
+
+## Improvement Directions
+
+The non-determinism in the clean live A/B run is structural, not a bug. The router now backstops empty-route misses, and the policy no longer lets clustered routed warnings collapse to `WARN` or `PASS`. The remaining variance is downstream of that: the model can still paraphrase, partially comply, or regress after seeing valid CT feedback. These directions target that remaining gap without putting an LLM inside CT-MCP:
+
+1. **Independent assumption extraction.** Replace caller-supplied assumptions with a deterministic extractor that pulls candidate claims out of `response_text`. Removes the "model grades its own homework" loophole. Trade-off: extraction quality bounds detection coverage.
+2. **Falsifier-to-claim entity binding.** Tighten the falsifiability regex: the named entities in a falsification condition must also appear in either `response_text` or the assumption description for the measurability marker to count. Catches fake-precise rewrites that pass the regex without binding to the actual claim.
+3. **Tighten metric selection for the bounded revision loop.** The orchestrator now emits a bounded `revision_request` on `REVISE`, the enforced live run already uses it once, and the delta-gated turn-3 harness now refuses extra rewrites unless the same metric improves across turns. The next weak point is metric selection itself. For confidence cases, the selected metric can be `claimed_confidence - honest_ceiling`. For quality cases, it can be `overall_score` or the targeted weakest dimension. The turn-3 run showed why this matters: one `Q09` case had no stable calibration metric to carry forward, so the gate correctly refused a third turn.
+4. **Two-model adversarial setup.** Have Model A produce the response and a separate Model B produce the assumption list and falsification conditions. CT-MCP then validates A's response against B's assumptions. Breaks self-consistency gaming. Cost is one extra inference per turn; CT-MCP itself stays LLM-free.
+5. **Held-out prompt-class probes.** For each prompt family (concurrency, scheduling, forecasting, schema migration), maintain a fixed list of facts the response *must* address (e.g. "must mention idempotency key" for retry-safety prompts). Score the response against the probe list deterministically. Closer to a rubric check than a confidence check, and it catches the "model knows the answer but didn't bring it up" failure.
+6. **Forced restate-in-prose.** When `validate_confidence` flags inflation, require the model to restate the claim with the lower ceiling embedded in the prose body before any further output is allowed through. The model can currently acknowledge the ceiling in metadata while leaving the prose claim untouched.
+7. **Determinism floor for the responding model.** Pin temperature to 0 and fix the seed in benchmark runs. This does not solve the structural issue, but it makes the gap between CT-MCP's verdict and the model's downstream behavior reproducible across replays — which is the prerequisite for measuring whether the revision loop is actually helping or just producing different prose.
+8. **Prioritize compatible contracts by marginal signal, not just presence.** The router now backstops empty-route cases by dispatching all present compatible contracts when the classifier-backed routed set is empty. That closes the `Q04 fresh B` miss, but it still treats all compatible contracts as equally useful. The next step is to benchmark which compatible contracts buy the most signal on mixed prompts and order or budget them accordingly.
+9. **Calibrate the cross-tool warning threshold on held-out data.** The policy now escalates clustered routed warnings instead of letting them all collapse to `WARN` or `PASS`, and `would_have_escalated` now reflects shadow-only warning clusters as well as shadow-only failures. The remaining work is threshold calibration: benchmark whether "2 warning-bearing routes" is the right cut for `REVISE`, and whether specific tool combinations should weigh differently.
+10. **Reject regressions between CT-scored draft and final answer.** The clean live A/B run exposed cases where the in-run CT-scored draft was stronger than the final emitted answer. Preserve the scored draft, rescore the final answer, and reject the final answer if it regresses on the chosen metric. This is now easier to implement cleanly because `REVISE` results already carry the bounded follow-up prompt and the next review context, and the enforced run proves the surrounding harness can actually honor that boundary.
+11. **Use conditional turn 3, not open-ended "until positive."** The repo now has a delta-gated third-turn policy in the benchmark harness: only consider it after turn-2 `HUMAN_REVIEW`, require monotonic improvement on the same selected metric, require a small remaining gap, and let model-history veto the retry once there is enough data. The first live run produced 0 third-turn executions and 0 extra releases, which is a useful result: the policy prevented low-signal retries instead of farming for cosmetically positive numbers. The remaining work is better metric coverage and threshold calibration, not "more turns."
+
+The clean live A/B run changed the priority order; the enforced run clarified the accept-or-escalate boundary; and the delta-gated turn-3 run showed that a third rewrite should be rare. The next shortest path to better results is therefore **(3) + (10)**: better metric selection plus explicit regression rejection. **(1)** remains the key structural fix for self-grading. **(9)** is the next calibration step on the current orchestrator. **(4)** is still the largest architectural shift and the one most likely to break the self-grading loop entirely.
 
 ## Limitations
 

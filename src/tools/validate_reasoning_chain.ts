@@ -21,6 +21,13 @@ interface CycleInfo {
   path: string[];
 }
 
+interface ContradictionViolation {
+  source_id: string;
+  source_label: string;
+  target_id: string;
+  target_label: string;
+}
+
 export interface ReasoningChainOutput {
   status: 'PASS' | 'ENFORCEMENT_FAIL';
   cycles: CycleInfo[];
@@ -29,6 +36,7 @@ export interface ReasoningChainOutput {
   node_count: number;
   edge_count: number;
   context_used: boolean;
+  contradiction_violations?: ContradictionViolation[];
   enforcement?: {
     blocking_issues: BlockingIssue[];
     warnings: string[];
@@ -138,6 +146,7 @@ function validateInput(input: unknown): { nodes: GraphNode[]; edges: GraphEdge[]
 const WHITE = 0;
 const GRAY = 1;
 const BLACK = 2;
+const SUPPORT_RELATIONS = new Set(['supports', 'implies', 'requires']);
 
 function detectCycles(
   nodeIds: string[],
@@ -199,7 +208,6 @@ const MAX_PATH_DEPTH = 20;
  */
 function computeGroundingScore(
   nodes: GraphNode[],
-  _adj: Map<string, string[]>,
   reverseAdj: Map<string, string[]>,
 ): number {
   const conclusions = nodes.filter(n => n.type === 'conclusion');
@@ -263,6 +271,85 @@ function computeGroundingScore(
   return totalPaths === 0 ? 1 : groundedPaths / totalPaths;
 }
 
+function computeGroundedNodeIds(
+  nodes: GraphNode[],
+  reverseAdj: Map<string, string[]>,
+): Set<string> {
+  const nodeById = new Map(nodes.map(node => [node.id, node]));
+  const groundedMemo = new Map<string, boolean>();
+
+  function isGrounded(nodeId: string, visiting: Set<string>): boolean {
+    const cached = groundedMemo.get(nodeId);
+    if (cached !== undefined) return cached;
+
+    const node = nodeById.get(nodeId);
+    if (!node) return false;
+
+    if (node.type === 'evidence' || node.type === 'assumption') {
+      groundedMemo.set(nodeId, true);
+      return true;
+    }
+
+    if (visiting.has(nodeId)) {
+      groundedMemo.set(nodeId, false);
+      return false;
+    }
+
+    const predecessors = reverseAdj.get(nodeId) || [];
+    if (predecessors.length === 0) {
+      groundedMemo.set(nodeId, false);
+      return false;
+    }
+
+    visiting.add(nodeId);
+    const grounded = predecessors.some(pred => isGrounded(pred, visiting));
+    visiting.delete(nodeId);
+
+    groundedMemo.set(nodeId, grounded);
+    return grounded;
+  }
+
+  const groundedNodeIds = new Set<string>();
+  for (const node of nodes) {
+    if (isGrounded(node.id, new Set())) {
+      groundedNodeIds.add(node.id);
+    }
+  }
+
+  return groundedNodeIds;
+}
+
+function detectGroundedContradictions(
+  nodes: GraphNode[],
+  edges: GraphEdge[],
+  groundedNodeIds: Set<string>,
+): ContradictionViolation[] {
+  const nodeById = new Map(nodes.map(node => [node.id, node]));
+  const violations: ContradictionViolation[] = [];
+
+  for (const edge of edges) {
+    if (edge.relation !== 'contradicts') continue;
+
+    const source = nodeById.get(edge.from);
+    const target = nodeById.get(edge.to);
+
+    if (!source || !target) continue;
+    if (target.type !== 'conclusion') continue;
+    if (source.type !== 'claim' && source.type !== 'assumption') continue;
+    if (!groundedNodeIds.has(edge.to)) continue;
+    if (source.type === 'claim' && !groundedNodeIds.has(edge.from)) continue;
+
+    violations.push({
+      source_id: source.id,
+      source_label: source.label,
+      target_id: target.id,
+      target_label: target.label,
+    });
+  }
+
+  return violations;
+}
+
 // ====== Handler ======
 
 export function handleValidateReasoningChain(
@@ -297,7 +384,7 @@ export function handleValidateReasoningChain(
     }
   }
 
-  // Build adjacency lists
+  // Build structural adjacency lists. Contradictions do not count as support.
   const adj = new Map<string, string[]>();
   const reverseAdj = new Map<string, string[]>();
 
@@ -307,6 +394,7 @@ export function handleValidateReasoningChain(
   }
 
   for (const edge of edges) {
+    if (!SUPPORT_RELATIONS.has(edge.relation)) continue;
     adj.get(edge.from)!.push(edge.to);
     reverseAdj.get(edge.to)!.push(edge.from);
   }
@@ -320,7 +408,9 @@ export function handleValidateReasoningChain(
     .map(n => n.id);
 
   // Grounding score
-  const groundingScore = computeGroundingScore(nodes, adj, reverseAdj);
+  const groundingScore = computeGroundingScore(nodes, reverseAdj);
+  const groundedNodeIds = computeGroundedNodeIds(nodes, reverseAdj);
+  const contradictionViolations = detectGroundedContradictions(nodes, edges, groundedNodeIds);
 
   // Enforcement: specificity check on node labels
   const blockingIssues: BlockingIssue[] = [];
@@ -344,6 +434,18 @@ export function handleValidateReasoningChain(
         warnings.push(`Consistency: ${v.description}`);
       }
     }
+  }
+
+  if (contradictionViolations.length > 0) {
+    blockingIssues.push({
+      mechanism: 'contradiction_detection',
+      description:
+        `Found ${contradictionViolations.length} grounded contradiction(s): ` +
+        contradictionViolations
+          .map(v => `"${v.source_label}" contradicts grounded conclusion "${v.target_label}"`)
+          .join('; '),
+      severity: 'blocking',
+    });
   }
 
   // Cycles are blocking
@@ -385,6 +487,10 @@ export function handleValidateReasoningChain(
     edge_count: edges.length,
     context_used: !!context,
   };
+
+  if (contradictionViolations.length > 0) {
+    result.contradiction_violations = contradictionViolations;
+  }
 
   if (hasFail || warnings.length > 0) {
     result.enforcement = {

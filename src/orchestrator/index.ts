@@ -16,7 +16,14 @@
  */
 
 import { TOOL_TO_CONTRACT_KEY } from './contracts.js';
+import { resolveCalibrationProfile } from './calibration.js';
+import { resolvePromptFamily } from './questionClassifier.js';
+import {
+  getHistoricalTurn3Stats,
+  recordCalibrationRun,
+} from './calibrationStore.js';
 import { evaluatePolicy } from './policy.js';
+import { buildRevisionRequest } from './revision.js';
 import { routeEnvelope } from './router.js';
 import { executeRoute } from './review.js';
 import {
@@ -25,9 +32,11 @@ import {
 } from './schemaValidation.js';
 import { buildTelemetry } from './shadowTelemetry.js';
 import type {
+  CalibrationProfile,
   OrchestratorEnvelope,
   OrchestratorMode,
   OrchestratorResult,
+  OrchestratorRuntimeOptions,
   OrchestratorToolName,
   PolicyDecision,
   RouteOrFailure,
@@ -36,11 +45,13 @@ import type {
 function envelopeFailureResult(
   envelope: Partial<OrchestratorEnvelope>,
   errors: Array<{ path: string; message: string }>,
+  runtimeOptions?: OrchestratorRuntimeOptions,
 ): OrchestratorResult {
   const mode: OrchestratorMode =
     envelope.mode === 'shadow' ? 'shadow' : 'routed';
   const iteration = envelope.review_context?.iteration_number ?? 1;
   const policyDecision: PolicyDecision = iteration >= 2 ? 'HUMAN_REVIEW' : 'REVISE';
+  const sessionDepth = runtimeOptions?.calibration?.session_depth ?? 1;
 
   return {
     schema_version: 'orchestrator_v0',
@@ -73,16 +84,90 @@ function envelopeFailureResult(
       schema_failures: [],
       policy_decision: policyDecision,
       iteration_number: iteration,
+      session_depth: sessionDepth,
       would_have_escalated: false,
     },
   };
 }
 
-export function runOrchestrator(envelope: OrchestratorEnvelope): OrchestratorResult {
+function finalizeResult(
+  result: OrchestratorResult,
+  runtimeOptions?: OrchestratorRuntimeOptions,
+  profile?: CalibrationProfile,
+  promptFamilySource:
+    | 'explicit'
+    | 'prompt_inferred'
+    | 'answer_inferred'
+    | 'locked' = 'explicit',
+): OrchestratorResult {
+  const calibrationRuntime = runtimeOptions?.calibration;
+  if (!calibrationRuntime || !profile) {
+    return result;
+  }
+
+  let recordedRunId: number | undefined;
+  if (calibrationRuntime.db_path) {
+    recordedRunId = recordCalibrationRun({
+      db_path: calibrationRuntime.db_path,
+      runtime: calibrationRuntime,
+      profile,
+      result,
+    });
+  }
+
+  return {
+    ...result,
+    calibration: {
+      profile_id: profile.profile_id,
+      model: calibrationRuntime.model,
+      prompt_family: calibrationRuntime.prompt_family ?? 'operational_claim',
+      prompt_family_source: promptFamilySource,
+      session_mode: calibrationRuntime.session_mode,
+      session_depth: calibrationRuntime.session_depth ?? 1,
+      warning_route_revision_threshold: profile.warning_route_revision_threshold,
+      metric_gate_failures: result.calibration?.metric_gate_failures ?? [],
+      ...(recordedRunId !== undefined ? { recorded_run_id: recordedRunId } : {}),
+    },
+  };
+}
+
+export function runOrchestrator(
+  envelope: OrchestratorEnvelope,
+  runtimeOptions?: OrchestratorRuntimeOptions,
+): OrchestratorResult {
+  const calibrationResolution = runtimeOptions?.calibration
+    ? resolvePromptFamily(runtimeOptions.calibration, envelope.answer_text)
+    : null;
+  const effectiveCalibrationRuntime =
+    runtimeOptions?.calibration && calibrationResolution
+      ? {
+          ...runtimeOptions.calibration,
+          prompt_family: calibrationResolution.prompt_family,
+          profile_id:
+            runtimeOptions.calibration.locked_profile_id ??
+            runtimeOptions.calibration.profile_id,
+          session_depth: runtimeOptions.calibration.session_depth ?? 1,
+        }
+      : undefined;
+  const effectiveRuntimeOptions = effectiveCalibrationRuntime
+    ? {
+        ...runtimeOptions,
+        calibration: effectiveCalibrationRuntime,
+      }
+    : runtimeOptions;
+  const calibrationProfile = effectiveCalibrationRuntime
+    ? resolveCalibrationProfile(effectiveCalibrationRuntime)
+    : undefined;
+
   // 1. Validate the envelope.
   const envelopeValidation = validateOrchestratorEnvelope(envelope);
   if (!envelopeValidation.valid) {
-    return envelopeFailureResult(envelope, envelopeValidation.errors);
+    return finalizeResult(
+      envelopeFailureResult(envelope, envelopeValidation.errors, effectiveRuntimeOptions),
+      effectiveRuntimeOptions,
+      calibrationProfile,
+      calibrationResolution?.prompt_family_source,
+    );
   }
 
   // 2. Route the envelope through the deterministic classifier.
@@ -113,7 +198,11 @@ export function runOrchestrator(envelope: OrchestratorEnvelope): OrchestratorRes
 
   // 4. Policy evaluates the ROUTED results only. Shadow results never leak
   //    into the policy decision — that is the entire point of shadow mode.
-  const policy = evaluatePolicy(routeResults, envelope.review_context);
+  const policy = evaluatePolicy(
+    routeResults,
+    envelope.review_context,
+    calibrationProfile,
+  );
 
   // 5. Telemetry is built last so it can describe everything that happened,
   //    including shadow runs and any schema failures observed in either set.
@@ -127,17 +216,51 @@ export function runOrchestrator(envelope: OrchestratorEnvelope): OrchestratorRes
     shadowResults,
     policyDecision: policy.decision,
     reviewContext: envelope.review_context,
+    profile: calibrationProfile,
+    sessionDepth: effectiveCalibrationRuntime?.session_depth ?? 1,
   });
 
-  return {
+  const result: OrchestratorResult = {
     schema_version: 'orchestrator_v0',
     mode: envelope.mode,
     policy_decision: policy.decision,
     route_results: routeResults,
     shadow_results: shadowResults,
     critique: policy.critique,
+    ...(policy.decision === 'REVISE' && policy.critique
+      ? {
+          revision_request: buildRevisionRequest(
+            envelope.answer_text,
+            policy.critique,
+            envelope.review_context,
+          ),
+        }
+      : {}),
     telemetry,
+    ...(calibrationProfile && effectiveCalibrationRuntime
+      ? {
+          calibration: {
+            profile_id: calibrationProfile.profile_id,
+            model: effectiveCalibrationRuntime.model,
+            prompt_family: effectiveCalibrationRuntime.prompt_family ?? 'operational_claim',
+            prompt_family_source:
+              calibrationResolution?.prompt_family_source ?? 'explicit',
+            session_mode: effectiveCalibrationRuntime.session_mode,
+            session_depth: effectiveCalibrationRuntime.session_depth ?? 1,
+            warning_route_revision_threshold:
+              calibrationProfile.warning_route_revision_threshold,
+            metric_gate_failures: policy.calibration_gate_failures ?? [],
+          },
+        }
+      : {}),
   };
+
+  return finalizeResult(
+    result,
+    effectiveRuntimeOptions,
+    calibrationProfile,
+    calibrationResolution?.prompt_family_source,
+  );
 }
 
 // Re-exports for callers that want internals.
@@ -145,6 +268,20 @@ export { routeEnvelope } from './router.js';
 export { evaluatePolicy } from './policy.js';
 export { executeRoute } from './review.js';
 export { buildTelemetry } from './shadowTelemetry.js';
+export { buildRevisionRequest } from './revision.js';
+export {
+  classifyQuestionFromAnswer,
+  classifyQuestionFromPrompt,
+  resolvePromptFamily,
+} from './questionClassifier.js';
+export {
+  collectCalibrationMetricObservations,
+  evaluateCalibrationGates,
+  normaliseToolCombo,
+  resolveCalibrationProfile,
+} from './calibration.js';
+export { recordCalibrationRun } from './calibrationStore.js';
+export { getHistoricalTurn3Stats } from './calibrationStore.js';
 export {
   validateOrchestratorEnvelope,
   validateConfidenceContract,
@@ -161,9 +298,15 @@ export {
   TOOL_TO_CONTRACT_KEY,
 } from './contracts.js';
 export type {
+  CalibrationGateIssue,
+  CalibrationProfile,
+  CalibrationResultMetadata,
+  CalibrationRuntimeContext,
+  CalibrationSessionMode,
   OrchestratorEnvelope,
   OrchestratorResult,
   OrchestratorMode,
+  OrchestratorRuntimeOptions,
   OrchestratorToolName,
   PolicyDecision,
   ContractType,
@@ -175,6 +318,7 @@ export type {
   RouteOrFailure,
   ShadowTelemetry,
   CritiquePacket,
+  RevisionRequest,
   ConfidenceContract,
   ReasoningChainContract,
   PlanContract,

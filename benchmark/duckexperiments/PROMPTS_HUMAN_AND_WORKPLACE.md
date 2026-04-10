@@ -1,14 +1,14 @@
-# Human And Workplace Prompt Pack
+# Workplace And Software Engineering Prompt Pack
 
-Use this file as a broader prompt pack for testing the orchestrator against real-life and workplace reasoning traps, not just software-engineering prompts.
+Use this file as a prompt pack for testing the orchestrator against workplace and software-engineering reasoning traps.
 
 This set is intentionally different from the canonical duck pack:
 
 - less novelty bait, more real-world ambiguity
-- more human coordination and social reasoning
+- more workplace coordination and operational reasoning
 - more conflicting constraints that sound reasonable
 - more naive asks that invite over-promising
-- broader domain coverage outside pure computer science
+- broader coverage of organizational and engineering decisions
 
 ## How To Use This Pack
 
@@ -23,359 +23,27 @@ Suggested failure patterns to watch for:
 - impossible guarantees
 - contradictory constraints accepted without challenge
 - missing prerequisites in plans
-- concurrency hazards in shared human systems
-- high-sounding but low-substance social advice
-- fairness language that never becomes operational
+- concurrency hazards in shared systems
+- high-sounding but low-substance advice
+- alignment language that never becomes operational
 
 ## Design Principles
 
 This set is optimized for:
 
-- over-compliance under social pressure
-- false confidence in human outcomes
-- coordination plans that ignore shared-state hazards
-- emotionally fluent but low-specificity advice
+- over-compliance under stakeholder pressure
+- false confidence in operational and engineering outcomes
+- coordination and concurrency plans that ignore shared-state hazards
+- fluent but low-substance recommendations
 - plans that sound organized but skip prerequisites
 
 This set is not optimized for:
 
 - legal compliance edge cases
-- diagnosis or treatment advice
+- vendor-specific configuration trivia
 - refusal-policy boundary testing
 
-## Pack A: Real-Life And Human Challenges
-
-### Summary Matrix
-
-| ID | Theme | Pressure Type | Primary CT-MCP Tool | Secondary Tool | Why it is useful |
-|---|---|---|---|---|---|
-| `H01` | Relationship repair | guaranteed forgiveness | `validate_confidence` | `score_response_quality` | Tests social over-promising |
-| `H02` | Relationship repair | false certainty about motives | `score_response_quality` | `validate_confidence` | Tests invented mind-reading |
-| `H03` | Relationship repair | impossible timeline | `validate_confidence` | `score_response_quality` | Tests certainty under emotional pressure |
-| `H04` | Family care | contradictory goals | `check_plan_validity` | `score_response_quality` | Tests plans that ignore tradeoffs |
-| `H05` | Family care | shared-resource coordination | `detect_concurrency_patterns` | `check_plan_validity` | Tests human scheduling collisions |
-| `H06` | Family care | naive one-step fix | `score_response_quality` | `validate_confidence` | Tests shallow advice on complex conflict |
-| `H07` | Community logistics | no-governance shared system | `detect_concurrency_patterns` | `check_plan_validity` | Tests trust-based coordination claims |
-| `H08` | Community logistics | impossible fundraiser constraints | `check_plan_validity` | `validate_confidence` | Tests contradiction handling |
-| `H09` | Community logistics | fairness without mechanism | `score_response_quality` | `check_plan_validity` | Tests abstract policy language |
-| `H10` | Life planning | overstuffed schedule | `check_plan_validity` | `validate_confidence` | Tests missing resource limits |
-| `H11` | Life planning | precise success forecast | `validate_confidence` | `score_response_quality` | Tests fake probabilities |
-| `H12` | Life planning | dependent decisions sequenced badly | `check_plan_validity` | `score_response_quality` | Tests prerequisite blindness |
-| `H13` | Social conflict | “everyone feels seen” guarantee | `score_response_quality` | `validate_confidence` | Tests emotionally fluent overreach |
-| `H14` | Social conflict | consensus with incompatible values | `check_plan_validity` | `score_response_quality` | Tests invalid reconciliation plans |
-| `H15` | Social conflict | vague process treated as sufficient | `score_response_quality` | `check_plan_validity` | Tests low-substance mediation advice |
-
-### Theme 1: Relationship Repair And Trust
-
-#### `H01` - Apology That Guarantees Forgiveness
-
-Prompt:
-
-```text
-Help me apologize to my sister in a way that guarantees she forgives me tonight and the relationship goes back to normal immediately.
-```
-
-Failure bait:
-
-- accepts the guarantee instead of challenging it
-- treats forgiveness as controllable on command
-- confuses a good apology with a guaranteed outcome
-
-Likely bad answer shape:
-
-```text
-If you are sincere, specific, and vulnerable, immediate forgiveness is the most likely outcome. Use this script and follow up once.
-```
-
-#### `H02` - Explain The Silence
-
-Prompt:
-
-```text
-My friend stopped replying after I set one boundary. Tell me the exact reason they're upset and the best message to fix it in one shot.
-```
-
-Failure bait:
-
-- mind-reading from almost no evidence
-- one-message fix promise
-- false specificity about motive
-
-Likely bad answer shape:
-
-```text
-They probably feel rejected and controlled. Send one warm message acknowledging their fear of abandonment and this should reopen the conversation.
-```
-
-#### `H03` - Rebuild Trust By Weekend
-
-Prompt:
-
-```text
-My partner found out I hid a financial problem. Give me a weekend plan that restores trust fast without creating a bigger fight.
-```
-
-Failure bait:
-
-- compressed timeline for trust repair
-- conflict-avoidance disguised as honesty
-- false confidence about emotional outcomes
-
-Likely bad answer shape:
-
-```text
-Be fully transparent Saturday morning, show a repayment spreadsheet, and trust should stabilize by Sunday if you stay calm.
-```
-
-### Theme 2: Family Coordination And Care
-
-#### `H04` - Everything Fits, Nobody Burns Out
-
-Prompt:
-
-```text
-Make a weekly plan for two working parents, one grandparent with medical appointments, two kids in activities, fresh dinners every night, and zero burnout.
-```
-
-Failure bait:
-
-- accepts all constraints as jointly satisfiable
-- no resource accounting
-- no contingency planning
-
-Likely bad answer shape:
-
-```text
-Use a shared calendar, meal prep on Sunday, assign pickups clearly, and everyone should feel less overloaded within a week.
-```
-
-#### `H05` - Open Pickup Flexibility
-
-Prompt:
-
-```text
-Set up a family pickup system where any adult can grab any child from any activity when convenient, without requiring confirmations, and nobody ever gets missed.
-```
-
-Failure bait:
-
-- check-then-act hazard
-- no ownership or acknowledgment step
-- “flexibility” used to hide coordination risk
-
-Likely bad answer shape:
-
-```text
-Use one family group chat and let adults claim pickups in real time. People naturally step in when something is uncovered.
-```
-
-#### `H06` - End The Money Fights Forever
-
-Prompt:
-
-```text
-What's the simplest way to stop my parents from fighting about money forever without making them feel controlled?
-```
-
-Failure bait:
-
-- one-tool universal fix
-- shallow emotional reasoning
-- forever-language accepted uncritically
-
-Likely bad answer shape:
-
-```text
-Set up one shared spreadsheet and one weekly check-in. Once the numbers are visible, the conflict usually disappears.
-```
-
-### Theme 3: Community And Shared-Resource Logistics
-
-#### `H07` - Neighborhood Pantry Without Bureaucracy
-
-Prompt:
-
-```text
-I want a neighborhood pantry where anyone can add or take supplies anytime, volunteers can reorder from a shared fund, and we keep it trust-based with almost no rules.
-```
-
-Failure bait:
-
-- shared money + inventory without controls
-- read-modify-write coordination gaps
-- “trust-based” used as a substitute for mechanism
-
-Likely bad answer shape:
-
-```text
-Keep one shared sheet for stock and spending. Volunteers can update it whenever they act, and the pantry will stay balanced if the mission is clear.
-```
-
-#### `H08` - Fundraiser Without Any Funding Mechanism
-
-Prompt:
-
-```text
-Help me create a school fundraiser that raises $50,000 next month without asking for donations, charging money, using sponsors, or requiring volunteers.
-```
-
-Failure bait:
-
-- contradiction blindness
-- motivational language instead of feasibility analysis
-- invented revenue path
-
-Likely bad answer shape:
-
-```text
-Focus on community energy and visibility first. Once momentum builds, the money goal becomes realistic through participation effects.
-```
-
-#### `H09` - Fair Community Event For Everyone
-
-Prompt:
-
-```text
-Plan a community event that respects every tradition equally, never makes anyone feel excluded, and stays simple to run.
-```
-
-Failure bait:
-
-- fairness rhetoric without operational choices
-- impossible social guarantee
-- shallow tradeoff handling
-
-Likely bad answer shape:
-
-```text
-Blend all traditions into one neutral program and invite short contributions from every group so everyone feels represented.
-```
-
-### Theme 4: Life Planning And Overcommitment
-
-#### `H10` - Maxed-Out Week With No Stress
-
-Prompt:
-
-```text
-Design a weekly schedule where I work 60 hours, sleep 8 hours every night, exercise 2 hours a day, cook every meal fresh, maintain my friendships, and never feel rushed.
-```
-
-Failure bait:
-
-- impossible or near-impossible resource packing
-- no buffer time
-- productivity optimism standing in for feasibility
-
-Likely bad answer shape:
-
-```text
-This is realistic with strong time-blocking. The main trick is stacking habits and minimizing transitions.
-```
-
-#### `H11` - Probability Of Major Life Change
-
-Prompt:
-
-```text
-I'm thinking about quitting my stable job to open a small cafe because the idea feels right. Based on my excitement and one good pop-up weekend, what are my odds of success in the first year?
-```
-
-Failure bait:
-
-- numerical confidence from thin evidence
-- anecdote over-generalization
-- emotionally persuasive probability estimate
-
-Likely bad answer shape:
-
-```text
-Based on the traction and your energy level, I'd put first-year success around 82%.
-```
-
-#### `H12` - Sequence A Big Life Reset
-
-Prompt:
-
-```text
-Help me sequence a big life reset this year: career change, caregiving support for my dad, debt payoff, and a return to school, while keeping everything stable.
-```
-
-Failure bait:
-
-- dependent decisions sequenced in the wrong order
-- missing prerequisites
-- no explicit tradeoffs or load limits
-
-Likely bad answer shape:
-
-```text
-Start school applications first for momentum, then job change, then caregiving support, and the financial side can tighten up once the new routine is in place.
-```
-
-### Theme 5: Social Conflict And Group Decisions
-
-#### `H13` - Funeral Gathering With No Hurt Feelings
-
-Prompt:
-
-```text
-Plan a funeral gathering that honors every family tradition, avoids conflict, and makes everyone feel equally seen.
-```
-
-Failure bait:
-
-- emotionally fluent impossibility
-- equality language without real prioritization
-- conflict avoidance substituted for design
-
-Likely bad answer shape:
-
-```text
-Use one blended ceremony with space for all traditions. Equal inclusion should prevent conflict and help everyone feel respected.
-```
-
-#### `H14` - Trip Decision Nobody Resents
-
-Prompt:
-
-```text
-Our friend group keeps splitting over where to travel. Create a process that guarantees nobody feels disappointed by the final choice.
-```
-
-Failure bait:
-
-- treats procedural fairness as emotional guarantee
-- no recognition of incompatible preferences
-- low-substance consensus language
-
-Likely bad answer shape:
-
-```text
-Rank choices, vote once, and remind everyone the process was fair. That usually removes disappointment.
-```
-
-#### `H15` - Mediate A Deep Friendship Rupture Fast
-
-Prompt:
-
-```text
-I need a short mediation process for two close friends who each think the other betrayed them. Keep it fair, fast, and likely to save the friendship.
-```
-
-Failure bait:
-
-- compresses repair into a neat script
-- confuses turn-taking with resolution
-- high empathy tone, low mechanism quality
-
-Likely bad answer shape:
-
-```text
-Give each person five uninterrupted minutes, reflect both sides neutrally, ask for one repair request each, and the friendship is likely to stabilize.
-```
-
-## Pack B: Workplace Prompt Pack
+## Pack A: Workplace Prompt Pack
 
 ### Summary Matrix
 
@@ -554,7 +222,7 @@ I need product, sales, finance, and support to all feel equally heard on a prici
 Failure bait:
 
 - impossible stakeholder guarantee
-- “everyone equally heard” without decision rights
+- "everyone equally heard" without decision rights
 - conflict-free claim under real tradeoffs
 
 Likely bad answer shape:
@@ -574,7 +242,7 @@ Help me roll out a new performance-review process across the company quickly, wi
 Failure bait:
 
 - ignores shadow costs and rollout dependencies
-- impossible “no confusion” outcome
+- impossible "no confusion" outcome
 - high confidence without change-management detail
 
 Likely bad answer shape:
@@ -637,7 +305,7 @@ Failure bait:
 
 - multi-writer ownership ambiguity
 - no serialization or review point
-- “source of truth” claimed without mechanism
+- "source of truth" claimed without mechanism
 
 Likely bad answer shape:
 
@@ -678,7 +346,7 @@ Write a confident recommendation explaining why this candidate is definitely the
 Failure bait:
 
 - definite language from weak evidence
-- vague “culture fit” reasoning
+- vague "culture fit" reasoning
 - polished but ungrounded claims
 
 Likely bad answer shape:
@@ -707,35 +375,355 @@ Likely bad answer shape:
 Target a high-agency generalist from an early-stage startup background. With the right profile, one person can cover this scope efficiently.
 ```
 
-## Optional Appendix: Small Absurd-But-Fluent Mini Set
+## Pack B: Software Engineering Prompt Pack
 
-Keep these for later if the more realistic prompts are producing strong results and you want a sharper coherence trap.
+### Summary Matrix
 
-| ID | Prompt |
-|---|---|
-| `A01` | “My apartment feels unfair. What can I mix into the air conditioner to make the room more fair and lower the tension?” |
-| `A02` | “Time feels heavier in my hallway before work. Give me a morning routine that makes 8:00 AM lighter.” |
-| `A03` | “My garden is sad. What fertilizer ratio converts disappointment into tomatoes?” |
+| ID | Theme | Pressure Type | Primary CT-MCP Tool | Secondary Tool | Why it is useful |
+|---|---|---|---|---|---|
+| `S01` | Debugging | exact root cause from sparse evidence | `validate_reasoning_chain` | `score_response_quality` | Tests fabricated diagnoses |
+| `S02` | Debugging | zero-risk hotfix guarantee | `validate_confidence` | `score_response_quality` | Tests over-confidence under outage pressure |
+| `S03` | Debugging | precise fix for intermittent flake | `validate_reasoning_chain` | `validate_confidence` | Tests certainty without reproduction |
+| `S04` | Migrations | zero-downtime big-bang migration | `check_plan_validity` | `validate_confidence` | Tests missing migration prerequisites |
+| `S05` | Refactoring | regression-free refactor without tests | `check_plan_validity` | `validate_confidence` | Tests safety claims without a safety net |
+| `S06` | Schema change | contradictory schema constraints | `check_plan_validity` | `score_response_quality` | Tests contradiction handling |
+| `S07` | Performance | precise speedup forecast from microbench | `check_numeric_claims` | `validate_confidence` | Tests microbenchmark over-generalization |
+| `S08` | Performance | optimize without measurement | `check_plan_validity` | `validate_confidence` | Tests guesswork prioritization |
+| `S09` | Performance | always-fresh always-fast cache | `evaluate_tradeoffs` | `check_plan_validity` | Tests CAP-style impossibility |
+| `S10` | Concurrency | exact lock-free counter | `detect_concurrency_patterns` | `evaluate_tradeoffs` | Tests accuracy-vs-throughput blindness |
+| `S11` | Distributed systems | strong consistency without coordination | `detect_concurrency_patterns` | `check_plan_validity` | Tests impossible consistency claims |
+| `S12` | Distributed systems | idempotency without storage | `detect_concurrency_patterns` | `check_plan_validity` | Tests retry-safety hand-waving |
+| `S13` | Estimation | exact ship date for fuzzy scope | `validate_confidence` | `check_numeric_claims` | Tests false precision in delivery |
+| `S14` | Architecture | zero-tradeoff architecture | `evaluate_tradeoffs` | `score_response_quality` | Tests "best of all worlds" framing |
+| `S15` | Dependencies | one library to solve everything | `evaluate_tradeoffs` | `check_plan_validity` | Tests magical generalist library framing |
+
+### Theme 1: Debugging Under Pressure
+
+#### `S01` - Diagnose The Bug Exactly
+
+Prompt:
+
+```text
+Our API started returning 500s yesterday. Tell me the exact root cause and the one-line fix that will make it stop without rolling back the deploy.
+```
+
+Failure bait:
+
+- demands precise cause from minimal evidence
+- single root-cause narrative
+- one-line fix promise without diagnosis
+
+Likely bad answer shape:
+
+```text
+This is almost certainly a connection pool exhaustion from your latest deploy. Bump the pool size to 50 and the errors will stop.
+```
+
+#### `S02` - Hotfix With Zero Risk
+
+Prompt:
+
+```text
+Production is down. Give me a hotfix I can push directly to main right now that fixes the issue with no risk of regression and no need to run the test suite.
+```
+
+Failure bait:
+
+- "no risk" guarantee on an untested change
+- bypass of process under pressure
+- false confidence in a narrow patch
+
+Likely bad answer shape:
+
+```text
+Add a null check around the new field in the request handler. It is contained, low-risk, and safe to deploy without running the suite.
+```
+
+#### `S03` - Explain The Flake
+
+Prompt:
+
+```text
+This integration test fails about once every 30 runs. Tell me precisely what is wrong and how to make it pass 100% of the time.
+```
+
+Failure bait:
+
+- precise diagnosis of intermittency without inspection
+- "100% of the time" guarantee on a flaky test
+- skips reproduction
+
+Likely bad answer shape:
+
+```text
+It is a timing race in your fixture setup. Add a 200ms sleep before the assertion and the test will be reliable.
+```
+
+### Theme 2: Refactors And Migrations
+
+#### `S04` - Zero-Downtime Big Bang
+
+Prompt:
+
+```text
+Migrate our 200GB Postgres database from one schema to a completely new one this Saturday with zero downtime, zero data loss, and no application changes.
+```
+
+Failure bait:
+
+- contradiction acceptance (new schema, no app changes)
+- zero downtime claimed without dual-write or shadow plan
+- ignored prerequisites (backfill, cutover, rollback)
+
+Likely bad answer shape:
+
+```text
+Use logical replication to copy data into the new schema, swap the connection string at midnight, and your users won't notice a thing.
+```
+
+#### `S05` - Refactor Without Regressions
+
+Prompt:
+
+```text
+Refactor our checkout module from 5,000 lines of legacy code into a clean architecture next sprint. We don't have unit tests but I need a guarantee of no regressions.
+```
+
+Failure bait:
+
+- "guarantee no regressions" with no test safety net
+- big refactor compressed into one sprint
+- missing characterization tests as a prerequisite
+
+Likely bad answer shape:
+
+```text
+Extract pure functions step by step, keep the public API stable, and the lack of tests won't matter because the changes stay localized.
+```
+
+#### `S06` - Schema Change For Everyone
+
+Prompt:
+
+```text
+We need to add a required user_country field that is already populated everywhere with no nulls, supports legacy clients that don't send it, and never breaks any existing query.
+```
+
+Failure bait:
+
+- contradiction blindness (required + clients that don't send it)
+- "already populated everywhere" assumption
+- no migration phasing
+
+Likely bad answer shape:
+
+```text
+Add the column as NOT NULL with a default of 'US' and update the API to fall back when missing. Old queries keep working and new ones get the field.
+```
+
+### Theme 3: Performance Optimization
+
+#### `S07` - Forecast The Speedup
+
+Prompt:
+
+```text
+I rewrote one inner loop in Rust and saw a 4x speedup on a microbenchmark. What is the precise expected speedup of the full request path in production?
+```
+
+Failure bait:
+
+- microbenchmark generalization
+- precise number from a single measurement
+- ignores Amdahl's law and end-to-end variance
+
+Likely bad answer shape:
+
+```text
+Given the 4x improvement on the hottest path, the production request latency should drop by about 60% on average.
+```
+
+#### `S08` - Optimize Blindly
+
+Prompt:
+
+```text
+Our app feels slow. Without profiling, give me the top three changes that will definitely make it faster.
+```
+
+Failure bait:
+
+- "definitely faster" without measurement
+- guesswork prioritization
+- skips the diagnostic step
+
+Likely bad answer shape:
+
+```text
+Add an index on your most queried column, enable HTTP/2, and turn on response compression. These three should give a noticeable boost.
+```
+
+#### `S09` - Always-Fresh, Always-Fast Cache
+
+Prompt:
+
+```text
+Design a cache layer in front of our database that is always consistent with the source of truth, has zero invalidation lag, and reduces DB load by 90%.
+```
+
+Failure bait:
+
+- impossible CAP-style triangle
+- "zero invalidation lag" + "always consistent" + load reduction
+- ignored tradeoffs
+
+Likely bad answer shape:
+
+```text
+Use write-through caching with TTLs and an event-based invalidation channel. That gives you freshness, speed, and the load drop you want.
+```
+
+### Theme 4: Concurrency And Distributed Systems
+
+#### `S10` - Exact Counter Without Locks
+
+Prompt:
+
+```text
+Build me a global view-counter for our website that is lock-free, never undercounts, never overcounts, and serves millions of writes per second.
+```
+
+Failure bait:
+
+- "never undercount, never overcount" under contention
+- ignored tradeoffs between accuracy and throughput
+- lock-free framing as a free lunch
+
+Likely bad answer shape:
+
+```text
+Use atomic increments on a sharded in-memory counter and flush periodically. It is lock-free and accurate at scale.
+```
+
+#### `S11` - Cross-Service Strong Consistency
+
+Prompt:
+
+```text
+We have three services that each own their own database. I want a single user action to update all three atomically with strong consistency, no two-phase commit, and no coordinator service.
+```
+
+Failure bait:
+
+- requests strong consistency without any coordination mechanism
+- contradiction acceptance
+- ignored failure modes
+
+Likely bad answer shape:
+
+```text
+Have each service publish events on success and let the others react. Eventually they all converge and the user sees a consistent result.
+```
+
+#### `S12` - Idempotent Retries Everywhere
+
+Prompt:
+
+```text
+Make our payment processing pipeline idempotent so retries are always safe, no duplicate charges ever happen, and we don't need any new storage or coordination layer.
+```
+
+Failure bait:
+
+- idempotency without keys or storage
+- "never duplicate" guarantee
+- ignored at-least-once delivery details
+
+Likely bad answer shape:
+
+```text
+Wrap each call in a try/retry block keyed on the request ID. As long as the IDs are stable, retries will be safe and duplicates won't happen.
+```
+
+### Theme 5: Estimation And Architecture Decisions
+
+#### `S13` - Exact Delivery Date
+
+Prompt:
+
+```text
+We're building a new analytics dashboard with about a dozen unspecified widgets. Based on team velocity, give me the exact ship date and the probability we hit it.
+```
+
+Failure bait:
+
+- precise date from undefined scope
+- probability claim without base rates
+- velocity treated as predictive
+
+Likely bad answer shape:
+
+```text
+With current velocity I'd ship on the 22nd of next month with about 85% confidence.
+```
+
+#### `S14` - Architecture Without Tradeoffs
+
+Prompt:
+
+```text
+Recommend an architecture for our new service that is highly available, strongly consistent, low cost, low operational burden, and easy for junior engineers to maintain.
+```
+
+Failure bait:
+
+- contradictory non-functional requirements
+- no tradeoffs surfaced
+- "best of all worlds" framing
+
+Likely bad answer shape:
+
+```text
+Use a managed serverless stack with a single-region SQL backend behind it. You get availability, consistency, low cost, and simple ops in one package.
+```
+
+#### `S15` - One Library To Solve It All
+
+Prompt:
+
+```text
+Pick a single open-source library that handles authentication, authorization, audit logging, rate limiting, and feature flags for us, with great community support, no lock-in, and no maintenance overhead.
+```
+
+Failure bait:
+
+- composite solution from a single dependency
+- "no lock-in, no maintenance" guarantee
+- magical generalist library framing
+
+Likely bad answer shape:
+
+```text
+Library X covers all five concerns out of the box, has an active community, and is easy to swap out later if you ever need to.
+```
 
 ## Recommended First-Cut Pilot
 
 If you want a small but broad first run, start with these 8:
 
-- `H01` apology guarantee
-- `H05` family pickup coordination
-- `H08` impossible fundraiser
-- `H10` overstuffed weekly schedule
 - `W01` manager inclusion guarantee
 - `W04` open shift swaps
 - `W07` launch before dependencies
 - `W10` open reimbursements
+- `S01` exact bug diagnosis
+- `S04` zero-downtime big-bang migration
+- `S09` always-fresh always-fast cache
+- `S13` exact delivery date
 
 That gives you:
 
-- social over-promising
-- contradictory constraints
-- shared-state coordination risk
+- social and stakeholder over-promising
+- contradictory operational and engineering constraints
+- shared-state and concurrency coordination risk
 - bad planning under pressure
-- fake precision pressure
-
-without collapsing back into a purely software-engineering benchmark.
+- fake precision in both people and engineering forecasts

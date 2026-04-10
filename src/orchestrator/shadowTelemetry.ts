@@ -8,12 +8,14 @@
  *
  * The orchestrator surfaces both routed and shadow tool executions, but
  * the policy layer evaluates only the routed set. `would_have_escalated`
- * captures shadow-only ENFORCEMENT_FAILs that would have changed the
- * outcome had they been part of the routed set.
+ * captures shadow-only findings that would have changed the outcome had
+ * they been part of the routed set under the current policy.
  */
 
+import { evaluatePolicy } from './policy.js';
 import { isSchemaFailure } from './schemaValidation.js';
 import type {
+  CalibrationProfile,
   OrchestratorMode,
   OrchestratorToolName,
   PolicyDecision,
@@ -35,6 +37,8 @@ export interface BuildTelemetryParams {
   shadowResults: RouteOrFailure[];
   policyDecision: PolicyDecision;
   reviewContext: ReviewContext;
+  profile?: CalibrationProfile;
+  sessionDepth: number;
 }
 
 function summariseFinding(result: RouteResult): string {
@@ -54,6 +58,12 @@ function summariseFinding(result: RouteResult): string {
   return `Shadow-only PASS on ${result.tool}`;
 }
 
+function getFindingStatus(result: RouteResult): ShadowOnlyFinding['status'] {
+  if (result.status === 'ENFORCEMENT_FAIL') return 'ENFORCEMENT_FAIL';
+  if ((result.enforcement?.warnings?.length ?? 0) > 0) return 'WARN';
+  return 'PASS';
+}
+
 export function buildTelemetry(params: BuildTelemetryParams): ShadowTelemetry {
   const {
     mode,
@@ -65,6 +75,8 @@ export function buildTelemetry(params: BuildTelemetryParams): ShadowTelemetry {
     shadowResults,
     policyDecision,
     reviewContext,
+    profile,
+    sessionDepth,
   } = params;
 
   // tools_executed records deterministic tool executions only.
@@ -91,7 +103,7 @@ export function buildTelemetry(params: BuildTelemetryParams): ShadowTelemetry {
     .filter((r): r is RouteResult => !isSchemaFailure(r) && !routedSet.has(r.tool))
     .map(r => ({
       tool: r.tool,
-      status: r.status,
+      status: getFindingStatus(r),
       summary: summariseFinding(r),
     }));
 
@@ -105,9 +117,12 @@ export function buildTelemetry(params: BuildTelemetryParams): ShadowTelemetry {
     });
   }
 
-  const wouldHaveEscalated = shadowOnlyFindings.some(
-    f => f.status === 'ENFORCEMENT_FAIL',
-  );
+  const shadowOnlyDecision =
+    shadowResults.length > 0
+      ? evaluatePolicy(shadowResults, reviewContext, profile).decision
+      : 'PASS';
+  const wouldHaveEscalated =
+    shadowOnlyDecision === 'REVISE' || shadowOnlyDecision === 'HUMAN_REVIEW';
 
   return {
     mode,
@@ -121,6 +136,7 @@ export function buildTelemetry(params: BuildTelemetryParams): ShadowTelemetry {
     schema_failures: Array.from(schemaFailureMap.values()),
     policy_decision: policyDecision,
     iteration_number: reviewContext.iteration_number,
+    session_depth: sessionDepth,
     would_have_escalated: wouldHaveEscalated,
   };
 }

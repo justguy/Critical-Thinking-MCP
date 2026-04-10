@@ -355,6 +355,64 @@ describe('Circumvention Tests', () => {
     }
   });
 
+  it('Test 17b: grounded contradiction between supported premise and conclusion is blocking', () => {
+    const engine = new EnforcementEngine();
+
+    const result = handleValidateReasoningChain(
+      {
+        nodes: [
+          { id: 'a1', label: 'The invisible guest does not exist', type: 'assumption' },
+          {
+            id: 'c1',
+            label: 'Non-existent entities cannot cause physical events',
+            type: 'claim',
+          },
+          {
+            id: 'e1',
+            label: 'The teapot was knocked over and tea spilled',
+            type: 'evidence',
+          },
+          { id: 'cn1', label: 'The invisible guest caused the spill', type: 'conclusion' },
+        ],
+        edges: [
+          { from: 'a1', to: 'c1', relation: 'supports' },
+          { from: 'e1', to: 'cn1', relation: 'requires' },
+          { from: 'c1', to: 'cn1', relation: 'contradicts' },
+        ],
+      },
+      engine,
+    );
+
+    expect(result.status).toBe('ENFORCEMENT_FAIL');
+    expect(result.contradiction_violations).toHaveLength(1);
+    expect(result.enforcement?.blocking_issues.map(issue => issue.mechanism)).toContain(
+      'contradiction_detection',
+    );
+  });
+
+  it('Test 17c: unsupported contradiction source does not block a grounded conclusion', () => {
+    const engine = new EnforcementEngine();
+
+    const result = handleValidateReasoningChain(
+      {
+        nodes: [
+          { id: 'c1', label: 'A speculative counter-claim with no support', type: 'claim' },
+          { id: 'e1', label: 'The teapot was knocked over and tea spilled', type: 'evidence' },
+          { id: 'cn1', label: 'A real guest caused the spill', type: 'conclusion' },
+        ],
+        edges: [
+          { from: 'e1', to: 'cn1', relation: 'supports' },
+          { from: 'c1', to: 'cn1', relation: 'contradicts' },
+        ],
+      },
+      engine,
+    );
+
+    expect(result.status).toBe('PASS');
+    expect(result.contradiction_violations).toBeUndefined();
+    expect(result.grounding_score).toBe(1);
+  });
+
   // ─── Test 18: Second failure produces schema-fill, not repeat instruction ─
 
   it('Test 18: second failure of same mechanism produces FILL IN THIS TEMPLATE', () => {

@@ -66,6 +66,35 @@ const GOOD_PLAN = {
   ],
 };
 
+const PLAN_WITH_RESOURCE_WARNING = {
+  steps: [
+    {
+      id: 'p1',
+      description: 'Update the shared release checklist',
+      dependencies: [],
+      resources: ['release-checklist'],
+    },
+    {
+      id: 'p2',
+      description: 'Revise the shared release checklist for rollback steps',
+      dependencies: [],
+      resources: ['release-checklist'],
+    },
+  ],
+};
+
+const LOW_GROUNDING_REASONING = {
+  nodes: [
+    { id: 'a1', label: 'The traffic spike pattern will repeat', type: 'assumption' },
+    { id: 'c1', label: 'Capacity will stay sufficient', type: 'claim' },
+    { id: 'cn1', label: 'The launch is safe to proceed', type: 'conclusion' },
+  ],
+  edges: [
+    { from: 'a1', to: 'c1', relation: 'supports' },
+    { from: 'c1', to: 'cn1', relation: 'implies' },
+  ],
+};
+
 function mixedEnvelope(
   mode: 'routed' | 'shadow',
   planContract: unknown = GOOD_PLAN,
@@ -161,6 +190,40 @@ describe('shadow mode — does NOT change the routed decision', () => {
     );
     // And the routed decision is the same — shadow does not mutate it.
     expect(shadow.policy_decision).toBe(routed.policy_decision);
+  });
+});
+
+describe('shadow mode — warning clusters are visible in telemetry', () => {
+  it('marks would_have_escalated true when shadow-only warnings cross the revision threshold', () => {
+    const result = runOrchestrator({
+      schema_version: 'orchestrator_v0',
+      answer_text: FORECAST_ANSWER,
+      contracts: {
+        confidence: GOOD_CONFIDENCE_CONTRACT,
+        plan: PLAN_WITH_RESOURCE_WARNING,
+        reasoning_chain: LOW_GROUNDING_REASONING,
+      },
+      mode: 'shadow',
+      review_context: { iteration_number: 1, prior_failures: [] },
+    });
+
+    expect(result.policy_decision).toBe('PASS');
+    expect(result.telemetry.tools_executed_only_in_shadow).toEqual(
+      expect.arrayContaining(['check_plan_validity', 'validate_reasoning_chain']),
+    );
+    expect(result.telemetry.shadow_only_findings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          tool: 'check_plan_validity',
+          status: 'WARN',
+        }),
+        expect.objectContaining({
+          tool: 'validate_reasoning_chain',
+          status: 'WARN',
+        }),
+      ]),
+    );
+    expect(result.telemetry.would_have_escalated).toBe(true);
   });
 });
 

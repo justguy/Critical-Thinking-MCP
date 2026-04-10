@@ -10,6 +10,20 @@ export type OrchestratorMode = 'routed' | 'shadow';
 
 export type PolicyDecision = 'PASS' | 'WARN' | 'REVISE' | 'HUMAN_REVIEW';
 
+export type CalibrationSessionMode = 'single_turn' | 'multi_turn';
+export type QuestionFamily =
+  | 'refutation'
+  | 'causal_refutation'
+  | 'humor_forward'
+  | 'forecasting'
+  | 'causal'
+  | 'operational_claim';
+export type PromptFamilySource =
+  | 'explicit'
+  | 'prompt_inferred'
+  | 'answer_inferred'
+  | 'locked';
+
 export type ContractType =
   | 'confidence_contract'
   | 'reasoning_chain_contract'
@@ -32,7 +46,11 @@ export type ContractKey =
   | 'concurrency'
   | 'quality';
 
-export type FailureSource = 'routing' | 'schema' | 'deterministic_tool';
+export type FailureSource =
+  | 'routing'
+  | 'schema'
+  | 'deterministic_tool'
+  | 'calibration_policy';
 
 // ─── Review context ────────────────────────────────────────────────────────
 
@@ -45,6 +63,94 @@ export interface PriorFailure {
 export interface ReviewContext {
   iteration_number: number;
   prior_failures: PriorFailure[];
+}
+
+// ─── Optional runtime calibration layer ────────────────────────────────────
+
+export interface QualityMetricGates {
+  min_overall_score?: number;
+  min_substance_score?: number;
+  min_specificity_score?: number;
+  min_structure_score?: number;
+  max_hedge_density?: number;
+}
+
+export interface ConfidenceMetricGates {
+  max_gap?: number;
+  min_falsifiability_score?: number;
+  require_no_inflation?: boolean;
+}
+
+export interface ReasoningMetricGates {
+  min_grounding_score?: number;
+  max_cycle_count?: number;
+  max_orphaned_conclusions?: number;
+}
+
+export interface PlanMetricGates {
+  min_completeness_score?: number;
+  max_circular_dependencies?: number;
+  max_missing_prerequisites?: number;
+  max_resource_conflicts?: number;
+}
+
+export interface ConcurrencyMetricGates {
+  max_hazard_count?: number;
+  max_critical_count?: number;
+  require_protections?: boolean;
+}
+
+export interface ToolMetricGates {
+  validate_confidence?: ConfidenceMetricGates;
+  validate_reasoning_chain?: ReasoningMetricGates;
+  check_plan_validity?: PlanMetricGates;
+  detect_concurrency_patterns?: ConcurrencyMetricGates;
+  score_response_quality?: QualityMetricGates;
+}
+
+export interface CalibrationProfile {
+  profile_id: string;
+  selectors: {
+    model?: string;
+    prompt_family?: string;
+    session_mode?: CalibrationSessionMode;
+  };
+  warning_route_revision_threshold: number;
+  metric_gates: ToolMetricGates;
+  prune_raw_run_days?: number | null;
+}
+
+export interface CalibrationRuntimeContext {
+  model: string;
+  prompt_family?: string;
+  locked_prompt_family?: string;
+  prompt_text?: string;
+  session_mode: CalibrationSessionMode;
+  session_depth?: number;
+  profile_id?: string;
+  locked_profile_id?: string;
+  db_path?: string;
+  prune_raw_run_days?: number | null;
+  turn_chain_id?: string;
+  selected_metric_tool?: OrchestratorToolName;
+  selected_metric_name?: string;
+  selected_metric_value?: number;
+  selected_metric_threshold?: number;
+  delta_from_prior_turn?: number;
+  released?: boolean;
+}
+
+export interface OrchestratorRuntimeOptions {
+  calibration?: CalibrationRuntimeContext;
+}
+
+export interface CalibrationGateIssue {
+  tool: OrchestratorToolName;
+  metric_name: string;
+  observed_value: number;
+  required_value: number;
+  comparator: '>=' | '<=';
+  description: string;
 }
 
 // ─── Envelope and contract shapes ─────────────────────────────────────────
@@ -152,11 +258,18 @@ export interface CritiquePacket {
   safer_revision_target: string;
 }
 
+export interface RevisionRequest {
+  strategy: 'bounded_single_revision';
+  next_review_context: ReviewContext;
+  safer_revision_target: string;
+  prompt: string;
+}
+
 // ─── Shadow telemetry ─────────────────────────────────────────────────────
 
 export interface ShadowOnlyFinding {
   tool: OrchestratorToolName;
-  status: 'PASS' | 'ENFORCEMENT_FAIL';
+  status: 'PASS' | 'WARN' | 'ENFORCEMENT_FAIL';
   summary: string;
 }
 
@@ -178,7 +291,20 @@ export interface ShadowTelemetry {
   schema_failures: SchemaFailureSummary[];
   policy_decision: PolicyDecision;
   iteration_number: number;
+  session_depth: number;
   would_have_escalated: boolean;
+}
+
+export interface CalibrationResultMetadata {
+  profile_id: string;
+  model: string;
+  prompt_family: string;
+  prompt_family_source: PromptFamilySource;
+  session_mode: CalibrationSessionMode;
+  session_depth: number;
+  warning_route_revision_threshold: number;
+  metric_gate_failures: CalibrationGateIssue[];
+  recorded_run_id?: number;
 }
 
 // ─── Final orchestrator result ────────────────────────────────────────────
@@ -190,5 +316,7 @@ export interface OrchestratorResult {
   route_results: RouteOrFailure[];
   shadow_results: RouteOrFailure[];
   critique?: CritiquePacket;
+  revision_request?: RevisionRequest;
   telemetry: ShadowTelemetry;
+  calibration?: CalibrationResultMetadata;
 }

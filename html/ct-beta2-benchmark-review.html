@@ -673,6 +673,64 @@
         gap: 8px;
       }
 
+      .finding-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .finding-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(199, 93, 44, 0.12);
+        color: var(--accent);
+        font-size: 0.8rem;
+        font-weight: 800;
+      }
+
+      .finding-badge strong {
+        color: var(--ink);
+        font-size: 0.82rem;
+      }
+
+      .finding-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .finding-item {
+        padding: 14px;
+        border-radius: 18px;
+        background: rgba(24, 21, 20, 0.04);
+        display: grid;
+        gap: 8px;
+      }
+
+      .finding-head {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .finding-copy {
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .finding-quote {
+        padding: 12px 14px;
+        border-left: 3px solid rgba(199, 93, 44, 0.45);
+        border-radius: 14px;
+        background: rgba(255, 247, 237, 0.92);
+        color: var(--ink);
+        font-size: 0.94rem;
+        line-height: 1.55;
+      }
+
       .section-copy {
         color: var(--muted);
         line-height: 1.55;
@@ -1423,6 +1481,102 @@
         return `<button class="info-badge" type="button" data-tip="${escapeHtml(tip)}" aria-label="Explain ${escapeHtml(label)}">?</button>`;
       }
 
+      function slugify(value) {
+        return String(value || "item")
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "")
+          .slice(0, 48);
+      }
+
+      function compactLine(value) {
+        return String(value ?? "").replace(/\s+/g, " ").trim();
+      }
+
+      function summarizeFindingText(text) {
+        const clean = compactLine(text);
+        if (!clean) return "";
+        const gateMatch = clean.match(/Calibration gate requires ([^;]+?)(?:;|$)/i);
+        if (gateMatch) return gateMatch[1];
+        const scoreMatch = clean.match(/([A-Za-z ]+score):\s*([0-9.]+)/i);
+        if (scoreMatch) return `${scoreMatch[1].trim()} ${scoreMatch[2]}`;
+        return clean.length > 120 ? `${clean.slice(0, 117)}...` : clean;
+      }
+
+      function clipText(text, max = 220) {
+        const clean = compactLine(text);
+        if (!clean) return "";
+        return clean.length > max ? `${clean.slice(0, max - 3)}...` : clean;
+      }
+
+      function quoteFromAnswer(answer, findingText) {
+        const answerText = String(answer || "");
+        const finding = compactLine(findingText).toLowerCase();
+        if (!answerText.trim() || !finding) return "";
+        const lines = answerText
+          .split(/\n+/)
+          .map((line) => compactLine(line))
+          .filter(Boolean);
+        const keywords = finding
+          .split(/[^a-z0-9]+/i)
+          .filter((token) => token.length > 4)
+          .filter((token, index, arr) => arr.indexOf(token) === index)
+          .slice(0, 8);
+        const match = lines.find((line) => {
+          const lower = line.toLowerCase();
+          return keywords.some((token) => lower.includes(token));
+        });
+        return clipText(match || lines.find((line) => line.length > 24) || "");
+      }
+
+      function extractCtFindings(run) {
+        const cal = run?.rawRun?.passes?.initial?.calibration_result;
+        const findings = [];
+        if (!cal) return findings;
+
+        const routeGroups = [...(cal.route_results || []), ...(cal.shadow_results || [])];
+        routeGroups.forEach((entry) => {
+          const tool = entry.tool || "ct-tool";
+          const enforcement = entry.result?.enforcement || {};
+          const warnings = enforcement.warnings || [];
+          const blocking = enforcement.blocking_issues || [];
+          [...blocking, ...warnings].forEach((message, idx) => {
+            findings.push({
+              id: `${tool}-${idx}-${slugify(message)}`,
+              tool,
+              severity: blocking.includes(message) ? "blocking" : "warning",
+              summary: summarizeFindingText(message),
+              detail: compactLine(message),
+              quote: quoteFromAnswer(entry.result?.result || run.lastAttemptedAnswer || run.bPreDraft || "", message),
+            });
+          });
+        });
+
+        (cal.calibration?.metric_gate_failures || []).forEach((failure, idx) => {
+          const detail =
+            failure?.reason ||
+            `${failure.metric || "metric"} expected ${failure.expected ?? "n/a"}, observed ${failure.observed ?? "n/a"}`;
+          findings.push({
+            id: `gate-${idx}-${slugify(detail)}`,
+            tool: failure.tool || "calibration",
+            severity: "gate",
+            summary: failure.metric ? `${failure.metric} gate` : "calibration gate",
+            detail: compactLine(detail),
+            quote: quoteFromAnswer(run.lastAttemptedAnswer || run.bPreDraft || "", detail),
+          });
+        });
+
+        const deduped = [];
+        const seen = new Set();
+        findings.forEach((item) => {
+          const key = `${item.tool}|${item.severity}|${item.detail}`;
+          if (seen.has(key)) return;
+          seen.add(key);
+          deduped.push(item);
+        });
+        return deduped;
+      }
+
       function sectionMarkup(section) {
         return `
           <section class="flow-section" id="${section.id}">
@@ -1609,6 +1763,45 @@
           ? activeRun.wrongWinsToWatchFor.map((item) => `<li>${escapeHtml(item)}</li>`).join("")
           : "<li>No explicit wrong-win list recorded for this case.</li>";
 
+        const ctFindings = extractCtFindings(activeRun);
+        const ctBadges = ctFindings.length
+          ? `
+              <div class="finding-badges">
+                ${ctFindings
+                  .slice(0, 6)
+                  .map(
+                    (finding) => `
+                      <span class="finding-badge">
+                        ${escapeHtml(finding.tool)}
+                        <strong>${escapeHtml(finding.summary || finding.severity)}</strong>
+                      </span>
+                    `
+                  )
+                  .join("")}
+              </div>
+            `
+          : `<p class="section-copy">No explicit CT issues were recorded on the first scored pass for this run.</p>`;
+        const ctFindingList = ctFindings.length
+          ? `
+              <div class="finding-list">
+                ${ctFindings
+                  .map(
+                    (finding) => `
+                      <article class="finding-item">
+                        <div class="finding-head">
+                          <span class="meta-pill">${escapeHtml(finding.tool)}</span>
+                          <span class="decision-pill ${finding.severity === "blocking" || finding.severity === "gate" ? "decision-review" : "decision-warn"}">${escapeHtml(finding.severity)}</span>
+                        </div>
+                        <p class="finding-copy">${escapeHtml(finding.detail)}</p>
+                        ${finding.quote ? `<div class="finding-quote">${escapeHtml(finding.quote)}</div>` : ""}
+                      </article>
+                    `
+                  )
+                  .join("")}
+              </div>
+            `
+          : "";
+
         const abSummary = activeRun.hasRevision
           ? `Arm A landed ${activeRun.aArmDecision}. Arm B needed one structural-revision pass and ultimately landed ${activeRun.decision}. This is the key audit question: did the bounded rewrite actually remove the unsafe shape, or just make it sound nicer?`
           : `Arm A landed ${activeRun.aArmDecision}. Arm B landed ${activeRun.decision} without a revision loop, which means this model cleared the locked grading profile on the first pass.`;
@@ -1657,7 +1850,11 @@
             nav: "CT review",
             kicker: "Step 6",
             title: "CT initial review payload",
-            body: `<div class="code answer">${escapeHtml(JSON.stringify(view.initialCt, null, 2))}</div>`,
+            body: `
+              ${ctBadges}
+              ${ctFindingList}
+              <div class="code answer">${escapeHtml(JSON.stringify(view.initialCt, null, 2))}</div>
+            `,
           },
           {
             id: "section-ct-critique",

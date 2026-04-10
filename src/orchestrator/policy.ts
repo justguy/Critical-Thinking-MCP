@@ -22,6 +22,7 @@ import type {
   CalibrationProfile,
   CritiquePacket,
   CritiqueRoute,
+  CrossToolInvariantViolation,
   PolicyDecision,
   ReviewContext,
   RouteOrFailure,
@@ -49,6 +50,7 @@ function getWarningRoutes(results: RouteOrFailure[]): RouteOrFailure[] {
 function buildCritiquePacket(
   problemRoutes: RouteOrFailure[],
   calibrationGateFailures: CalibrationGateIssue[] = [],
+  crossToolViolations: CrossToolInvariantViolation[] = [],
 ): CritiquePacket {
   const failingRoutes: CritiqueRoute[] = problemRoutes.map(f => {
     if (isSchemaFailure(f)) {
@@ -84,6 +86,17 @@ function buildCritiquePacket(
     });
   }
 
+  for (const violation of crossToolViolations) {
+    failingRoutes.push({
+      tool: '__cross_tool__',
+      blocking_issues:
+        violation.severity === 'blocking' ? [violation.description] : [],
+      warnings: violation.severity === 'warning' ? [violation.description] : [],
+      contract_failures: [],
+      failure_source: 'cross_tool_invariant',
+    });
+  }
+
   const allBlocking = failingRoutes.flatMap(r => r.blocking_issues);
   const allWarnings = failingRoutes.flatMap(r => r.warnings);
   const saferTarget =
@@ -103,9 +116,13 @@ export function evaluatePolicy(
   routeResults: RouteOrFailure[],
   reviewContext: ReviewContext,
   profile?: CalibrationProfile,
+  crossToolViolations: CrossToolInvariantViolation[] = [],
 ): PolicyResult {
   const failures = routeResults.filter(isFailure);
   const warningRoutes = getWarningRoutes(routeResults);
+  const blockingCrossToolViolations = crossToolViolations.filter(
+    violation => violation.severity === 'blocking',
+  );
   const warningThreshold =
     profile?.warning_route_revision_threshold ??
     WARNING_ROUTE_REVISION_THRESHOLD;
@@ -120,7 +137,8 @@ export function evaluatePolicy(
   const shouldRevise =
     failures.length > 0 ||
     warningClusterNeedsRevision ||
-    calibrationGateFailures.length > 0;
+    calibrationGateFailures.length > 0 ||
+    blockingCrossToolViolations.length > 0;
   const problemRoutes =
     failures.length > 0 ? failures : warningClusterNeedsRevision ? warningRoutes : [];
 
@@ -128,6 +146,7 @@ export function evaluatePolicy(
     iteration >= 2 &&
     failures.length === 0 &&
     calibrationGateFailures.length === 0 &&
+    blockingCrossToolViolations.length === 0 &&
     warningRoutes.length === 1
   ) {
     return {
@@ -139,7 +158,11 @@ export function evaluatePolicy(
   if (shouldRevise && iteration >= 2) {
     return {
       decision: 'HUMAN_REVIEW',
-      critique: buildCritiquePacket(problemRoutes, calibrationGateFailures),
+      critique: buildCritiquePacket(
+        problemRoutes,
+        calibrationGateFailures,
+        blockingCrossToolViolations,
+      ),
       calibration_gate_failures: calibrationGateFailures,
     };
   }
@@ -147,7 +170,11 @@ export function evaluatePolicy(
   if (shouldRevise) {
     return {
       decision: 'REVISE',
-      critique: buildCritiquePacket(problemRoutes, calibrationGateFailures),
+      critique: buildCritiquePacket(
+        problemRoutes,
+        calibrationGateFailures,
+        blockingCrossToolViolations,
+      ),
       calibration_gate_failures: calibrationGateFailures,
     };
   }

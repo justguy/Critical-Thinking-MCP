@@ -169,6 +169,7 @@ export const PLAN_CONTRACT_SCHEMA = {
   required: ['steps'],
   additionalProperties: false,
   properties: {
+    time_budget_hours: { type: 'number', minimum: 0 },
     steps: {
       type: 'array',
       minItems: 2,
@@ -187,6 +188,7 @@ export const PLAN_CONTRACT_SCHEMA = {
             type: 'array',
             items: { type: 'string' },
           },
+          duration_hours: { type: 'number', minimum: 0 },
         },
       },
     },
@@ -220,6 +222,18 @@ export const CONCURRENCY_CONTRACT_SCHEMA = {
     retry_behavior: {
       type: 'string',
       enum: ['none', 'automatic', 'manual'],
+    },
+    capacity_model: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        throughput_per_sec: { type: 'number', minimum: 0 },
+        mean_latency_sec: { type: 'number', minimum: 0 },
+        capacity_slots: { type: 'number', minimum: 0 },
+        retry_count: { type: 'number', minimum: 0 },
+        timeout_sec: { type: 'number', minimum: 0 },
+        sla_sec: { type: 'number', minimum: 0 },
+      },
     },
   },
 } as const;

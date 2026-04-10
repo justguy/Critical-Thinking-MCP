@@ -50,7 +50,8 @@ export type FailureSource =
   | 'routing'
   | 'schema'
   | 'deterministic_tool'
-  | 'calibration_policy';
+  | 'calibration_policy'
+  | 'cross_tool_invariant';
 
 // ─── Review context ────────────────────────────────────────────────────────
 
@@ -186,12 +187,23 @@ export interface ReasoningChainContract {
 }
 
 export interface PlanContract {
+  time_budget_hours?: number;
   steps: Array<{
     id: string;
     description: string;
     dependencies: string[];
     resources?: string[];
+    duration_hours?: number;
   }>;
+}
+
+export interface CapacityModel {
+  throughput_per_sec?: number;
+  mean_latency_sec?: number;
+  capacity_slots?: number;
+  retry_count?: number;
+  timeout_sec?: number;
+  sla_sec?: number;
 }
 
 export interface ConcurrencyContract {
@@ -200,6 +212,7 @@ export interface ConcurrencyContract {
   protections?: string[];
   delivery_model?: 'at_least_once' | 'at_most_once' | 'exactly_once';
   retry_behavior?: 'none' | 'automatic' | 'manual';
+  capacity_model?: CapacityModel;
 }
 
 export interface QualityContract {
@@ -307,6 +320,28 @@ export interface CalibrationResultMetadata {
   recorded_run_id?: number;
 }
 
+export interface SharedVariableBinding {
+  name: string;
+  value: number;
+  source_contract: ContractKey;
+  source_path: string;
+  unit?: string;
+}
+
+export interface CrossToolInvariantViolation {
+  invariant_id: string;
+  severity: 'blocking' | 'warning';
+  description: string;
+  variables: string[];
+  source_contracts: ContractKey[];
+  corrective_prompt: string;
+}
+
+export interface CrossToolContext {
+  bindings: SharedVariableBinding[];
+  violations: CrossToolInvariantViolation[];
+}
+
 // ─── Final orchestrator result ────────────────────────────────────────────
 
 export interface OrchestratorResult {
@@ -315,6 +350,7 @@ export interface OrchestratorResult {
   policy_decision: PolicyDecision;
   route_results: RouteOrFailure[];
   shadow_results: RouteOrFailure[];
+  cross_tool_context?: CrossToolContext;
   critique?: CritiquePacket;
   revision_request?: RevisionRequest;
   telemetry: ShadowTelemetry;

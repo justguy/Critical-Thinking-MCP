@@ -31,6 +31,7 @@ import {
   validateOrchestratorEnvelope,
 } from './schemaValidation.js';
 import { buildTelemetry } from './shadowTelemetry.js';
+import { buildCrossToolContext } from './variableBinder.js';
 import type {
   CalibrationProfile,
   OrchestratorEnvelope,
@@ -198,10 +199,12 @@ export function runOrchestrator(
 
   // 4. Policy evaluates the ROUTED results only. Shadow results never leak
   //    into the policy decision — that is the entire point of shadow mode.
+  const crossToolContext = buildCrossToolContext(envelope);
   const policy = evaluatePolicy(
     routeResults,
     envelope.review_context,
     calibrationProfile,
+    crossToolContext.violations,
   );
 
   // 5. Telemetry is built last so it can describe everything that happened,
@@ -226,6 +229,9 @@ export function runOrchestrator(
     policy_decision: policy.decision,
     route_results: routeResults,
     shadow_results: shadowResults,
+    ...(crossToolContext.bindings.length > 0 || crossToolContext.violations.length > 0
+      ? { cross_tool_context: crossToolContext }
+      : {}),
     critique: policy.critique,
     ...(policy.decision === 'REVISE' && policy.critique
       ? {
@@ -282,6 +288,7 @@ export {
 } from './calibration.js';
 export { recordCalibrationRun } from './calibrationStore.js';
 export { getHistoricalTurn3Stats } from './calibrationStore.js';
+export { buildCrossToolContext } from './variableBinder.js';
 export {
   validateOrchestratorEnvelope,
   validateConfidenceContract,
@@ -303,6 +310,8 @@ export type {
   CalibrationResultMetadata,
   CalibrationRuntimeContext,
   CalibrationSessionMode,
+  CrossToolContext,
+  CrossToolInvariantViolation,
   OrchestratorEnvelope,
   OrchestratorResult,
   OrchestratorMode,

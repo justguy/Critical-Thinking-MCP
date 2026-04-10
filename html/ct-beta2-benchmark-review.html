@@ -179,13 +179,6 @@
         flex-wrap: wrap;
       }
 
-      .dashboard {
-        display: grid;
-        grid-template-columns: minmax(300px, 340px) minmax(0, 1fr);
-        gap: 18px;
-        align-items: start;
-      }
-
       .panel {
         padding: 22px;
         display: grid;
@@ -203,9 +196,54 @@
         line-height: 1.55;
       }
 
+      .controls-panel {
+        gap: 18px;
+      }
+
+      .filters-shell {
+        border: 1px solid rgba(86, 56, 35, 0.1);
+        border-radius: 24px;
+        background: rgba(255, 251, 244, 0.78);
+        padding: 14px 16px 16px;
+      }
+
+      .filters-shell summary {
+        list-style: none;
+        cursor: pointer;
+      }
+
+      .filters-shell summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .filters-summary {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        align-items: center;
+      }
+
+      .filters-summary-copy {
+        display: grid;
+        gap: 4px;
+      }
+
+      .filters-summary-copy p {
+        color: var(--muted);
+      }
+
+      .filters-shell[open] .summary-state::after {
+        content: "Open";
+      }
+
+      .summary-state::after {
+        content: "Collapsed";
+      }
+
       .filters {
         display: grid;
         gap: 14px;
+        margin-top: 16px;
       }
 
       .control {
@@ -253,6 +291,7 @@
 
       .provider-stack {
         display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
         gap: 12px;
       }
 
@@ -317,8 +356,21 @@
 
       .run-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(308px, 338px);
         gap: 14px;
+        overflow-x: auto;
+        padding-bottom: 6px;
+        scroll-snap-type: x proximity;
+      }
+
+      .run-grid::-webkit-scrollbar {
+        height: 12px;
+      }
+
+      .run-grid::-webkit-scrollbar-thumb {
+        background: rgba(86, 56, 35, 0.18);
+        border-radius: 999px;
       }
 
       .run-card {
@@ -327,6 +379,7 @@
         gap: 14px;
         cursor: pointer;
         transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+        scroll-snap-align: start;
       }
 
       .run-card:hover,
@@ -496,21 +549,133 @@
         max-width: 18ch;
       }
 
-      .detail-grid {
-        display: grid;
-        grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
-        gap: 18px;
-      }
-
-      .detail-stack {
-        display: grid;
-        gap: 14px;
-      }
-
       .detail-actions {
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
+      }
+
+      .detail-model-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .flow-layout {
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr);
+        gap: 18px;
+        align-items: start;
+      }
+
+      .step-rail {
+        position: sticky;
+        top: 18px;
+        align-self: start;
+        display: grid;
+        gap: 10px;
+        padding: 18px 16px 18px 24px;
+        border-radius: 24px;
+        background: rgba(255, 251, 244, 0.9);
+        border: 1px solid rgba(86, 56, 35, 0.08);
+      }
+
+      .step-rail::before {
+        content: "";
+        position: absolute;
+        left: 26px;
+        top: 28px;
+        bottom: 28px;
+        width: 2px;
+        background: linear-gradient(180deg, rgba(199, 93, 44, 0.4), rgba(31, 123, 116, 0.22));
+      }
+
+      .step-rail {
+        position: sticky;
+      }
+
+      .step-link {
+        position: relative;
+        display: grid;
+        gap: 3px;
+        padding: 0 0 0 22px;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        text-align: left;
+        cursor: pointer;
+        font: inherit;
+      }
+
+      .step-link::before {
+        content: "";
+        position: absolute;
+        left: -3px;
+        top: 5px;
+        width: 12px;
+        height: 12px;
+        border-radius: 999px;
+        background: #fff8ef;
+        border: 2px solid rgba(199, 93, 44, 0.58);
+        box-shadow: 0 0 0 5px rgba(199, 93, 44, 0.08);
+      }
+
+      .step-link.active::before {
+        background: var(--accent);
+      }
+
+      .step-link strong {
+        font-size: 0.96rem;
+      }
+
+      .step-link span {
+        color: var(--muted);
+        font-size: 0.8rem;
+        line-height: 1.35;
+      }
+
+      .flow-sections {
+        display: grid;
+        gap: 14px;
+      }
+
+      .flow-section {
+        padding: 18px;
+        border-radius: 22px;
+        background: var(--panel-strong);
+        border: 1px solid rgba(86, 56, 35, 0.08);
+        display: grid;
+        gap: 12px;
+        scroll-margin-top: 18px;
+      }
+
+      .flow-section-head {
+        display: grid;
+        gap: 6px;
+      }
+
+      .flow-kicker {
+        color: var(--accent);
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .flow-section h3 {
+        font-size: 1.32rem;
+        line-height: 1;
+      }
+
+      .section-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .section-copy {
+        color: var(--muted);
+        line-height: 1.55;
       }
 
       .block {
@@ -726,10 +891,31 @@
 
       @media (max-width: 1100px) {
         .hero-grid,
-        .dashboard,
-        .detail-grid,
         .modal-grid {
           grid-template-columns: 1fr;
+        }
+
+        .flow-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .step-rail {
+          position: relative;
+          top: 0;
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+          padding-left: 16px;
+        }
+
+        .step-rail::before {
+          display: none;
+        }
+
+        .step-link {
+          padding-left: 18px;
+        }
+
+        .step-link::before {
+          left: 0;
         }
       }
 
@@ -768,11 +954,6 @@
               summary, and lets you inspect where the orchestrator bounded, salvaged, or
               escalated each case.
             </p>
-            <p>
-              If this page is opened as a local file and the browser blocks JSON fetches,
-              serve the repo with <code>python3 -m http.server 8000</code> and open the
-              page through <code>http://localhost:8000/html/ct-beta2-benchmark-review.html</code>.
-            </p>
             <div class="hero-links">
               <a href="./ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md">Open markdown report</a>
               <a href="./ct_beta2_ab_matrix_2026-04-10_release_gate_r2.json">Open machine JSON</a>
@@ -784,12 +965,15 @@
         </div>
       </section>
 
-      <section class="dashboard">
-        <aside class="panel">
-          <div>
-            <h2>Filters</h2>
-            <p>Use this view to isolate provider behavior, revision-heavy runs, or the queue that still needs semantic human audit.</p>
-          </div>
+      <section class="panel controls-panel">
+        <details class="filters-shell">
+          <summary class="filters-summary">
+            <div class="filters-summary-copy">
+              <h2>Filters and quick queues</h2>
+              <p id="filter-summary">Use this to isolate provider behavior, revision-heavy runs, or the queue that still needs semantic human audit.</p>
+            </div>
+            <span class="meta-pill summary-state"></span>
+          </summary>
 
           <div class="filters">
             <div class="control">
@@ -844,78 +1028,42 @@
               </div>
             </div>
           </div>
+        </details>
 
-          <div class="provider-stack" id="provider-stack"></div>
-        </aside>
+        <div class="provider-stack" id="provider-stack"></div>
+      </section>
 
-        <section class="results-panel">
-          <div class="panel">
-            <div class="results-header">
-              <div>
-                <h2>Reviewer Queue</h2>
-                <p id="results-copy">Loading benchmark data…</p>
-              </div>
+      <section class="results-panel">
+        <div class="panel">
+          <div class="results-header">
+            <div>
+              <h2>Reviewer queue</h2>
+              <p id="results-copy">Loading benchmark data…</p>
             </div>
-            <div class="run-grid" id="run-grid"></div>
-            <div class="empty" id="empty-state" hidden>No runs match the current filter set.</div>
+          </div>
+          <div class="run-grid" id="run-grid"></div>
+          <div class="empty" id="empty-state" hidden>No runs match the current filter set.</div>
+        </div>
+
+        <section class="detail" id="detail-panel" hidden>
+          <div class="detail-head">
+            <div>
+              <div class="stat-row" id="detail-badges"></div>
+              <h2 id="detail-title">Select a run</h2>
+            </div>
+            <div class="detail-actions">
+              <a id="detail-report-link" href="./ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md">Open report</a>
+              <a href="./ct_mcp_beta2_semantic_audit_packet.md">Open audit packet</a>
+              <button class="tab" type="button" id="open-raw-dialog">Open raw artifact</button>
+            </div>
           </div>
 
-          <section class="detail" id="detail-panel" hidden>
-            <div class="detail-head">
-              <div>
-                <div class="stat-row" id="detail-badges"></div>
-                <h2 id="detail-title">Select a run</h2>
-              </div>
-              <div class="detail-actions">
-                <button class="tab" type="button" id="open-raw-dialog">Open full run viewer</button>
-                <a id="detail-report-link" href="./ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md">Open report</a>
-              </div>
-            </div>
+          <div class="detail-model-tabs" id="detail-model-tabs"></div>
 
-            <div class="detail-grid">
-              <div class="detail-stack">
-                <div class="block">
-                  <h3>Benchmark Expectation</h3>
-                  <p id="detail-expectation"></p>
-                  <div class="insight-grid" id="detail-expectation-grid"></div>
-                </div>
-
-                <div class="block">
-                  <h3>Released Answer</h3>
-                  <div class="code answer" id="detail-released-answer"></div>
-                </div>
-
-                <div class="block">
-                  <h3>Last Attempted Answer</h3>
-                  <div class="code answer" id="detail-last-answer"></div>
-                </div>
-
-                <div class="block">
-                  <h3>Revision Critique Packet</h3>
-                  <div class="code" id="detail-critique"></div>
-                </div>
-              </div>
-
-              <div class="detail-stack">
-                <div class="block">
-                  <h3>Run Mechanics</h3>
-                  <div class="insight-grid" id="detail-metrics"></div>
-                </div>
-
-                <div class="block">
-                  <h3>Wrong Wins To Watch For</h3>
-                  <ul class="list" id="detail-wrong-wins"></ul>
-                </div>
-
-                <div class="block">
-                  <h3>A/B Readout</h3>
-                  <p id="detail-ab-summary"></p>
-                </div>
-
-                <div class="warning" id="detail-review-warning" hidden></div>
-              </div>
-            </div>
-          </section>
+          <div class="flow-layout">
+            <nav class="step-rail" id="detail-step-rail" aria-label="Run flow"></nav>
+            <div class="flow-sections" id="detail-flow-sections"></div>
+          </div>
         </section>
       </section>
     </main>
@@ -988,6 +1136,7 @@
         data: null,
         promptTexts: {},
         selectedId: null,
+        detailModelId: null,
         chip: "all",
         filters: {
           search: "",
@@ -1009,18 +1158,13 @@
         runGrid: document.getElementById("run-grid"),
         resultsCopy: document.getElementById("results-copy"),
         emptyState: document.getElementById("empty-state"),
+        filterSummary: document.getElementById("filter-summary"),
         detailPanel: document.getElementById("detail-panel"),
         detailBadges: document.getElementById("detail-badges"),
         detailTitle: document.getElementById("detail-title"),
-        detailExpectation: document.getElementById("detail-expectation"),
-        detailExpectationGrid: document.getElementById("detail-expectation-grid"),
-        detailReleasedAnswer: document.getElementById("detail-released-answer"),
-        detailLastAnswer: document.getElementById("detail-last-answer"),
-        detailCritique: document.getElementById("detail-critique"),
-        detailMetrics: document.getElementById("detail-metrics"),
-        detailWrongWins: document.getElementById("detail-wrong-wins"),
-        detailAbSummary: document.getElementById("detail-ab-summary"),
-        detailReviewWarning: document.getElementById("detail-review-warning"),
+        detailModelTabs: document.getElementById("detail-model-tabs"),
+        detailStepRail: document.getElementById("detail-step-rail"),
+        detailFlowSections: document.getElementById("detail-flow-sections"),
         detailReportLink: document.getElementById("detail-report-link"),
         openRawDialog: document.getElementById("open-raw-dialog"),
         rawModal: document.getElementById("raw-modal"),
@@ -1279,9 +1423,42 @@
         return `<button class="info-badge" type="button" data-tip="${escapeHtml(tip)}" aria-label="Explain ${escapeHtml(label)}">?</button>`;
       }
 
+      function sectionMarkup(section) {
+        return `
+          <section class="flow-section" id="${section.id}">
+            <div class="flow-section-head">
+              <span class="flow-kicker">${section.kicker}</span>
+              <h3>${section.title}</h3>
+            </div>
+            ${section.body}
+          </section>
+        `;
+      }
+
+      function renderFilterSummary() {
+        const chipLabels = {
+          all: "All B-arm runs",
+          audit: "Human audit priority",
+          review: "Escalations only",
+          bloat: "Bloat over 1.2x",
+        };
+        const parts = [];
+        if (state.filters.search.trim()) parts.push(`search: "${state.filters.search.trim()}"`);
+        if (state.filters.provider !== "all") parts.push(`provider: ${state.filters.provider}`);
+        if (state.filters.model !== "all") parts.push(`model: ${state.filters.model}`);
+        if (state.filters.decision !== "all") parts.push(`decision: ${state.filters.decision}`);
+        if (state.filters.revision !== "all") parts.push(`revision: ${state.filters.revision}`);
+        if (state.chip !== "all") parts.push(`queue: ${chipLabels[state.chip]}`);
+        els.filterSummary.textContent =
+          parts.length
+            ? parts.join(" · ")
+            : "Use this to isolate provider behavior, revision-heavy runs, or the queue that still needs semantic human audit.";
+      }
+
       function renderRuns() {
         const runs = filterRuns();
-        els.resultsCopy.textContent = `${runs.length} of ${state.data.bRuns.length} B-arm runs match the current filters. Select a card to inspect expectation, critique, and released output.`;
+        renderFilterSummary();
+        els.resultsCopy.textContent = `${runs.length} of ${state.data.bRuns.length} B-arm runs match the current filters. Scroll the shelf, pick a run, and the full pass sequence opens below.`;
         els.emptyState.hidden = runs.length > 0;
         els.runGrid.innerHTML = runs
           .map((run) => {
@@ -1332,7 +1509,11 @@
           selectRun(runs[0].id);
         } else if (!runs.length) {
           state.selectedId = null;
+          state.detailModelId = null;
           els.detailPanel.hidden = true;
+        } else {
+          const activeRun = runs.find((item) => item.id === state.selectedId) || runs[0];
+          renderDetail(activeRun);
         }
       }
 
@@ -1342,20 +1523,39 @@
           return;
         }
 
+        const promptRuns = getPromptRuns(run.promptId);
+        const activeRun =
+          promptRuns.find((item) => item.id === state.selectedId) ||
+          promptRuns.find((item) => item.model === state.detailModelId) ||
+          run;
+        state.detailModelId = activeRun.model;
+        const view = getModelView(activeRun);
+
         els.detailPanel.hidden = false;
         els.detailBadges.innerHTML = [
-          `<span class="prompt-tag">${run.promptId}</span>`,
-          `<span class="meta-pill">${run.provider}</span>`,
-          `<span class="meta-pill">${run.model}</span>`,
-          `<span class="decision-pill ${decisionClass(run.decision)}">${run.decision}</span>`,
+          `<span class="prompt-tag">${activeRun.promptId}</span>`,
+          `<span class="meta-pill">${activeRun.provider}</span>`,
+          `<span class="meta-pill">${activeRun.model}</span>`,
+          `<span class="decision-pill ${decisionClass(activeRun.decision)}">${activeRun.decision}</span>`,
         ].join("");
-        els.detailTitle.textContent = run.promptTitle;
-        els.detailExpectation.textContent = run.expectedSafeAnswerShape;
-        els.detailExpectationGrid.innerHTML = [
-          { label: "Preferred terminal", value: run.expectedTerminal },
-          { label: "Acceptable fallback", value: run.acceptableFallback },
-          { label: "Final B decision", value: run.decision },
-          { label: "A arm decision", value: run.aArmDecision },
+        els.detailTitle.textContent = activeRun.promptTitle;
+        els.detailReportLink.href = REPORT_PATH;
+
+        els.detailModelTabs.innerHTML = promptRuns
+          .map(
+            (item) => `
+              <button class="tab ${item.id === activeRun.id ? "active" : ""}" type="button" data-detail-model="${item.id}">
+                ${item.provider} · ${item.model}
+              </button>
+            `
+          )
+          .join("");
+
+        const expectationGrid = [
+          { label: "Preferred terminal", value: activeRun.expectedTerminal },
+          { label: "Acceptable fallback", value: activeRun.acceptableFallback },
+          { label: "Final B decision", value: activeRun.decision },
+          { label: "A arm decision", value: activeRun.aArmDecision },
         ]
           .map(
             (item) => `
@@ -1367,20 +1567,30 @@
           )
           .join("");
 
-        els.detailReleasedAnswer.textContent = run.releasedAnswer || "No released answer recorded for this run.";
-        els.detailLastAnswer.textContent = run.lastAttemptedAnswer || "No attempted answer recorded.";
-        els.detailCritique.textContent = run.revisionCritique || "No revision critique packet was needed for this run.";
-
-        els.detailMetrics.innerHTML = [
-          { label: "Initial output", value: fmtTokens(run.initialOutputTokens), key: "initialOutput" },
-          { label: "Initial duration", value: fmtMs(run.initialDurationMs), key: "initialDuration" },
-          { label: "Initial cost", value: fmtMoney(run.initialCostUsd), key: "initialCost" },
-          { label: "Revision output", value: fmtTokens(run.revisionOutputTokens), key: "revisionOutput" },
-          { label: "Revision duration", value: fmtMs(run.revisionDurationMs), key: "revisionDuration" },
-          { label: "Revision cost", value: fmtMoney(run.revisionCostUsd), key: "revisionCost" },
-          { label: "Bloat ratio", value: fmtRatio(run.revisionBloatRatio), key: "bloatRatio" },
-          { label: "Token delta", value: run.revisionOutputTokenDelta == null ? "n/a" : `${run.revisionOutputTokenDelta > 0 ? "+" : ""}${fmtTokens(run.revisionOutputTokenDelta)}`, key: "tokenDelta" },
-          { label: "Latency delta", value: run.revisionDurationDeltaMs == null ? "n/a" : `${run.revisionDurationDeltaMs > 0 ? "+" : ""}${fmtMs(run.revisionDurationDeltaMs)}`, key: "latencyDelta" },
+        const metricsGrid = [
+          { label: "Initial output", value: fmtTokens(activeRun.initialOutputTokens), key: "initialOutput" },
+          { label: "Initial duration", value: fmtMs(activeRun.initialDurationMs), key: "initialDuration" },
+          { label: "Initial cost", value: fmtMoney(activeRun.initialCostUsd), key: "initialCost" },
+          { label: "Revision output", value: fmtTokens(activeRun.revisionOutputTokens), key: "revisionOutput" },
+          { label: "Revision duration", value: fmtMs(activeRun.revisionDurationMs), key: "revisionDuration" },
+          { label: "Revision cost", value: fmtMoney(activeRun.revisionCostUsd), key: "revisionCost" },
+          { label: "Bloat ratio", value: fmtRatio(activeRun.revisionBloatRatio), key: "bloatRatio" },
+          {
+            label: "Token delta",
+            value:
+              activeRun.revisionOutputTokenDelta == null
+                ? "n/a"
+                : `${activeRun.revisionOutputTokenDelta > 0 ? "+" : ""}${fmtTokens(activeRun.revisionOutputTokenDelta)}`,
+            key: "tokenDelta",
+          },
+          {
+            label: "Latency delta",
+            value:
+              activeRun.revisionDurationDeltaMs == null
+                ? "n/a"
+                : `${activeRun.revisionDurationDeltaMs > 0 ? "+" : ""}${fmtMs(activeRun.revisionDurationDeltaMs)}`,
+            key: "latencyDelta",
+          },
         ]
           .map(
             (item) => `
@@ -1395,18 +1605,148 @@
           )
           .join("");
 
-        els.detailWrongWins.innerHTML = run.wrongWinsToWatchFor.length
-          ? run.wrongWinsToWatchFor.map((item) => `<li>${item}</li>`).join("")
+        const wrongWins = activeRun.wrongWinsToWatchFor.length
+          ? activeRun.wrongWinsToWatchFor.map((item) => `<li>${escapeHtml(item)}</li>`).join("")
           : "<li>No explicit wrong-win list recorded for this case.</li>";
 
-        els.detailAbSummary.textContent =
-          run.hasRevision
-            ? `Arm A landed ${run.aArmDecision}. Arm B needed one structural-revision pass and ultimately landed ${run.decision}. This is the exact control-plane surface to inspect during semantic audit: whether the bounded rewrite actually removed the unsafe shape rather than merely changing the wording.`
-            : `Arm A landed ${run.aArmDecision}. Arm B landed ${run.decision} without a revision loop, which means this model cleared the locked grading profile on the first pass.`;
+        const abSummary = activeRun.hasRevision
+          ? `Arm A landed ${activeRun.aArmDecision}. Arm B needed one structural-revision pass and ultimately landed ${activeRun.decision}. This is the key audit question: did the bounded rewrite actually remove the unsafe shape, or just make it sound nicer?`
+          : `Arm A landed ${activeRun.aArmDecision}. Arm B landed ${activeRun.decision} without a revision loop, which means this model cleared the locked grading profile on the first pass.`;
 
-        els.detailReviewWarning.hidden = run.decision !== "HUMAN_REVIEW";
-        els.detailReviewWarning.textContent = run.humanReviewReason || "";
-        els.detailReportLink.href = REPORT_PATH;
+        const sections = [
+          {
+            id: "section-prompt",
+            nav: "Prompt",
+            kicker: "Step 1",
+            title: "Benchmark prompt",
+            body: `<div class="code">${escapeHtml(view.prompt)}</div>`,
+          },
+          {
+            id: "section-expectation",
+            nav: "Expected shape",
+            kicker: "Step 2",
+            title: "What a safe answer should look like",
+            body: `
+              <p class="section-copy">${escapeHtml(activeRun.expectedSafeAnswerShape)}</p>
+              <div class="insight-grid">${expectationGrid}</div>
+            `,
+          },
+          {
+            id: "section-arm-a",
+            nav: "Arm A",
+            kicker: "Step 3",
+            title: "Arm A answer",
+            body: `<div class="code answer">${escapeHtml(view.armA)}</div>`,
+          },
+          {
+            id: "section-pre-draft",
+            nav: "B pre-draft",
+            kicker: "Step 4",
+            title: "B arm pre-draft",
+            body: `<div class="code answer">${escapeHtml(view.preDraft)}</div>`,
+          },
+          {
+            id: "section-initial-pass",
+            nav: "B initial",
+            kicker: "Step 5",
+            title: "B arm initial answer",
+            body: `<div class="code answer">${escapeHtml(view.initialPass)}</div>`,
+          },
+          {
+            id: "section-ct-review",
+            nav: "CT review",
+            kicker: "Step 6",
+            title: "CT initial review payload",
+            body: `<div class="code answer">${escapeHtml(JSON.stringify(view.initialCt, null, 2))}</div>`,
+          },
+          {
+            id: "section-ct-critique",
+            nav: "CT critique",
+            kicker: "Step 7",
+            title: "Revision packet sent back to the model",
+            body: `<div class="code answer">${escapeHtml(view.revisionCritique)}</div>`,
+          },
+          {
+            id: "section-revision-pass",
+            nav: "Revision",
+            kicker: "Step 8",
+            title: "B arm revision answer",
+            body: `<div class="code answer">${escapeHtml(view.revisionPass)}</div>`,
+          },
+          {
+            id: "section-final",
+            nav: "Released",
+            kicker: "Step 9",
+            title: "Final released answer",
+            body: `
+              <div class="section-meta">
+                <span class="decision-pill ${decisionClass(activeRun.decision)}">${activeRun.decision}</span>
+                <span class="meta-pill">${activeRun.releaseState === "released" ? "released" : "not released"}</span>
+              </div>
+              <div class="code answer">${escapeHtml(view.finalReleased)}</div>
+              ${activeRun.humanReviewReason ? `<div class="warning">${escapeHtml(activeRun.humanReviewReason)}</div>` : ""}
+            `,
+          },
+          {
+            id: "section-metrics",
+            nav: "Mechanics",
+            kicker: "Step 10",
+            title: "Run mechanics",
+            body: `<div class="insight-grid">${metricsGrid}</div>`,
+          },
+          {
+            id: "section-wrong-wins",
+            nav: "Wrong wins",
+            kicker: "Step 11",
+            title: "Wrong wins to watch for",
+            body: `<ul class="list">${wrongWins}</ul>`,
+          },
+          {
+            id: "section-ab",
+            nav: "A/B readout",
+            kicker: "Step 12",
+            title: "A/B readout",
+            body: `
+              <p class="section-copy">${escapeHtml(abSummary)}</p>
+              <div class="section-meta">
+                <a href="${REPORT_PATH}">Open markdown report</a>
+                <a href="${AUDIT_PATH}">Open audit packet</a>
+              </div>
+            `,
+          },
+        ];
+
+        els.detailStepRail.innerHTML = sections
+          .map(
+            (section, index) => `
+              <button class="step-link ${index === 0 ? "active" : ""}" type="button" data-step-target="${section.id}">
+                <strong>${section.nav}</strong>
+                <span>${section.title}</span>
+              </button>
+            `
+          )
+          .join("");
+        els.detailFlowSections.innerHTML = sections.map(sectionMarkup).join("");
+
+        els.detailModelTabs.querySelectorAll("[data-detail-model]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const nextRun = state.data.bRuns.find((item) => item.id === button.dataset.detailModel);
+            if (nextRun) {
+              state.detailModelId = nextRun.model;
+              selectRun(nextRun.id);
+            }
+          });
+        });
+
+        els.detailStepRail.querySelectorAll("[data-step-target]").forEach((button) => {
+          button.addEventListener("click", () => {
+            els.detailStepRail.querySelectorAll("[data-step-target]").forEach((node) => node.classList.toggle("active", node === button));
+            const target = document.getElementById(button.dataset.stepTarget);
+            if (target) {
+              target.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+          });
+        });
       }
 
       function getPromptRuns(promptId) {
@@ -1533,9 +1873,7 @@
 
       function selectRun(runId) {
         state.selectedId = runId;
-        const run = filterRuns().find((item) => item.id === runId) || state.data.bRuns.find((item) => item.id === runId);
         renderRuns();
-        renderDetail(run);
       }
 
       function populateFilters() {

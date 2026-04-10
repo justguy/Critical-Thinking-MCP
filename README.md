@@ -180,7 +180,11 @@ Numeric-only calibration layer:
 
 - The orchestrator can optionally resolve a versioned calibration profile from `model + prompt_family + session_mode`, then record only numeric and enum outcomes to SQLite.
 - Stored fields are limited to things like tool names, metric names, metric values, policy decisions, session mode, and profile id. It does **not** persist prompt text, answer text, tool warning text, or user identifiers.
+- Ground-truth release labeling now defaults to the terminal orchestrator decision: `PASS` and `WARN` are recorded as `released = 1`, while `REVISE` and `HUMAN_REVIEW` are recorded as `released = 0`, unless a caller intentionally supplies an explicit terminal override.
+- Multi-turn calibration rows can also carry `turn_chain_id`, `selected_metric_*`, and `delta_from_prior_turn`, which makes turn-2 salvage and bounded-revision ROI measurable without storing any answer text.
 - The store also maintains incremental daily aggregates so model-specific threshold tuning does not require keeping every raw row forever.
+- When a calibration DB is present, the orchestrator can adapt supported min/max metric gates from the last 7 days of released runs for the same `model + prompt_family + session_mode`. Those runtime threshold changes are emitted back in `calibration.adaptive_metric_overrides`.
+- The same store now supports analytics queries for released-run metric windows, turn-pair salvage, and tool-pair redundancy, so the data can drive threshold tuning and future tool-pruning work instead of only serving as passive telemetry.
 - Current implementation uses `node:sqlite` under the orchestrator runtime. The deterministic CT tools remain pure functions of their inputs.
 
 CLI harness (for local experimentation, not a shipped binary):

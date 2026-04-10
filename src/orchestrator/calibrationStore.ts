@@ -7,9 +7,11 @@ import {
   normaliseToolCombo,
 } from './calibration.js';
 import type {
+  AdaptiveMetricGateOverride,
   CalibrationProfile,
   CalibrationRuntimeContext,
   OrchestratorResult,
+  OrchestratorToolName,
 } from './types.js';
 
 interface AggregateRow {
@@ -37,6 +39,175 @@ export interface HistoricalTurn3Stats {
   success_rate: number;
   mean_delta_from_prior_turn: number | null;
 }
+
+export interface ReleasedMetricWindowStats {
+  sample_count: number;
+  mean_value: number | null;
+  stddev_value: number | null;
+  min_value: number | null;
+  max_value: number | null;
+  recommended_min_threshold: number | null;
+  recommended_max_threshold: number | null;
+  window_days: number;
+}
+
+export interface TurnSalvageStats {
+  paired_chain_count: number;
+  turn_1_released_count: number;
+  turn_2_released_count: number;
+  eligible_turn_1_failure_count: number;
+  salvage_count: number;
+  salvage_rate: number;
+  mean_metric_delta: number | null;
+}
+
+export interface ToolRedundancyRecommendation {
+  anchor_tool: OrchestratorToolName;
+  candidate_tool: OrchestratorToolName;
+  paired_run_count: number;
+  anchor_signal_count: number;
+  candidate_signal_count: number;
+  candidate_independent_signal_count: number;
+  candidate_independent_signal_rate: number;
+}
+
+interface MetricSampleRow {
+  metric_value: number;
+}
+
+interface TurnChainRow {
+  turn_chain_id: string;
+  iteration_number: number;
+  released: number;
+  selected_metric_value: number | null;
+  delta_from_prior_turn: number | null;
+}
+
+interface ToolSignalMetricRow {
+  run_id: number;
+  tool_name: OrchestratorToolName;
+  metric_value: number;
+}
+
+interface GateAdaptationMapping {
+  tool: OrchestratorToolName;
+  gate_key: string;
+  metric_name: string;
+  comparator: '>=' | '<=';
+}
+
+interface AdaptCalibrationProfileFromHistoryInput {
+  db_path: string;
+  runtime: CalibrationRuntimeContext;
+  profile: CalibrationProfile;
+  window_days?: number;
+  minimum_sample_count?: number;
+  sigma_multiplier?: number;
+}
+
+export interface AdaptCalibrationProfileFromHistoryResult {
+  profile: CalibrationProfile;
+  adaptive_metric_overrides: AdaptiveMetricGateOverride[];
+}
+
+const ADAPTIVE_GATE_MAPPINGS: GateAdaptationMapping[] = [
+  {
+    tool: 'validate_confidence',
+    gate_key: 'max_gap',
+    metric_name: 'gap',
+    comparator: '<=',
+  },
+  {
+    tool: 'validate_confidence',
+    gate_key: 'min_falsifiability_score',
+    metric_name: 'falsifiability_score',
+    comparator: '>=',
+  },
+  {
+    tool: 'validate_reasoning_chain',
+    gate_key: 'min_grounding_score',
+    metric_name: 'grounding_score',
+    comparator: '>=',
+  },
+  {
+    tool: 'validate_reasoning_chain',
+    gate_key: 'max_cycle_count',
+    metric_name: 'cycle_count',
+    comparator: '<=',
+  },
+  {
+    tool: 'validate_reasoning_chain',
+    gate_key: 'max_orphaned_conclusions',
+    metric_name: 'orphaned_conclusion_count',
+    comparator: '<=',
+  },
+  {
+    tool: 'check_plan_validity',
+    gate_key: 'min_completeness_score',
+    metric_name: 'completeness_score',
+    comparator: '>=',
+  },
+  {
+    tool: 'check_plan_validity',
+    gate_key: 'max_circular_dependencies',
+    metric_name: 'circular_dependency_count',
+    comparator: '<=',
+  },
+  {
+    tool: 'check_plan_validity',
+    gate_key: 'max_missing_prerequisites',
+    metric_name: 'missing_prerequisite_count',
+    comparator: '<=',
+  },
+  {
+    tool: 'check_plan_validity',
+    gate_key: 'max_resource_conflicts',
+    metric_name: 'resource_conflict_count',
+    comparator: '<=',
+  },
+  {
+    tool: 'detect_concurrency_patterns',
+    gate_key: 'max_hazard_count',
+    metric_name: 'hazard_count',
+    comparator: '<=',
+  },
+  {
+    tool: 'detect_concurrency_patterns',
+    gate_key: 'max_critical_count',
+    metric_name: 'critical_count',
+    comparator: '<=',
+  },
+  {
+    tool: 'score_response_quality',
+    gate_key: 'min_overall_score',
+    metric_name: 'overall_score',
+    comparator: '>=',
+  },
+  {
+    tool: 'score_response_quality',
+    gate_key: 'min_substance_score',
+    metric_name: 'substance_score',
+    comparator: '>=',
+  },
+  {
+    tool: 'score_response_quality',
+    gate_key: 'min_specificity_score',
+    metric_name: 'specificity_score',
+    comparator: '>=',
+  },
+  {
+    tool: 'score_response_quality',
+    gate_key: 'min_structure_score',
+    metric_name: 'structure_score',
+    comparator: '>=',
+  },
+  {
+    tool: 'score_response_quality',
+    gate_key: 'max_hedge_density',
+    metric_name: 'hedge_density',
+    comparator: '<=',
+  },
+];
 
 function ensureSchema(db: DatabaseSync): void {
   db.exec(`
@@ -134,6 +305,34 @@ function ensureSchema(db: DatabaseSync): void {
       db.exec(statement);
     }
   }
+}
+
+function computeMean(values: number[]): number | null {
+  if (values.length === 0) return null;
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function computeStddev(values: number[], mean: number): number | null {
+  if (values.length === 0) return null;
+  const variance =
+    values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length;
+  return Math.sqrt(variance);
+}
+
+function roundMetric(value: number): number {
+  return Math.round(value * 10000) / 10000;
+}
+
+function deriveReleasedLabel(
+  runtime: CalibrationRuntimeContext,
+  result: OrchestratorResult,
+): number {
+  if (typeof runtime.released === 'boolean') {
+    return runtime.released ? 1 : 0;
+  }
+  return result.policy_decision === 'PASS' || result.policy_decision === 'WARN'
+    ? 1
+    : 0;
 }
 
 function pruneRawRuns(
@@ -296,7 +495,7 @@ export function recordCalibrationRun(
     const toolCombo = normaliseToolCombo(input.result);
     const revised = input.result.policy_decision === 'REVISE' ? 1 : 0;
     const humanReview = input.result.policy_decision === 'HUMAN_REVIEW' ? 1 : 0;
-    const released = input.runtime.released ? 1 : 0;
+    const released = deriveReleasedLabel(input.runtime, input.result);
 
     const runInfo = db
       .prepare(
@@ -483,4 +682,446 @@ export function getHistoricalTurn3Stats(
   } finally {
     db.close();
   }
+}
+
+export function getReleasedMetricWindowStats(
+  input: {
+    db_path: string;
+    model: string;
+    prompt_family: string;
+    session_mode: string;
+    tool_name: OrchestratorToolName;
+    metric_name: string;
+    profile_id?: string;
+    scope?: 'routed' | 'shadow' | 'summary';
+    window_days?: number;
+    sigma_multiplier?: number;
+  },
+): ReleasedMetricWindowStats {
+  const db = new DatabaseSync(input.db_path);
+
+  try {
+    ensureSchema(db);
+
+    const windowDays = input.window_days ?? 7;
+    const sigmaMultiplier = input.sigma_multiplier ?? 1;
+    const cutoff = new Date(
+      Date.now() - windowDays * 24 * 60 * 60 * 1000,
+    ).toISOString();
+    const scope = input.scope ?? 'routed';
+    const clauses = [
+      'r.model = ?',
+      'r.prompt_family = ?',
+      'r.session_mode = ?',
+      'r.released = 1',
+      'r.recorded_at >= ?',
+      'm.scope = ?',
+      'm.tool_name = ?',
+      'm.metric_name = ?',
+    ];
+    const params: Array<string | number> = [
+      input.model,
+      input.prompt_family,
+      input.session_mode,
+      cutoff,
+      scope,
+      input.tool_name,
+      input.metric_name,
+    ];
+
+    if (input.profile_id) {
+      clauses.push('r.profile_id = ?');
+      params.push(input.profile_id);
+    }
+
+    const rows = db
+      .prepare(
+        `
+          SELECT m.metric_value
+          FROM orchestrator_metrics m
+          INNER JOIN orchestrator_runs r
+            ON r.id = m.run_id
+          WHERE ${clauses.join(' AND ')}
+          ORDER BY r.recorded_at DESC, r.id DESC
+        `,
+      )
+      .all(...params) as MetricSampleRow[];
+    const values = rows
+      .map(row => Number(row.metric_value))
+      .filter(value => Number.isFinite(value));
+
+    if (values.length === 0) {
+      return {
+        sample_count: 0,
+        mean_value: null,
+        stddev_value: null,
+        min_value: null,
+        max_value: null,
+        recommended_min_threshold: null,
+        recommended_max_threshold: null,
+        window_days: windowDays,
+      };
+    }
+
+    const meanValue = computeMean(values);
+    if (meanValue === null) {
+      return {
+        sample_count: 0,
+        mean_value: null,
+        stddev_value: null,
+        min_value: null,
+        max_value: null,
+        recommended_min_threshold: null,
+        recommended_max_threshold: null,
+        window_days: windowDays,
+      };
+    }
+
+    const stddevValue = computeStddev(values, meanValue) ?? 0;
+
+    return {
+      sample_count: values.length,
+      mean_value: roundMetric(meanValue),
+      stddev_value: roundMetric(stddevValue),
+      min_value: roundMetric(Math.min(...values)),
+      max_value: roundMetric(Math.max(...values)),
+      recommended_min_threshold: roundMetric(
+        Math.max(0, meanValue - sigmaMultiplier * stddevValue),
+      ),
+      recommended_max_threshold: roundMetric(meanValue + sigmaMultiplier * stddevValue),
+      window_days: windowDays,
+    };
+  } finally {
+    db.close();
+  }
+}
+
+export function getTurnSalvageStats(
+  input: {
+    db_path: string;
+    model: string;
+    prompt_family: string;
+    session_mode: string;
+    from_iteration?: number;
+    to_iteration?: number;
+    selected_metric_tool?: string;
+    selected_metric_name?: string;
+  },
+): TurnSalvageStats {
+  const db = new DatabaseSync(input.db_path);
+
+  try {
+    ensureSchema(db);
+
+    const fromIteration = input.from_iteration ?? 1;
+    const toIteration = input.to_iteration ?? 2;
+    const clauses = [
+      'model = ?',
+      'prompt_family = ?',
+      'session_mode = ?',
+      'turn_chain_id IS NOT NULL',
+      'iteration_number IN (?, ?)',
+    ];
+    const params: Array<string | number> = [
+      input.model,
+      input.prompt_family,
+      input.session_mode,
+      fromIteration,
+      toIteration,
+    ];
+
+    if (input.selected_metric_tool) {
+      clauses.push('selected_metric_tool = ?');
+      params.push(input.selected_metric_tool);
+    }
+    if (input.selected_metric_name) {
+      clauses.push('selected_metric_name = ?');
+      params.push(input.selected_metric_name);
+    }
+
+    const rows = db
+      .prepare(
+        `
+          SELECT
+            turn_chain_id,
+            iteration_number,
+            released,
+            selected_metric_value,
+            delta_from_prior_turn
+          FROM orchestrator_runs
+          WHERE ${clauses.join(' AND ')}
+          ORDER BY recorded_at ASC, id ASC
+        `,
+      )
+      .all(...params) as TurnChainRow[];
+
+    const chains = new Map<
+      string,
+      Partial<Record<number, TurnChainRow>>
+    >();
+    for (const row of rows) {
+      const chain = chains.get(row.turn_chain_id) ?? {};
+      chain[row.iteration_number] = row;
+      chains.set(row.turn_chain_id, chain);
+    }
+
+    let pairedChainCount = 0;
+    let turn1ReleasedCount = 0;
+    let turn2ReleasedCount = 0;
+    let eligibleTurn1FailureCount = 0;
+    let salvageCount = 0;
+    const metricDeltas: number[] = [];
+
+    for (const chain of chains.values()) {
+      const fromRow = chain[fromIteration];
+      const toRow = chain[toIteration];
+      if (!fromRow || !toRow) continue;
+
+      pairedChainCount += 1;
+      if (fromRow.released === 1) turn1ReleasedCount += 1;
+      if (toRow.released === 1) turn2ReleasedCount += 1;
+
+      if (fromRow.released === 0) {
+        eligibleTurn1FailureCount += 1;
+        if (toRow.released === 1) {
+          salvageCount += 1;
+        }
+      }
+
+      const metricDelta =
+        typeof toRow.delta_from_prior_turn === 'number'
+          ? toRow.delta_from_prior_turn
+          : typeof fromRow.selected_metric_value === 'number' &&
+              typeof toRow.selected_metric_value === 'number'
+            ? toRow.selected_metric_value - fromRow.selected_metric_value
+            : null;
+      if (typeof metricDelta === 'number' && Number.isFinite(metricDelta)) {
+        metricDeltas.push(metricDelta);
+      }
+    }
+
+    const meanMetricDelta = computeMean(metricDeltas);
+
+    return {
+      paired_chain_count: pairedChainCount,
+      turn_1_released_count: turn1ReleasedCount,
+      turn_2_released_count: turn2ReleasedCount,
+      eligible_turn_1_failure_count: eligibleTurn1FailureCount,
+      salvage_count: salvageCount,
+      salvage_rate:
+        eligibleTurn1FailureCount > 0
+          ? salvageCount / eligibleTurn1FailureCount
+          : 0,
+      mean_metric_delta:
+        typeof meanMetricDelta === 'number' ? roundMetric(meanMetricDelta) : null,
+    };
+  } finally {
+    db.close();
+  }
+}
+
+export function getToolRedundancyRecommendations(
+  input: {
+    db_path: string;
+    model: string;
+    prompt_family: string;
+    session_mode: string;
+    profile_id?: string;
+    window_days?: number;
+    min_paired_runs?: number;
+  },
+): ToolRedundancyRecommendation[] {
+  const db = new DatabaseSync(input.db_path);
+
+  try {
+    ensureSchema(db);
+
+    const cutoff = new Date(
+      Date.now() - (input.window_days ?? 30) * 24 * 60 * 60 * 1000,
+    ).toISOString();
+    const clauses = [
+      'r.model = ?',
+      'r.prompt_family = ?',
+      'r.session_mode = ?',
+      'r.recorded_at >= ?',
+      "m.scope = 'routed'",
+      "m.metric_name IN ('warning_count', 'blocking_issue_count')",
+    ];
+    const params: Array<string | number> = [
+      input.model,
+      input.prompt_family,
+      input.session_mode,
+      cutoff,
+    ];
+
+    if (input.profile_id) {
+      clauses.push('r.profile_id = ?');
+      params.push(input.profile_id);
+    }
+
+    const rows = db
+      .prepare(
+        `
+          SELECT
+            r.id AS run_id,
+            m.tool_name,
+            m.metric_name,
+            m.metric_value
+          FROM orchestrator_metrics m
+          INNER JOIN orchestrator_runs r
+            ON r.id = m.run_id
+          WHERE ${clauses.join(' AND ')}
+          ORDER BY r.id ASC
+        `,
+      )
+      .all(...params) as ToolSignalMetricRow[];
+
+    const runSignals = new Map<number, Map<OrchestratorToolName, boolean>>();
+    for (const row of rows) {
+      const toolSignals = runSignals.get(row.run_id) ?? new Map();
+      const current = toolSignals.get(row.tool_name) ?? false;
+      toolSignals.set(row.tool_name, current || row.metric_value > 0);
+      runSignals.set(row.run_id, toolSignals);
+    }
+
+    const pairStats = new Map<
+      string,
+      {
+        anchor_tool: OrchestratorToolName;
+        candidate_tool: OrchestratorToolName;
+        paired_run_count: number;
+        anchor_signal_count: number;
+        candidate_signal_count: number;
+        candidate_independent_signal_count: number;
+      }
+    >();
+
+    for (const toolSignals of runSignals.values()) {
+      const tools = [...toolSignals.keys()].sort();
+      for (const anchorTool of tools) {
+        const anchorSignal = toolSignals.get(anchorTool) ?? false;
+        for (const candidateTool of tools) {
+          if (anchorTool === candidateTool) continue;
+          const candidateSignal = toolSignals.get(candidateTool) ?? false;
+          const key = `${anchorTool}->${candidateTool}`;
+          const current = pairStats.get(key) ?? {
+            anchor_tool: anchorTool,
+            candidate_tool: candidateTool,
+            paired_run_count: 0,
+            anchor_signal_count: 0,
+            candidate_signal_count: 0,
+            candidate_independent_signal_count: 0,
+          };
+
+          current.paired_run_count += 1;
+          if (anchorSignal) current.anchor_signal_count += 1;
+          if (candidateSignal) current.candidate_signal_count += 1;
+          if (candidateSignal && !anchorSignal) {
+            current.candidate_independent_signal_count += 1;
+          }
+
+          pairStats.set(key, current);
+        }
+      }
+    }
+
+    const minPairedRuns = input.min_paired_runs ?? 10;
+    return [...pairStats.values()]
+      .filter(
+        pair =>
+          pair.paired_run_count >= minPairedRuns &&
+          pair.candidate_independent_signal_count === 0,
+      )
+      .map(pair => ({
+        ...pair,
+        candidate_independent_signal_rate:
+          pair.paired_run_count > 0
+            ? pair.candidate_independent_signal_count / pair.paired_run_count
+            : 0,
+      }))
+      .sort((a, b) => b.paired_run_count - a.paired_run_count);
+  } finally {
+    db.close();
+  }
+}
+
+export function adaptCalibrationProfileFromHistory(
+  input: AdaptCalibrationProfileFromHistoryInput,
+): AdaptCalibrationProfileFromHistoryResult {
+  const adaptedProfile: CalibrationProfile = {
+    ...input.profile,
+    selectors: { ...input.profile.selectors },
+    metric_gates: {
+      validate_confidence: input.profile.metric_gates.validate_confidence
+        ? { ...input.profile.metric_gates.validate_confidence }
+        : undefined,
+      validate_reasoning_chain: input.profile.metric_gates.validate_reasoning_chain
+        ? { ...input.profile.metric_gates.validate_reasoning_chain }
+        : undefined,
+      check_plan_validity: input.profile.metric_gates.check_plan_validity
+        ? { ...input.profile.metric_gates.check_plan_validity }
+        : undefined,
+      detect_concurrency_patterns: input.profile.metric_gates.detect_concurrency_patterns
+        ? { ...input.profile.metric_gates.detect_concurrency_patterns }
+        : undefined,
+      score_response_quality: input.profile.metric_gates.score_response_quality
+        ? { ...input.profile.metric_gates.score_response_quality }
+        : undefined,
+    },
+  };
+  const adaptiveMetricOverrides: AdaptiveMetricGateOverride[] = [];
+  const minimumSampleCount = input.minimum_sample_count ?? 5;
+  const sigmaMultiplier = input.sigma_multiplier ?? 1;
+  const windowDays = input.window_days ?? 7;
+
+  for (const mapping of ADAPTIVE_GATE_MAPPINGS) {
+    const toolGates = (
+      adaptedProfile.metric_gates as Record<string, Record<string, unknown> | undefined>
+    )[mapping.tool];
+    if (!toolGates) continue;
+    const baselineThreshold = toolGates[mapping.gate_key];
+    if (typeof baselineThreshold !== 'number') continue;
+
+    const stats = getReleasedMetricWindowStats({
+      db_path: input.db_path,
+      model: input.runtime.model,
+      prompt_family: input.runtime.prompt_family ?? 'operational_claim',
+      session_mode: input.runtime.session_mode,
+      tool_name: mapping.tool,
+      metric_name: mapping.metric_name,
+      window_days: windowDays,
+      sigma_multiplier: sigmaMultiplier,
+    });
+    if (stats.sample_count < minimumSampleCount) continue;
+
+    const adaptedThreshold =
+      mapping.comparator === '>='
+        ? stats.recommended_min_threshold
+        : stats.recommended_max_threshold;
+    if (
+      typeof adaptedThreshold !== 'number' ||
+      !Number.isFinite(adaptedThreshold) ||
+      Math.abs(adaptedThreshold - baselineThreshold) < 0.0001
+    ) {
+      continue;
+    }
+
+    toolGates[mapping.gate_key] = adaptedThreshold;
+    adaptiveMetricOverrides.push({
+      tool: mapping.tool,
+      metric_name: mapping.metric_name,
+      comparator: mapping.comparator,
+      baseline_threshold: baselineThreshold,
+      adapted_threshold: adaptedThreshold,
+      sample_count: stats.sample_count,
+      mean_value: stats.mean_value ?? adaptedThreshold,
+      stddev_value: stats.stddev_value ?? 0,
+      window_days: stats.window_days,
+    });
+  }
+
+  return {
+    profile: adaptedProfile,
+    adaptive_metric_overrides: adaptiveMetricOverrides,
+  };
 }

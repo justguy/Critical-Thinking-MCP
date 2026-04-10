@@ -19,6 +19,7 @@ import { TOOL_TO_CONTRACT_KEY } from './contracts.js';
 import { resolveCalibrationProfile } from './calibration.js';
 import { resolvePromptFamily } from './questionClassifier.js';
 import {
+  adaptCalibrationProfileFromHistory,
   getHistoricalTurn3Stats,
   recordCalibrationRun,
 } from './calibrationStore.js';
@@ -36,6 +37,7 @@ import { mergeTemporalReasoningRegistry } from './temporalRegistry.js';
 import { buildCrossToolContext } from './variableBinder.js';
 import type {
   CalibrationProfile,
+  AdaptiveMetricGateOverride,
   OrchestratorEnvelope,
   OrchestratorMode,
   OrchestratorResult,
@@ -97,6 +99,7 @@ function finalizeResult(
   result: OrchestratorResult,
   runtimeOptions?: OrchestratorRuntimeOptions,
   profile?: CalibrationProfile,
+  adaptiveMetricOverrides: AdaptiveMetricGateOverride[] = [],
   promptFamilySource:
     | 'explicit'
     | 'prompt_inferred'
@@ -129,6 +132,8 @@ function finalizeResult(
       session_depth: calibrationRuntime.session_depth ?? 1,
       warning_route_revision_threshold: profile.warning_route_revision_threshold,
       metric_gate_failures: result.calibration?.metric_gate_failures ?? [],
+      adaptive_metric_overrides:
+        result.calibration?.adaptive_metric_overrides ?? adaptiveMetricOverrides,
       ...(recordedRunId !== undefined ? { recorded_run_id: recordedRunId } : {}),
     },
   };
@@ -158,9 +163,28 @@ export function runOrchestrator(
         calibration: effectiveCalibrationRuntime,
       }
     : runtimeOptions;
-  const calibrationProfile = effectiveCalibrationRuntime
+  const baseCalibrationProfile = effectiveCalibrationRuntime
     ? resolveCalibrationProfile(effectiveCalibrationRuntime)
     : undefined;
+  const adaptiveCalibration =
+    effectiveCalibrationRuntime?.db_path &&
+    baseCalibrationProfile &&
+    effectiveCalibrationRuntime.adaptive_thresholds?.enabled !== false
+      ? adaptCalibrationProfileFromHistory({
+          db_path: effectiveCalibrationRuntime.db_path,
+          runtime: effectiveCalibrationRuntime,
+          profile: baseCalibrationProfile,
+          window_days:
+            effectiveCalibrationRuntime.adaptive_thresholds?.window_days,
+          minimum_sample_count:
+            effectiveCalibrationRuntime.adaptive_thresholds?.minimum_sample_count,
+          sigma_multiplier:
+            effectiveCalibrationRuntime.adaptive_thresholds?.sigma_multiplier,
+        })
+      : null;
+  const calibrationProfile = adaptiveCalibration?.profile ?? baseCalibrationProfile;
+  const adaptiveMetricOverrides =
+    adaptiveCalibration?.adaptive_metric_overrides ?? [];
 
   // 1. Validate the envelope.
   const envelopeValidation = validateOrchestratorEnvelope(envelope);
@@ -169,6 +193,7 @@ export function runOrchestrator(
       envelopeFailureResult(envelope, envelopeValidation.errors, effectiveRuntimeOptions),
       effectiveRuntimeOptions,
       calibrationProfile,
+      adaptiveMetricOverrides,
       calibrationResolution?.prompt_family_source,
     );
   }
@@ -280,20 +305,22 @@ export function runOrchestrator(
             prompt_family: effectiveCalibrationRuntime.prompt_family ?? 'operational_claim',
             prompt_family_source:
               calibrationResolution?.prompt_family_source ?? 'explicit',
-            session_mode: effectiveCalibrationRuntime.session_mode,
-            session_depth: effectiveCalibrationRuntime.session_depth ?? 1,
-            warning_route_revision_threshold:
-              calibrationProfile.warning_route_revision_threshold,
-            metric_gate_failures: policy.calibration_gate_failures ?? [],
-          },
-        }
-      : {}),
+             session_mode: effectiveCalibrationRuntime.session_mode,
+             session_depth: effectiveCalibrationRuntime.session_depth ?? 1,
+             warning_route_revision_threshold:
+               calibrationProfile.warning_route_revision_threshold,
+             metric_gate_failures: policy.calibration_gate_failures ?? [],
+             adaptive_metric_overrides: adaptiveMetricOverrides,
+           },
+         }
+       : {}),
   };
 
   return finalizeResult(
     result,
     effectiveRuntimeOptions,
     calibrationProfile,
+    adaptiveMetricOverrides,
     calibrationResolution?.prompt_family_source,
   );
 }
@@ -317,6 +344,10 @@ export {
 } from './calibration.js';
 export { recordCalibrationRun } from './calibrationStore.js';
 export { getHistoricalTurn3Stats } from './calibrationStore.js';
+export { getReleasedMetricWindowStats } from './calibrationStore.js';
+export { getTurnSalvageStats } from './calibrationStore.js';
+export { getToolRedundancyRecommendations } from './calibrationStore.js';
+export { adaptCalibrationProfileFromHistory } from './calibrationStore.js';
 export { buildCrossToolContext } from './variableBinder.js';
 export {
   buildTemporalRegistry,
@@ -339,6 +370,7 @@ export {
 } from './contracts.js';
 export type {
   CalibrationGateIssue,
+  AdaptiveMetricGateOverride,
   CalibrationProfile,
   CalibrationResultMetadata,
   CalibrationRuntimeContext,

@@ -11,6 +11,13 @@ export type OrchestratorMode = 'routed' | 'shadow';
 export type PolicyDecision = 'PASS' | 'WARN' | 'REVISE' | 'HUMAN_REVIEW';
 
 export type CalibrationSessionMode = 'single_turn' | 'multi_turn';
+export interface AdaptiveThresholdSettings {
+  enabled?: boolean;
+  window_days?: number;
+  minimum_sample_count?: number;
+  sigma_multiplier?: number;
+}
+
 export type QuestionFamily =
   | 'refutation'
   | 'causal_refutation'
@@ -121,6 +128,18 @@ export interface CalibrationProfile {
   prune_raw_run_days?: number | null;
 }
 
+export interface AdaptiveMetricGateOverride {
+  tool: OrchestratorToolName;
+  metric_name: string;
+  comparator: '>=' | '<=';
+  baseline_threshold: number;
+  adapted_threshold: number;
+  sample_count: number;
+  mean_value: number;
+  stddev_value: number;
+  window_days: number;
+}
+
 export interface CalibrationRuntimeContext {
   model: string;
   prompt_family?: string;
@@ -139,6 +158,7 @@ export interface CalibrationRuntimeContext {
   selected_metric_threshold?: number;
   delta_from_prior_turn?: number;
   released?: boolean;
+  adaptive_thresholds?: AdaptiveThresholdSettings;
 }
 
 export interface TemporalReasoningRegistry {
@@ -345,6 +365,7 @@ export interface CalibrationResultMetadata {
   session_depth: number;
   warning_route_revision_threshold: number;
   metric_gate_failures: CalibrationGateIssue[];
+  adaptive_metric_overrides?: AdaptiveMetricGateOverride[];
   recorded_run_id?: number;
 }
 

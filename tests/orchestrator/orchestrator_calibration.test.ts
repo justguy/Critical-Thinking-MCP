@@ -7,15 +7,20 @@ import { DatabaseSync } from 'node:sqlite';
 import { describe, expect, it } from 'vitest';
 
 import {
+  getReleasedMetricWindowStats,
   classifyQuestionFromPrompt,
   evaluatePolicy,
   getHistoricalTurn3Stats,
+  getToolRedundancyRecommendations,
+  getTurnSalvageStats,
+  recordCalibrationRun,
   resolveCalibrationProfile,
   runOrchestrator,
 } from '../../src/orchestrator/index.js';
 import type {
   CalibrationProfile,
   OrchestratorEnvelope,
+  OrchestratorResult,
   RouteResult,
 } from '../../src/orchestrator/index.js';
 
@@ -59,6 +64,148 @@ function makeQualityEnvelope(answerText: string, iteration = 1): OrchestratorEnv
     review_context: {
       iteration_number: iteration,
       prior_failures: [],
+    },
+  };
+}
+
+function makeRecordedQualityResult(input: {
+  iteration?: number;
+  policyDecision?: OrchestratorResult['policy_decision'];
+  overallScore?: number;
+  specificityScore?: number;
+  structureScore?: number;
+  warnings?: string[];
+  blockingIssues?: Array<{ description: string }>;
+} = {}): OrchestratorResult {
+  const warnings = input.warnings ?? [];
+  const blockingIssues = input.blockingIssues ?? [];
+  const policyDecision = input.policyDecision ?? 'PASS';
+
+  return {
+    schema_version: 'orchestrator_v0',
+    mode: 'routed',
+    policy_decision: policyDecision,
+    route_results: [
+      {
+        tool: 'score_response_quality',
+        contract_type: 'quality_contract',
+        status: blockingIssues.length > 0 ? 'ENFORCEMENT_FAIL' : 'PASS',
+        result: {
+          overall_score: input.overallScore ?? 0.62,
+          substance_score: 0.88,
+          specificity_score: input.specificityScore ?? 0.08,
+          hedge_density: 0,
+          structure_score: input.structureScore ?? 0,
+          context_used: false,
+          improvement_prompt: 'n/a',
+        },
+        ...(warnings.length > 0 || blockingIssues.length > 0
+          ? {
+              enforcement: {
+                blocking_issues: blockingIssues.map(issue => ({
+                  mechanism: 'test',
+                  description: issue.description,
+                  severity: 'blocking',
+                })),
+                warnings,
+                corrective_prompt: '',
+              },
+            }
+          : {}),
+      },
+    ],
+    shadow_results: [],
+    telemetry: {
+      mode: 'routed',
+      router_primary_type: 'quality',
+      router_secondary_type: null,
+      routed_tools: ['score_response_quality'],
+      artifact_compatible_tools: ['score_response_quality'],
+      tools_executed: ['score_response_quality'],
+      tools_executed_only_in_shadow: [],
+      shadow_only_findings: [],
+      schema_failures: [],
+      policy_decision: policyDecision,
+      iteration_number: input.iteration ?? 1,
+      session_depth: 1,
+      would_have_escalated: false,
+    },
+  };
+}
+
+function makeRecordedPairResult(input: {
+  iteration?: number;
+  reasoningSignal?: boolean;
+  qualitySignal?: boolean;
+} = {}): OrchestratorResult {
+  const reasoningWarnings = input.reasoningSignal ? ['Graph issue'] : [];
+  const qualityWarnings = input.qualitySignal ? ['Quality issue'] : [];
+
+  return {
+    schema_version: 'orchestrator_v0',
+    mode: 'routed',
+    policy_decision: 'PASS',
+    route_results: [
+      {
+        tool: 'validate_reasoning_chain',
+        contract_type: 'reasoning_chain_contract',
+        status: 'PASS',
+        result: {
+          grounding_score: 0.8,
+          cycles: [],
+          orphaned_conclusions: [],
+          node_count: 3,
+          edge_count: 2,
+        },
+        ...(reasoningWarnings.length > 0
+          ? {
+              enforcement: {
+                blocking_issues: [],
+                warnings: reasoningWarnings,
+                corrective_prompt: '',
+              },
+            }
+          : {}),
+      },
+      {
+        tool: 'score_response_quality',
+        contract_type: 'quality_contract',
+        status: 'PASS',
+        result: {
+          overall_score: 0.6,
+          substance_score: 0.8,
+          specificity_score: 0.09,
+          hedge_density: 0,
+          structure_score: 0.33,
+          context_used: false,
+          improvement_prompt: 'n/a',
+        },
+        ...(qualityWarnings.length > 0
+          ? {
+              enforcement: {
+                blocking_issues: [],
+                warnings: qualityWarnings,
+                corrective_prompt: '',
+              },
+            }
+          : {}),
+      },
+    ],
+    shadow_results: [],
+    telemetry: {
+      mode: 'routed',
+      router_primary_type: 'quality',
+      router_secondary_type: 'reasoning',
+      routed_tools: ['validate_reasoning_chain', 'score_response_quality'],
+      artifact_compatible_tools: ['validate_reasoning_chain', 'score_response_quality'],
+      tools_executed: ['validate_reasoning_chain', 'score_response_quality'],
+      tools_executed_only_in_shadow: [],
+      shadow_only_findings: [],
+      schema_failures: [],
+      policy_decision: 'PASS',
+      iteration_number: input.iteration ?? 1,
+      session_depth: 1,
+      would_have_escalated: false,
     },
   };
 }
@@ -229,6 +376,68 @@ describe('orchestrator calibration profiles', () => {
 });
 
 describe('numeric-only calibration recording', () => {
+  it('derives released truth from the final policy decision when no explicit label is supplied', () => {
+    const workDir = mkdtempSync(join(tmpdir(), 'ct-calibration-release-'));
+    const dbPath = join(workDir, 'metrics.sqlite');
+
+    try {
+      runOrchestrator(
+        makeQualityEnvelope(
+          'This answer names 3 rollback checkpoints, a 15-minute review window, and 2 on-call owners to keep the duck ritual grounded in operational reality.',
+        ),
+        {
+          calibration: {
+            model: 'claude-sonnet-4-6',
+            prompt_family: 'operational_claim',
+            session_mode: 'single_turn',
+            profile_id: 'default.unscoped.v1',
+            db_path: dbPath,
+          },
+        },
+      );
+
+      runOrchestrator(
+        {
+          schema_version: 'orchestrator_v0',
+          answer_text: 'invalid',
+          contracts: {},
+          mode: 'routed',
+        } as unknown as OrchestratorEnvelope,
+        {
+          calibration: {
+            model: 'claude-sonnet-4-6',
+            prompt_family: 'operational_claim',
+            session_mode: 'single_turn',
+            profile_id: 'default.unscoped.v1',
+            db_path: dbPath,
+          },
+        },
+      );
+
+      const db = new DatabaseSync(dbPath);
+      try {
+        const rows = db
+          .prepare(
+            `
+              SELECT policy_decision, released
+              FROM orchestrator_runs
+              ORDER BY id ASC
+            `,
+          )
+          .all() as Array<{ policy_decision: string; released: number }>;
+
+        expect(rows).toHaveLength(2);
+        expect(['PASS', 'WARN']).toContain(rows[0].policy_decision);
+        expect(rows[0].released).toBe(1);
+        expect(rows[1]).toEqual({ policy_decision: 'REVISE', released: 0 });
+      } finally {
+        db.close();
+      }
+    } finally {
+      rmSync(workDir, { recursive: true, force: true });
+    }
+  });
+
   it('records runs and daily aggregates without storing answer or prompt text', () => {
     const workDir = mkdtempSync(join(tmpdir(), 'ct-calibration-'));
     const dbPath = join(workDir, 'metrics.sqlite');
@@ -470,6 +679,268 @@ describe('numeric-only calibration recording', () => {
       expect(stats.human_review_count).toBe(0);
       expect(stats.success_rate).toBe(1);
       expect(stats.mean_delta_from_prior_turn).toBe(0.08);
+    } finally {
+      rmSync(workDir, { recursive: true, force: true });
+    }
+  });
+
+  it('adapts min-threshold gates from released 7-day history for the same model and prompt family', () => {
+    const workDir = mkdtempSync(join(tmpdir(), 'ct-calibration-adaptive-'));
+    const dbPath = join(workDir, 'metrics.sqlite');
+    const promptText =
+      'Exactly how many duck squeezes guarantees a safe prod deployment, and what is the minimum viable squeeze rate per minute to maintain 99.999% uptime?';
+
+    try {
+      for (let i = 0; i < 5; i += 1) {
+        recordCalibrationRun({
+          db_path: dbPath,
+          runtime: {
+            model: 'claude-sonnet-4-6',
+            prompt_family: 'causal_refutation',
+            session_mode: 'single_turn',
+          },
+          profile: resolveCalibrationProfile({
+            model: 'claude-sonnet-4-6',
+            prompt_family: 'causal_refutation',
+            session_mode: 'single_turn',
+          }),
+          result: makeRecordedQualityResult({
+            policyDecision: 'PASS',
+            overallScore: 0.45,
+            specificityScore: 0.09,
+            structureScore: 0,
+          }),
+        });
+      }
+
+      const stats = getReleasedMetricWindowStats({
+        db_path: dbPath,
+        model: 'claude-sonnet-4-6',
+        prompt_family: 'causal_refutation',
+        session_mode: 'single_turn',
+        tool_name: 'score_response_quality',
+        metric_name: 'structure_score',
+      });
+
+      expect(stats.sample_count).toBe(5);
+      expect(stats.recommended_min_threshold).toBe(0);
+
+      const answerText =
+        'Rubber duck ritual stays useful only when the team logs 3 concrete failure modes, 2 rollback checkpoints, and a 15-minute incident review window.';
+      const withoutHistory = runOrchestrator(makeQualityEnvelope(answerText), {
+        calibration: {
+          model: 'claude-sonnet-4-6',
+          prompt_text: promptText,
+          session_mode: 'single_turn',
+          adaptive_thresholds: {
+            enabled: false,
+          },
+        },
+      });
+      const withHistory = runOrchestrator(makeQualityEnvelope(answerText), {
+        calibration: {
+          model: 'claude-sonnet-4-6',
+          prompt_text: promptText,
+          session_mode: 'single_turn',
+          db_path: dbPath,
+        },
+      });
+
+      expect(withoutHistory.policy_decision).toBe('REVISE');
+      expect(withHistory.policy_decision).not.toBe('REVISE');
+      expect(
+        withHistory.calibration?.adaptive_metric_overrides?.some(
+          override =>
+            override.tool === 'score_response_quality' &&
+            override.metric_name === 'structure_score' &&
+            override.adapted_threshold === 0,
+        ),
+      ).toBe(true);
+    } finally {
+      rmSync(workDir, { recursive: true, force: true });
+    }
+  });
+
+  it('measures turn-2 salvage by shared turn chain and metric delta', () => {
+    const workDir = mkdtempSync(join(tmpdir(), 'ct-calibration-salvage-'));
+    const dbPath = join(workDir, 'metrics.sqlite');
+    const profile = resolveCalibrationProfile({
+      model: 'claude-sonnet-4-6',
+      prompt_family: 'causal_refutation',
+      session_mode: 'multi_turn',
+    });
+
+    try {
+      recordCalibrationRun({
+        db_path: dbPath,
+        runtime: {
+          model: 'claude-sonnet-4-6',
+          prompt_family: 'causal_refutation',
+          session_mode: 'multi_turn',
+          turn_chain_id: 'chain-a',
+          selected_metric_tool: 'score_response_quality',
+          selected_metric_name: 'specificity_score',
+          selected_metric_value: 0.04,
+        },
+        profile,
+        result: makeRecordedQualityResult({
+          iteration: 1,
+          policyDecision: 'REVISE',
+          overallScore: 0.44,
+          specificityScore: 0.04,
+          structureScore: 0.1,
+        }),
+      });
+      recordCalibrationRun({
+        db_path: dbPath,
+        runtime: {
+          model: 'claude-sonnet-4-6',
+          prompt_family: 'causal_refutation',
+          session_mode: 'multi_turn',
+          turn_chain_id: 'chain-a',
+          selected_metric_tool: 'score_response_quality',
+          selected_metric_name: 'specificity_score',
+          selected_metric_value: 0.18,
+          delta_from_prior_turn: 0.14,
+        },
+        profile,
+        result: makeRecordedQualityResult({
+          iteration: 2,
+          policyDecision: 'PASS',
+          overallScore: 0.6,
+          specificityScore: 0.18,
+          structureScore: 0.1,
+        }),
+      });
+      recordCalibrationRun({
+        db_path: dbPath,
+        runtime: {
+          model: 'claude-sonnet-4-6',
+          prompt_family: 'causal_refutation',
+          session_mode: 'multi_turn',
+          turn_chain_id: 'chain-b',
+          selected_metric_tool: 'score_response_quality',
+          selected_metric_name: 'specificity_score',
+          selected_metric_value: 0.03,
+        },
+        profile,
+        result: makeRecordedQualityResult({
+          iteration: 1,
+          policyDecision: 'REVISE',
+          overallScore: 0.41,
+          specificityScore: 0.03,
+          structureScore: 0.1,
+        }),
+      });
+      recordCalibrationRun({
+        db_path: dbPath,
+        runtime: {
+          model: 'claude-sonnet-4-6',
+          prompt_family: 'causal_refutation',
+          session_mode: 'multi_turn',
+          turn_chain_id: 'chain-b',
+          selected_metric_tool: 'score_response_quality',
+          selected_metric_name: 'specificity_score',
+          selected_metric_value: 0.05,
+          delta_from_prior_turn: 0.02,
+        },
+        profile,
+        result: makeRecordedQualityResult({
+          iteration: 2,
+          policyDecision: 'HUMAN_REVIEW',
+          overallScore: 0.42,
+          specificityScore: 0.05,
+          structureScore: 0.1,
+        }),
+      });
+
+      const stats = getTurnSalvageStats({
+        db_path: dbPath,
+        model: 'claude-sonnet-4-6',
+        prompt_family: 'causal_refutation',
+        session_mode: 'multi_turn',
+        selected_metric_tool: 'score_response_quality',
+        selected_metric_name: 'specificity_score',
+      });
+
+      expect(stats.paired_chain_count).toBe(2);
+      expect(stats.turn_1_released_count).toBe(0);
+      expect(stats.turn_2_released_count).toBe(1);
+      expect(stats.eligible_turn_1_failure_count).toBe(2);
+      expect(stats.salvage_count).toBe(1);
+      expect(stats.salvage_rate).toBe(0.5);
+      expect(stats.mean_metric_delta).toBe(0.08);
+    } finally {
+      rmSync(workDir, { recursive: true, force: true });
+    }
+  });
+
+  it('finds tool-pair cases where one tool never produces an independent signal', () => {
+    const workDir = mkdtempSync(join(tmpdir(), 'ct-calibration-prune-'));
+    const dbPath = join(workDir, 'metrics.sqlite');
+    const profile = resolveCalibrationProfile({
+      model: 'claude-sonnet-4-6',
+      prompt_family: 'refutation',
+      session_mode: 'single_turn',
+    });
+
+    try {
+      recordCalibrationRun({
+        db_path: dbPath,
+        runtime: {
+          model: 'claude-sonnet-4-6',
+          prompt_family: 'refutation',
+          session_mode: 'single_turn',
+        },
+        profile,
+        result: makeRecordedPairResult({
+          reasoningSignal: true,
+          qualitySignal: true,
+        }),
+      });
+      recordCalibrationRun({
+        db_path: dbPath,
+        runtime: {
+          model: 'claude-sonnet-4-6',
+          prompt_family: 'refutation',
+          session_mode: 'single_turn',
+        },
+        profile,
+        result: makeRecordedPairResult({
+          reasoningSignal: true,
+          qualitySignal: false,
+        }),
+      });
+      recordCalibrationRun({
+        db_path: dbPath,
+        runtime: {
+          model: 'claude-sonnet-4-6',
+          prompt_family: 'refutation',
+          session_mode: 'single_turn',
+        },
+        profile,
+        result: makeRecordedPairResult({
+          reasoningSignal: false,
+          qualitySignal: false,
+        }),
+      });
+
+      const recommendations = getToolRedundancyRecommendations({
+        db_path: dbPath,
+        model: 'claude-sonnet-4-6',
+        prompt_family: 'refutation',
+        session_mode: 'single_turn',
+        min_paired_runs: 3,
+      });
+
+      expect(recommendations).toContainEqual(
+        expect.objectContaining({
+          anchor_tool: 'validate_reasoning_chain',
+          candidate_tool: 'score_response_quality',
+          paired_run_count: 3,
+          candidate_independent_signal_count: 0,
+        }),
+      );
     } finally {
       rmSync(workDir, { recursive: true, force: true });
     }

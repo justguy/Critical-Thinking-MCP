@@ -10,12 +10,19 @@ The key point is simple: if you do not use a deterministic control layer like CT
 
 The repo now includes a standalone simulator for this model:
 
-- [Interactive simulator](./cost-of-not-using-ct-simulator.html)
+- [Interactive simulator](../html/cost-of-not-using-ct-simulator.html)
+
+The simulator now also includes a clickable evidence shelf:
+
+- observed Beta 2 A/B examples from the release-gate benchmark
+- a compact export of those cases in [reports/ct_beta2_release_gate_examples.json](./reports/ct_beta2_release_gate_examples.json)
+
+Those examples are there to show stakeholders where the cost tiers come from, not just the abstract monthly math. Click any badge to inspect the case, see the A/B framing, and jump straight to the matching tier math in the page.
 
 Open it either by loading the HTML file directly in a browser or by serving the repo locally:
 
 ```bash
-open docs/cost-of-not-using-ct-simulator.html
+open html/cost-of-not-using-ct-simulator.html
 python3 -m http.server 8000
 ```
 

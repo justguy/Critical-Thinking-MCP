@@ -109,6 +109,33 @@ Tested on 56 scenarios (42 defect + 14 clean control) across 3 conditions (basel
 
 Note: these baseline metrics reflect static analysis quality. In live Beta 2 agent workflows, CT-MCP deliberately trades raw acceptance rate for safer `HUMAN_REVIEW` halts when a model cannot be deterministically repaired.
 
+## Beta 2 Release-Gate Summary
+
+The current Beta 2 release-gate benchmark is a control-plane benchmark, not a prose-quality benchmark. The result to optimize for is not "everything passed." The result to optimize for is "unsafe answers were either repaired, bounded, or halted."
+
+- Release-gate run: `2 providers x 1 model each x A/B x 8 core prompts`
+- Current report: [`docs/reports/ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md`](docs/reports/ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md)
+- B-arm accepted: `15/16`
+- Final B-arm split: `PASS=5`, `WARN=10`, `HUMAN_REVIEW=1`
+- `claude_sonnet_high`: `7/8` accepted, `3` revisions triggered, `2` salvaged, `1` escalated, average `revision_bloat_ratio = 1.44x`
+- `codex_high`: `8/8` accepted, `0` revisions, `0` escalations
+
+The system is now doing different jobs for different model defaults under one contract:
+
+- For stricter models like Codex, CT-MCP mostly behaves like a silent validator.
+- For more RLHF-heavy models like Claude, CT-MCP behaves like a constraint-enforcement layer that suppresses filler, forces structural repair, and escalates when one bounded rewrite is not enough.
+
+That is the Beta 2 result: one deterministic control plane, two different provider behaviors, one shared release policy.
+
+## Publication Surfaces
+
+The repo now includes a static publication surface under [`html/`](html/) for public sharing and GitHub Pages style hosting:
+
+- [`html/index.html`](html/index.html) — landing page for the publication bundle
+- [`html/cost-of-not-using-ct-simulator.html`](html/cost-of-not-using-ct-simulator.html) — interactive cost simulator with real release-gate evidence cases
+- [`html/ct-beta2-benchmark-review.html`](html/ct-beta2-benchmark-review.html) — interactive reviewer view over the Beta 2 release-gate benchmark
+- [`html/ct_beta2_ab_matrix_2026-04-10_release_gate_r2.json`](html/ct_beta2_ab_matrix_2026-04-10_release_gate_r2.json) — machine artifact used by the review surface
+
 The system distinguishes between blocking issues (must fix) and warnings (non-critical, correctly non-blocking):
 
 ```
@@ -308,7 +335,7 @@ The full phase-by-phase story now lives in [`docs/ARCHITECTURE_JOURNEY.md`](docs
 2. **Models yap to avoid constraints.** Once the critique packet became structurally useful, the next failure mode was token thrash. That is why Beta 2 added structural directives, formatting caps, and the anti-yap bloat breaker.
 3. **Multi-turn contexts get poisoned.** Humor and forecasting prompts can drift into fictional operational frameworks, and once that fiction is in prior-turn context a single rewrite is often not enough to recover. That is why Beta 2 treats `HUMAN_REVIEW` as a feature, not a miss.
 
-Current Beta 2 headline from [`docs/reports/ct_ab_clean_live_enforced_prompt_classifier_2026-04-10_topology.md`](docs/reports/ct_ab_clean_live_enforced_prompt_classifier_2026-04-10_topology.md): `PASS=1`, `WARN=3`, `HUMAN_REVIEW=2`. That is lower acceptance than the earlier classifier-only phase by design. The system now prefers halting and escalating over releasing a structured hallucination.
+The earlier topology report in [`docs/reports/ct_ab_clean_live_enforced_prompt_classifier_2026-04-10_topology.md`](docs/reports/ct_ab_clean_live_enforced_prompt_classifier_2026-04-10_topology.md) is still useful as the lab notebook for how Beta 2 got here. The current release-gate headline, though, is the cross-provider run in [`docs/reports/ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md`](docs/reports/ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md): `PASS=5`, `WARN=10`, `HUMAN_REVIEW=1` on the B arm. That is the right shape for a control plane. The system now prefers bounded release and explicit escalation over polished hallucination.
 
 ## Current Issues
 

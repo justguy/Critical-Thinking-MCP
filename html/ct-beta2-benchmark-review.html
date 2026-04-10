@@ -171,6 +171,14 @@
         line-height: 1.45;
       }
 
+      .metric-head,
+      .block-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
       .dashboard {
         display: grid;
         grid-template-columns: minmax(300px, 340px) minmax(0, 1fr);
@@ -413,6 +421,50 @@
         font-weight: 700;
       }
 
+      .info-badge {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        border: 0;
+        border-radius: 999px;
+        background: rgba(199, 93, 44, 0.14);
+        color: var(--accent);
+        font-size: 0.76rem;
+        font-weight: 900;
+        cursor: help;
+        padding: 0;
+      }
+
+      .info-badge::after {
+        content: attr(data-tip);
+        position: absolute;
+        left: 50%;
+        bottom: calc(100% + 10px);
+        transform: translateX(-50%);
+        width: min(260px, 72vw);
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: rgba(24, 21, 20, 0.96);
+        color: #f6efe2;
+        font-size: 0.82rem;
+        font-weight: 600;
+        line-height: 1.45;
+        text-align: left;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 120ms ease;
+        z-index: 20;
+      }
+
+      .info-badge:hover::after,
+      .info-badge:focus-visible::after {
+        opacity: 1;
+      }
+
       .run-callout {
         padding: 14px;
         border-radius: 18px;
@@ -453,6 +505,12 @@
       .detail-stack {
         display: grid;
         gap: 14px;
+      }
+
+      .detail-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
       }
 
       .block {
@@ -536,10 +594,141 @@
         color: #6c3140;
       }
 
+      dialog.raw-modal {
+        width: min(1200px, calc(100vw - 22px));
+        max-height: min(92vh, 980px);
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        padding: 0;
+        background: rgba(251, 245, 236, 0.98);
+        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
+      }
+
+      dialog.raw-modal::backdrop {
+        background: rgba(23, 20, 18, 0.52);
+        backdrop-filter: blur(4px);
+      }
+
+      .modal-shell {
+        display: grid;
+        gap: 16px;
+        padding: 22px;
+      }
+
+      .modal-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        align-items: start;
+      }
+
+      .modal-close {
+        appearance: none;
+        border: 1px solid rgba(86, 56, 35, 0.12);
+        background: rgba(255, 251, 244, 0.96);
+        color: var(--ink);
+        padding: 10px 14px;
+        border-radius: 999px;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 800;
+      }
+
+      .modal-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .modal-tabs,
+      .subtabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .tab,
+      .subtab {
+        appearance: none;
+        border: 1px solid rgba(86, 56, 35, 0.12);
+        background: rgba(255, 251, 244, 0.95);
+        color: var(--ink);
+        padding: 10px 14px;
+        border-radius: 999px;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 700;
+      }
+
+      .tab.active,
+      .subtab.active {
+        background: rgba(199, 93, 44, 0.12);
+        border-color: rgba(199, 93, 44, 0.28);
+        color: var(--accent);
+      }
+
+      .modal-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+        gap: 16px;
+      }
+
+      .modal-side {
+        display: grid;
+        gap: 12px;
+      }
+
+      .modal-content {
+        padding: 18px;
+        border-radius: 22px;
+        background: rgba(255, 251, 244, 0.98);
+        border: 1px solid rgba(86, 56, 35, 0.08);
+        min-height: 320px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .modal-content h3 {
+        font-size: 1rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      .modal-content .code {
+        min-height: 0;
+      }
+
+      .meta-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .meta-item {
+        padding: 14px;
+        border-radius: 18px;
+        background: rgba(24, 21, 20, 0.04);
+        display: grid;
+        gap: 4px;
+      }
+
+      .meta-item span {
+        color: var(--muted);
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .meta-item strong {
+        font-size: 1rem;
+      }
+
       @media (max-width: 1100px) {
         .hero-grid,
         .dashboard,
-        .detail-grid {
+        .detail-grid,
+        .modal-grid {
           grid-template-columns: 1fr;
         }
       }
@@ -677,7 +866,8 @@
                 <div class="stat-row" id="detail-badges"></div>
                 <h2 id="detail-title">Select a run</h2>
               </div>
-              <div class="hero-links">
+              <div class="detail-actions">
+                <button class="tab" type="button" id="open-raw-dialog">Open full run viewer</button>
                 <a id="detail-report-link" href="./ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md">Open report</a>
               </div>
             </div>
@@ -730,13 +920,73 @@
       </section>
     </main>
 
+    <dialog class="raw-modal" id="raw-modal">
+      <div class="modal-shell">
+        <div class="modal-head">
+          <div>
+            <div class="modal-meta" id="modal-badges"></div>
+            <h2 id="modal-title">Full run viewer</h2>
+            <p id="modal-copy">Prompt, both model traces, and CT artifacts for the selected benchmark case.</p>
+          </div>
+          <button class="modal-close" type="button" id="close-raw-dialog">Close</button>
+        </div>
+
+        <div class="modal-tabs" id="modal-model-tabs"></div>
+
+        <div class="modal-grid">
+          <section class="modal-content">
+            <div class="subtabs" id="modal-pass-tabs"></div>
+            <h3 id="modal-section-title">Prompt</h3>
+            <div class="code answer" id="modal-body"></div>
+          </section>
+
+          <aside class="modal-side">
+            <div class="block">
+              <div class="block-head">
+                <h3>What You’re Seeing</h3>
+                <button
+                  class="info-badge"
+                  type="button"
+                  data-tip="These are the real benchmark artifacts: the prompt, the model outputs for each arm, and the CT review packet that decided whether the run was repaired, released, or halted."
+                  aria-label="Explain modal contents"
+                >?</button>
+              </div>
+              <p id="modal-help"></p>
+            </div>
+
+            <div class="block">
+              <h3>Run Snapshot</h3>
+              <div class="meta-list" id="modal-meta-list"></div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </dialog>
+
     <script>
       const DATA_PATH = "./ct_beta2_ab_matrix_2026-04-10_release_gate_r2.json";
+      const PROMPT_DATA_PATH = "./ct_beta2_prompt_text.json";
       const REPORT_PATH = "./ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md";
       const AUDIT_PATH = "./ct_mcp_beta2_semantic_audit_packet.md";
+      const METRIC_EXPLAINERS = {
+        accepted: "How many B-arm runs ended in a bounded release instead of being halted.",
+        humanReview: "How many runs the control plane stopped and escalated rather than pretending it had a safe answer.",
+        revisionTurns: "How many B-arm runs needed one repair pass after CT flagged a structural problem.",
+        averageBloat: "How much longer a revision became than the first answer. Higher is only bad when the answer also becomes expensive or noisy.",
+        initialOutput: "How many answer tokens the model used on its first scored pass.",
+        initialDuration: "How long the first scored pass took end to end.",
+        initialCost: "Estimated API spend for the first scored pass.",
+        revisionOutput: "How many tokens the repair pass used, if a repair happened.",
+        revisionDuration: "How long the repair pass took, if there was one.",
+        revisionCost: "Estimated API spend for the repair pass.",
+        bloatRatio: "Revision length divided by first-pass length. It spots answers that get wordier instead of cleaner.",
+        tokenDelta: "Extra or fewer output tokens after the repair pass.",
+        latencyDelta: "Extra or fewer milliseconds after the repair pass.",
+      };
 
       const state = {
         data: null,
+        promptTexts: {},
         selectedId: null,
         chip: "all",
         filters: {
@@ -745,6 +995,11 @@
           model: "all",
           decision: "all",
           revision: "all",
+        },
+        modal: {
+          promptId: null,
+          modelId: null,
+          tab: "prompt",
         },
       };
 
@@ -767,6 +1022,18 @@
         detailAbSummary: document.getElementById("detail-ab-summary"),
         detailReviewWarning: document.getElementById("detail-review-warning"),
         detailReportLink: document.getElementById("detail-report-link"),
+        openRawDialog: document.getElementById("open-raw-dialog"),
+        rawModal: document.getElementById("raw-modal"),
+        closeRawDialog: document.getElementById("close-raw-dialog"),
+        modalBadges: document.getElementById("modal-badges"),
+        modalTitle: document.getElementById("modal-title"),
+        modalCopy: document.getElementById("modal-copy"),
+        modalModelTabs: document.getElementById("modal-model-tabs"),
+        modalPassTabs: document.getElementById("modal-pass-tabs"),
+        modalSectionTitle: document.getElementById("modal-section-title"),
+        modalBody: document.getElementById("modal-body"),
+        modalHelp: document.getElementById("modal-help"),
+        modalMetaList: document.getElementById("modal-meta-list"),
         search: document.getElementById("search"),
         providerFilter: document.getElementById("provider-filter"),
         modelFilter: document.getElementById("model-filter"),
@@ -809,7 +1076,7 @@
         return clean.reduce((sum, v) => sum + v, 0) / clean.length;
       }
 
-      function normalizeData(raw) {
+      function normalizeData(raw, promptTexts) {
         const pairMap = new Map();
         raw.runs.forEach((run) => {
           const key = `${run.prompt_id}::${run.model_id}`;
@@ -855,14 +1122,26 @@
               revisionCritique: initialCal.revision_request?.critique_packet || "",
               releasedAnswer: run.released_answer || "",
               lastAttemptedAnswer: run.last_attempted_answer || "",
+              promptText: promptTexts[run.prompt_id] || `${run.prompt_title}\n\nPrompt body not embedded in this artifact.`,
               aArmDecision: pair.A?.final_policy_decision || "n/a",
               aArmOutcome: pair.A?.final_outcome || "n/a",
+              aArmAnswer: pair.A?.last_attempted_answer || pair.A?.released_answer || "",
+              aArmReleasedAnswer: pair.A?.released_answer || "",
+              bPreDraft: run.pre_draft || "",
+              rawPair: pair,
+              rawRun: run,
             };
           });
 
         const providers = [...new Set(bRuns.map((run) => run.provider))];
         const models = [...new Set(bRuns.map((run) => run.model))];
-        return { raw, bRuns, providers, models };
+        const promptIndex = new Map();
+        bRuns.forEach((run) => {
+          const existing = promptIndex.get(run.promptId) || [];
+          existing.push(run);
+          promptIndex.set(run.promptId, existing);
+        });
+        return { raw, bRuns, providers, models, promptIndex };
       }
 
       function computeSummary(runs) {
@@ -923,21 +1202,25 @@
             label: "B-arm accepted",
             value: `${summary.accepted}/${summary.total}`,
             copy: "Accepted means the control plane released a bounded PASS or WARN instead of leaving the run unresolved.",
+            tip: METRIC_EXPLAINERS.accepted,
           },
           {
             label: "Human review",
             value: `${summary.escalations}`,
             copy: "Escalations are intentional halts. They show where one-turn deterministic repair was exhausted.",
+            tip: METRIC_EXPLAINERS.humanReview,
           },
           {
             label: "Revision turns",
             value: `${summary.revisions}`,
             copy: "These are the B-arm runs that needed an explicit structural critique packet before final policy resolution.",
+            tip: METRIC_EXPLAINERS.revisionTurns,
           },
           {
             label: "Average bloat",
             value: fmtRatio(summary.avgBloat),
             copy: "Relative revision growth should be read alongside absolute size. Bloat is only dangerous when it becomes operationally expensive.",
+            tip: METRIC_EXPLAINERS.averageBloat,
           },
         ];
 
@@ -945,7 +1228,10 @@
           .map(
             (metric) => `
               <article class="metric">
-                <span class="label">${metric.label}</span>
+                <div class="metric-head">
+                  <span class="label">${metric.label}</span>
+                  <button class="info-badge" type="button" data-tip="${metric.tip}" aria-label="Explain ${metric.label}">?</button>
+                </div>
                 <div class="value">${metric.value}</div>
                 <p>${metric.copy}</p>
               </article>
@@ -978,6 +1264,19 @@
 
       function createStat(label, value) {
         return `<span class="stat">${label}: ${value}</span>`;
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
+
+      function infoBadge(label, tip) {
+        return `<button class="info-badge" type="button" data-tip="${escapeHtml(tip)}" aria-label="Explain ${escapeHtml(label)}">?</button>`;
       }
 
       function renderRuns() {
@@ -1073,20 +1372,23 @@
         els.detailCritique.textContent = run.revisionCritique || "No revision critique packet was needed for this run.";
 
         els.detailMetrics.innerHTML = [
-          { label: "Initial output", value: fmtTokens(run.initialOutputTokens) },
-          { label: "Initial duration", value: fmtMs(run.initialDurationMs) },
-          { label: "Initial cost", value: fmtMoney(run.initialCostUsd) },
-          { label: "Revision output", value: fmtTokens(run.revisionOutputTokens) },
-          { label: "Revision duration", value: fmtMs(run.revisionDurationMs) },
-          { label: "Revision cost", value: fmtMoney(run.revisionCostUsd) },
-          { label: "Bloat ratio", value: fmtRatio(run.revisionBloatRatio) },
-          { label: "Token delta", value: run.revisionOutputTokenDelta == null ? "n/a" : `${run.revisionOutputTokenDelta > 0 ? "+" : ""}${fmtTokens(run.revisionOutputTokenDelta)}` },
-          { label: "Latency delta", value: run.revisionDurationDeltaMs == null ? "n/a" : `${run.revisionDurationDeltaMs > 0 ? "+" : ""}${fmtMs(run.revisionDurationDeltaMs)}` },
+          { label: "Initial output", value: fmtTokens(run.initialOutputTokens), key: "initialOutput" },
+          { label: "Initial duration", value: fmtMs(run.initialDurationMs), key: "initialDuration" },
+          { label: "Initial cost", value: fmtMoney(run.initialCostUsd), key: "initialCost" },
+          { label: "Revision output", value: fmtTokens(run.revisionOutputTokens), key: "revisionOutput" },
+          { label: "Revision duration", value: fmtMs(run.revisionDurationMs), key: "revisionDuration" },
+          { label: "Revision cost", value: fmtMoney(run.revisionCostUsd), key: "revisionCost" },
+          { label: "Bloat ratio", value: fmtRatio(run.revisionBloatRatio), key: "bloatRatio" },
+          { label: "Token delta", value: run.revisionOutputTokenDelta == null ? "n/a" : `${run.revisionOutputTokenDelta > 0 ? "+" : ""}${fmtTokens(run.revisionOutputTokenDelta)}`, key: "tokenDelta" },
+          { label: "Latency delta", value: run.revisionDurationDeltaMs == null ? "n/a" : `${run.revisionDurationDeltaMs > 0 ? "+" : ""}${fmtMs(run.revisionDurationDeltaMs)}`, key: "latencyDelta" },
         ]
           .map(
             (item) => `
               <div class="insight">
-                <span>${item.label}</span>
+                <div class="metric-head">
+                  <span>${item.label}</span>
+                  ${infoBadge(item.label, METRIC_EXPLAINERS[item.key])}
+                </div>
                 <strong>${item.value}</strong>
               </div>
             `
@@ -1105,6 +1407,128 @@
         els.detailReviewWarning.hidden = run.decision !== "HUMAN_REVIEW";
         els.detailReviewWarning.textContent = run.humanReviewReason || "";
         els.detailReportLink.href = REPORT_PATH;
+      }
+
+      function getPromptRuns(promptId) {
+        return (state.data.promptIndex.get(promptId) || []).slice().sort((a, b) => a.model.localeCompare(b.model));
+      }
+
+      function getModelView(run) {
+        const initialResult = run.rawRun?.passes?.initial?.result_event?.result || "";
+        const revisionResult = run.rawRun?.passes?.revision?.result_event?.result || "";
+        const initialCt = run.rawRun?.passes?.initial?.calibration_result || {};
+        const revisionCt = run.rawRun?.passes?.revision?.calibration_result || {};
+        return {
+          prompt: run.promptText,
+          armA: run.aArmAnswer || "No A-arm answer recorded.",
+          preDraft: run.bPreDraft || "No B pre-draft recorded.",
+          initialPass: initialResult || run.lastAttemptedAnswer || "No initial pass answer recorded.",
+          initialCt,
+          revisionCritique:
+            run.rawRun?.passes?.initial?.calibration_result?.revision_request?.prompt ||
+            run.revisionCritique ||
+            "No CT revision packet was needed for this run.",
+          revisionPass: revisionResult || "No revision pass recorded.",
+          finalReleased: run.releasedAnswer || "No released answer recorded for this run.",
+          rawJson: JSON.stringify(run.rawRun, null, 2),
+        };
+      }
+
+      function renderModal() {
+        if (!state.modal.promptId) return;
+        const runs = getPromptRuns(state.modal.promptId);
+        const activeRun =
+          runs.find((run) => run.model === state.modal.modelId) ||
+          runs[0];
+        if (!activeRun) return;
+        state.modal.modelId = activeRun.model;
+        const view = getModelView(activeRun);
+
+        els.modalBadges.innerHTML = [
+          `<span class="prompt-tag">${activeRun.promptId}</span>`,
+          `<span class="meta-pill">${activeRun.promptTitle}</span>`,
+        ].join("");
+        els.modalTitle.textContent = `${activeRun.promptId} · Full run viewer`;
+        els.modalCopy.textContent =
+          "See the prompt, both model traces for this prompt, and the exact CT packet that shaped the revision path.";
+        els.modalHelp.textContent =
+          "Use the model tabs to switch between Claude and Codex for the same prompt. Use the pass tabs to inspect the prompt, the raw answer for each arm, the CT critique, and the final released form.";
+        els.modalModelTabs.innerHTML = runs
+          .map(
+            (run) => `
+              <button class="tab ${run.model === state.modal.modelId ? "active" : ""}" type="button" data-model-tab="${run.model}">
+                ${run.provider} · ${run.model}
+              </button>
+            `
+          )
+          .join("");
+
+        const tabs = [
+          { id: "prompt", label: "Prompt", title: "Benchmark prompt", body: view.prompt },
+          { id: "armA", label: "Arm A answer", title: "Arm A final answer", body: view.armA },
+          { id: "preDraft", label: "B pre-draft", title: "B arm pre-draft", body: view.preDraft },
+          { id: "initialPass", label: "B initial pass", title: "B initial answer", body: view.initialPass },
+          { id: "initialCt", label: "CT initial review", title: "CT initial review payload", body: JSON.stringify(view.initialCt, null, 2) },
+          { id: "revisionCritique", label: "CT critique", title: "Revision request prompt", body: view.revisionCritique },
+          { id: "revisionPass", label: "B revision pass", title: "B revision answer", body: view.revisionPass },
+          { id: "finalReleased", label: "Final released", title: "Released answer", body: view.finalReleased },
+          { id: "rawJson", label: "Raw JSON", title: "Raw run artifact", body: view.rawJson },
+        ];
+
+        const activeTab = tabs.find((tab) => tab.id === state.modal.tab) ? state.modal.tab : "prompt";
+        state.modal.tab = activeTab;
+        const selectedTab = tabs.find((tab) => tab.id === activeTab);
+
+        els.modalPassTabs.innerHTML = tabs
+          .map(
+            (tab) => `
+              <button class="subtab ${tab.id === activeTab ? "active" : ""}" type="button" data-pass-tab="${tab.id}">
+                ${tab.label}
+              </button>
+            `
+          )
+          .join("");
+        els.modalSectionTitle.textContent = selectedTab.title;
+        els.modalBody.textContent = selectedTab.body;
+        els.modalMetaList.innerHTML = [
+          { label: "Final decision", value: activeRun.decision },
+          { label: "Outcome", value: activeRun.outcome },
+          { label: "A arm", value: activeRun.aArmDecision },
+          { label: "Revision used", value: activeRun.hasRevision ? "yes" : "no" },
+          { label: "Bloat ratio", value: fmtRatio(activeRun.revisionBloatRatio) },
+          { label: "Released", value: activeRun.releaseState },
+        ]
+          .map(
+            (item) => `
+              <div class="meta-item">
+                <span>${item.label}</span>
+                <strong>${item.value}</strong>
+              </div>
+            `
+          )
+          .join("");
+
+        els.modalModelTabs.querySelectorAll("[data-model-tab]").forEach((button) => {
+          button.addEventListener("click", () => {
+            state.modal.modelId = button.dataset.modelTab;
+            renderModal();
+          });
+        });
+        els.modalPassTabs.querySelectorAll("[data-pass-tab]").forEach((button) => {
+          button.addEventListener("click", () => {
+            state.modal.tab = button.dataset.passTab;
+            renderModal();
+          });
+        });
+      }
+
+      function openModalForRun(run) {
+        if (!run) return;
+        state.modal.promptId = run.promptId;
+        state.modal.modelId = run.model;
+        state.modal.tab = "prompt";
+        renderModal();
+        els.rawModal.showModal();
       }
 
       function selectRun(runId) {
@@ -1154,6 +1578,25 @@
             renderRuns();
           });
         });
+
+        els.openRawDialog.addEventListener("click", () => {
+          const run = state.data.bRuns.find((item) => item.id === state.selectedId);
+          openModalForRun(run);
+        });
+        els.closeRawDialog.addEventListener("click", () => {
+          els.rawModal.close();
+        });
+        els.rawModal.addEventListener("click", (event) => {
+          const rect = els.rawModal.getBoundingClientRect();
+          const inDialog =
+            event.clientX >= rect.left &&
+            event.clientX <= rect.right &&
+            event.clientY >= rect.top &&
+            event.clientY <= rect.bottom;
+          if (!inDialog) {
+            els.rawModal.close();
+          }
+        });
       }
 
       function renderLoadError(error) {
@@ -1170,12 +1613,22 @@
 
       async function init() {
         try {
-          const response = await fetch(DATA_PATH);
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status} while loading ${DATA_PATH}`);
+          const [dataResponse, promptResponse] = await Promise.all([
+            fetch(DATA_PATH),
+            fetch(PROMPT_DATA_PATH),
+          ]);
+          if (!dataResponse.ok) {
+            throw new Error(`HTTP ${dataResponse.status} while loading ${DATA_PATH}`);
           }
-          const raw = await response.json();
-          state.data = normalizeData(raw);
+          if (!promptResponse.ok) {
+            throw new Error(`HTTP ${promptResponse.status} while loading ${PROMPT_DATA_PATH}`);
+          }
+          const [raw, promptTexts] = await Promise.all([
+            dataResponse.json(),
+            promptResponse.json(),
+          ]);
+          state.promptTexts = promptTexts;
+          state.data = normalizeData(raw, promptTexts);
           renderHeadline();
           renderProviderCards();
           populateFilters();

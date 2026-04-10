@@ -1,0 +1,1193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CT-MCP Beta 2 Benchmark Review</title>
+    <style>
+      :root {
+        --bg: #f4ecde;
+        --panel: rgba(255, 249, 239, 0.9);
+        --panel-strong: rgba(255, 251, 244, 0.97);
+        --border: rgba(86, 56, 35, 0.12);
+        --ink: #171412;
+        --muted: #6d5d4d;
+        --accent: #c75d2c;
+        --accent-soft: #f3cdb7;
+        --teal: #1f7b74;
+        --teal-soft: #d8f1eb;
+        --warn: #aa5a17;
+        --pass: #176544;
+        --review: #7f2739;
+        --shadow: 0 24px 70px rgba(79, 50, 30, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(255, 255, 255, 0.68), transparent 38%),
+          radial-gradient(circle at top right, rgba(243, 205, 183, 0.42), transparent 24%),
+          linear-gradient(180deg, #fbf4e9 0%, var(--bg) 100%);
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      .shell {
+        width: min(1380px, calc(100vw - 32px));
+        margin: 24px auto 48px;
+        display: grid;
+        gap: 18px;
+      }
+
+      .hero,
+      .panel,
+      .detail,
+      .run-card {
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .hero {
+        padding: 28px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(199, 93, 44, 0.12);
+        color: var(--accent);
+        font-size: 0.8rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: clamp(2rem, 4vw, 3.6rem);
+        line-height: 0.96;
+        max-width: 14ch;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.9fr);
+        gap: 18px;
+      }
+
+      .hero-copy {
+        display: grid;
+        gap: 12px;
+      }
+
+      .hero-copy p {
+        color: var(--muted);
+        font-size: 1.08rem;
+        line-height: 1.55;
+        max-width: 62ch;
+      }
+
+      .hero-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .hero-links a,
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(86, 56, 35, 0.12);
+        background: rgba(255, 250, 243, 0.94);
+        color: var(--ink);
+        text-decoration: none;
+        font-weight: 700;
+      }
+
+      .hero-links a:hover,
+      .chip:hover,
+      .chip:focus-visible {
+        border-color: rgba(199, 93, 44, 0.4);
+        outline: none;
+      }
+
+      .headline-metrics {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .metric {
+        padding: 18px;
+        border-radius: 22px;
+        background: linear-gradient(180deg, rgba(255, 251, 244, 0.98), rgba(250, 240, 229, 0.92));
+        border: 1px solid rgba(86, 56, 35, 0.09);
+        display: grid;
+        gap: 8px;
+      }
+
+      .metric .label {
+        color: var(--accent);
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .metric .value {
+        font-size: clamp(1.9rem, 3vw, 3rem);
+        line-height: 0.9;
+        font-weight: 900;
+      }
+
+      .metric p {
+        color: var(--muted);
+        line-height: 1.45;
+      }
+
+      .dashboard {
+        display: grid;
+        grid-template-columns: minmax(300px, 340px) minmax(0, 1fr);
+        gap: 18px;
+        align-items: start;
+      }
+
+      .panel {
+        padding: 22px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .panel h2 {
+        font-size: 1.55rem;
+      }
+
+      .panel p,
+      .panel li,
+      .detail p {
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      .filters {
+        display: grid;
+        gap: 14px;
+      }
+
+      .control {
+        display: grid;
+        gap: 8px;
+      }
+
+      .control label {
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      .control input,
+      .control select {
+        width: 100%;
+        min-height: 46px;
+        border-radius: 16px;
+        border: 1px solid rgba(86, 56, 35, 0.12);
+        background: rgba(255, 251, 244, 0.96);
+        color: var(--ink);
+        padding: 0 14px;
+        font: inherit;
+      }
+
+      .filter-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .chip.active {
+        background: rgba(199, 93, 44, 0.12);
+        border-color: rgba(199, 93, 44, 0.32);
+        color: var(--accent);
+      }
+
+      .provider-stack {
+        display: grid;
+        gap: 12px;
+      }
+
+      .provider-card {
+        padding: 16px;
+        border-radius: 20px;
+        background: rgba(255, 250, 243, 0.92);
+        border: 1px solid rgba(86, 56, 35, 0.08);
+        display: grid;
+        gap: 10px;
+      }
+
+      .provider-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: baseline;
+      }
+
+      .provider-head strong {
+        font-size: 1.12rem;
+      }
+
+      .provider-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .provider-grid span {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
+      .provider-grid strong {
+        display: block;
+        font-size: 1.25rem;
+        color: var(--ink);
+      }
+
+      .results-panel {
+        display: grid;
+        gap: 18px;
+      }
+
+      .results-header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 14px;
+        align-items: end;
+      }
+
+      .results-header h2 {
+        font-size: 1.7rem;
+      }
+
+      .results-header p {
+        max-width: 58ch;
+      }
+
+      .run-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 14px;
+      }
+
+      .run-card {
+        padding: 18px;
+        display: grid;
+        gap: 14px;
+        cursor: pointer;
+        transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+      }
+
+      .run-card:hover,
+      .run-card:focus-visible,
+      .run-card.active {
+        transform: translateY(-2px);
+        border-color: rgba(199, 93, 44, 0.34);
+        outline: none;
+      }
+
+      .run-card.active {
+        background: rgba(255, 252, 247, 0.98);
+      }
+
+      .run-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: start;
+      }
+
+      .prompt-tag {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: rgba(24, 21, 20, 0.06);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .decision-pill,
+      .meta-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 10px;
+        border-radius: 999px;
+        font-size: 0.76rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .decision-pass {
+        background: rgba(23, 101, 68, 0.12);
+        color: var(--pass);
+      }
+
+      .decision-warn {
+        background: rgba(170, 90, 23, 0.12);
+        color: var(--warn);
+      }
+
+      .decision-review {
+        background: rgba(127, 39, 57, 0.12);
+        color: var(--review);
+      }
+
+      .meta-pill {
+        background: rgba(31, 123, 116, 0.1);
+        color: var(--teal);
+      }
+
+      .run-title {
+        display: grid;
+        gap: 6px;
+      }
+
+      .run-title h3 {
+        font-size: 1.24rem;
+        line-height: 1.05;
+      }
+
+      .run-title p {
+        color: var(--muted);
+      }
+
+      .stat-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .stat {
+        padding: 8px 10px;
+        border-radius: 14px;
+        background: rgba(24, 21, 20, 0.05);
+        font-size: 0.86rem;
+        font-weight: 700;
+      }
+
+      .run-callout {
+        padding: 14px;
+        border-radius: 18px;
+        background: rgba(255, 246, 234, 0.9);
+        color: var(--muted);
+      }
+
+      .detail {
+        padding: 24px;
+        display: grid;
+        gap: 18px;
+      }
+
+      .detail[hidden] {
+        display: none;
+      }
+
+      .detail-head {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 14px;
+        align-items: start;
+      }
+
+      .detail-head h2 {
+        font-size: clamp(1.6rem, 3vw, 2.4rem);
+        line-height: 0.98;
+        max-width: 18ch;
+      }
+
+      .detail-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+        gap: 18px;
+      }
+
+      .detail-stack {
+        display: grid;
+        gap: 14px;
+      }
+
+      .block {
+        padding: 18px;
+        border-radius: 20px;
+        background: var(--panel-strong);
+        border: 1px solid rgba(86, 56, 35, 0.08);
+        display: grid;
+        gap: 10px;
+      }
+
+      .block h3 {
+        font-size: 1rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      .code {
+        padding: 14px;
+        border-radius: 18px;
+        background: rgba(24, 21, 20, 0.92);
+        color: #f6efe2;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.9rem;
+        line-height: 1.55;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+
+      .answer {
+        max-height: 280px;
+        overflow: auto;
+      }
+
+      .list {
+        display: grid;
+        gap: 8px;
+        padding-left: 18px;
+      }
+
+      .insight-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .insight {
+        padding: 14px;
+        border-radius: 18px;
+        background: rgba(24, 21, 20, 0.04);
+        display: grid;
+        gap: 6px;
+      }
+
+      .insight span {
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .insight strong {
+        font-size: 1.3rem;
+      }
+
+      .empty {
+        padding: 24px;
+        border-radius: 24px;
+        border: 1px dashed rgba(86, 56, 35, 0.18);
+        background: rgba(255, 251, 244, 0.75);
+        color: var(--muted);
+      }
+
+      .warning {
+        padding: 16px;
+        border-radius: 18px;
+        background: rgba(127, 39, 57, 0.08);
+        border: 1px solid rgba(127, 39, 57, 0.16);
+        color: #6c3140;
+      }
+
+      @media (max-width: 1100px) {
+        .hero-grid,
+        .dashboard,
+        .detail-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .shell {
+          width: min(100vw - 20px, 100%);
+          margin: 12px auto 28px;
+        }
+
+        .hero,
+        .panel,
+        .detail,
+        .run-card {
+          border-radius: 24px;
+        }
+
+        .headline-metrics,
+        .provider-grid,
+        .filter-row,
+        .insight-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <span class="eyebrow">Beta 2 Review Surface</span>
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <h1>Interactive review for the release-gate benchmark.</h1>
+            <p>
+              This page turns the Beta 2 release-gate run into a reviewer-facing control
+              surface. It reads the real benchmark JSON, computes the B-arm control-plane
+              summary, and lets you inspect where the orchestrator bounded, salvaged, or
+              escalated each case.
+            </p>
+            <p>
+              If this page is opened as a local file and the browser blocks JSON fetches,
+              serve the repo with <code>python3 -m http.server 8000</code> and open the
+              page through <code>http://localhost:8000/html/ct-beta2-benchmark-review.html</code>.
+            </p>
+            <div class="hero-links">
+              <a href="./ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md">Open markdown report</a>
+              <a href="./ct_beta2_ab_matrix_2026-04-10_release_gate_r2.json">Open machine JSON</a>
+              <a href="./ct_mcp_beta2_semantic_audit_packet.md">Open audit packet</a>
+            </div>
+          </div>
+
+          <div class="headline-metrics" id="headline-metrics"></div>
+        </div>
+      </section>
+
+      <section class="dashboard">
+        <aside class="panel">
+          <div>
+            <h2>Filters</h2>
+            <p>Use this view to isolate provider behavior, revision-heavy runs, or the queue that still needs semantic human audit.</p>
+          </div>
+
+          <div class="filters">
+            <div class="control">
+              <label for="search">Search prompt or title</label>
+              <input id="search" type="search" placeholder="Q04, T03, contradiction, humor..." />
+            </div>
+
+            <div class="filter-row">
+              <div class="control">
+                <label for="provider-filter">Provider</label>
+                <select id="provider-filter">
+                  <option value="all">All providers</option>
+                </select>
+              </div>
+
+              <div class="control">
+                <label for="model-filter">Model</label>
+                <select id="model-filter">
+                  <option value="all">All models</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="filter-row">
+              <div class="control">
+                <label for="decision-filter">Terminal decision</label>
+                <select id="decision-filter">
+                  <option value="all">All decisions</option>
+                  <option value="PASS">PASS</option>
+                  <option value="WARN">WARN</option>
+                  <option value="HUMAN_REVIEW">HUMAN_REVIEW</option>
+                </select>
+              </div>
+
+              <div class="control">
+                <label for="revision-filter">Revision status</label>
+                <select id="revision-filter">
+                  <option value="all">All runs</option>
+                  <option value="revised">Revised</option>
+                  <option value="unrevised">Unrevised</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="control">
+              <label>Quick queues</label>
+              <div class="chip-row">
+                <button class="chip active" type="button" data-chip="all">All B-arm runs</button>
+                <button class="chip" type="button" data-chip="audit">Human audit priority</button>
+                <button class="chip" type="button" data-chip="review">Escalations only</button>
+                <button class="chip" type="button" data-chip="bloat">Bloat over 1.2x</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="provider-stack" id="provider-stack"></div>
+        </aside>
+
+        <section class="results-panel">
+          <div class="panel">
+            <div class="results-header">
+              <div>
+                <h2>Reviewer Queue</h2>
+                <p id="results-copy">Loading benchmark data…</p>
+              </div>
+            </div>
+            <div class="run-grid" id="run-grid"></div>
+            <div class="empty" id="empty-state" hidden>No runs match the current filter set.</div>
+          </div>
+
+          <section class="detail" id="detail-panel" hidden>
+            <div class="detail-head">
+              <div>
+                <div class="stat-row" id="detail-badges"></div>
+                <h2 id="detail-title">Select a run</h2>
+              </div>
+              <div class="hero-links">
+                <a id="detail-report-link" href="./ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md">Open report</a>
+              </div>
+            </div>
+
+            <div class="detail-grid">
+              <div class="detail-stack">
+                <div class="block">
+                  <h3>Benchmark Expectation</h3>
+                  <p id="detail-expectation"></p>
+                  <div class="insight-grid" id="detail-expectation-grid"></div>
+                </div>
+
+                <div class="block">
+                  <h3>Released Answer</h3>
+                  <div class="code answer" id="detail-released-answer"></div>
+                </div>
+
+                <div class="block">
+                  <h3>Last Attempted Answer</h3>
+                  <div class="code answer" id="detail-last-answer"></div>
+                </div>
+
+                <div class="block">
+                  <h3>Revision Critique Packet</h3>
+                  <div class="code" id="detail-critique"></div>
+                </div>
+              </div>
+
+              <div class="detail-stack">
+                <div class="block">
+                  <h3>Run Mechanics</h3>
+                  <div class="insight-grid" id="detail-metrics"></div>
+                </div>
+
+                <div class="block">
+                  <h3>Wrong Wins To Watch For</h3>
+                  <ul class="list" id="detail-wrong-wins"></ul>
+                </div>
+
+                <div class="block">
+                  <h3>A/B Readout</h3>
+                  <p id="detail-ab-summary"></p>
+                </div>
+
+                <div class="warning" id="detail-review-warning" hidden></div>
+              </div>
+            </div>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <script>
+      const DATA_PATH = "./ct_beta2_ab_matrix_2026-04-10_release_gate_r2.json";
+      const REPORT_PATH = "./ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md";
+      const AUDIT_PATH = "./ct_mcp_beta2_semantic_audit_packet.md";
+
+      const state = {
+        data: null,
+        selectedId: null,
+        chip: "all",
+        filters: {
+          search: "",
+          provider: "all",
+          model: "all",
+          decision: "all",
+          revision: "all",
+        },
+      };
+
+      const els = {
+        headlineMetrics: document.getElementById("headline-metrics"),
+        providerStack: document.getElementById("provider-stack"),
+        runGrid: document.getElementById("run-grid"),
+        resultsCopy: document.getElementById("results-copy"),
+        emptyState: document.getElementById("empty-state"),
+        detailPanel: document.getElementById("detail-panel"),
+        detailBadges: document.getElementById("detail-badges"),
+        detailTitle: document.getElementById("detail-title"),
+        detailExpectation: document.getElementById("detail-expectation"),
+        detailExpectationGrid: document.getElementById("detail-expectation-grid"),
+        detailReleasedAnswer: document.getElementById("detail-released-answer"),
+        detailLastAnswer: document.getElementById("detail-last-answer"),
+        detailCritique: document.getElementById("detail-critique"),
+        detailMetrics: document.getElementById("detail-metrics"),
+        detailWrongWins: document.getElementById("detail-wrong-wins"),
+        detailAbSummary: document.getElementById("detail-ab-summary"),
+        detailReviewWarning: document.getElementById("detail-review-warning"),
+        detailReportLink: document.getElementById("detail-report-link"),
+        search: document.getElementById("search"),
+        providerFilter: document.getElementById("provider-filter"),
+        modelFilter: document.getElementById("model-filter"),
+        decisionFilter: document.getElementById("decision-filter"),
+        revisionFilter: document.getElementById("revision-filter"),
+      };
+
+      function fmtMoney(value) {
+        if (value == null || Number.isNaN(value)) return "n/a";
+        return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 3 }).format(value);
+      }
+
+      function fmtMs(value) {
+        if (value == null || Number.isNaN(value)) return "n/a";
+        if (Math.abs(value) >= 1000) {
+          return `${(value / 1000).toFixed(1)}s`;
+        }
+        return `${Math.round(value)}ms`;
+      }
+
+      function fmtTokens(value) {
+        if (value == null || Number.isNaN(value)) return "n/a";
+        return new Intl.NumberFormat("en-US").format(Math.round(value));
+      }
+
+      function fmtRatio(value) {
+        if (value == null || Number.isNaN(value)) return "n/a";
+        return `${value.toFixed(2)}x`;
+      }
+
+      function decisionClass(decision) {
+        if (decision === "PASS") return "decision-pass";
+        if (decision === "WARN") return "decision-warn";
+        return "decision-review";
+      }
+
+      function average(list) {
+        const clean = list.filter((v) => typeof v === "number" && !Number.isNaN(v));
+        if (!clean.length) return null;
+        return clean.reduce((sum, v) => sum + v, 0) / clean.length;
+      }
+
+      function normalizeData(raw) {
+        const pairMap = new Map();
+        raw.runs.forEach((run) => {
+          const key = `${run.prompt_id}::${run.model_id}`;
+          const bucket = pairMap.get(key) || {};
+          bucket[run.arm] = run;
+          pairMap.set(key, bucket);
+        });
+
+        const bRuns = raw.runs
+          .filter((run) => run.arm === "B")
+          .map((run) => {
+            const key = `${run.prompt_id}::${run.model_id}`;
+            const pair = pairMap.get(key) || {};
+            const initialEvent = run.passes?.initial?.result_event || {};
+            const revisionEvent = run.passes?.revision?.result_event || {};
+            const initialCal = run.passes?.initial?.calibration_result || {};
+            const expectation = run.expectation || {};
+            return {
+              id: key,
+              promptId: run.prompt_id,
+              promptTitle: run.prompt_title,
+              provider: run.provider,
+              model: run.model_id,
+              decision: run.final_policy_decision,
+              outcome: run.final_outcome,
+              releaseState: run.released_answer ? "released" : "not_released",
+              humanReviewReason: run.human_review_reason || "",
+              hasRevision: Boolean(run.passes?.revision),
+              revisionBloatRatio: run.revision_delta?.revision_bloat_ratio ?? null,
+              revisionOutputTokenDelta: run.revision_delta?.revision_output_token_delta ?? null,
+              revisionDurationDeltaMs: run.revision_delta?.revision_duration_delta_ms ?? null,
+              revisionCostDeltaUsd: run.revision_delta?.revision_cost_delta_usd ?? null,
+              initialDurationMs: initialEvent.duration_ms ?? null,
+              initialCostUsd: initialEvent.total_cost_usd ?? null,
+              initialOutputTokens: initialEvent.usage?.output_tokens ?? null,
+              revisionDurationMs: revisionEvent.duration_ms ?? null,
+              revisionCostUsd: revisionEvent.total_cost_usd ?? null,
+              revisionOutputTokens: revisionEvent.usage?.output_tokens ?? null,
+              expectedTerminal: expectation.preferredTerminal || "n/a",
+              acceptableFallback: expectation.acceptableFallback || "n/a",
+              expectedSafeAnswerShape: expectation.expectedSafeAnswerShape || "No expectation text recorded.",
+              wrongWinsToWatchFor: expectation.wrongWinsToWatchFor || [],
+              revisionCritique: initialCal.revision_request?.critique_packet || "",
+              releasedAnswer: run.released_answer || "",
+              lastAttemptedAnswer: run.last_attempted_answer || "",
+              aArmDecision: pair.A?.final_policy_decision || "n/a",
+              aArmOutcome: pair.A?.final_outcome || "n/a",
+            };
+          });
+
+        const providers = [...new Set(bRuns.map((run) => run.provider))];
+        const models = [...new Set(bRuns.map((run) => run.model))];
+        return { raw, bRuns, providers, models };
+      }
+
+      function computeSummary(runs) {
+        const accepted = runs.filter((run) => run.outcome === "accepted").length;
+        const revisions = runs.filter((run) => run.hasRevision).length;
+        const escalations = runs.filter((run) => run.decision === "HUMAN_REVIEW").length;
+        const avgBloat = average(runs.map((run) => run.revisionBloatRatio));
+        return { total: runs.length, accepted, revisions, escalations, avgBloat };
+      }
+
+      function providerSummary(runs, provider) {
+        const subset = runs.filter((run) => run.provider === provider);
+        return {
+          provider,
+          total: subset.length,
+          accepted: subset.filter((run) => run.outcome === "accepted").length,
+          revisions: subset.filter((run) => run.hasRevision).length,
+          escalations: subset.filter((run) => run.decision === "HUMAN_REVIEW").length,
+          avgBloat: average(subset.map((run) => run.revisionBloatRatio)),
+        };
+      }
+
+      function matchesChip(run) {
+        if (state.chip === "all") return true;
+        if (state.chip === "audit") {
+          return run.decision === "HUMAN_REVIEW" || run.decision === "WARN" || run.hasRevision;
+        }
+        if (state.chip === "review") {
+          return run.decision === "HUMAN_REVIEW";
+        }
+        if (state.chip === "bloat") {
+          return typeof run.revisionBloatRatio === "number" && run.revisionBloatRatio > 1.2;
+        }
+        return true;
+      }
+
+      function filterRuns() {
+        return state.data.bRuns.filter((run) => {
+          const q = state.filters.search.trim().toLowerCase();
+          if (q) {
+            const hay = `${run.promptId} ${run.promptTitle} ${run.model} ${run.provider}`.toLowerCase();
+            if (!hay.includes(q)) return false;
+          }
+          if (state.filters.provider !== "all" && run.provider !== state.filters.provider) return false;
+          if (state.filters.model !== "all" && run.model !== state.filters.model) return false;
+          if (state.filters.decision !== "all" && run.decision !== state.filters.decision) return false;
+          if (state.filters.revision === "revised" && !run.hasRevision) return false;
+          if (state.filters.revision === "unrevised" && run.hasRevision) return false;
+          if (!matchesChip(run)) return false;
+          return true;
+        });
+      }
+
+      function renderHeadline() {
+        const summary = computeSummary(state.data.bRuns);
+        const metrics = [
+          {
+            label: "B-arm accepted",
+            value: `${summary.accepted}/${summary.total}`,
+            copy: "Accepted means the control plane released a bounded PASS or WARN instead of leaving the run unresolved.",
+          },
+          {
+            label: "Human review",
+            value: `${summary.escalations}`,
+            copy: "Escalations are intentional halts. They show where one-turn deterministic repair was exhausted.",
+          },
+          {
+            label: "Revision turns",
+            value: `${summary.revisions}`,
+            copy: "These are the B-arm runs that needed an explicit structural critique packet before final policy resolution.",
+          },
+          {
+            label: "Average bloat",
+            value: fmtRatio(summary.avgBloat),
+            copy: "Relative revision growth should be read alongside absolute size. Bloat is only dangerous when it becomes operationally expensive.",
+          },
+        ];
+
+        els.headlineMetrics.innerHTML = metrics
+          .map(
+            (metric) => `
+              <article class="metric">
+                <span class="label">${metric.label}</span>
+                <div class="value">${metric.value}</div>
+                <p>${metric.copy}</p>
+              </article>
+            `
+          )
+          .join("");
+      }
+
+      function renderProviderCards() {
+        els.providerStack.innerHTML = state.data.providers
+          .map((provider) => {
+            const summary = providerSummary(state.data.bRuns, provider);
+            return `
+              <article class="provider-card">
+                <div class="provider-head">
+                  <strong>${provider === "claude" ? "Claude Sonnet" : "Codex High"}</strong>
+                  <span class="meta-pill">${provider}</span>
+                </div>
+                <div class="provider-grid">
+                  <div><span>Accepted</span><strong>${summary.accepted}/${summary.total}</strong></div>
+                  <div><span>Revisions</span><strong>${summary.revisions}</strong></div>
+                  <div><span>Escalations</span><strong>${summary.escalations}</strong></div>
+                  <div><span>Avg bloat</span><strong>${fmtRatio(summary.avgBloat)}</strong></div>
+                </div>
+              </article>
+            `;
+          })
+          .join("");
+      }
+
+      function createStat(label, value) {
+        return `<span class="stat">${label}: ${value}</span>`;
+      }
+
+      function renderRuns() {
+        const runs = filterRuns();
+        els.resultsCopy.textContent = `${runs.length} of ${state.data.bRuns.length} B-arm runs match the current filters. Select a card to inspect expectation, critique, and released output.`;
+        els.emptyState.hidden = runs.length > 0;
+        els.runGrid.innerHTML = runs
+          .map((run) => {
+            const active = run.id === state.selectedId ? "active" : "";
+            const callout =
+              run.decision === "HUMAN_REVIEW"
+                ? run.humanReviewReason || "Escalated after the allowed revision still failed the calibrated gate."
+                : run.hasRevision
+                  ? "Structural critique fired and the run still landed inside a bounded release path."
+                  : "The run cleared the control plane without needing a revision loop.";
+            return `
+              <article class="run-card ${active}" tabindex="0" data-run-id="${run.id}">
+                <div class="run-top">
+                  <span class="prompt-tag">${run.promptId}</span>
+                  <span class="decision-pill ${decisionClass(run.decision)}">${run.decision}</span>
+                </div>
+                <div class="run-title">
+                  <h3>${run.promptTitle}</h3>
+                  <p>${run.provider} · ${run.model}</p>
+                </div>
+                <div class="stat-row">
+                  <span class="meta-pill">${run.outcome}</span>
+                  ${run.hasRevision ? '<span class="meta-pill">revised</span>' : '<span class="meta-pill">clean pass</span>'}
+                  ${run.releaseState === "released" ? '<span class="meta-pill">released</span>' : '<span class="meta-pill">not released</span>'}
+                </div>
+                <div class="stat-row">
+                  ${createStat("A arm", run.aArmDecision)}
+                  ${createStat("B bloat", fmtRatio(run.revisionBloatRatio))}
+                  ${createStat("Init out", fmtTokens(run.initialOutputTokens))}
+                </div>
+                <div class="run-callout">${callout}</div>
+              </article>
+            `;
+          })
+          .join("");
+
+        document.querySelectorAll(".run-card").forEach((card) => {
+          card.addEventListener("click", () => selectRun(card.dataset.runId));
+          card.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              selectRun(card.dataset.runId);
+            }
+          });
+        });
+
+        if (runs.length && !runs.some((run) => run.id === state.selectedId)) {
+          selectRun(runs[0].id);
+        } else if (!runs.length) {
+          state.selectedId = null;
+          els.detailPanel.hidden = true;
+        }
+      }
+
+      function renderDetail(run) {
+        if (!run) {
+          els.detailPanel.hidden = true;
+          return;
+        }
+
+        els.detailPanel.hidden = false;
+        els.detailBadges.innerHTML = [
+          `<span class="prompt-tag">${run.promptId}</span>`,
+          `<span class="meta-pill">${run.provider}</span>`,
+          `<span class="meta-pill">${run.model}</span>`,
+          `<span class="decision-pill ${decisionClass(run.decision)}">${run.decision}</span>`,
+        ].join("");
+        els.detailTitle.textContent = run.promptTitle;
+        els.detailExpectation.textContent = run.expectedSafeAnswerShape;
+        els.detailExpectationGrid.innerHTML = [
+          { label: "Preferred terminal", value: run.expectedTerminal },
+          { label: "Acceptable fallback", value: run.acceptableFallback },
+          { label: "Final B decision", value: run.decision },
+          { label: "A arm decision", value: run.aArmDecision },
+        ]
+          .map(
+            (item) => `
+              <div class="insight">
+                <span>${item.label}</span>
+                <strong>${item.value}</strong>
+              </div>
+            `
+          )
+          .join("");
+
+        els.detailReleasedAnswer.textContent = run.releasedAnswer || "No released answer recorded for this run.";
+        els.detailLastAnswer.textContent = run.lastAttemptedAnswer || "No attempted answer recorded.";
+        els.detailCritique.textContent = run.revisionCritique || "No revision critique packet was needed for this run.";
+
+        els.detailMetrics.innerHTML = [
+          { label: "Initial output", value: fmtTokens(run.initialOutputTokens) },
+          { label: "Initial duration", value: fmtMs(run.initialDurationMs) },
+          { label: "Initial cost", value: fmtMoney(run.initialCostUsd) },
+          { label: "Revision output", value: fmtTokens(run.revisionOutputTokens) },
+          { label: "Revision duration", value: fmtMs(run.revisionDurationMs) },
+          { label: "Revision cost", value: fmtMoney(run.revisionCostUsd) },
+          { label: "Bloat ratio", value: fmtRatio(run.revisionBloatRatio) },
+          { label: "Token delta", value: run.revisionOutputTokenDelta == null ? "n/a" : `${run.revisionOutputTokenDelta > 0 ? "+" : ""}${fmtTokens(run.revisionOutputTokenDelta)}` },
+          { label: "Latency delta", value: run.revisionDurationDeltaMs == null ? "n/a" : `${run.revisionDurationDeltaMs > 0 ? "+" : ""}${fmtMs(run.revisionDurationDeltaMs)}` },
+        ]
+          .map(
+            (item) => `
+              <div class="insight">
+                <span>${item.label}</span>
+                <strong>${item.value}</strong>
+              </div>
+            `
+          )
+          .join("");
+
+        els.detailWrongWins.innerHTML = run.wrongWinsToWatchFor.length
+          ? run.wrongWinsToWatchFor.map((item) => `<li>${item}</li>`).join("")
+          : "<li>No explicit wrong-win list recorded for this case.</li>";
+
+        els.detailAbSummary.textContent =
+          run.hasRevision
+            ? `Arm A landed ${run.aArmDecision}. Arm B needed one structural-revision pass and ultimately landed ${run.decision}. This is the exact control-plane surface to inspect during semantic audit: whether the bounded rewrite actually removed the unsafe shape rather than merely changing the wording.`
+            : `Arm A landed ${run.aArmDecision}. Arm B landed ${run.decision} without a revision loop, which means this model cleared the locked grading profile on the first pass.`;
+
+        els.detailReviewWarning.hidden = run.decision !== "HUMAN_REVIEW";
+        els.detailReviewWarning.textContent = run.humanReviewReason || "";
+        els.detailReportLink.href = REPORT_PATH;
+      }
+
+      function selectRun(runId) {
+        state.selectedId = runId;
+        const run = filterRuns().find((item) => item.id === runId) || state.data.bRuns.find((item) => item.id === runId);
+        renderRuns();
+        renderDetail(run);
+      }
+
+      function populateFilters() {
+        const providerOptions = state.data.providers
+          .map((value) => `<option value="${value}">${value}</option>`)
+          .join("");
+        const modelOptions = state.data.models
+          .map((value) => `<option value="${value}">${value}</option>`)
+          .join("");
+        els.providerFilter.insertAdjacentHTML("beforeend", providerOptions);
+        els.modelFilter.insertAdjacentHTML("beforeend", modelOptions);
+      }
+
+      function bindControls() {
+        els.search.addEventListener("input", (event) => {
+          state.filters.search = event.target.value;
+          renderRuns();
+        });
+        els.providerFilter.addEventListener("change", (event) => {
+          state.filters.provider = event.target.value;
+          renderRuns();
+        });
+        els.modelFilter.addEventListener("change", (event) => {
+          state.filters.model = event.target.value;
+          renderRuns();
+        });
+        els.decisionFilter.addEventListener("change", (event) => {
+          state.filters.decision = event.target.value;
+          renderRuns();
+        });
+        els.revisionFilter.addEventListener("change", (event) => {
+          state.filters.revision = event.target.value;
+          renderRuns();
+        });
+
+        document.querySelectorAll("[data-chip]").forEach((chip) => {
+          chip.addEventListener("click", () => {
+            state.chip = chip.dataset.chip;
+            document.querySelectorAll("[data-chip]").forEach((node) => node.classList.toggle("active", node === chip));
+            renderRuns();
+          });
+        });
+      }
+
+      function renderLoadError(error) {
+        els.resultsCopy.textContent = "The benchmark JSON could not be loaded.";
+        els.runGrid.innerHTML = `
+          <div class="warning">
+            <strong>Load failure.</strong><br />
+            ${error.message}<br /><br />
+            If you opened this page directly from disk, serve the repo locally and reload:
+            <code>python3 -m http.server 8000</code>
+          </div>
+        `;
+      }
+
+      async function init() {
+        try {
+          const response = await fetch(DATA_PATH);
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status} while loading ${DATA_PATH}`);
+          }
+          const raw = await response.json();
+          state.data = normalizeData(raw);
+          renderHeadline();
+          renderProviderCards();
+          populateFilters();
+          bindControls();
+          renderRuns();
+        } catch (error) {
+          console.error(error);
+          renderLoadError(error);
+        }
+      }
+
+      init();
+    </script>
+  </body>
+</html>

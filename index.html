@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CT-MCP Beta 2 Publication Surface</title>
+    <style>
+      :root {
+        --bg: #f4ecde;
+        --panel: rgba(255, 249, 239, 0.92);
+        --border: rgba(86, 56, 35, 0.12);
+        --ink: #171412;
+        --muted: #6d5d4d;
+        --accent: #c75d2c;
+        --teal: #1f7b74;
+        --shadow: 0 24px 70px rgba(79, 50, 30, 0.12);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(255,255,255,0.68), transparent 38%),
+          radial-gradient(circle at top right, rgba(243,205,183,0.42), transparent 24%),
+          linear-gradient(180deg, #fbf4e9 0%, var(--bg) 100%);
+      }
+
+      main {
+        width: min(1100px, calc(100vw - 32px));
+        margin: 28px auto 48px;
+        display: grid;
+        gap: 18px;
+      }
+
+      section, article {
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .hero {
+        padding: 32px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        width: fit-content;
+        align-items: center;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(199, 93, 44, 0.12);
+        color: var(--accent);
+        font-size: 0.8rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1, h2, h3, p { margin: 0; }
+
+      h1 {
+        font-size: clamp(2.2rem, 4vw, 4rem);
+        line-height: 0.95;
+        max-width: 12ch;
+      }
+
+      p {
+        color: var(--muted);
+        line-height: 1.6;
+        max-width: 70ch;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      article {
+        padding: 22px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .tag {
+        color: var(--accent);
+        font-size: 0.8rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h2 {
+        font-size: 1.55rem;
+        line-height: 1.02;
+      }
+
+      a {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        min-height: 42px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(86, 56, 35, 0.12);
+        background: rgba(255, 251, 244, 0.96);
+        color: var(--ink);
+        text-decoration: none;
+        font-weight: 700;
+      }
+
+      a:hover,
+      a:focus-visible {
+        border-color: rgba(199, 93, 44, 0.36);
+        outline: none;
+      }
+
+      .list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      @media (max-width: 760px) {
+        main {
+          width: min(100vw - 20px, 100%);
+          margin: 12px auto 28px;
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <span class="eyebrow">CT-MCP Beta 2</span>
+        <h1>Publication assets for the release-gate benchmark.</h1>
+        <p>
+          This folder is the static publication surface for Beta 2. It includes the
+          interactive cost simulator, the interactive benchmark reviewer, and the machine
+          artifacts that back both views.
+        </p>
+      </section>
+
+      <section class="grid">
+        <article>
+          <span class="tag">Interactive</span>
+          <h2>Cost of Not Using CT</h2>
+          <p>
+            A stakeholder-facing simulator that turns hidden waste into visible token,
+            debugging, and blast-radius cost. The evidence shelf now uses real release-gate
+            benchmark cases.
+          </p>
+          <a href="./cost-of-not-using-ct-simulator.html">Open simulator</a>
+        </article>
+
+        <article>
+          <span class="tag">Interactive</span>
+          <h2>Benchmark Review</h2>
+          <p>
+            A reviewer-facing surface for the release-gate run. Filter B-arm cases, inspect
+            critique packets, compare A vs B behavior, and review semantic-risk candidates.
+          </p>
+          <a href="./ct-beta2-benchmark-review.html">Open review surface</a>
+        </article>
+
+        <article>
+          <span class="tag">Artifacts</span>
+          <h2>Release-Gate Report</h2>
+          <p>
+            The written report for the cross-provider Beta 2 release-gate benchmark.
+          </p>
+          <div class="list">
+            <a href="./ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md">Markdown report</a>
+            <a href="./ct_beta2_ab_matrix_2026-04-10_release_gate_r2.json">Machine JSON</a>
+          </div>
+        </article>
+
+        <article>
+          <span class="tag">Review</span>
+          <h2>Semantic Audit Packet</h2>
+          <p>
+            The fixed human-review rubric for canonical semantic metrics and priority review
+            order.
+          </p>
+          <div class="list">
+            <a href="./ct_mcp_beta2_semantic_audit_packet.md">Audit packet</a>
+            <a href="./ct_beta2_release_gate_examples.json">A/B example export</a>
+          </div>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

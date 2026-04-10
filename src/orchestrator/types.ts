@@ -141,8 +141,18 @@ export interface CalibrationRuntimeContext {
   released?: boolean;
 }
 
+export interface TemporalReasoningRegistry {
+  nodes: ReasoningChainContract['nodes'];
+  edges: ReasoningChainContract['edges'];
+}
+
+export interface TemporalRuntimeContext {
+  reasoning_registry?: TemporalReasoningRegistry;
+}
+
 export interface OrchestratorRuntimeOptions {
   calibration?: CalibrationRuntimeContext;
+  temporal?: TemporalRuntimeContext;
 }
 
 export interface CalibrationGateIssue {
@@ -369,6 +379,7 @@ export interface OrchestratorResult {
   route_results: RouteOrFailure[];
   shadow_results: RouteOrFailure[];
   cross_tool_context?: CrossToolContext;
+  temporal_registry?: TemporalReasoningRegistry;
   critique?: CritiquePacket;
   revision_request?: RevisionRequest;
   telemetry: ShadowTelemetry;

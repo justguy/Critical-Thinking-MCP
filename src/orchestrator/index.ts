@@ -28,9 +28,11 @@ import { routeEnvelope } from './router.js';
 import { executeRoute } from './review.js';
 import {
   isSchemaFailure,
+  validateReasoningChainContract,
   validateOrchestratorEnvelope,
 } from './schemaValidation.js';
 import { buildTelemetry } from './shadowTelemetry.js';
+import { mergeTemporalReasoningRegistry } from './temporalRegistry.js';
 import { buildCrossToolContext } from './variableBinder.js';
 import type {
   CalibrationProfile,
@@ -174,6 +176,24 @@ export function runOrchestrator(
   // 2. Route the envelope through the deterministic classifier.
   const routing = routeEnvelope(envelope);
 
+  // 2.5 Merge prior structured reasoning assertions into the current graph
+  // when a reasoning-chain contract is present and valid.
+  const priorTemporalRegistry = runtimeOptions?.temporal?.reasoning_registry;
+  const currentReasoningContract = envelope.contracts.reasoning_chain;
+  const temporalReasoning =
+    currentReasoningContract &&
+    validateReasoningChainContract(currentReasoningContract).valid
+      ? mergeTemporalReasoningRegistry(
+          priorTemporalRegistry,
+          currentReasoningContract as import('./types.js').ReasoningChainContract,
+        )
+      : priorTemporalRegistry
+        ? {
+            mergedContract: undefined,
+            registry: priorTemporalRegistry,
+          }
+        : undefined;
+
   // 3. Build the working sets for routed vs shadow execution.
   const routedSet = new Set<OrchestratorToolName>(routing.routed_tools);
   const routeResults: RouteOrFailure[] = [];
@@ -182,7 +202,10 @@ export function runOrchestrator(
   // Standard mode runs only the routed intersection.
   for (const tool of routing.routed_tools) {
     const contractKey = TOOL_TO_CONTRACT_KEY[tool];
-    const contract = envelope.contracts[contractKey];
+    const contract =
+      tool === 'validate_reasoning_chain' && temporalReasoning?.mergedContract
+        ? temporalReasoning.mergedContract
+        : envelope.contracts[contractKey];
     routeResults.push(executeRoute(tool, contract, envelope.review_context));
   }
 
@@ -192,7 +215,10 @@ export function runOrchestrator(
     for (const tool of routing.artifact_compatible_tools) {
       if (routedSet.has(tool)) continue;
       const contractKey = TOOL_TO_CONTRACT_KEY[tool];
-      const contract = envelope.contracts[contractKey];
+      const contract =
+        tool === 'validate_reasoning_chain' && temporalReasoning?.mergedContract
+          ? temporalReasoning.mergedContract
+          : envelope.contracts[contractKey];
       shadowResults.push(executeRoute(tool, contract, envelope.review_context));
     }
   }
@@ -231,6 +257,9 @@ export function runOrchestrator(
     shadow_results: shadowResults,
     ...(crossToolContext.bindings.length > 0 || crossToolContext.violations.length > 0
       ? { cross_tool_context: crossToolContext }
+      : {}),
+    ...(temporalReasoning?.registry
+      ? { temporal_registry: temporalReasoning.registry }
       : {}),
     critique: policy.critique,
     ...(policy.decision === 'REVISE' && policy.critique
@@ -290,6 +319,10 @@ export { recordCalibrationRun } from './calibrationStore.js';
 export { getHistoricalTurn3Stats } from './calibrationStore.js';
 export { buildCrossToolContext } from './variableBinder.js';
 export {
+  buildTemporalRegistry,
+  mergeTemporalReasoningRegistry,
+} from './temporalRegistry.js';
+export {
   validateOrchestratorEnvelope,
   validateConfidenceContract,
   validateReasoningChainContract,
@@ -312,6 +345,8 @@ export type {
   CalibrationSessionMode,
   CrossToolContext,
   CrossToolInvariantViolation,
+  TemporalReasoningRegistry,
+  TemporalRuntimeContext,
   OrchestratorEnvelope,
   OrchestratorResult,
   OrchestratorMode,

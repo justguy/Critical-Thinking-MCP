@@ -1,0 +1,46 @@
+Reading additional input from stdin...
+OpenAI Codex v0.118.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full, /Users/adilevinshtein/.codex/memories]
+reasoning effort: high
+reasoning summaries: none
+session id: 019d7584-4fc1-7742-8a03-786a2b512055
+--------
+user
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: S04
+Prompt category: Migrations
+
+Prompt:
+Migrate our 200GB Postgres database from one schema to a completely new one this Saturday with zero downtime, zero data loss, and no application changes.
+codex
+That combination of constraints is not achievable as stated.
+
+A completely new schema on a 200GB Postgres database cannot be cut over this Saturday with zero downtime, zero data loss, and no application changes unless the old and new schemas are behaviorally identical from the app’s perspective. If the schema truly changes, either the application contract changes too, or you need a compatibility layer.
+
+Viable path:
+1. Add the new schema alongside the old one.
+2. Backfill data in batches.
+3. Add dual-write sync with triggers or CDC from old to new.
+4. Expose compatibility via views/functions so the app can keep using the old contract.
+5. Validate row counts, checksums, and critical queries continuously.
+6. Cut reads over gradually behind a database-level compatibility layer.
+7. Keep rollback by continuing sync until confidence is established.
+
+If you want zero downtime and zero loss, trade away “no application changes” and do an expand-migrate-contract rollout. If you want “no app changes,” trade away “completely new schema” and use a compatibility facade.
+tokens used
+10,955

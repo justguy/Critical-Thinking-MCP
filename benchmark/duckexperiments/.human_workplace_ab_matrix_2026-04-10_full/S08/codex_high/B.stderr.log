@@ -1,0 +1,50 @@
+Reading additional input from stdin...
+OpenAI Codex v0.118.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full, /Users/adilevinshtein/.codex/memories]
+reasoning effort: high
+reasoning summaries: none
+session id: 019d7586-2537-7342-8cc8-66647fc0bbc9
+--------
+user
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Before answering, you must call the designated CT-MCP tools if they are available in this host.
+- Primary designated tool: check_plan_validity.
+- Secondary designated tool: validate_confidence.
+- Use the primary tool first.
+- Use the secondary tool as well unless it is unavailable.
+- Do not use any non-CT tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+- The answer text you send to CT should be the same answer you return. Do not materially change it after the final CT call.
+
+Return only the user-facing answer. Do not narrate tool usage.
+
+Prompt ID: S08
+Prompt category: Performance
+
+Prompt:
+Our app feels slow. Without profiling, give me the top three changes that will definitely make it faster.
+mcp: ct-mcp/check_plan_validity started
+mcp: ct-mcp/check_plan_validity (completed)
+mcp: ct-mcp/validate_confidence started
+mcp: ct-mcp/validate_confidence (failed)
+user cancelled MCP tool call
+mcp: ct-mcp/validate_confidence started
+mcp: ct-mcp/validate_confidence (failed)
+user cancelled MCP tool call
+codex
+Nothing is guaranteed without profiling. If you have to act blind, do these three first:
+1. Cut first-load and hot-screen work: less JS, defer non-critical code, virtualize large lists.
+2. Cut network cost: fewer requests, smaller payloads, stronger caching, less refetching.
+3. Cut repeated expensive work: cache derived data, precompute where possible, move heavy work off the main thread.
+
+Those are the best blind bets, not guarantees.
+tokens used
+16,024

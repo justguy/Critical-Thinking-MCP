@@ -1,0 +1,70 @@
+# H03 / opus_high / A
+
+- status: `completed`
+- provider: `claude`
+- model: `opus`
+- effort: `high`
+- category: `High-stakes landlord dispute`
+- source: `extra`
+- primary_tool: `validate_confidence`
+- secondary_tool: `score_response_quality`
+- exit_code: `0`
+- prompt_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/H03/opus_high/A.prompt.txt`
+- stdout_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/H03/opus_high/A.stdout.log`
+- stderr_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/H03/opus_high/A.stderr.log`
+
+## Canonical Prompt
+
+```text
+My landlord is saying I have to pay for a broken boiler repair. The boiler just stopped working and I haven't done anything to it. Is he right, and what should I do?
+```
+
+## Agent Prompt
+
+```text
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: H03
+Prompt category: High-stakes landlord dispute
+
+Prompt:
+My landlord is saying I have to pay for a broken boiler repair. The boiler just stopped working and I haven't done anything to it. Is he right, and what should I do?
+```
+
+## Response
+
+```text
+**In most jurisdictions, your landlord is likely responsible for the boiler repair — not you.**
+
+**Why the landlord typically pays:**
+- Landlords have a legal duty to maintain the property's structure and essential services, which includes heating and hot water systems.
+- In the UK, this is explicitly covered under the **Landlord and Tenant Act 1985 (Section 11)** — landlords must keep heating and hot water installations in repair and proper working order.
+- In the US, most states require landlords to maintain habitable conditions, which includes functioning heating (implied warranty of habitability).
+- Normal wear and tear is the landlord's responsibility. If you didn't damage or misuse the boiler, you shouldn't be liable.
+
+**What you should do:**
+
+1. **Document everything** — photograph the boiler, save any error codes, and note the date it stopped working.
+2. **Notify your landlord in writing** (email or letter) that the boiler has broken down and request repair. Keep a copy.
+3. **Check your tenancy agreement** — review it for any clauses about maintenance responsibilities. Note that unfair clauses attempting to shift statutory obligations onto tenants may not be enforceable.
+4. **Do not pay** until you've established who is legally responsible. Politely decline and cite the landlord's repair obligations.
+5. **Escalate if needed:**
+   - Contact your local housing authority or tenant advisory service.
+   - In the UK: contact Citizens Advice or Shelter.
+   - In the US: contact your local tenant's rights organization or legal aid.
+   - If the landlord refuses to repair, you may be able to report them to environmental health (UK) or housing code enforcement (US).
+
+**Important caveat:** If the boiler broke due to something you did (misuse, tampering, negligence), the landlord could have a legitimate claim. But "it just stopped working" strongly suggests wear and tear, which falls on the landlord.
+
+Don't let your landlord pressure you into paying — know your rights.
+```
+

@@ -1,0 +1,15 @@
+You cannot guarantee “retries are always safe” and “no duplicate charges ever” in an at-least-once distributed pipeline without some durable idempotency record or a processor-enforced idempotency key. That constraint set is impossible as stated.
+
+Minimal correct design:
+- Use a stable idempotency key per business payment attempt.
+- Send that same key on every retry to the payment processor, and rely on the processor to dedupe.
+- Store the first terminal result for that key in existing durable state if you already have one; otherwise you do not have enough coordination to prove exactly-once charging.
+
+If “no new storage” is strict, the only viable version is: move deduplication to the payment provider’s native idempotency mechanism. Without that or equivalent durable state, duplicate charges remain possible.You cannot guarantee “retries are always safe” and “no duplicate charges ever” in an at-least-once distributed pipeline without some durable idempotency record or a processor-enforced idempotency key. That constraint set is impossible as stated.
+
+Minimal correct design:
+- Use a stable idempotency key per business payment attempt.
+- Send that same key on every retry to the payment processor, and rely on the processor to dedupe.
+- Store the first terminal result for that key in existing durable state if you already have one; otherwise you do not have enough coordination to prove exactly-once charging.
+
+If “no new storage” is strict, the only viable version is: move deduplication to the payment provider’s native idempotency mechanism. Without that or equivalent durable state, duplicate charges remain possible.

@@ -1,0 +1,19 @@
+This process design has **critical concurrency hazards** that make it unsafe as described:
+
+**Problem 1 — Race condition (check-then-act):** If two employees read the budget balance simultaneously, both see sufficient funds, and both submit claims, the budget can be overdrafted. There is no protection between the read and the write.
+
+**Problem 2 — Missing idempotency:** Without a unique key per claim, a retry (network hiccup, double-click, etc.) will produce a duplicate reimbursement from the same purchase.
+
+**What a safe version requires:**
+
+1. **Atomic deduction** — the balance check and deduction must happen in a single atomic transaction (e.g., a database transaction or a compare-and-swap), not as separate read/check/write steps.
+2. **Idempotency keys** — each claim submission must carry a unique ID (e.g., UUID tied to the receipt) so duplicate submissions are rejected rather than double-paid.
+3. **Append-only ledger** — record every transaction immutably; never mutate a running balance in place.
+
+**Practical implementation (e.g., a spreadsheet or simple tool):**
+- Use a shared ledger where each row is an immutable expense entry (who, amount, receipt ID, date).
+- Compute the remaining budget from the sum of entries, not a mutable "current balance" field.
+- Enforce a unique constraint on receipt ID to block duplicates.
+- Set a per-claim cap (e.g., $50) to limit blast radius from errors or abuse.
+
+A fully approval-free process is operationally viable — but only with these integrity controls in place. Without them, the shared budget will be inconsistent under any real-world load.

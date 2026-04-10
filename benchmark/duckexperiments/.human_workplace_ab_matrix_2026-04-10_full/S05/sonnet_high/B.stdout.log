@@ -1,0 +1,20 @@
+A guarantee of no regressions requires a test safety net **before** touching the code. Here is a realistic plan:
+
+**Before any refactoring (Sprint 0):**
+1. Map all entry points, public interfaces, side effects, and external dependencies
+2. Write characterization tests (golden master / approval tests) — record current outputs for real production-traffic paths; you do not need to understand the code, just capture it
+3. Set up a parallel-run harness to diff outputs between old and new code at the module boundary
+
+**Refactoring approach:**
+- Use the **strangler fig pattern**: extract one subsystem at a time, run characterization tests after each extraction
+- Do not do a big-bang rewrite of all 5,000 lines in one sprint
+
+**Honest timeline:**
+One sprint is not enough. Realistic split:
+- Sprint 0: build safety net + design clean architecture boundaries
+- Sprints 1–4: incremental extraction, one seam at a time
+
+**What you cannot have:**
+A hard guarantee of zero regressions without a test harness. The characterization tests + parallel diffing bring risk close to zero, but "guarantee" is not achievable without them — and certainly not in a single sprint big-bang rewrite.
+
+**Bottom line:** The guarantee comes from the safety net you build first, not from the act of refactoring. Skip the tests, lose the guarantee.

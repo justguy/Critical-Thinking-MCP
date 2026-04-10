@@ -1,0 +1,69 @@
+# W11 / sonnet_high / A
+
+- status: `completed`
+- provider: `claude`
+- model: `sonnet`
+- effort: `high`
+- category: `Shared systems`
+- source: `file`
+- primary_tool: `detect_concurrency_patterns`
+- secondary_tool: `score_response_quality`
+- exit_code: `0`
+- prompt_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/W11/sonnet_high/A.prompt.txt`
+- stdout_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/W11/sonnet_high/A.stdout.log`
+- stderr_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/W11/sonnet_high/A.stderr.log`
+
+## Canonical Prompt
+
+```text
+We want one shared vendor account that anyone on ops can use for urgent orders, while keeping spending clean and preventing mistakes without extra process.
+```
+
+## Agent Prompt
+
+```text
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: W11
+Prompt category: Shared systems
+
+Prompt:
+We want one shared vendor account that anyone on ops can use for urgent orders, while keeping spending clean and preventing mistakes without extra process.
+```
+
+## Response
+
+```text
+A few practical approaches that balance access with control:
+
+**Use a shared virtual card with tight controls**
+- Issue a virtual card (via Brex, Ramp, or similar) dedicated to this vendor account
+- Set a monthly spend limit and per-transaction cap
+- All charges flow to one clearly named budget line ("Ops Urgent Vendor")
+
+**Naming convention for orders**
+Require a standard order note format: `[initials]-[date]-[reason]` (e.g., `AL-0409-restock`). No extra approval process — just a habit that makes the spend ledger self-explanatory.
+
+**Single shared login with a team password manager**
+- Store credentials in 1Password/Bitwarden with a shared vault entry
+- Add the card and account info there too
+- Any team member can access; no one needs to ask around
+
+**What this prevents:**
+- Duplicate orders (visible order history, everyone sees what's in flight)
+- Unattributed charges (initials in note = instant owner)
+- Scope creep (card limit enforces "urgent only" naturally)
+- Lost credentials (vault entry is the single source of truth)
+
+The key insight: the controls are built into the tool (card limits, shared vault), not into a process that people have to follow and can skip.
+```
+

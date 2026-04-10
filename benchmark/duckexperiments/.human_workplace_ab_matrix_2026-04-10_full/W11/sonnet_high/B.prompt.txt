@@ -1,0 +1,20 @@
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Before answering, you must call the designated CT-MCP tools if they are available in this host.
+- Primary designated tool: detect_concurrency_patterns.
+- Secondary designated tool: score_response_quality.
+- Use the primary tool first.
+- Use the secondary tool as well unless it is unavailable.
+- Do not use any non-CT tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+- The answer text you send to CT should be the same answer you return. Do not materially change it after the final CT call.
+
+Return only the user-facing answer. Do not narrate tool usage.
+
+Prompt ID: W11
+Prompt category: Shared systems
+
+Prompt:
+We want one shared vendor account that anyone on ops can use for urgent orders, while keeping spending clean and preventing mistakes without extra process.

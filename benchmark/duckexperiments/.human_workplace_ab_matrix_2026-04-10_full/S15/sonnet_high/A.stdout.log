@@ -1,0 +1,18 @@
+No single open-source library does all five of those things well. This requirement bundles five distinct concerns that each have their own mature ecosystems:
+
+- **Authentication**: Keycloak, SuperTokens
+- **Authorization**: Casbin, OpenFGA
+- **Audit logging**: structured logging libraries + your existing log pipeline
+- **Rate limiting**: express-rate-limit, nginx, API gateway rules
+- **Feature flags**: Unleash, Flagsmith, OpenFeature
+
+A library claiming to cover all five is either a heavyweight platform (Keycloak covers auth + audit but not rate limiting or feature flags) or vaporware.
+
+**Honest recommendation**: pick a purpose-built tool per concern. The "no maintenance overhead" and "great community support" requirements are also in tension — maintained projects require ongoing work; abandoned ones have no community.
+
+If you want minimal surface area, the practical path is:
+1. **Keycloak** for authn + authz + audit
+2. **Unleash** (self-hosted) for feature flags
+3. Rate limiting at the infrastructure layer (nginx / API gateway)
+
+That's three tools, not one — but it's honest, and each has strong community support and no vendor lock-in.

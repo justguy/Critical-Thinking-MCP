@@ -1,0 +1,9 @@
+None.
+
+There is no credible single open-source library that cleanly covers authentication, authorization, audit logging, rate limiting, and feature flags with great community support, low lock-in, and near-zero maintenance. If someone claims that, you are buying coupling and operational debt.
+
+Practical choice: use separate best-of-breed components instead of forcing a monolith. If you must centralize, `Keycloak` is the closest starting point for auth/authz/audit, but it does not solve rate limiting and feature flags well enough to meet your requirement.None.
+
+There is no credible single open-source library that cleanly covers authentication, authorization, audit logging, rate limiting, and feature flags with great community support, low lock-in, and near-zero maintenance. If someone claims that, you are buying coupling and operational debt.
+
+Practical choice: use separate best-of-breed components instead of forcing a monolith. If you must centralize, `Keycloak` is the closest starting point for auth/authz/audit, but it does not solve rate limiting and feature flags well enough to meet your requirement.

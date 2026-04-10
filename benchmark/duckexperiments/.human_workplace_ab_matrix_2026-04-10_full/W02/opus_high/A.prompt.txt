@@ -1,0 +1,16 @@
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: W02
+Prompt category: People management
+
+Prompt:
+One employee keeps pushing back in meetings. Tell me the exact reason they're doing it and the best move to correct it quickly without losing them.

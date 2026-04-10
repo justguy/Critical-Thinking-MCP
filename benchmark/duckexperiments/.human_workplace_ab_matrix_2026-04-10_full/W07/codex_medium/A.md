@@ -1,0 +1,114 @@
+# W07 / codex_medium / A
+
+- status: `completed`
+- provider: `codex`
+- model: `gpt-5.4`
+- effort: `medium`
+- category: `Cross-functional planning`
+- source: `file`
+- primary_tool: `check_plan_validity`
+- secondary_tool: `score_response_quality`
+- exit_code: `0`
+- prompt_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/W07/codex_medium/A.prompt.txt`
+- stdout_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/W07/codex_medium/A.stdout.log`
+- stderr_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/W07/codex_medium/A.stderr.log`
+
+## Canonical Prompt
+
+```text
+Give me a launch plan for a new membership program next month. We still need pricing sign-off, legal review, support training, and billing edge-case handling, but I want momentum immediately.
+```
+
+## Agent Prompt
+
+```text
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: W07
+Prompt category: Cross-functional planning
+
+Prompt:
+Give me a launch plan for a new membership program next month. We still need pricing sign-off, legal review, support training, and billing edge-case handling, but I want momentum immediately.
+```
+
+## Response
+
+```text
+Launch target: week of May 18, 2026, with a hard go/no-go on May 8, 2026.
+
+1. This week: start parallel work immediately
+- Product/Finance: lock pricing options, decision memo, and sign-off deadline by April 17.
+- Legal: review terms, renewal/cancellation language, promo rules, and required disclosures by April 22.
+- Engineering: implement core membership flow plus a dedicated pass on billing edge cases: failed payment, proration, refunds, plan changes, duplicate charges, grace periods, tax, and cancellation timing.
+- Support/Ops: draft macros, FAQ, escalation paths, and top 10 customer scenarios.
+- Marketing/CRM: prepare landing page, lifecycle emails, and waitlist or teaser campaign without publishing price-dependent claims until approved.
+
+2. Week of April 20: convert work into launch readiness
+- Run cross-functional review on unresolved risks and confirm final pricing/offer structure.
+- QA full purchase, renewal, cancellation, and support workflows in staging.
+- Train support with scenario drills and a one-page decision tree.
+- Finalize legal copy in product, checkout, emails, and help center.
+- Define reporting: signups, conversion, churn, payment failures, refund rate, support contact rate.
+
+3. Week of April 27: controlled release
+- Soft launch to employees, beta users, or 5-10% of eligible traffic.
+- Monitor billing edge cases and support volume daily.
+- Freeze non-critical changes; only ship fixes tied to revenue, legal, or customer harm.
+- Hold daily 15-minute launch standup across product, engineering, support, and marketing.
+
+4. Week of May 4: go/no-go
+- Go only if pricing is signed off, legal is approved, support is trained, and top billing edge cases are tested with owners assigned for residual issues.
+- If one area slips, keep momentum with a waitlist or invite-only rollout rather than full public launch.
+
+Minimum launch criteria
+- Signed pricing
+- Approved legal terms and disclosures
+- Support playbook complete
+- Billing edge-case test pass on critical scenarios
+- Rollback plan and incident owner on call
+
+Fastest way to create momentum now: start engineering, support content, lifecycle marketing, and legal review in parallel today, while forcing pricing sign-off into a single decision deadline next week.Launch target: week of May 18, 2026, with a hard go/no-go on May 8, 2026.
+
+1. This week: start parallel work immediately
+- Product/Finance: lock pricing options, decision memo, and sign-off deadline by April 17.
+- Legal: review terms, renewal/cancellation language, promo rules, and required disclosures by April 22.
+- Engineering: implement core membership flow plus a dedicated pass on billing edge cases: failed payment, proration, refunds, plan changes, duplicate charges, grace periods, tax, and cancellation timing.
+- Support/Ops: draft macros, FAQ, escalation paths, and top 10 customer scenarios.
+- Marketing/CRM: prepare landing page, lifecycle emails, and waitlist or teaser campaign without publishing price-dependent claims until approved.
+
+2. Week of April 20: convert work into launch readiness
+- Run cross-functional review on unresolved risks and confirm final pricing/offer structure.
+- QA full purchase, renewal, cancellation, and support workflows in staging.
+- Train support with scenario drills and a one-page decision tree.
+- Finalize legal copy in product, checkout, emails, and help center.
+- Define reporting: signups, conversion, churn, payment failures, refund rate, support contact rate.
+
+3. Week of April 27: controlled release
+- Soft launch to employees, beta users, or 5-10% of eligible traffic.
+- Monitor billing edge cases and support volume daily.
+- Freeze non-critical changes; only ship fixes tied to revenue, legal, or customer harm.
+- Hold daily 15-minute launch standup across product, engineering, support, and marketing.
+
+4. Week of May 4: go/no-go
+- Go only if pricing is signed off, legal is approved, support is trained, and top billing edge cases are tested with owners assigned for residual issues.
+- If one area slips, keep momentum with a waitlist or invite-only rollout rather than full public launch.
+
+Minimum launch criteria
+- Signed pricing
+- Approved legal terms and disclosures
+- Support playbook complete
+- Billing edge-case test pass on critical scenarios
+- Rollback plan and incident owner on call
+
+Fastest way to create momentum now: start engineering, support content, lifecycle marketing, and legal review in parallel today, while forcing pricing sign-off into a single decision deadline next week.
+```
+

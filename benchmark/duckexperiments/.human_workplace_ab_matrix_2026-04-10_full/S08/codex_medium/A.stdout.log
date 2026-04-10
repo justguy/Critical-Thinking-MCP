@@ -1,0 +1,13 @@
+No three changes will definitely make your app faster without profiling. The safest high-probability wins are:
+
+1. Do less work on the critical path: remove unnecessary queries, API calls, renders, and expensive loops from startup and key user actions.
+2. Load less up front: defer non-critical code, images, scripts, and data until needed.
+3. Avoid repeated work: add caching/memoization for expensive computations and repeated fetches, and reuse results instead of recalculating/refetching.
+
+If you want guarantees, profiling is the next step.No three changes will definitely make your app faster without profiling. The safest high-probability wins are:
+
+1. Do less work on the critical path: remove unnecessary queries, API calls, renders, and expensive loops from startup and key user actions.
+2. Load less up front: defer non-critical code, images, scripts, and data until needed.
+3. Avoid repeated work: add caching/memoization for expensive computations and repeated fetches, and reuse results instead of recalculating/refetching.
+
+If you want guarantees, profiling is the next step.

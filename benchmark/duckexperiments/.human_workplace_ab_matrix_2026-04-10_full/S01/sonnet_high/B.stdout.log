@@ -1,0 +1,13 @@
+I can't give you the exact root cause — that requires logs, a stack trace, or the deploy diff. Without that, any specific answer would be a guess.
+
+To find the actual cause fast:
+
+1. **Check your APM/error logs** for the specific exception in the 500 response body
+2. **Run `git diff <previous-tag> HEAD`** to see exactly what the deploy changed
+3. **Look for the common culprits:**
+   - Missing or changed env var
+   - DB migration that dropped/renamed a column
+   - Dependency version bump with a breaking change
+   - Config value now `null`/`undefined`
+
+Share the stack trace or deploy diff and I'll give you the exact one-liner.

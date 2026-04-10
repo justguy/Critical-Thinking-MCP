@@ -1,0 +1,11 @@
+There are no changes that **definitely** make any app faster without profiling — that's the core problem with the question. Optimizing the wrong thing wastes time and adds complexity.
+
+That said, if you're looking for high-probability wins that apply broadly:
+
+1. **Fix N+1 queries / reduce round trips.** Database and network calls dominate latency in most apps. Look for loops that trigger queries, unbatched API calls, or missing eager-loads. These are often the actual bottleneck and easy to spot in code without tooling.
+
+2. **Add caching at the right boundary.** Cache expensive, repeated computations or slow external calls close to where the result is used. Even a short TTL eliminates redundant work under load.
+
+3. **Move work off the critical path.** Anything the user doesn't need to see immediately (emails, webhooks, analytics writes, image processing) should be async/background. This directly reduces perceived latency regardless of where the true bottleneck is.
+
+The honest advice: spend 20 minutes with your framework's built-in query logger or a basic request timer before committing to any of these. You'll know within minutes whether the problem is data access, computation, or something else entirely.

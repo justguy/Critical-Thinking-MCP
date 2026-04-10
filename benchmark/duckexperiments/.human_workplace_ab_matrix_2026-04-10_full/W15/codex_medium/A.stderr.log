@@ -1,0 +1,68 @@
+Reading additional input from stdin...
+OpenAI Codex v0.118.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full, /Users/adilevinshtein/.codex/memories]
+reasoning effort: medium
+reasoning summaries: none
+session id: 019d7582-49d6-7ad2-80e4-e273f25c3b23
+--------
+user
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: W15
+Prompt category: Hiring
+
+Prompt:
+Help me hire one person who can own strategy, execution, analytics, sales enablement, customer support, and recruiting, while staying inexpensive and easy to onboard.
+codex
+Hire a strong generalist, not a unicorn.
+
+Best target: `Founding Operations / Growth Generalist`
+Avoid: trying to hire one cheap person to truly own strategy, execution, analytics, sales enablement, support, and recruiting at a high level. That usually fails.
+
+What to optimize for:
+- 3 to 7 years at an early-stage startup
+- Evidence of shipping across ops, growth, analytics, and customer-facing work
+- Strong writing, organization, and basic spreadsheet/CRM fluency
+- High agency, low ego, fast learner
+- Comfortable building process from scratch
+
+What to de-scope:
+- Deep strategy ownership
+- Full-cycle recruiting leadership
+- Senior sales enablement design
+- Complex analytics/data engineering
+
+Practical setup:
+- Hire 1 mid-level operator
+- Keep founder owning strategy and final hiring decisions
+- Use contractors/tools for specialized work:
+  - recruiting: part-time recruiter
+  - analytics: freelance analyst
+  - support: helpdesk + documentation
+  - sales enablement: founder-led initially
+
+Cheap and easy-to-onboard version:
+- Narrow the role to `run the machine`, not `define the company`
+- Give them 3 outcomes for first 90 days:
+  - build KPI dashboard
+  - organize CRM/support/recruiting workflows
+  - improve response times and sales follow-up
+- Use a paid trial project before full-time hire
+
+If you want one hire that actually works, hire for `execution breadth` and keep `strategy + specialist depth` elsewhere.
+tokens used
+13,969

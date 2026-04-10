@@ -1,0 +1,102 @@
+# W05 / opus_high / A
+
+- status: `completed`
+- provider: `claude`
+- model: `opus`
+- effort: `high`
+- category: `Staffing and scheduling`
+- source: `file`
+- primary_tool: `check_plan_validity`
+- secondary_tool: `validate_confidence`
+- exit_code: `0`
+- prompt_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/W05/opus_high/A.prompt.txt`
+- stdout_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/W05/opus_high/A.stdout.log`
+- stderr_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/W05/opus_high/A.stderr.log`
+
+## Canonical Prompt
+
+```text
+I need a staffing plan that cuts labor costs 20%, improves response times, avoids burnout, and adds seven-day coverage without hiring.
+```
+
+## Agent Prompt
+
+```text
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: W05
+Prompt category: Staffing and scheduling
+
+Prompt:
+I need a staffing plan that cuts labor costs 20%, improves response times, avoids burnout, and adds seven-day coverage without hiring.
+```
+
+## Response
+
+```text
+# Staffing Plan: 20% Cost Reduction with 7-Day Coverage
+
+## Core Strategy: Compressed + Staggered Shifts
+
+Replace the traditional 5×8 schedule with a hybrid model combining compressed weeks and staggered start times.
+
+---
+
+## Schedule Structure
+
+**Team A (60% of staff):** 4×10 schedule, Mon–Thu or Tue–Fri
+**Team B (40% of staff):** 3×12 schedule, rotating Fri–Sun + 1 weekday
+
+This naturally produces 7-day coverage with zero new hires. Weekend shifts are filled by Team B on their normal schedule, not as overtime.
+
+## Where the 20% Cost Savings Come From
+
+| Lever | Estimated Savings |
+|---|---|
+| Eliminate weekend overtime/on-call premiums | 8–10% |
+| Reduce shift-change handoff overlap (fewer transitions per day) | 3–4% |
+| Lower absenteeism from burnout reduction (compressed weeks = more days off) | 3–5% |
+| Cross-train to eliminate underutilized specialist bench time | 3–4% |
+
+## How Response Times Improve
+
+- **Staggered start times** (e.g., 6am, 8am, 10am cohorts) spread coverage across more hours, eliminating the 8am surge and late-afternoon dead zone.
+- **Dedicated weekend team** replaces skeleton-crew coverage with fully staffed shifts — no more Monday backlog.
+- **Tiered routing**: Cross-train staff into Tier 1 (quick resolution) and Tier 2 (complex), so simple requests don't queue behind hard ones.
+
+## Burnout Prevention
+
+- 4×10 staff get a **3-day weekend every week**.
+- 3×12 staff get **4 consecutive days off**.
+- Nobody works more than 4 days straight.
+- Rotate Team B's weekday shift quarterly so the same people don't always miss the same day.
+- Set a hard cap: no individual exceeds 42 hours/week averaged over any 4-week window.
+
+## Implementation Timeline
+
+**Weeks 1–2:** Audit current hours, identify overtime hotspots, survey staff for schedule preferences.
+**Weeks 3–4:** Cross-training sprint — every person picks up at least one adjacent skill area.
+**Week 5:** Pilot with one department or function. Measure response time, hours worked, and satisfaction.
+**Week 7:** Roll out org-wide with adjustments from pilot.
+**Ongoing:** Monthly review of hours distribution, response time metrics, and voluntary turnover signals.
+
+## Key Risks and Mitigations
+
+- **"Nobody wants 12-hour shifts"** → Make Team B voluntary first; sweeten with 4 days off and shift differential funded from overtime savings.
+- **Knowledge silos on weekends** → Cross-training and shared runbooks close this gap before launch.
+- **10-hour days cause fatigue** → Monitor error rates and enforce the 42-hour rolling cap.
+
+---
+
+**The math in one line:** You're converting expensive overtime + idle bench time + Monday backlogs into a schedule that matches staffing density to actual demand across all 7 days — the savings come from waste elimination, not from asking people to do more with less.
+```
+

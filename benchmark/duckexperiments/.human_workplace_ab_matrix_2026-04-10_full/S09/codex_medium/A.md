@@ -1,0 +1,96 @@
+# S09 / codex_medium / A
+
+- status: `completed`
+- provider: `codex`
+- model: `gpt-5.4`
+- effort: `medium`
+- category: `Performance`
+- source: `file`
+- primary_tool: `evaluate_tradeoffs`
+- secondary_tool: `check_plan_validity`
+- exit_code: `0`
+- prompt_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/S09/codex_medium/A.prompt.txt`
+- stdout_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/S09/codex_medium/A.stdout.log`
+- stderr_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/S09/codex_medium/A.stderr.log`
+
+## Canonical Prompt
+
+```text
+Design a cache layer in front of our database that is always consistent with the source of truth, has zero invalidation lag, and reduces DB load by 90%.
+```
+
+## Agent Prompt
+
+```text
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: S09
+Prompt category: Performance
+
+Prompt:
+Design a cache layer in front of our database that is always consistent with the source of truth, has zero invalidation lag, and reduces DB load by 90%.
+```
+
+## Response
+
+```text
+You cannot guarantee all three simultaneously in a distributed system.
+
+An always-consistent cache with zero invalidation lag is effectively the database, or a cache updated inside the same write transaction and read through the same serialization boundary. If you need strict correctness, use this design:
+
+- Put a single logical read/write service in front of the DB.
+- Use cache-aside for reads only when staleness is acceptable.
+- For strongly consistent keys, write DB and cache atomically in one transaction boundary:
+  - Write DB.
+  - Commit change event to an outbox in the same DB transaction.
+  - Readers treat cache entries as valid only if their version matches the DB row version / commit token.
+  - On cache miss or version mismatch, read DB and repopulate.
+- Use per-key leasing/singleflight to stop stampedes.
+- Cache only hot, mostly-read data with TTL as eviction, not correctness.
+
+If you truly require zero lag and strict consistency, use:
+- DB read replicas
+- Materialized views
+- Better indexing/query plans
+- Result caching inside the DB or application process with transaction/version checks
+
+To cut DB load by 90%, the practical compromise is:
+- Strong consistency for a small set of critical reads via versioned read-through
+- Event-driven invalidation for the rest, accepting tiny staleness windows
+
+So the correct design answer is: strict consistency plus zero invalidation lag is possible only by collapsing the cache into the write path or into the database itself; otherwise you must trade off consistency, latency, or load reduction.You cannot guarantee all three simultaneously in a distributed system.
+
+An always-consistent cache with zero invalidation lag is effectively the database, or a cache updated inside the same write transaction and read through the same serialization boundary. If you need strict correctness, use this design:
+
+- Put a single logical read/write service in front of the DB.
+- Use cache-aside for reads only when staleness is acceptable.
+- For strongly consistent keys, write DB and cache atomically in one transaction boundary:
+  - Write DB.
+  - Commit change event to an outbox in the same DB transaction.
+  - Readers treat cache entries as valid only if their version matches the DB row version / commit token.
+  - On cache miss or version mismatch, read DB and repopulate.
+- Use per-key leasing/singleflight to stop stampedes.
+- Cache only hot, mostly-read data with TTL as eviction, not correctness.
+
+If you truly require zero lag and strict consistency, use:
+- DB read replicas
+- Materialized views
+- Better indexing/query plans
+- Result caching inside the DB or application process with transaction/version checks
+
+To cut DB load by 90%, the practical compromise is:
+- Strong consistency for a small set of critical reads via versioned read-through
+- Event-driven invalidation for the rest, accepting tiny staleness windows
+
+So the correct design answer is: strict consistency plus zero invalidation lag is possible only by collapsing the cache into the write path or into the database itself; otherwise you must trade off consistency, latency, or load reduction.
+```
+

@@ -1,0 +1,37 @@
+Reading additional input from stdin...
+OpenAI Codex v0.118.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full, /Users/adilevinshtein/.codex/memories]
+reasoning effort: medium
+reasoning summaries: none
+session id: 019d757d-f50d-7663-bb0b-471e89ba18e2
+--------
+user
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: W06
+Prompt category: Staffing and scheduling
+
+Prompt:
+Based on two strong weeks and a motivated team, what is the probability we can ship every roadmap item this quarter without quality slipping?
+codex
+Roughly 25% to 35%.
+
+Two strong weeks and high motivation are positive signals, but they are weak evidence for shipping every roadmap item for an entire quarter without quality slipping. The main risks are hidden scope, integration delays, testing compression, and team fatigue.
+
+A practical stance: assume “all items, no quality loss” is unlikely unless the roadmap already has buffer, scope is stable, and quality gates are non-negotiable. More realistic odds for shipping the highest-priority 80% to 90% well are much higher.
+tokens used
+13,763

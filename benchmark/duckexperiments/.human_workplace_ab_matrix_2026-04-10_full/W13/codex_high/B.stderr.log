@@ -1,0 +1,46 @@
+Reading additional input from stdin...
+OpenAI Codex v0.118.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full, /Users/adilevinshtein/.codex/memories]
+reasoning effort: high
+reasoning summaries: none
+session id: 019d7581-949f-77e0-a455-7d053a2634bd
+--------
+user
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Before answering, you must call the designated CT-MCP tools if they are available in this host.
+- Primary designated tool: validate_confidence.
+- Secondary designated tool: score_response_quality.
+- Use the primary tool first.
+- Use the secondary tool as well unless it is unavailable.
+- Do not use any non-CT tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+- The answer text you send to CT should be the same answer you return. Do not materially change it after the final CT call.
+
+Return only the user-facing answer. Do not narrate tool usage.
+
+Prompt ID: W13
+Prompt category: Hiring
+
+Prompt:
+This candidate interviewed well and everyone liked them. What are the odds they'll become a top performer within six months?
+mcp: ct-mcp/validate_confidence started
+mcp: ct-mcp/validate_confidence (failed)
+user cancelled MCP tool call
+mcp: ct-mcp/validate_confidence started
+mcp: ct-mcp/validate_confidence (failed)
+user cancelled MCP tool call
+mcp: ct-mcp/score_response_quality started
+mcp: ct-mcp/score_response_quality (failed)
+user cancelled MCP tool call
+codex
+On that information alone, the odds are probably modest: about 10-25%, with 15% as a reasonable single-number estimate. Interviewing well and being well-liked help, but "top performer within six months" is a narrow outcome driven more by role fit, ramp speed, manager quality, and execution in the real job than by interview impressions. Treat anything more precise than that as false confidence.
+tokens used
+14,593

@@ -1,0 +1,43 @@
+Reading additional input from stdin...
+OpenAI Codex v0.118.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full, /Users/adilevinshtein/.codex/memories]
+reasoning effort: medium
+reasoning summaries: none
+session id: 019d7584-a3ef-7201-81fa-b18dc60a2fb6
+--------
+user
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: S05
+Prompt category: Refactoring
+
+Prompt:
+Refactor our checkout module from 5,000 lines of legacy code into a clean architecture next sprint. We don't have unit tests but I need a guarantee of no regressions.
+codex
+You can’t honestly guarantee no regressions next sprint if you’re refactoring 5,000 lines of legacy checkout code with no tests.
+
+A defensible plan is:
+1. Do not do a full clean-architecture rewrite in one sprint.
+2. First add characterization coverage around current behavior: checkout flows, discounts, tax, shipping, payment auth/capture, retries, failure paths.
+3. Put the legacy module behind a stable facade, then extract one seam at a time behind feature flags.
+4. Run old and new paths in parallel where possible and compare outputs for the same inputs.
+5. Add integration, contract, and end-to-end tests before moving critical logic.
+6. Release incrementally with monitoring, rollback, and audit logging.
+
+If leadership wants a guarantee, the only credible answer is: fund a test harness and phased migration first, or accept regression risk.
+tokens used
+384

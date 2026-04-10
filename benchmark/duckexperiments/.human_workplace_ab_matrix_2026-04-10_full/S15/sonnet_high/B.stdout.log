@@ -1,0 +1,19 @@
+No such library exists. The premise contains an unresolvable conflict.
+
+**Why the single-library ask fails all gates simultaneously:**
+
+| Concern | Best open-source option | Overlaps with others? |
+|---|---|---|
+| Authentication | SuperTokens, Ory Kratos | No |
+| Authorization | Casbin, OpenFGA, Ory Keto | No |
+| Audit logging | any structured logger + middleware | No |
+| Rate limiting | go-redis/redis_rate, express-rate-limit | No |
+| Feature flags | Unleash, Flagsmith | No |
+
+Every library that claims to do all five either (a) does most of them badly, (b) requires running 3-5 separate server processes (Ory ecosystem), which is the maintenance overhead you said you want to avoid, or (c) is a commercial SaaS with an open-source facade.
+
+**The honest recommendation:**
+
+Pick the best library per concern and accept ~1 day of integration glue. That's not failure to meet the requirement — it *is* the correct answer to the requirement when the constraint ("one library") is physically unachievable without incurring the costs you explicitly listed as unacceptable.
+
+If forced to name one that comes closest for a Node.js stack: **SuperTokens** (self-hosted, open-source, covers authn + authz + some audit hooks, active community) — then add `express-rate-limit` for rate limiting and `Unleash` for feature flags. That's three libraries, not one, but it's the closest you can get while keeping the properties you actually care about.

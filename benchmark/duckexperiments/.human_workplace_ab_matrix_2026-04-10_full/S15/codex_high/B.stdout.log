@@ -1,0 +1,5 @@
+None.
+
+There is no credible single open-source library that cleanly covers authentication, authorization, audit logging, rate limiting, and feature flags with great community support, no lock-in, and effectively zero maintenance overhead. The closest single dependency is Keycloak, but it still does not solve feature flags or general-purpose rate limiting, and you would still own operational maintenance.None.
+
+There is no credible single open-source library that cleanly covers authentication, authorization, audit logging, rate limiting, and feature flags with great community support, no lock-in, and effectively zero maintenance overhead. The closest single dependency is Keycloak, but it still does not solve feature flags or general-purpose rate limiting, and you would still own operational maintenance.

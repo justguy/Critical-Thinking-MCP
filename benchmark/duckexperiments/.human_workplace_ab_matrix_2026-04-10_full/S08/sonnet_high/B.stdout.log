@@ -1,0 +1,9 @@
+**"Definitely" isn't achievable without profiling** — the honest confidence ceiling on any universal fix is ~13% given the number of ways each assumption can be wrong. That said, here are the three highest-probability wins:
+
+1. **Add database indexes** on columns used in `WHERE`, `JOIN`, and `ORDER BY` clauses. Missing indexes are the single most common cause of unexplained slowness.
+
+2. **Cache frequently-read, rarely-changed data** (Redis, in-memory, HTTP cache headers). Eliminates redundant DB/API round-trips.
+
+3. **Move blocking I/O off the hot path** — file reads, external API calls, emails — to async handlers or background queues. Keeps request latency from being held hostage by slow dependencies.
+
+These address the most statistically common bottlenecks. Any one of them may be irrelevant to your specific app. Profile before committing engineering time.

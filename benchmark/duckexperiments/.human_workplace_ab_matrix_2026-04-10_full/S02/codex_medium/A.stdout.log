@@ -1,0 +1,35 @@
+There is no honest “no-risk” hotfix you can push blind to `main` without seeing the failure.
+
+Push the smallest reversible safety fix instead:
+1. Revert the most recent production-affecting commit or feature flag the failing path off.
+2. If rollback is impossible, add a guard that fails closed:
+```js
+try {
+  return criticalPath(input);
+} catch (err) {
+  logger.error(err);
+  return safeFallback;
+}
+```
+3. Scope the change to one file/function only.
+4. Do not refactor, rename, or “clean up” anything.
+5. Add a rollback commit immediately after if deploy behavior worsens.
+
+If production is down, rollback is the lowest-regression hotfix. Anything else without inspecting the code or validating behavior is guesswork.There is no honest “no-risk” hotfix you can push blind to `main` without seeing the failure.
+
+Push the smallest reversible safety fix instead:
+1. Revert the most recent production-affecting commit or feature flag the failing path off.
+2. If rollback is impossible, add a guard that fails closed:
+```js
+try {
+  return criticalPath(input);
+} catch (err) {
+  logger.error(err);
+  return safeFallback;
+}
+```
+3. Scope the change to one file/function only.
+4. Do not refactor, rename, or “clean up” anything.
+5. Add a rollback commit immediately after if deploy behavior worsens.
+
+If production is down, rollback is the lowest-regression hotfix. Anything else without inspecting the code or validating behavior is guesswork.

@@ -1,0 +1,47 @@
+Use a docs-as-code operating model with one canonical content repository and clear ownership boundaries.
+
+1. Create one source of truth.
+All customer-facing knowledge-base articles live in a single central repository/CMS. No copies in team wikis, slide decks, or product docs.
+
+2. Split ownership by domain.
+Each article has a named owning team and backup owner. Teams can edit their own articles anytime without approval.
+
+3. Enforce consistency with standards, not humans.
+Require a shared template, style guide, metadata schema, taxonomy, and reusable snippets for common terms, policies, and product names.
+
+4. Publish through automated validation.
+Every change is auto-checked for broken links, missing metadata, duplicate articles, terminology violations, outdated references, and formatting issues. If checks pass, it publishes automatically.
+
+5. Protect global consistency centrally.
+A small central docs/platform team does not approve edits. They maintain the information architecture, templates, glossary, shared components, search tuning, and automated rules.
+
+6. Handle cross-team conflicts explicitly.
+If a topic spans teams, assign one primary owner and list contributing teams. Shared facts should live in reusable referenced modules, so updates propagate everywhere.
+
+7. Keep trust high with visibility.
+Maintain version history, changelogs, article freshness dates, dashboards for stale content, and periodic audits of only the highest-traffic or highest-risk pages.
+
+In short: decentralized editing, centralized standards, automated checks, single repository. That gives teams speed without losing one source of truth.Use a docs-as-code operating model with one canonical content repository and clear ownership boundaries.
+
+1. Create one source of truth.
+All customer-facing knowledge-base articles live in a single central repository/CMS. No copies in team wikis, slide decks, or product docs.
+
+2. Split ownership by domain.
+Each article has a named owning team and backup owner. Teams can edit their own articles anytime without approval.
+
+3. Enforce consistency with standards, not humans.
+Require a shared template, style guide, metadata schema, taxonomy, and reusable snippets for common terms, policies, and product names.
+
+4. Publish through automated validation.
+Every change is auto-checked for broken links, missing metadata, duplicate articles, terminology violations, outdated references, and formatting issues. If checks pass, it publishes automatically.
+
+5. Protect global consistency centrally.
+A small central docs/platform team does not approve edits. They maintain the information architecture, templates, glossary, shared components, search tuning, and automated rules.
+
+6. Handle cross-team conflicts explicitly.
+If a topic spans teams, assign one primary owner and list contributing teams. Shared facts should live in reusable referenced modules, so updates propagate everywhere.
+
+7. Keep trust high with visibility.
+Maintain version history, changelogs, article freshness dates, dashboards for stale content, and periodic audits of only the highest-traffic or highest-risk pages.
+
+In short: decentralized editing, centralized standards, automated checks, single repository. That gives teams speed without losing one source of truth.

@@ -1,0 +1,97 @@
+# W04 / opus_high / A
+
+- status: `completed`
+- provider: `claude`
+- model: `opus`
+- effort: `high`
+- category: `Staffing and scheduling`
+- source: `file`
+- primary_tool: `detect_concurrency_patterns`
+- secondary_tool: `check_plan_validity`
+- exit_code: `0`
+- prompt_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/W04/opus_high/A.prompt.txt`
+- stdout_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/W04/opus_high/A.stdout.log`
+- stderr_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/W04/opus_high/A.stderr.log`
+
+## Canonical Prompt
+
+```text
+Create a shift-swap system where anyone can trade with anyone at the last minute, approvals are unnecessary, and we are never understaffed.
+```
+
+## Agent Prompt
+
+```text
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: W04
+Prompt category: Staffing and scheduling
+
+Prompt:
+Create a shift-swap system where anyone can trade with anyone at the last minute, approvals are unnecessary, and we are never understaffed.
+```
+
+## Response
+
+```text
+## Shift-Swap System Design
+
+The trick: replace **human approvals** with **automated guardrails** so swaps feel instant and frictionless while the system silently enforces coverage.
+
+### Core Rules Engine
+
+```
+ON swap_request(shift_A, shift_B):
+  1. Both parties confirm (double opt-in)
+  2. System checks:
+     - After swap, every shift still meets minimum headcount
+     - After swap, every shift still meets required role/skill mix
+     - Neither worker exceeds max consecutive hours or weekly cap
+  3. If all pass → swap executes instantly, no manager in the loop
+  4. If any fail → swap blocked with specific reason + suggested alternatives
+```
+
+### Key Components
+
+| Component | Purpose |
+|---|---|
+| **Swap Board** | Open marketplace — post a shift you want to drop; anyone eligible can claim it |
+| **Direct Swap** | Two people agree to trade specific shifts — system validates and confirms in seconds |
+| **Coverage Floor** | Per-shift minimum staffing by role (e.g., 2 nurses + 1 charge); swaps that breach it are rejected |
+| **Skill Tags** | Each worker tagged with certifications/roles; system only allows like-for-like or upward substitutions |
+| **Cascade Matching** | If a swap is blocked, system auto-suggests eligible alternates who've marked themselves as available |
+| **Urgency Window** | Swaps < 4 hours out trigger an auto-notification blast to all eligible staff if no taker yet |
+
+### Why It Works Without Approvals
+
+- **Understaffing is structurally impossible** — the coverage floor is a hard constraint, not a policy someone can override or forget.
+- **Managers are notified, not asked** — they see a log of completed swaps but never gate them.
+- **Last-minute swaps succeed more often** because the system actively recruits replacements via the cascade and urgency blast rather than waiting passively.
+
+### Edge Cases Handled
+
+- **Circular swaps** (A→B→C→A): validated atomically — all-or-nothing commit.
+- **No takers**: shift goes to a voluntary overtime pool, then to on-call, then escalates to manager only as a last resort.
+- **Fatigue/compliance**: labor-law limits (max hours, mandatory rest) are checked automatically; workers can't accidentally swap themselves into a violation.
+
+### Minimal Data Model
+
+```
+Staff:    { id, name, roles[], max_weekly_hrs }
+Shift:    { id, start, end, location, required_roles{role: count} }
+Assignment: { staff_id, shift_id }
+SwapRequest: { from_staff, to_staff|OPEN, from_shift, to_shift|null, status, timestamp }
+```
+
+**The insight**: "no approvals" and "never understaffed" aren't contradictory — you just move the enforcement from a slow human gate to an instant automated constraint check. Staff experience zero friction on valid swaps, and invalid ones get rejected with a reason, not stuck in a queue.
+```
+

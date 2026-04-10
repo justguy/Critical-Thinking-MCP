@@ -1,0 +1,45 @@
+Reading additional input from stdin...
+OpenAI Codex v0.118.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full, /Users/adilevinshtein/.codex/memories]
+reasoning effort: high
+reasoning summaries: none
+session id: 019d757c-8d54-7e13-8f24-6e977fbd81dc
+--------
+user
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Before answering, you must call the designated CT-MCP tools if they are available in this host.
+- Primary designated tool: check_plan_validity.
+- Secondary designated tool: score_response_quality.
+- Use the primary tool first.
+- Use the secondary tool as well unless it is unavailable.
+- Do not use any non-CT tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+- The answer text you send to CT should be the same answer you return. Do not materially change it after the final CT call.
+
+Return only the user-facing answer. Do not narrate tool usage.
+
+Prompt ID: W03
+Prompt category: People management
+
+Prompt:
+Our team feels shaky. What's the simplest process change that will stop attrition without increasing management overhead?
+mcp: ct-mcp/check_plan_validity started
+mcp: ct-mcp/check_plan_validity (completed)
+mcp: ct-mcp/score_response_quality started
+mcp: ct-mcp/score_response_quality (failed)
+user cancelled MCP tool call
+mcp: ct-mcp/score_response_quality started
+mcp: ct-mcp/score_response_quality (failed)
+user cancelled MCP tool call
+codex
+The highest-leverage low-overhead change is a fixed 15-minute weekly manager check-in that replaces status-heavy 1:1 time, not adds to it. Use the same three questions every week: what is frustrating you, where are you stuck, and what would make next week better; end with one action item, and review repeated themes monthly. That catches flight-risk signals early, shows follow-through, and creates almost no extra management load.
+tokens used
+12,627

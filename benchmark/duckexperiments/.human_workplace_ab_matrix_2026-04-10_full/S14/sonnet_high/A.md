@@ -1,0 +1,80 @@
+# S14 / sonnet_high / A
+
+- status: `completed`
+- provider: `claude`
+- model: `sonnet`
+- effort: `high`
+- category: `Architecture`
+- source: `file`
+- primary_tool: `evaluate_tradeoffs`
+- secondary_tool: `score_response_quality`
+- exit_code: `0`
+- prompt_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/S14/sonnet_high/A.prompt.txt`
+- stdout_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/S14/sonnet_high/A.stdout.log`
+- stderr_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/S14/sonnet_high/A.stderr.log`
+
+## Canonical Prompt
+
+```text
+Recommend an architecture for our new service that is highly available, strongly consistent, low cost, low operational burden, and easy for junior engineers to maintain.
+```
+
+## Agent Prompt
+
+```text
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: S14
+Prompt category: Architecture
+
+Prompt:
+Recommend an architecture for our new service that is highly available, strongly consistent, low cost, low operational burden, and easy for junior engineers to maintain.
+```
+
+## Response
+
+```text
+These five constraints can't all be fully maximized simultaneously — there are real, unavoidable tensions:
+
+**The core conflicts:**
+- **High availability + strong consistency**: CAP theorem means during a network partition, you must choose one. Multi-region strong consistency is expensive and complex; single-region strong consistency is achievable but limits availability to that region.
+- **High availability + low cost**: HA requires redundancy, which costs money.
+- **Low cost + low operational burden**: Managed services reduce ops burden but carry a premium.
+
+---
+
+**Practical recommendation for most services:**
+
+**Single-region, multi-AZ on a managed cloud platform.**
+
+| Layer | Choice | Rationale |
+|---|---|---|
+| App tier | Cloud Run or ECS Fargate | Serverless containers: no cluster to manage, scales to zero |
+| Database | RDS PostgreSQL Multi-AZ or Cloud SQL HA | Strong consistency, managed failover, familiar to juniors |
+| Load balancer | Managed ALB / Cloud LB | Zero config HA |
+| Secrets/Config | AWS SSM / GCP Secret Manager | No Vault cluster to operate |
+
+**Why this works:**
+- Multi-AZ gives ~99.99% availability without multi-region complexity
+- PostgreSQL provides strong consistency within a region
+- Managed services eliminate the majority of operational burden
+- PostgreSQL + containers is the most learnable stack for junior engineers
+
+---
+
+**What you must accept:**
+- If the region itself goes down, the service goes down. True multi-region HA + strong consistency requires Spanner, CockroachDB, or similar — materially higher cost and complexity.
+- "Highly available" and "strongly consistent" define a spectrum. Clarify your actual SLO (99.9%? 99.99%?) before over-engineering.
+
+Pick two or three of these constraints to optimize hard and treat the others as soft targets.
+```
+

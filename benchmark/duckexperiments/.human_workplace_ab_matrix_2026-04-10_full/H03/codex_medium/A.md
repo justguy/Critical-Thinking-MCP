@@ -1,0 +1,84 @@
+# H03 / codex_medium / A
+
+- status: `completed`
+- provider: `codex`
+- model: `gpt-5.4`
+- effort: `medium`
+- category: `High-stakes landlord dispute`
+- source: `extra`
+- primary_tool: `validate_confidence`
+- secondary_tool: `score_response_quality`
+- exit_code: `0`
+- prompt_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/H03/codex_medium/A.prompt.txt`
+- stdout_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/H03/codex_medium/A.stdout.log`
+- stderr_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/H03/codex_medium/A.stderr.log`
+
+## Canonical Prompt
+
+```text
+My landlord is saying I have to pay for a broken boiler repair. The boiler just stopped working and I haven't done anything to it. Is he right, and what should I do?
+```
+
+## Agent Prompt
+
+```text
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: H03
+Prompt category: High-stakes landlord dispute
+
+Prompt:
+My landlord is saying I have to pay for a broken boiler repair. The boiler just stopped working and I haven't done anything to it. Is he right, and what should I do?
+```
+
+## Response
+
+```text
+Usually no. In most U.S. rentals, the landlord is responsible for repairing and maintaining essential systems like heat/hot water unless the lease clearly makes you responsible or the damage was caused by you.
+
+What to do now:
+1. Check your lease for any boiler/maintenance clause.
+2. Put everything in writing immediately: say the boiler failed, you did not damage it, and ask for prompt repair by a licensed technician.
+3. Ask for the reason, in writing, if the landlord says you must pay.
+4. Do not admit fault or agree to pay before seeing the lease language and the repair basis.
+5. Save evidence: photos, texts/emails, dates without heat/hot water, and any prior complaints.
+6. If heat or hot water is out, look up your city/state tenant rights or contact a local tenants’ union, legal aid office, or housing/code enforcement right away. Loss of heat is often treated as an urgent habitability issue.
+
+You may have to pay only if:
+- you actually caused the damage,
+- someone you allowed to use it caused it, or
+- your lease validly shifts that specific responsibility to you.
+
+A short message you can send:
+“The boiler stopped working through normal use. I did not cause any damage. Please confirm in writing when it will be repaired and the basis for any claim that I am responsible for the cost.”
+
+If you want, I can help you draft a stronger notice letter to send today.Usually no. In most U.S. rentals, the landlord is responsible for repairing and maintaining essential systems like heat/hot water unless the lease clearly makes you responsible or the damage was caused by you.
+
+What to do now:
+1. Check your lease for any boiler/maintenance clause.
+2. Put everything in writing immediately: say the boiler failed, you did not damage it, and ask for prompt repair by a licensed technician.
+3. Ask for the reason, in writing, if the landlord says you must pay.
+4. Do not admit fault or agree to pay before seeing the lease language and the repair basis.
+5. Save evidence: photos, texts/emails, dates without heat/hot water, and any prior complaints.
+6. If heat or hot water is out, look up your city/state tenant rights or contact a local tenants’ union, legal aid office, or housing/code enforcement right away. Loss of heat is often treated as an urgent habitability issue.
+
+You may have to pay only if:
+- you actually caused the damage,
+- someone you allowed to use it caused it, or
+- your lease validly shifts that specific responsibility to you.
+
+A short message you can send:
+“The boiler stopped working through normal use. I did not cause any damage. Please confirm in writing when it will be repaired and the basis for any claim that I am responsible for the cost.”
+
+If you want, I can help you draft a stronger notice letter to send today.
+```
+

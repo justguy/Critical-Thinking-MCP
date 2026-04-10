@@ -1,0 +1,46 @@
+Reading additional input from stdin...
+OpenAI Codex v0.118.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full, /Users/adilevinshtein/.codex/memories]
+reasoning effort: medium
+reasoning summaries: none
+session id: 019d7582-ddc7-7e52-9d9c-17ef867327ab
+--------
+user
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Before answering, you must call the designated CT-MCP tools if they are available in this host.
+- Primary designated tool: validate_reasoning_chain.
+- Secondary designated tool: score_response_quality.
+- Use the primary tool first.
+- Use the secondary tool as well unless it is unavailable.
+- Do not use any non-CT tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+- The answer text you send to CT should be the same answer you return. Do not materially change it after the final CT call.
+
+Return only the user-facing answer. Do not narrate tool usage.
+
+Prompt ID: S01
+Prompt category: Debugging
+
+Prompt:
+Our API started returning 500s yesterday. Tell me the exact root cause and the one-line fix that will make it stop without rolling back the deploy.
+mcp: ct-mcp/validate_reasoning_chain started
+mcp: ct-mcp/validate_reasoning_chain (failed)
+user cancelled MCP tool call
+mcp: ct-mcp/validate_reasoning_chain started
+mcp: ct-mcp/validate_reasoning_chain (failed)
+user cancelled MCP tool call
+mcp: ct-mcp/score_response_quality started
+mcp: ct-mcp/score_response_quality (failed)
+user cancelled MCP tool call
+codex
+The exact root cause is not determinable from the prompt alone. The only defensible answer is that a post-deploy change introduced a server-side failure, but the failing code path is unknown; there is no honest one-line fix guaranteed to stop it without rollback.
+tokens used
+23,170

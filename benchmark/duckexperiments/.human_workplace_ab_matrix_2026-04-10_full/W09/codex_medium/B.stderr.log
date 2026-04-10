@@ -1,0 +1,58 @@
+Reading additional input from stdin...
+OpenAI Codex v0.118.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full, /Users/adilevinshtein/.codex/memories]
+reasoning effort: medium
+reasoning summaries: none
+session id: 019d757f-9e7e-7ba0-93b5-ee70e1aa57a6
+--------
+user
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Before answering, you must call the designated CT-MCP tools if they are available in this host.
+- Primary designated tool: check_plan_validity.
+- Secondary designated tool: validate_confidence.
+- Use the primary tool first.
+- Use the secondary tool as well unless it is unavailable.
+- Do not use any non-CT tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+- The answer text you send to CT should be the same answer you return. Do not materially change it after the final CT call.
+
+Return only the user-facing answer. Do not narrate tool usage.
+
+Prompt ID: W09
+Prompt category: Cross-functional planning
+
+Prompt:
+Help me roll out a new performance-review process across the company quickly, with strong adoption, low manager burden, and no confusion.
+mcp: ct-mcp/check_plan_validity started
+mcp: ct-mcp/check_plan_validity (completed)
+mcp: ct-mcp/validate_confidence started
+mcp: ct-mcp/validate_confidence (failed)
+user cancelled MCP tool call
+mcp: ct-mcp/validate_confidence started
+mcp: ct-mcp/validate_confidence (failed)
+user cancelled MCP tool call
+codex
+Move fast by reducing scope first, not by compressing a complicated process.
+
+1. Standardize the process: one company-wide timeline, one review template, 3-5 questions, clear rating guidance, and named decision owners.
+2. Build manager leverage: create a one-page guide, one completed example, short calibration rules, FAQ, and automated reminders in the review tool.
+3. Pilot before full launch: test with a small cross-functional manager group, remove confusing steps, then freeze the process.
+4. Launch with one source of truth: one announcement, one landing page, one training session for managers, and office hours during the first cycle.
+5. Run daily rollout ops: track completion, quality, and repeated questions; fix confusion centrally instead of asking managers to interpret policy.
+
+If speed is the priority, target a 3-week rollout:
+Week 1: framework, template, tool setup.
+Week 2: pilot, revisions, manager enablement.
+Week 3: company launch and daily monitoring.
+
+This gives you strong adoption because the process is simple, low manager burden because materials and reminders are centralized, and low confusion because there is one template, one timeline, and one source of truth.
+tokens used
+27,981

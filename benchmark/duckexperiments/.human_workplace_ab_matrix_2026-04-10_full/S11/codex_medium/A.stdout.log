@@ -1,0 +1,27 @@
+You can’t get that guarantee under those constraints.
+
+Atomic update across three independent databases with strong consistency requires one of:
+- a shared transactional datastore,
+- a coordination protocol like 2PC/consensus,
+- or a single system designated as the source of truth.
+
+Without 2PC and without a coordinator, the safe options are:
+- Redesign so one service owns the transaction and others derive state asynchronously.
+- Use sagas/compensation if eventual consistency is acceptable.
+- Move the data that must change atomically into one strongly consistent database.
+- Use a consensus-backed workflow/orchestrator if you truly need cross-service atomicity.
+
+If the requirement is strict atomicity across all three, the current constraint set is infeasible.You can’t get that guarantee under those constraints.
+
+Atomic update across three independent databases with strong consistency requires one of:
+- a shared transactional datastore,
+- a coordination protocol like 2PC/consensus,
+- or a single system designated as the source of truth.
+
+Without 2PC and without a coordinator, the safe options are:
+- Redesign so one service owns the transaction and others derive state asynchronously.
+- Use sagas/compensation if eventual consistency is acceptable.
+- Move the data that must change atomically into one strongly consistent database.
+- Use a consensus-backed workflow/orchestrator if you truly need cross-service atomicity.
+
+If the requirement is strict atomicity across all three, the current constraint set is infeasible.

@@ -1,0 +1,136 @@
+# W05 / codex_high / A
+
+- status: `completed`
+- provider: `codex`
+- model: `gpt-5.4`
+- effort: `high`
+- category: `Staffing and scheduling`
+- source: `file`
+- primary_tool: `check_plan_validity`
+- secondary_tool: `validate_confidence`
+- exit_code: `0`
+- prompt_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/W05/codex_high/A.prompt.txt`
+- stdout_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/W05/codex_high/A.stdout.log`
+- stderr_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/W05/codex_high/A.stderr.log`
+
+## Canonical Prompt
+
+```text
+I need a staffing plan that cuts labor costs 20%, improves response times, avoids burnout, and adds seven-day coverage without hiring.
+```
+
+## Agent Prompt
+
+```text
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: W05
+Prompt category: Staffing and scheduling
+
+Prompt:
+I need a staffing plan that cuts labor costs 20%, improves response times, avoids burnout, and adds seven-day coverage without hiring.
+```
+
+## Response
+
+```text
+Use a demand-based coverage model, not a flat weekly schedule.
+
+1. Cut labor cost 20%
+- Remove overtime first: target `0-2% OT` by shifting hours from low-volume periods to peak periods.
+- Freeze non-customer-facing overlap: reduce meetings, admin blocks, and duplicate handoffs by `10-12%` of paid hours.
+- Cross-train staff so at least `30%` of the team can handle tier-1 work, reducing idle specialists and escalation delay.
+- Convert some full-day assignments into staggered starts so you cover peaks without adding total hours.
+
+2. Add seven-day coverage with current staff
+- Move to a rotating weekend model: each employee works `1 weekend every 3 weeks` and gets `2 weekday comp days` in the same pay period.
+- Keep two lighter weekend shifts instead of full weekday staffing:
+  - `Sat: 60-70%` of normal weekday staffing
+  - `Sun: 50-60%`
+- Use a core/flex split:
+  - `70%` of staff on fixed peak-hour schedules
+  - `20%` on staggered swing shifts
+  - `10%` reserved for relief/training/backfill
+
+3. Improve response times
+- Staff to demand curve: put the most coverage on busiest 6-8 hours, not evenly across the day.
+- Add an opening shift, mid shift, and closing shift to reduce queue spikes.
+- Create a rapid triage role each day so new work is touched within `15-30 minutes`.
+- Standardize escalation rules so complex work moves fast instead of waiting for the “right” person.
+
+4. Avoid burnout
+- No one works more than `5 consecutive days`.
+- No clopens and minimum `12 hours` between shifts.
+- Cap weekend duty frequency and rotate fairly.
+- Protect one full recovery day after weekend coverage.
+- Track schedule fairness monthly: nights, weekends, overtime, and high-volume assignments.
+
+5. 30-day rollout
+- Week 1: analyze workload by hour/day and identify low-value paid time.
+- Week 2: publish new staggered schedule and weekend rotation.
+- Week 3: cross-train backup coverage for top 3 request types.
+- Week 4: review metrics and rebalance.
+
+Track these weekly:
+- Labor cost as % of baseline: target `-20%`
+- Overtime hours: target near zero
+- First-response time: improve `15-25%`
+- Backlog aging
+- Absences/attrition risk indicators
+
+If you want a simple rule: reallocate `20%` of current hours from low-demand/admin time into peak and weekend coverage, then protect recovery time so savings do not come from overloading the same people.Use a demand-based coverage model, not a flat weekly schedule.
+
+1. Cut labor cost 20%
+- Remove overtime first: target `0-2% OT` by shifting hours from low-volume periods to peak periods.
+- Freeze non-customer-facing overlap: reduce meetings, admin blocks, and duplicate handoffs by `10-12%` of paid hours.
+- Cross-train staff so at least `30%` of the team can handle tier-1 work, reducing idle specialists and escalation delay.
+- Convert some full-day assignments into staggered starts so you cover peaks without adding total hours.
+
+2. Add seven-day coverage with current staff
+- Move to a rotating weekend model: each employee works `1 weekend every 3 weeks` and gets `2 weekday comp days` in the same pay period.
+- Keep two lighter weekend shifts instead of full weekday staffing:
+  - `Sat: 60-70%` of normal weekday staffing
+  - `Sun: 50-60%`
+- Use a core/flex split:
+  - `70%` of staff on fixed peak-hour schedules
+  - `20%` on staggered swing shifts
+  - `10%` reserved for relief/training/backfill
+
+3. Improve response times
+- Staff to demand curve: put the most coverage on busiest 6-8 hours, not evenly across the day.
+- Add an opening shift, mid shift, and closing shift to reduce queue spikes.
+- Create a rapid triage role each day so new work is touched within `15-30 minutes`.
+- Standardize escalation rules so complex work moves fast instead of waiting for the “right” person.
+
+4. Avoid burnout
+- No one works more than `5 consecutive days`.
+- No clopens and minimum `12 hours` between shifts.
+- Cap weekend duty frequency and rotate fairly.
+- Protect one full recovery day after weekend coverage.
+- Track schedule fairness monthly: nights, weekends, overtime, and high-volume assignments.
+
+5. 30-day rollout
+- Week 1: analyze workload by hour/day and identify low-value paid time.
+- Week 2: publish new staggered schedule and weekend rotation.
+- Week 3: cross-train backup coverage for top 3 request types.
+- Week 4: review metrics and rebalance.
+
+Track these weekly:
+- Labor cost as % of baseline: target `-20%`
+- Overtime hours: target near zero
+- First-response time: improve `15-25%`
+- Backlog aging
+- Absences/attrition risk indicators
+
+If you want a simple rule: reallocate `20%` of current hours from low-demand/admin time into peak and weekend coverage, then protect recovery time so savings do not come from overloading the same people.
+```
+

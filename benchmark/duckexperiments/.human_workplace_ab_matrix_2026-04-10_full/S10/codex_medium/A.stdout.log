@@ -1,0 +1,53 @@
+You can’t have all four at once in a distributed system:
+
+- `lock-free`
+- `never undercounts`
+- `never overcounts`
+- `millions of writes/sec`
+
+At that scale, exact global counting requires serialized coordination somewhere. If you remove coordination, retries, duplicates, crashes, and partitions force either undercount or overcount.
+
+Best practical design:
+
+- If exactness matters: send every increment through a durable log/queue with an idempotency key, partition by counter, and have a single logical owner per partition apply increments transactionally. This is not lock-free, but it is exact and scalable by sharding.
+- If lock-free/high-throughput matters: use sharded per-node counters and periodic aggregation. This scales to millions of writes/sec, but the reported total is eventually consistent and may temporarily under/overcount unless you add exactly-once coordination.
+
+So the engineering answer is: choose 2 of 3:
+- exact
+- lock-free
+- ultra-high-throughput
+
+For most websites, use:
+- local batched increments
+- append-only durable event stream
+- idempotency keys on retries
+- shard-by-counter aggregation
+- background exact compaction for the displayed total
+
+That gets very high throughput with operationally controlled error, but not the impossible guarantee set you asked for.You can’t have all four at once in a distributed system:
+
+- `lock-free`
+- `never undercounts`
+- `never overcounts`
+- `millions of writes/sec`
+
+At that scale, exact global counting requires serialized coordination somewhere. If you remove coordination, retries, duplicates, crashes, and partitions force either undercount or overcount.
+
+Best practical design:
+
+- If exactness matters: send every increment through a durable log/queue with an idempotency key, partition by counter, and have a single logical owner per partition apply increments transactionally. This is not lock-free, but it is exact and scalable by sharding.
+- If lock-free/high-throughput matters: use sharded per-node counters and periodic aggregation. This scales to millions of writes/sec, but the reported total is eventually consistent and may temporarily under/overcount unless you add exactly-once coordination.
+
+So the engineering answer is: choose 2 of 3:
+- exact
+- lock-free
+- ultra-high-throughput
+
+For most websites, use:
+- local batched increments
+- append-only durable event stream
+- idempotency keys on retries
+- shard-by-counter aggregation
+- background exact compaction for the displayed total
+
+That gets very high throughput with operationally controlled error, but not the impossible guarantee set you asked for.

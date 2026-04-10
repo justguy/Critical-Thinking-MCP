@@ -1,0 +1,21 @@
+You can’t honestly guarantee no regressions next sprint if you’re refactoring 5,000 lines of legacy checkout code with no tests.
+
+A defensible plan is:
+1. Do not do a full clean-architecture rewrite in one sprint.
+2. First add characterization coverage around current behavior: checkout flows, discounts, tax, shipping, payment auth/capture, retries, failure paths.
+3. Put the legacy module behind a stable facade, then extract one seam at a time behind feature flags.
+4. Run old and new paths in parallel where possible and compare outputs for the same inputs.
+5. Add integration, contract, and end-to-end tests before moving critical logic.
+6. Release incrementally with monitoring, rollback, and audit logging.
+
+If leadership wants a guarantee, the only credible answer is: fund a test harness and phased migration first, or accept regression risk.You can’t honestly guarantee no regressions next sprint if you’re refactoring 5,000 lines of legacy checkout code with no tests.
+
+A defensible plan is:
+1. Do not do a full clean-architecture rewrite in one sprint.
+2. First add characterization coverage around current behavior: checkout flows, discounts, tax, shipping, payment auth/capture, retries, failure paths.
+3. Put the legacy module behind a stable facade, then extract one seam at a time behind feature flags.
+4. Run old and new paths in parallel where possible and compare outputs for the same inputs.
+5. Add integration, contract, and end-to-end tests before moving critical logic.
+6. Release incrementally with monitoring, rollback, and audit logging.
+
+If leadership wants a guarantee, the only credible answer is: fund a test harness and phased migration first, or accept regression risk.

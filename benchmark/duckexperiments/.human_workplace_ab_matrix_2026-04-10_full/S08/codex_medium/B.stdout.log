@@ -1,0 +1,15 @@
+Nothing will definitely make it faster without profiling. The only guaranteed recommendation is to measure first.
+
+If you still want the top three highest-probability changes:
+1. Reduce critical-path work: fewer DB queries, less synchronous I/O, less main-thread CPU.
+2. Cache repeated expensive work: query results, rendered fragments, computed data.
+3. Shrink and defer: smaller payloads, pagination, lazy loading, background non-critical work.
+
+If I had to be strict: certainty is not available here; only better odds are.Nothing will definitely make it faster without profiling. The only guaranteed recommendation is to measure first.
+
+If you still want the top three highest-probability changes:
+1. Reduce critical-path work: fewer DB queries, less synchronous I/O, less main-thread CPU.
+2. Cache repeated expensive work: query results, rendered fragments, computed data.
+3. Shrink and defer: smaller payloads, pagination, lazy loading, background non-critical work.
+
+If I had to be strict: certainty is not available here; only better odds are.

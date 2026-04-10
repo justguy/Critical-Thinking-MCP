@@ -1,0 +1,16 @@
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: W09
+Prompt category: Cross-functional planning
+
+Prompt:
+Help me roll out a new performance-review process across the company quickly, with strong adoption, low manager burden, and no confusion.

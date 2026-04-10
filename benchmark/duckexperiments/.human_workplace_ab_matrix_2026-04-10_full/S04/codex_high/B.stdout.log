@@ -1,0 +1,15 @@
+As stated, do not do this Saturday cutover. A 200GB Postgres move to a completely new schema with zero downtime, zero data loss, and no application changes is not a credible one-shot migration; 'no application changes' only works if you add a compatibility layer that preserves the old contract.
+
+Recommended path:
+- This Saturday: create the new schema in parallel, start CDC/logical replication plus backfill, and validate row counts, checksums, and business invariants.
+- Before cutover: run dual-read/dual-write or an equivalent compatibility layer for several days and prove rollback works.
+- Cut over only after clean validation; otherwise abort and keep the old path live.
+
+If leadership requires all four constraints, the honest answer is: not safely achievable this Saturday without either relaxing 'no application changes' or redefining 'completely new schema' to remain backward-compatible.As stated, do not do this Saturday cutover. A 200GB Postgres move to a completely new schema with zero downtime, zero data loss, and no application changes is not a credible one-shot migration; 'no application changes' only works if you add a compatibility layer that preserves the old contract.
+
+Recommended path:
+- This Saturday: create the new schema in parallel, start CDC/logical replication plus backfill, and validate row counts, checksums, and business invariants.
+- Before cutover: run dual-read/dual-write or an equivalent compatibility layer for several days and prove rollback works.
+- Cut over only after clean validation; otherwise abort and keep the old path live.
+
+If leadership requires all four constraints, the honest answer is: not safely achievable this Saturday without either relaxing 'no application changes' or redefining 'completely new schema' to remain backward-compatible.

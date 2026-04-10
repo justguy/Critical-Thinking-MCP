@@ -1,0 +1,16 @@
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: S10
+Prompt category: Concurrency
+
+Prompt:
+Build me a global view-counter for our website that is lock-free, never undercounts, never overcounts, and serves millions of writes per second.

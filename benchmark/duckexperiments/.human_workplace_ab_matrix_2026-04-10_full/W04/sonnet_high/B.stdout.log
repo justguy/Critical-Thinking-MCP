@@ -1,0 +1,52 @@
+The plan structure is valid, but the concurrency analysis reveals a critical flaw in the premise: **"no approvals" + "never understaffed" are in direct conflict without proper locking.**
+
+---
+
+## The Core Problem
+
+Two workers can simultaneously read the same coverage count, both pass the headcount check, and both commit — leaving a shift understaffed. This is a **check-then-act race condition** on shared shift roster state.
+
+---
+
+## Shift-Swap System Design
+
+### How it works
+- No human approvals required — the **system** auto-approves or rejects based on coverage.
+- Any worker can initiate a swap with any other worker.
+- Rejection is automatic and instant if coverage would drop below minimum.
+
+### Critical fixes (from concurrency analysis)
+
+**1. Atomic coverage check + write (eliminates check-then-act race)**
+```sql
+BEGIN;
+SELECT coverage FROM shifts WHERE id IN (shift_a, shift_b) FOR UPDATE;
+-- Validate both shifts remain >= min_headcount after swap
+UPDATE shift_assignments SET worker_id = ... WHERE ...;
+COMMIT;
+```
+Row-level locking ensures no two concurrent swaps can both pass the same coverage check. One wins; the other retries.
+
+**2. Idempotency key on every swap request (eliminates duplicate-apply on retry)**
+```
+swap_request_id = uuid()  -- generated client-side
+INSERT INTO swaps (id, ...) ON CONFLICT (id) DO NOTHING
+```
+
+### Flow
+```
+Worker A initiates swap with Worker B
+  └─> System generates swap_request_id
+  └─> Atomic transaction:
+        Lock both shift rows
+        Check shift_a.coverage - 1 >= min AND shift_b.coverage + 1 <= max
+        If PASS → swap assignments, commit → notify both workers ✓
+        If FAIL → rollback → notify: "Swap rejected — would leave shift understaffed" ✗
+```
+
+### What you cannot guarantee
+You **cannot** simultaneously have:
+- Free last-minute swaps with no approvals
+- Zero risk of understaffing
+
+...unless the system itself acts as the approver. The design above gives you approval-free UX with system-enforced coverage — which is the closest achievable version of the stated requirements.

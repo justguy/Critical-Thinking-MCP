@@ -1,0 +1,81 @@
+# S14 / opus_high / A
+
+- status: `completed`
+- provider: `claude`
+- model: `opus`
+- effort: `high`
+- category: `Architecture`
+- source: `file`
+- primary_tool: `evaluate_tradeoffs`
+- secondary_tool: `score_response_quality`
+- exit_code: `0`
+- prompt_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/S14/opus_high/A.prompt.txt`
+- stdout_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/S14/opus_high/A.stdout.log`
+- stderr_path: `/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full/S14/opus_high/A.stderr.log`
+
+## Canonical Prompt
+
+```text
+Recommend an architecture for our new service that is highly available, strongly consistent, low cost, low operational burden, and easy for junior engineers to maintain.
+```
+
+## Agent Prompt
+
+```text
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: S14
+Prompt category: Architecture
+
+Prompt:
+Recommend an architecture for our new service that is highly available, strongly consistent, low cost, low operational burden, and easy for junior engineers to maintain.
+```
+
+## Response
+
+```text
+## Architecture Recommendation
+
+**Short answer:** You can't have all five at once — these constraints are in tension. Here's the closest practical compromise and where you'll need to make deliberate tradeoffs.
+
+### Recommended Starting Point
+
+**Managed monolith on a single cloud platform:**
+
+- **Runtime:** Single containerized service on a managed platform (e.g., Cloud Run, ECS Fargate, or Azure Container Apps). Avoids Kubernetes operational burden.
+- **Database:** Managed PostgreSQL (Cloud SQL, RDS, Aurora) with synchronous replication for strong consistency. Single-region, multi-AZ for high availability without the cost of multi-region.
+- **Queue/async work:** Managed queue (SQS, Cloud Tasks) for anything that doesn't need synchronous response.
+
+### Where the Tradeoffs Bite
+
+| Goal | What you get | What you give up |
+|---|---|---|
+| **High availability** | Multi-AZ within one region (~99.95%) | True multi-region HA (99.99%+) is expensive and conflicts with strong consistency |
+| **Strong consistency** | Single-leader Postgres gives you this naturally | Multi-region consistency requires distributed consensus (Spanner, CockroachDB) — not low-cost or simple |
+| **Low cost** | Managed services, no dedicated infra team | You pay a premium per-request vs. self-managed, and can't do multi-region cheaply |
+| **Low ops burden** | Managed everything, no K8s, no self-hosted DB | Less control over tuning, scaling behavior |
+| **Junior-friendly** | Monolith, one repo, standard SQL, no distributed systems concepts | You'll eventually hit scaling walls that require more sophistication |
+
+### Key Design Decisions
+
+1. **Stay monolith until you can't.** Microservices add distributed systems complexity that directly conflicts with "junior-friendly" and "low ops."
+2. **Pick one region.** Multi-region strong consistency is the single most expensive and complex thing you can add. Most services don't need it.
+3. **Use the managed version of everything.** Managed DB, managed containers, managed queues. The ops cost of self-hosting always exceeds the dollar cost of managed services for small teams.
+4. **Invest in CI/CD and observability early.** These are what actually make a service maintainable by junior engineers — not the architecture itself.
+
+### If You Truly Need Multi-Region Strong Consistency
+
+You're looking at Google Spanner or CockroachDB, a significantly higher bill, and engineers who understand distributed consensus. At that point, drop "low cost" and "junior-friendly" from the requirements — you can't have them all.
+
+**The most important architectural decision is being explicit about which constraint you'll relax when they conflict.** I'd recommend relaxing "highly available" from 99.99% to 99.95% (single-region multi-AZ) — most services never notice the difference, and it preserves everything else.
+```
+

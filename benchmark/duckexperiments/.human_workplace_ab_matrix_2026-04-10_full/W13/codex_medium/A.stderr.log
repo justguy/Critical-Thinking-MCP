@@ -1,0 +1,42 @@
+Reading additional input from stdin...
+OpenAI Codex v0.118.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full, /Users/adilevinshtein/.codex/memories]
+reasoning effort: medium
+reasoning summaries: none
+session id: 019d7581-667f-7d52-8e07-f2e65a74363d
+--------
+user
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: W13
+Prompt category: Hiring
+
+Prompt:
+This candidate interviewed well and everyone liked them. What are the odds they'll become a top performer within six months?
+codex
+Low to moderate. A strong interview and good rapport are positive signals, but they are weak predictors of becoming a top performer in six months.
+
+A reasonable prior is roughly 10% to 25%, unless you also have strong evidence on:
+- past execution in similar environments
+- speed of learning
+- ownership under ambiguity
+- reference-backed performance pattern
+- manager, role, and onboarding fit
+
+If you want a decision rule: hire based on expected solid performance, not on betting they’ll be a top performer quickly.
+tokens used
+10,808

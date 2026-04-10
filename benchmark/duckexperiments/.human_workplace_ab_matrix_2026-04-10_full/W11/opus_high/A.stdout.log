@@ -1,0 +1,27 @@
+## Shared Vendor Account for Ops — Practical Setup
+
+**Account structure:**
+- One shared vendor account with a single set of credentials stored in a password manager (e.g., 1Password vault shared with the ops group).
+- Each person logs in with the shared account but identifies themselves per order (see below).
+
+**Keep spending clean without extra process:**
+
+1. **PO/reference field convention** — Every order must include `[initials]-[date]-[brief reason]` in the PO or reference field (e.g., `JM-0409-server-fans`). This takes 5 seconds and gives you a full audit trail in the vendor's order history.
+
+2. **Shared ledger, not approvals** — Use a lightweight shared spreadsheet or Slack channel where each person posts immediately after ordering: what, how much, why. No approval step, just visibility. If something looks wrong, anyone can flag it.
+
+3. **Spending guardrails:**
+   - Set a per-order soft cap (e.g., $500). Below it, just order and log. Above it, ping the team channel before placing.
+   - If the vendor supports it, set a monthly credit limit on the account itself as a hard backstop.
+   - Turn on email/SMS order confirmations routed to a shared ops alias so nothing goes unnoticed.
+
+4. **Prevent common mistakes:**
+   - Pin the correct shipping address and default payment method in the vendor account — don't let people re-enter these manually.
+   - Keep a pinned note (in the password manager entry or a shared doc) with: approved shipping addresses, cost centers, and items that need manager sign-off (if any).
+   - If the vendor supports saved lists or favorites, pre-load commonly ordered items to reduce typos and wrong SKUs.
+
+5. **Periodic hygiene (low effort):**
+   - Once a month, one person does a 10-minute reconciliation: vendor order history vs. the shared log. Catch gaps early before they become mysteries.
+   - Rotate the account password quarterly via the password manager.
+
+**Why this works:** No approval chains slow down urgent orders. The reference-field convention and shared log give you accountability without gatekeeping. The hard limits and pinned defaults prevent the most costly mistakes structurally rather than procedurally.

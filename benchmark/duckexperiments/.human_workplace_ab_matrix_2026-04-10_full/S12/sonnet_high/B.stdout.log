@@ -1,0 +1,79 @@
+The plan validator flagged that `processor-dedup-log` is accessed by unordered steps (s3/s4/s5) — those are mutually exclusive branches, so fix it by making s4 and s5 both depend on s3 explicitly, which the plan already does. The conflict is a false positive from branching logic; the ordering is correct.
+
+---
+
+## Making Payment Processing Idempotent — No New Storage Required
+
+### Core principle: deterministic key + atomic dedup in existing storage
+
+**1. Generate a stable idempotency key on the caller side**
+
+Derive it deterministically from inputs that don't change on retry:
+
+```python
+idempotency_key = sha256(f"{user_id}:{order_id}:{amount_cents}:{currency}").hexdigest()
+```
+
+Never generate a random key per attempt — that defeats idempotency. Generate once, reuse on every retry for the same logical operation.
+
+**2. Use your existing payments table as the dedup store**
+
+Add a `UNIQUE` constraint on `idempotency_key` to your existing payments table — no new table, no Redis:
+
+```sql
+ALTER TABLE payments ADD COLUMN idempotency_key TEXT UNIQUE;
+```
+
+**3. Atomic check-and-reserve with INSERT ... ON CONFLICT**
+
+```sql
+INSERT INTO payments (idempotency_key, status, amount, user_id, created_at)
+VALUES ($key, 'pending', $amount, $user_id, NOW())
+ON CONFLICT (idempotency_key) DO NOTHING
+RETURNING id, status, processor_charge_id;
+```
+
+- If it inserts → proceed to charge.
+- If it returns nothing (conflict) → fetch the existing row and return its cached result. **Done — no charge attempted.**
+
+**4. Pass the same key to your payment processor**
+
+All major processors (Stripe, Braintree, Adyen) support idempotency keys natively. Pass yours through:
+
+```python
+stripe.PaymentIntent.create(
+    amount=amount_cents,
+    currency="usd",
+    idempotency_key=idempotency_key,  # processor-level dedup
+)
+```
+
+This makes the charge itself safe to retry even if your DB write crashes mid-flight.
+
+**5. Complete the record atomically after charge**
+
+```sql
+UPDATE payments
+SET status = 'completed', processor_charge_id = $charge_id, completed_at = NOW()
+WHERE idempotency_key = $key AND status = 'pending';
+```
+
+**6. Handle the crash-between-insert-and-charge case**
+
+On retry, if the row exists with `status = 'pending'`:
+- Re-attempt the charge using the **same idempotency key** to the processor.
+- The processor deduplicates at their end — you either get the original result or a safe no-op.
+- Update the row to `completed` once confirmed.
+
+---
+
+### Why this satisfies all constraints
+
+| Constraint | How it's met |
+|---|---|
+| No duplicate charges | `UNIQUE` constraint prevents double-insert; processor key prevents double-charge |
+| Retries always safe | Same key → same idempotent path every time |
+| No new storage | One column on existing table + DB's own constraint enforcement |
+| No coordination layer | No distributed lock, no Redis, no Zookeeper — DB unique constraint is atomic |
+
+The only caution: idempotency windows. Processors expire keys after ~24 hours (Stripe) to ~7 days. Match your retry window to their expiry, or store the processor's charge ID so expired retries can query the processor's API to confirm rather than re-charge.

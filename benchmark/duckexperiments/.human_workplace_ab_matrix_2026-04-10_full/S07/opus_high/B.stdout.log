@@ -1,0 +1,16 @@
+There is no precise answer — it depends entirely on what fraction of the total request time that inner loop consumes. This is Amdahl's Law:
+
+**Speedup_total = 1 / ((1 - f) + f / S)**
+
+where **f** is the fraction of end-to-end time spent in the loop and **S** is the component speedup (4x).
+
+Examples:
+- If the loop is 20% of request time: 1 / (0.80 + 0.05) = **~1.18x** end-to-end
+- If the loop is 5% of request time: 1 / (0.95 + 0.0125) = **~1.04x** end-to-end
+
+Additionally, the 4x microbenchmark figure itself may not hold in production. Microbenchmarks typically run with warm caches, no memory pressure from adjacent work, and no I/O interleaving. Real production conditions often erode that multiplier.
+
+To get an actual number:
+1. **Profile the full request path** to measure what percentage of wall-clock time is spent in that loop under realistic load.
+2. **Apply Amdahl's Law** with that fraction.
+3. **Validate with a production A/B test** or shadow traffic comparison, since Amdahl's Law assumes clean decomposition that real systems often violate.

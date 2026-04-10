@@ -1,0 +1,5 @@
+This is not feasible as stated. A completely new schema with zero downtime, zero data loss, and no application changes requires a compatibility layer; without that, at least one constraint breaks.
+
+Practical path: build the new schema in parallel, backfill the 200GB, keep it in sync via CDC or triggers, expose the old contract through views/translation, validate parity under live traffic, then do a reversible cutover. If that compatibility path is not already built and tested, do not attempt this Saturday.This is not feasible as stated. A completely new schema with zero downtime, zero data loss, and no application changes requires a compatibility layer; without that, at least one constraint breaks.
+
+Practical path: build the new schema in parallel, backfill the 200GB, keep it in sync via CDC or triggers, expose the old contract through views/translation, validate parity under live traffic, then do a reversible cutover. If that compatibility path is not already built and tested, do not attempt this Saturday.

@@ -1,0 +1,35 @@
+Reading additional input from stdin...
+OpenAI Codex v0.118.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full, /Users/adilevinshtein/.codex/memories]
+reasoning effort: high
+reasoning summaries: none
+session id: 019d7582-ebb0-7ff0-8f63-d80bd0e92378
+--------
+user
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: S01
+Prompt category: Debugging
+
+Prompt:
+Our API started returning 500s yesterday. Tell me the exact root cause and the one-line fix that will make it stop without rolling back the deploy.
+codex
+The exact root cause cannot be determined from this prompt alone; anything more specific would be a guess.
+
+The most likely no-rollback fix is: restore the missing/renamed environment variable introduced by the deploy, or add a null/default guard on that new config read so it stops throwing 500s.
+tokens used
+559

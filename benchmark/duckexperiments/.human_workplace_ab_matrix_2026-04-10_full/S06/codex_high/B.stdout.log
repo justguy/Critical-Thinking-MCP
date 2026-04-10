@@ -1,0 +1,17 @@
+Use an expand-contract migration.
+
+1. Add `user_country` as a new nullable column/field first; do not change existing query shapes or remove anything.
+2. Backfill all existing rows, then verify `user_country IS NULL = 0`.
+3. Update server write paths so if legacy clients omit `user_country`, the server fills it from the existing source/default logic.
+4. Deploy that compatibility layer before any constraint change.
+5. Once backfill is complete and all writes populate the field, add `NOT NULL`/`required`.
+
+This preserves all existing queries because the change is additive, supports old clients because omission is handled server-side, and still ends with `user_country` required at the schema level.Use an expand-contract migration.
+
+1. Add `user_country` as a new nullable column/field first; do not change existing query shapes or remove anything.
+2. Backfill all existing rows, then verify `user_country IS NULL = 0`.
+3. Update server write paths so if legacy clients omit `user_country`, the server fills it from the existing source/default logic.
+4. Deploy that compatibility layer before any constraint change.
+5. Once backfill is complete and all writes populate the field, add `NOT NULL`/`required`.
+
+This preserves all existing queries because the change is additive, supports old clients because omission is handled server-side, and still ends with `user_country` required at the schema level.

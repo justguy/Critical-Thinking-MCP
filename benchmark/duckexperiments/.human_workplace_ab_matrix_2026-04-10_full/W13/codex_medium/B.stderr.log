@@ -1,0 +1,48 @@
+Reading additional input from stdin...
+OpenAI Codex v0.118.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full, /Users/adilevinshtein/.codex/memories]
+reasoning effort: medium
+reasoning summaries: none
+session id: 019d7581-82e8-74a1-80e7-19e55fb8baf2
+--------
+user
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Before answering, you must call the designated CT-MCP tools if they are available in this host.
+- Primary designated tool: validate_confidence.
+- Secondary designated tool: score_response_quality.
+- Use the primary tool first.
+- Use the secondary tool as well unless it is unavailable.
+- Do not use any non-CT tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+- The answer text you send to CT should be the same answer you return. Do not materially change it after the final CT call.
+
+Return only the user-facing answer. Do not narrate tool usage.
+
+Prompt ID: W13
+Prompt category: Hiring
+
+Prompt:
+This candidate interviewed well and everyone liked them. What are the odds they'll become a top performer within six months?
+mcp: ct-mcp/validate_confidence started
+mcp: ct-mcp/validate_confidence (failed)
+user cancelled MCP tool call
+mcp: ct-mcp/validate_confidence started
+mcp: ct-mcp/validate_confidence (failed)
+user cancelled MCP tool call
+mcp: ct-mcp/score_response_quality started
+mcp: ct-mcp/score_response_quality (failed)
+user cancelled MCP tool call
+codex
+Roughly 20% to 35%.
+
+A strong interview and broad enthusiasm are positive signals, but they are not strong enough to justify high confidence that someone will be a top performer that quickly. If you only know "they interviewed well and everyone liked them," treat it as moderate upside with high uncertainty, not a likely outcome.
+tokens used
+12,021

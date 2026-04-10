@@ -1,0 +1,11 @@
+There's no basis for an exact date or probability here — "about a dozen unspecified widgets" and "team velocity" are placeholders, not inputs.
+
+To give a real estimate you need:
+
+- **Scope**: What are the widgets? Even rough complexity buckets (small/medium/large) matter enormously.
+- **Velocity**: Actual measured throughput — story points per sprint, features per week, tickets per sprint. "Team velocity" without a number is not a velocity.
+- **Team availability**: Headcount, part-time allocation, upcoming PTO, competing priorities.
+- **Definition of done**: MVP with hardcoded data vs. production-ready with real data pipelines, auth, and error states are very different timelines.
+- **Historical accuracy**: How often has this team's past estimates been right? That sets the confidence interval.
+
+Any date I give without these inputs would be a random number dressed up as analysis. Provide the actuals and I can give you a grounded range with a real confidence level.

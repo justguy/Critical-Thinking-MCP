@@ -1,0 +1,59 @@
+## Adding a Required `user_country` Field Safely
+
+These requirements are in tension — here's how to resolve them:
+
+### Database Layer
+
+```sql
+-- Safe: column is NOT NULL with a default so existing rows and INSERT-without-column both work
+ALTER TABLE users ADD COLUMN user_country VARCHAR(2) NOT NULL DEFAULT 'US';
+
+-- If data is already populated, backfill first in a separate migration:
+-- 1. ADD COLUMN user_country VARCHAR(2) NULL;
+-- 2. UPDATE users SET user_country = <source> WHERE user_country IS NULL;
+-- 3. ALTER COLUMN user_country SET NOT NULL;
+```
+
+The `DEFAULT` clause is what protects legacy clients — any INSERT that omits the column gets the default value instead of failing.
+
+### Application / API Layer
+
+```python
+# In your schema/model, make it required but with a default
+class User(BaseModel):
+    user_country: str = "US"  # Required in schema, defaulted for legacy clients
+```
+
+**For REST/GraphQL APIs:** Make the field optional in the *input* schema but required in the *output* schema:
+
+```python
+# Write DTO — legacy clients can omit it
+class CreateUserRequest(BaseModel):
+    name: str
+    user_country: str = "US"  # defaults if absent
+
+# Read DTO — always present in responses
+class UserResponse(BaseModel):
+    name: str
+    user_country: str  # no default, always returned
+```
+
+### Why This Doesn't Break Queries
+
+| Concern | Mitigation |
+|---|---|
+| `SELECT *` queries | New column appears but doesn't break result parsing |
+| `INSERT` without the column | `DEFAULT` fills it in |
+| Legacy clients reading responses | Extra field is ignored by well-behaved clients |
+| Legacy clients writing | Default applies; no validation failure |
+| `NOT NULL` constraint | Default + backfill means no nulls ever exist |
+
+### Deployment Order
+
+1. **Migrate**: Add column as `NULL`, no default
+2. **Backfill**: Populate from existing data source
+3. **Constrain**: Set `NOT NULL` + `DEFAULT` for future inserts
+4. **Deploy app code**: Start reading/writing the field explicitly
+5. **Later**: Remove the default once all clients send the field (optional)
+
+Steps 1-3 can collapse into a single `ADD COLUMN ... NOT NULL DEFAULT 'US'` if the table is small enough that the lock is acceptable and the default value is correct for all existing rows. For large tables, do it in phases to avoid long locks.

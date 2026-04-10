@@ -1,0 +1,29 @@
+You cannot compute a precise full-path production speedup from that microbenchmark alone.
+
+Use Amdahl’s law:
+
+`overall_speedup = 1 / ((1 - p) + p / 4)`
+
+Where `p` is the fraction of total production request time originally spent in that loop.
+
+Examples:
+- `p = 0.20` -> `1.18x`
+- `p = 0.50` -> `1.60x`
+- `p = 0.80` -> `2.50x`
+- `p = 1.00` -> `4.00x` (best possible)
+
+So the expected production speedup depends entirely on the loop’s actual share of end-to-end request time in production. If you want the real number, measure `p` with production profiling first.You cannot compute a precise full-path production speedup from that microbenchmark alone.
+
+Use Amdahl’s law:
+
+`overall_speedup = 1 / ((1 - p) + p / 4)`
+
+Where `p` is the fraction of total production request time originally spent in that loop.
+
+Examples:
+- `p = 0.20` -> `1.18x`
+- `p = 0.50` -> `1.60x`
+- `p = 0.80` -> `2.50x`
+- `p = 1.00` -> `4.00x` (best possible)
+
+So the expected production speedup depends entirely on the loop’s actual share of end-to-end request time in production. If you want the real number, measure `p` with production profiling first.

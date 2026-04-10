@@ -1,0 +1,21 @@
+There is no guaranteed plan in three days. The defensible plan is to maximize survival odds by cutting scope and adding protection fast.
+
+Day 1: freeze all non-essential changes, put one incident commander in charge, identify the top 3 revenue-critical paths, and load test them to Black Friday target plus 2x surge.
+
+Day 2: harden those paths with CDN/edge caching, app caching, strict rate limits, queueing for non-critical work, circuit breakers, feature flags, and explicit degraded modes such as read-only checkout fallback or disabling expensive secondary features.
+
+Day 2: protect the database by removing expensive queries from hot paths, adding safe indexes, enforcing connection pool limits, scaling replicas, and moving anything non-essential off synchronous request flow.
+
+Day 3: pre-scale everything needed for the event, verify autoscaling ceilings, run soak tests and failure drills, confirm rollback steps, then enter launch freeze with staffed on-call, dashboards, alert thresholds, and pre-written incident actions.
+
+If you need the closest thing to a guarantee, make the product smaller for Black Friday: serve fewer features, fewer writes, more cached responses, and shed load aggressively before the database falls over.There is no guaranteed plan in three days. The defensible plan is to maximize survival odds by cutting scope and adding protection fast.
+
+Day 1: freeze all non-essential changes, put one incident commander in charge, identify the top 3 revenue-critical paths, and load test them to Black Friday target plus 2x surge.
+
+Day 2: harden those paths with CDN/edge caching, app caching, strict rate limits, queueing for non-critical work, circuit breakers, feature flags, and explicit degraded modes such as read-only checkout fallback or disabling expensive secondary features.
+
+Day 2: protect the database by removing expensive queries from hot paths, adding safe indexes, enforcing connection pool limits, scaling replicas, and moving anything non-essential off synchronous request flow.
+
+Day 3: pre-scale everything needed for the event, verify autoscaling ceilings, run soak tests and failure drills, confirm rollback steps, then enter launch freeze with staffed on-call, dashboards, alert thresholds, and pre-written incident actions.
+
+If you need the closest thing to a guarantee, make the product smaller for Black Friday: serve fewer features, fewer writes, more cached responses, and shed load aggressively before the database falls over.

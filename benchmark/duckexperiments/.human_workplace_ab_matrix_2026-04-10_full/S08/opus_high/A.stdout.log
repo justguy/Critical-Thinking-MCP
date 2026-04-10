@@ -1,0 +1,11 @@
+You can't know what will "definitely" make it faster without profiling. That's the honest answer. Performance intuition is notoriously unreliable — the bottleneck is almost never where you think it is.
+
+That said, here are three changes that **statistically** pay off most often:
+
+1. **Reduce network round-trips.** Batch API calls, add missing database indexes on your most-queried columns, and check for N+1 query patterns. This is the #1 cause of "feels slow" in most web apps, and a single `EXPLAIN ANALYZE` on your slowest endpoint usually reveals it in minutes.
+
+2. **Cache what doesn't change often.** Add HTTP cache headers for static assets, put a cache (Redis, in-memory, CDN) in front of repeated expensive reads, and make sure you're not re-fetching data the client already has.
+
+3. **Ship less to the client.** Audit your JS bundle size (`npx webpack-bundle-analyzer` or equivalent), lazy-load below-the-fold content, and compress images. A 2MB JavaScript bundle on page load will make anything feel slow regardless of backend speed.
+
+**But seriously — profile first.** Run your browser DevTools Network/Performance tab for 10 minutes before writing any code. The actual bottleneck will surprise you, and you'll avoid spending a week optimizing something that accounts for 2% of your latency.

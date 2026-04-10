@@ -1,0 +1,12 @@
+**That library doesn't exist.** No single open-source library credibly handles all five of authentication, authorization, audit logging, rate limiting, and feature flags — and claiming one does would set you up for lock-in or painful workarounds.
+
+Here's why the premise is a trap:
+
+- **Auth (authn + authz)** is a deep, security-critical domain. Libraries like **Keycloak**, **Ory** (Kratos + Keto), or **Auth.js** specialize here.
+- **Audit logging** is an orthogonal concern — structured logging with an immutable trail (e.g., **pino** with a dedicated audit transport, or a purpose-built service).
+- **Rate limiting** is infrastructure-level, typically handled by **rate-limiter-flexible**, Redis-backed middleware, or your API gateway.
+- **Feature flags** are a product/release concern, best served by **Unleash**, **Flagsmith**, or the **OpenFeature** SDK.
+
+Any library that claims to do all five will do 2–3 of them reasonably and bolt on the rest as an afterthought. The expected utility of the monolithic approach (EU ≈ 0) is dramatically worse than composing purpose-built tools (EU ≈ 65.5), because a 5-in-1 tool almost always means lock-in into the vendor's opinionated glue and half-baked coverage of at least two concerns.
+
+**The right move:** Pick one best-of-breed tool per concern, wire them through a shared middleware layer, and keep each one independently replaceable. That's how you actually get "no lock-in and no maintenance overhead" — not by finding a unicorn library, but by keeping each concern decoupled.

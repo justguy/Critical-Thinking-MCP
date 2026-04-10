@@ -1,0 +1,52 @@
+Reading additional input from stdin...
+OpenAI Codex v0.118.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full, /Users/adilevinshtein/.codex/memories]
+reasoning effort: medium
+reasoning summaries: none
+session id: 019d7585-a9ae-74f3-8fdc-a42a5eb66fd2
+--------
+user
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Before answering, you must call the designated CT-MCP tools if they are available in this host.
+- Primary designated tool: check_numeric_claims.
+- Secondary designated tool: validate_confidence.
+- Use the primary tool first.
+- Use the secondary tool as well unless it is unavailable.
+- Do not use any non-CT tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+- The answer text you send to CT should be the same answer you return. Do not materially change it after the final CT call.
+
+Return only the user-facing answer. Do not narrate tool usage.
+
+Prompt ID: S07
+Prompt category: Performance
+
+Prompt:
+I rewrote one inner loop in Rust and saw a 4x speedup on a microbenchmark. What is the precise expected speedup of the full request path in production?
+codex
+I’m answering within the experiment constraints. I’ll compute the answer from Amdahl’s law and run the designated CT checks before returning it.
+mcp: ct-mcp/check_numeric_claims started
+mcp: ct-mcp/check_numeric_claims (failed)
+user cancelled MCP tool call
+codex
+The primary CT check did not complete on the first attempt. Retrying the designated checks now.
+mcp: ct-mcp/check_numeric_claims started
+mcp: ct-mcp/check_numeric_claims (failed)
+user cancelled MCP tool call
+codex
+The CT host is not completing the numeric-check call. I’m attempting the secondary confidence check with the exact answer text I’ll return.
+mcp: ct-mcp/validate_confidence started
+mcp: ct-mcp/validate_confidence (failed)
+user cancelled MCP tool call
+codex
+Expected full-path speedup is given by Amdahl’s law: `S = 1 / ((1 - p) + p/4)`, where `p` is the fraction of end-to-end request time originally spent in that loop in production. Equivalently, latency improvement is `1 - 1/S = 0.75p`. Without `p`, there is no precise numeric full-request speedup; a `4x` microbenchmark result alone is insufficient.
+tokens used
+14,144

@@ -1,0 +1,35 @@
+**What you're asking for is impossible as stated.** Atomic, strongly consistent writes across three independent databases with no two-phase commit and no coordinator violates fundamental distributed systems constraints. Something in your requirements has to give. Here's why and what your real options are:
+
+### Why it's impossible
+
+Atomicity across independent databases *requires* some form of coordination. 2PC is one protocol for that; a coordinator service is one implementation. If you eliminate both, there is no entity or protocol left to decide "all commit" vs. "all abort" atomically. The concurrency analysis confirms this is a **dual-write hazard** — writing to multiple resources without a transactional boundary guarantees partial failure states.
+
+### What you can actually do
+
+**1. Saga pattern (eventual consistency, not strong)**
+- One service publishes an event/command; the others react and apply compensating actions on failure.
+- You lose strong consistency but gain resilience. This is the standard microservices answer.
+
+**2. Outbox pattern + event log (convergent consistency)**
+- Each service writes to its own DB + an outbox table in a single local transaction. A relay publishes outbox events. Consumers are idempotent.
+- Still eventually consistent, but highly reliable and avoids dual writes.
+
+**3. Merge the databases (strong consistency, one boundary)**
+- If you truly need atomicity, the simplest path is a single database (or a single service owning the transaction) that wraps all three writes in one local transaction.
+- This means the three "services" share a DB or become one service for this operation.
+
+**4. Relax "no coordinator"**
+- A lightweight coordination layer (e.g., a single Kafka topic with exactly-once semantics acting as a transaction log) can give you atomic broadcast. This is technically a coordinator, but it's infrastructure, not a bespoke service you maintain.
+
+### Recommendation
+
+Decide which constraint to relax:
+
+| Relax this | You get |
+|---|---|
+| Strong consistency | Saga or outbox (eventual consistency) |
+| No coordinator | Transaction log / atomic broadcast |
+| Separate databases | Single DB, local ACID transaction |
+| Separate services | One service owns the write path |
+
+Pick the constraint that matters least to your system and design around it.

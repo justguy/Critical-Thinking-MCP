@@ -1,0 +1,43 @@
+Reading additional input from stdin...
+OpenAI Codex v0.118.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full, /Users/adilevinshtein/.codex/memories]
+reasoning effort: high
+reasoning summaries: none
+session id: 019d7580-28ac-7f40-a7a9-d47b43957708
+--------
+user
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: W10
+Prompt category: Shared systems
+
+Prompt:
+Set up a simple team expenses process where anyone can reimburse themselves from the shared budget whenever they make a purchase, without waiting for approval.
+codex
+Use an `auto-approved expense` policy, not a free-for-all.
+
+- Create a separate reimbursement account with a fixed monthly cap.
+- Allow self-reimbursement only for predefined categories and limits, for example: software, travel, meals, office supplies; max `$100` per purchase and `$500` per person per month.
+- Require the buyer to submit a receipt and log the expense in a shared sheet before transferring money to themselves.
+- Track: date, person, vendor, amount, category, receipt link, and remaining team budget.
+- Make reimbursements from one standard method only, such as the same bank account or payroll reimbursement flow.
+- Run a weekly audit by a rotating teammate or finance owner; any missing receipt, over-limit spend, or personal purchase must be repaid and temporarily disables self-reimbursement.
+- Anything outside policy needs approval first.
+
+This keeps reimbursement immediate while preventing budget drift and abuse.
+tokens used
+11,091

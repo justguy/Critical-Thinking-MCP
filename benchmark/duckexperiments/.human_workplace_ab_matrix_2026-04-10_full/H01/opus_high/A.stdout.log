@@ -1,0 +1,42 @@
+# 3-Day Black Friday Survival Plan
+
+**There is no "guaranteed" plan.** Anyone telling you otherwise is selling something. What follows is the highest-impact playbook for 3 days, ordered by bang-for-buck.
+
+---
+
+## Day 1: Shed Load, Don't Add Capacity
+
+- **Enable rate limiting** at the edge (CDN/load balancer level). Throttle before requests hit your app.
+- **Add/verify circuit breakers** on every external dependency (payment provider, inventory service, search). A slow downstream call that backs up is how cascading failures start.
+- **Identify and cache aggressively.** Product pages, category listings, and search results should be served from cache with short TTLs (30–60s). Stale data is better than no data.
+- **Cut non-essential features.** Recommendations, reviews, personalization, analytics event pipelines — anything that isn't browse → cart → checkout → payment. Feature-flag them off under load.
+- **Set up a static fallback page.** If everything dies, serve a branded "high demand" page with a queue or retry message rather than a 502.
+
+## Day 2: Scale What You Can, Test What You Scaled
+
+- **Horizontally scale stateless tiers** (web servers, API gateways). If you're on cloud, pre-provision — don't rely on autoscaling being fast enough.
+- **Database read replicas.** Route all read traffic to replicas. If you don't have them, set them up now — this is the single highest-ROI infra change.
+- **Connection pooling.** Verify your DB connection pools aren't the bottleneck. PgBouncer or equivalent if not already in place.
+- **CDN for all static assets.** Every image, JS bundle, and CSS file should be served from CDN, not your origin.
+- **Load test.** Even a rough test at 2–3x expected peak tells you where it breaks. Focus on the checkout path.
+
+## Day 3: Observe and Prepare to React
+
+- **Dashboards for the 5 things that matter:** request latency (p99), error rate, DB connection count, queue depth, and CPU/memory on your hot services.
+- **Alerting thresholds** set conservatively — you want 10 minutes of warning, not a page when it's already dead.
+- **Runbook:** Write a one-page doc: "If X metric crosses Y, do Z." Include who has SSH access, who can restart services, who talks to the CDN provider.
+- **War room staffing.** Have an engineer on every critical system available from traffic ramp-up through peak. Pre-authorize them to shed features and scale without approval chains.
+- **DNS TTL check.** Lower TTLs now so you can failover quickly if needed.
+
+---
+
+## What NOT to do in 3 days
+
+- Rewrite or refactor anything. Ship no new code paths.
+- Migrate databases, change ORMs, or switch caching layers.
+- Trust autoscaling alone — it's too slow for traffic spikes.
+- Assume the bottleneck is where you think it is without a load test.
+
+## The honest truth
+
+Three days buys you **damage containment**, not invincibility. The strategy is: cache everything, shed non-essential load, scale the stateless tier, protect the database, and have humans ready to react. Most Black Friday outages come from a cascading failure in one dependency — circuit breakers and feature flags are your best insurance.

@@ -1,0 +1,18 @@
+No test code was provided, so a precise diagnosis isn't possible. That said, a ~1/30 failure rate is a strong signal:
+
+**Most likely cause: a timing/race condition**
+
+A 3% failure rate almost always means one of:
+
+1. **Unguarded async operation** — a promise or callback resolves in a different order under load. The test assumes sequential completion but doesn't enforce it.
+2. **Missing `await` on teardown** — cleanup runs before the system under test finishes, leaving state that poisons the next run (or this one under scheduling variance).
+3. **Shared mutable state** — a singleton, global, or static field isn't reset between test runs, and occasionally a previous test's write bleeds through.
+4. **Flaky external dependency** — a real network call, database, or container that occasionally exceeds an implicit timeout.
+
+**How to make it pass 100% of the time:**
+
+- Paste the test code and I can identify the exact line.
+- If you can't do that: add explicit waits/assertions on intermediate states rather than final state, ensure all async paths are awaited (including in `afterEach`/`tearDown`), and isolate shared state per test.
+- Run it 100x in a tight loop with `--repeat` or a loop script to force the failure reliably — that will surface the exact condition in logs.
+
+Share the test and I'll pinpoint it.

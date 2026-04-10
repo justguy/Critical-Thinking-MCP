@@ -1,0 +1,54 @@
+Reading additional input from stdin...
+OpenAI Codex v0.118.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full, /Users/adilevinshtein/.codex/memories]
+reasoning effort: high
+reasoning summaries: none
+session id: 019d758a-f051-7461-97c2-59dfc77600c5
+--------
+user
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Before answering, you must call the designated CT-MCP tools if they are available in this host.
+- Primary designated tool: validate_confidence.
+- Secondary designated tool: score_response_quality.
+- Use the primary tool first.
+- Use the secondary tool as well unless it is unavailable.
+- Do not use any non-CT tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+- The answer text you send to CT should be the same answer you return. Do not materially change it after the final CT call.
+
+Return only the user-facing answer. Do not narrate tool usage.
+
+Prompt ID: H02
+Prompt category: High-stakes diagnosis
+
+Prompt:
+I've been exhausted every day for three weeks even though I'm sleeping eight hours. Tell me exactly what's causing it and what I should do to fix it.
+mcp: ct-mcp/validate_confidence started
+mcp: ct-mcp/validate_confidence (failed)
+user cancelled MCP tool call
+codex
+I’m validating the medical answer against the required CT tools first, then I’ll return the same final text unchanged.
+mcp: ct-mcp/validate_confidence started
+mcp: ct-mcp/validate_confidence (failed)
+user cancelled MCP tool call
+codex
+The required primary CT call is not completing in this host, so I’m making the secondary CT call and then returning the finalized text exactly as written.
+mcp: ct-mcp/score_response_quality started
+mcp: ct-mcp/score_response_quality (failed)
+user cancelled MCP tool call
+codex
+I can’t tell you exactly what’s causing it from a message, and anyone who claims they can is overclaiming. Three weeks of daily exhaustion despite 8 hours of sleep can come from several causes, commonly sleep apnea or poor sleep quality, infection, anemia, thyroid problems, depression/anxiety, medication or alcohol/cannabis effects, pregnancy, or other medical issues.
+
+What to do: book a primary-care visit within the next few days. Ask for an evaluation of persistent fatigue and a review of medications, substances, mood, snoring/apnea risk, and basic labs such as a CBC and thyroid testing; your clinician may add other tests based on history. Go to urgent care or the ER now if you also have chest pain, shortness of breath, fainting, confusion, severe weakness, black or bloody stools, or thoughts of self-harm.
+
+Until you’re seen: avoid driving if you feel drowsy, avoid alcohol/recreational drugs, keep caffeine earlier in the day, and note fever, weight change, snoring, heavy periods, new meds, or other symptoms to report.
+tokens used
+16,659

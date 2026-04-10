@@ -1,0 +1,31 @@
+This role as described is not hireable. Owning six distinct functions — strategy, execution, analytics, sales enablement, customer support, and recruiting — simultaneously produces a fractured generalist who excels at none of them. "Inexpensive" compounds the problem: the rare person capable of all six commands a premium salary.
+
+---
+
+**Option A: Hire an "Ops & GTM Generalist" (most realistic)**
+- **Scope:** execution, analytics, sales enablement, customer support
+- **Drop:** strategy (stay with you) and recruiting (referrals + a $99/mo ATS like Breezy or Workable)
+- **Profile:** 2–4 years BizOps or revenue ops, startup experience, SQL-literate, Salesforce or HubSpot proficient
+- **Salary:** $70–95K US; $40–60K in LATAM/Eastern Europe for remote hires
+- **Onboarding:** Write 10–15 SOPs before Day 1; structured 2-week ramp with weekly milestone check-ins
+
+**Option B: Chief of Staff (if strategy adjacency matters)**
+- **Profile:** ex-consultant or early-stage operator, 4–6 years, high-bandwidth communicator
+- Executes strategy — does not set it; recruiting and deep analytics still won't be well-owned
+- **Salary:** $90–130K; onboarding takes 4–6 weeks longer due to broader scope
+
+---
+
+**Scope cuts you must make:**
+
+| Drop | Replace with |
+|---|---|
+| Recruiting | Employee referral bonus ($1–2K) + one agency on 15% contingency |
+| Deep analytics | Metabase ($500/yr) or Hex — self-serve BI |
+| Strategy | Stays with you — one cheap hire cannot hold this |
+
+---
+
+**How to hire fast:**
+
+Post on LinkedIn as "GTM Ops Manager" or "BizOps Lead." Skip a traditional JD — write a 90-day outcomes doc instead (e.g., "by day 30, own the support queue; by day 60, ship a weekly revenue dashboard; by day 90, run the sales enablement cycle"). This filters for execution-oriented candidates and cuts screening time by roughly half.

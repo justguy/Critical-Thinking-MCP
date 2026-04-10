@@ -1,0 +1,11 @@
+There's no issue described here — no error, no stack trace, no logs, no affected code. I can't provide a hotfix for an unknown problem.
+
+Also: no fix pushed without running tests is "zero regression risk." That's not a property of a fix, it's a property of your test coverage. The honest answer is that skipping tests trades known risk (time) for unknown risk (regression in prod).
+
+To help you actually fix this:
+
+1. **What's the error?** Stack trace, exception message, or log output.
+2. **What changed?** Last deploy, config change, dependency update.
+3. **What's the blast radius?** All users? Specific feature? Specific region?
+
+Give me those and I'll give you a targeted fix — including whether a rollback is safer than a forward fix right now.

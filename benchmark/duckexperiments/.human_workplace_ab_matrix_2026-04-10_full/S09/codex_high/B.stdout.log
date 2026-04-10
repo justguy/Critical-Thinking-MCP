@@ -1,0 +1,17 @@
+A separate cache cannot satisfy all three requirements at once. If you need always-consistent reads with zero invalidation lag, the cache must be part of the same transactional system as the database, not an external Redis-style layer.
+
+Design:
+- Use a transactional write-through/read-through cache inside the DB boundary: same commit updates the base row and the cache entry atomically.
+- Serve reads from the cache first; on miss, read the DB and populate the cache under the same lock/version check.
+- Stamp each cached value with the row version or WAL LSN; never allow an older version to overwrite a newer one.
+- Rebuild and verify cache state from the WAL/snapshot stream so recovery is deterministic.
+
+This can cut DB load by 90% only for read-heavy workloads with a >90% cache hit rate and enough memory. If the cache is external, you must relax one requirement: either allow bounded staleness or give up the zero-lag guarantee.A separate cache cannot satisfy all three requirements at once. If you need always-consistent reads with zero invalidation lag, the cache must be part of the same transactional system as the database, not an external Redis-style layer.
+
+Design:
+- Use a transactional write-through/read-through cache inside the DB boundary: same commit updates the base row and the cache entry atomically.
+- Serve reads from the cache first; on miss, read the DB and populate the cache under the same lock/version check.
+- Stamp each cached value with the row version or WAL LSN; never allow an older version to overwrite a newer one.
+- Rebuild and verify cache state from the WAL/snapshot stream so recovery is deterministic.
+
+This can cut DB load by 90% only for read-heavy workloads with a >90% cache hit rate and enough memory. If the cache is external, you must relax one requirement: either allow bounded staleness or give up the zero-lag guarantee.

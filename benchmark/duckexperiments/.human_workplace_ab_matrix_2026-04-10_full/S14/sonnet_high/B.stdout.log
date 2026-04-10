@@ -1,0 +1,35 @@
+**The requirements conflict — name it first**
+
+"Highly available + strongly consistent + low cost" are in inherent tension. Synchronous replication (required for strong consistency across failures) costs money and adds latency. You can optimize for 3–4 of these properties cheaply; all 5 simultaneously requires accepting explicit tradeoffs.
+
+---
+
+**Recommended: Managed cloud-native stack**
+
+| Layer | Choice | Why |
+|---|---|---|
+| Database | RDS PostgreSQL, Multi-AZ | ACID consistency, automated failover (~30s RTO), no DBA overhead |
+| App tier | ECS Fargate (2+ tasks, multi-AZ) | No cluster management, auto-scaling, junior-friendly deploys |
+| Load balancer | ALB with health checks | Automatic traffic cutover on instance failure |
+| Secrets | AWS Secrets Manager | Managed rotation, no custom tooling |
+| Observability | CloudWatch + RDS Performance Insights | Zero setup, sufficient signal for junior engineers |
+
+---
+
+**What you give up**
+
+- **Cost**: Managed services carry a 20–40% premium over self-managed at equivalent specs. Multi-AZ RDS roughly doubles the DB line-item cost.
+- **HA ceiling**: RDS Multi-AZ failover takes ~30 seconds. If your SLA requires <10s RTO, upgrade to Aurora Postgres — automated failover is ~15–20s, and the cluster handles read scaling — at higher cost.
+- **Tuning**: Custom Postgres extensions and kernel parameters are not available without self-managed hosting.
+
+---
+
+**The one decision to make now**
+
+If "highly available" means 99.99%+ with <30s RTO, budget for **Aurora Postgres Multi-AZ** instead of standard RDS. If 99.95% (standard RDS SLA) is acceptable, standard RDS Multi-AZ is cheaper and simpler — and the right default.
+
+---
+
+**What to avoid**
+
+Self-managed Kubernetes + distributed DB (CockroachDB/Vitess) optimizes for raw compute cost while destroying every other goal: high operational burden, steep junior learning curve, and frequent incidents that erase the compute savings.

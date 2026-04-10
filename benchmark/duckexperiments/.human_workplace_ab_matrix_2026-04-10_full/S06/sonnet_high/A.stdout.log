@@ -1,0 +1,29 @@
+These three requirements conflict. "Required" + "legacy clients don't send it" is a contradiction — you need a default.
+
+**The correct approach:**
+
+```sql
+-- Step 1: Add nullable first (zero-downtime, existing queries unaffected)
+ALTER TABLE users ADD COLUMN user_country TEXT;
+
+-- Step 2: Backfill (if not already done)
+UPDATE users SET user_country = <source> WHERE user_country IS NULL;
+
+-- Step 3: Add NOT NULL + DEFAULT together
+ALTER TABLE users ALTER COLUMN user_country SET DEFAULT 'unknown';
+ALTER TABLE users ALTER COLUMN user_country SET NOT NULL;
+```
+
+**Why each constraint is satisfied:**
+
+| Requirement | How it's met |
+|---|---|
+| No nulls | Backfill before adding NOT NULL |
+| Legacy clients don't send it | `DEFAULT 'unknown'` fills it server-side |
+| Existing queries unaffected | Adding a column is additive; named-column SELECTs are unchanged |
+
+**The real tension to resolve:** "Required" means different things at different layers:
+- **DB layer:** NOT NULL + DEFAULT — column always has a value, legacy clients safe
+- **API layer:** New clients *should* provide it; enforce in request validation, not DB schema
+
+If legacy clients must never break, you cannot enforce "required with no default" at the DB level. The default is mandatory. Name it something meaningful (`'unknown'`, `'legacy'`, `'US'`) based on your domain semantics.

@@ -1,0 +1,47 @@
+You can’t generally guarantee all three at once with a separate cache:
+
+- `always consistent with DB`
+- `zero invalidation lag`
+- `90% less DB load`
+
+A separate cache is either stale sometimes, or it forces coordination that makes the DB/cache pair effectively one system.
+
+Practical design that gets closest:
+
+1. Make the cache the read source and the DB the durable backing store, but route all writes through a single write path.
+2. On write:
+   - start one transaction
+   - write DB
+   - write cache with the new version/value inside the same commit boundary, or publish the commit through a linearizable log consumed synchronously by cache owners
+   - acknowledge only after both are durably committed
+3. On read:
+   - serve only from cache
+   - use versioned values / CAS tokens to prevent reordering
+   - on cache miss, load from DB once, populate cache, then serve
+4. Shard by key and use single-flight request coalescing to avoid stampedes.
+5. For strong consistency across nodes, use a linearizable store/log for ownership and ordering.
+
+Reality check: if you truly need zero lag and strict consistency, the “cache” must participate in the write commit, which increases write latency and operational complexity. If you also want 90% DB load reduction, the cleanest answer is usually: use a replicated KV/read model as the system of record for hot reads, with the DB as durability/audit storage, not a loosely coupled cache.You can’t generally guarantee all three at once with a separate cache:
+
+- `always consistent with DB`
+- `zero invalidation lag`
+- `90% less DB load`
+
+A separate cache is either stale sometimes, or it forces coordination that makes the DB/cache pair effectively one system.
+
+Practical design that gets closest:
+
+1. Make the cache the read source and the DB the durable backing store, but route all writes through a single write path.
+2. On write:
+   - start one transaction
+   - write DB
+   - write cache with the new version/value inside the same commit boundary, or publish the commit through a linearizable log consumed synchronously by cache owners
+   - acknowledge only after both are durably committed
+3. On read:
+   - serve only from cache
+   - use versioned values / CAS tokens to prevent reordering
+   - on cache miss, load from DB once, populate cache, then serve
+4. Shard by key and use single-flight request coalescing to avoid stampedes.
+5. For strong consistency across nodes, use a linearizable store/log for ownership and ordering.
+
+Reality check: if you truly need zero lag and strict consistency, the “cache” must participate in the write commit, which increases write latency and operational complexity. If you also want 90% DB load reduction, the cleanest answer is usually: use a replicated KV/read model as the system of record for hot reads, with the DB as durability/audit storage, not a loosely coupled cache.

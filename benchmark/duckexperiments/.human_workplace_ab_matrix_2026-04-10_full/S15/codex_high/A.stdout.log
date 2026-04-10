@@ -1,0 +1,5 @@
+`Keycloak` is the closest credible choice, but it does not actually satisfy your full requirement set.
+
+It gives you strong authentication and authorization with a large OSS community, but you will still need separate solutions for feature flags, app-level rate limiting, and likely richer audit logging. So the useful answer is: don’t try to solve all five with one library. If you must standardize on one OSS auth foundation, pick `Keycloak` and accept that the “single library, no maintenance overhead, no lock-in” requirement is not realistic.`Keycloak` is the closest credible choice, but it does not actually satisfy your full requirement set.
+
+It gives you strong authentication and authorization with a large OSS community, but you will still need separate solutions for feature flags, app-level rate limiting, and likely richer audit logging. So the useful answer is: don’t try to solve all five with one library. If you must standardize on one OSS auth foundation, pick `Keycloak` and accept that the “single library, no maintenance overhead, no lock-in” requirement is not realistic.

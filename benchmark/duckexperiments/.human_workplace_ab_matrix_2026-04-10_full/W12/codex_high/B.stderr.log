@@ -1,0 +1,47 @@
+Reading additional input from stdin...
+OpenAI Codex v0.118.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full, /Users/adilevinshtein/.codex/memories]
+reasoning effort: high
+reasoning summaries: none
+session id: 019d7581-1e0d-79a2-9fda-bdb73a5d86f5
+--------
+user
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Before answering, you must call the designated CT-MCP tools if they are available in this host.
+- Primary designated tool: check_plan_validity.
+- Secondary designated tool: detect_concurrency_patterns.
+- Use the primary tool first.
+- Use the secondary tool as well unless it is unavailable.
+- Do not use any non-CT tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+- The answer text you send to CT should be the same answer you return. Do not materially change it after the final CT call.
+
+Return only the user-facing answer. Do not narrate tool usage.
+
+Prompt ID: W12
+Prompt category: Shared systems
+
+Prompt:
+Design a process where multiple teams can update customer-facing knowledge-base content anytime, without approvals, while still keeping one consistent source of truth.
+mcp: ct-mcp/check_plan_validity started
+mcp: ct-mcp/check_plan_validity (completed)
+mcp: ct-mcp/detect_concurrency_patterns started
+mcp: ct-mcp/detect_concurrency_patterns (failed)
+user cancelled MCP tool call
+mcp: ct-mcp/detect_concurrency_patterns started
+mcp: ct-mcp/detect_concurrency_patterns (failed)
+user cancelled MCP tool call
+codex
+Use one canonical knowledge-base platform as the only place articles can be created or edited, with stable article IDs, owners, metadata, and full version history. Let any team publish directly, but only through that system and only if automated checks pass: required template fields, terminology/style rules, link checks, duplicate-topic detection, and preview validation.
+
+Keep consistency by assigning each article a single accountable owner/domain, even though any team can propose edits. Handle simultaneous edits with version locking plus mandatory rebase/merge on stale drafts, then publish to every customer channel from that same source. Keep an audit log, instant rollback, and recurring stale-content reports so the source stays current without adding approval gates.
+tokens used
+15,737

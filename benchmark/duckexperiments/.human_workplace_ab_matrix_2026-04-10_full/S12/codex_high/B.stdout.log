@@ -1,0 +1,17 @@
+Use the existing payment record as the single source of truth; do not add a new layer.
+
+- Derive one deterministic idempotency key from the business payment ID, and send that exact key to the PSP on every retry.
+- Keep exactly one payment row per business payment ID in your existing DB, enforced by a unique constraint.
+- On receipt, read that row first: if it is already terminal, return the stored result and do not call the PSP again.
+- If it is not terminal, perform one state transition in the existing row, call the PSP with the same idempotency key, then persist the final outcome before acking or replying.
+- Never ack before the final state is durably written.
+
+Hard constraint: if you have neither an existing durable payment record nor PSP-side idempotency, then “automatic retries, no duplicate charges ever” is not achievable without durable coordination somewhere.Use the existing payment record as the single source of truth; do not add a new layer.
+
+- Derive one deterministic idempotency key from the business payment ID, and send that exact key to the PSP on every retry.
+- Keep exactly one payment row per business payment ID in your existing DB, enforced by a unique constraint.
+- On receipt, read that row first: if it is already terminal, return the stored result and do not call the PSP again.
+- If it is not terminal, perform one state transition in the existing row, call the PSP with the same idempotency key, then persist the final outcome before acking or replying.
+- Never ack before the final state is durably written.
+
+Hard constraint: if you have neither an existing durable payment record nor PSP-side idempotency, then “automatic retries, no duplicate charges ever” is not achievable without durable coordination somewhere.

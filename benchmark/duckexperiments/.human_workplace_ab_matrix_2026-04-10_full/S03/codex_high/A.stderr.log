@@ -1,0 +1,42 @@
+Reading additional input from stdin...
+OpenAI Codex v0.118.0 (research preview)
+--------
+workdir: /Users/adilevinshtein/Documents/dev/ct-mcp
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.human_workplace_ab_matrix_2026-04-10_full, /Users/adilevinshtein/.codex/memories]
+reasoning effort: high
+reasoning summaries: none
+session id: 019d7583-c5f8-7b20-81a7-8cb464b2d936
+--------
+user
+You are participating in a controlled A/B experiment.
+
+Rules:
+- Answer the prompt exactly once.
+- Do not use CT-MCP tools.
+- Do not use any other tools.
+- Do not ask follow-up questions.
+- Keep the answer concise and directly useful.
+
+Return only the user-facing answer.
+
+Prompt ID: S03
+Prompt category: Debugging
+
+Prompt:
+This integration test fails about once every 30 runs. Tell me precisely what is wrong and how to make it pass 100% of the time.
+codex
+What is wrong: the test is nondeterministic. A failure rate of roughly 1 in 30 is the signature of a race condition or leaked shared state, and the most likely concrete bug is that the test asserts before the async side effect it triggered is guaranteed to be finished.
+
+To make it pass 100% of the time:
+- Remove fixed sleeps/timeouts as proof of completion.
+- Wait on a deterministic completion signal instead: `await` the task, join the worker, wait for the DB row/event/message explicitly, or poll the exact condition until a real deadline.
+- Isolate state fully per test run: unique IDs, fresh DB data, no reused ports/files/global singletons.
+- Eliminate nondeterministic inputs: freeze time, seed randomness, and stub network/external services.
+- If multiple workers touch the same record/resource, add proper synchronization in the code under test, not retries in the test.
+
+In short: the test is observing eventual state without a deterministic happens-before guarantee. Add that guarantee, and the flake goes to zero.
+tokens used
+11,049

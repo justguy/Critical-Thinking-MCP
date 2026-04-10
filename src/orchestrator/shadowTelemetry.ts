@@ -31,6 +31,7 @@ export interface BuildTelemetryParams {
   mode: OrchestratorMode;
   primaryType: string;
   secondaryType: string | null;
+  answerText: string;
   routedTools: OrchestratorToolName[];
   artifactCompatibleTools: OrchestratorToolName[];
   routeResults: RouteOrFailure[];
@@ -69,6 +70,7 @@ export function buildTelemetry(params: BuildTelemetryParams): ShadowTelemetry {
     mode,
     primaryType,
     secondaryType,
+    answerText,
     routedTools,
     artifactCompatibleTools,
     routeResults,
@@ -119,7 +121,9 @@ export function buildTelemetry(params: BuildTelemetryParams): ShadowTelemetry {
 
   const shadowOnlyDecision =
     shadowResults.length > 0
-      ? evaluatePolicy(shadowResults, reviewContext, profile).decision
+      ? evaluatePolicy(shadowResults, reviewContext, profile, [], {
+          answer_text: answerText,
+        }).decision
       : 'PASS';
   const wouldHaveEscalated =
     shadowOnlyDecision === 'REVISE' || shadowOnlyDecision === 'HUMAN_REVIEW';

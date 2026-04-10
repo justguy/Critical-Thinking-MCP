@@ -312,11 +312,15 @@ export interface CritiqueRoute {
   warnings: string[];
   contract_failures: string[];
   failure_source: FailureSource;
+  structural_directives: string[];
 }
 
 export interface CritiquePacket {
   failing_routes: CritiqueRoute[];
   safer_revision_target: string;
+  formatting_override: string;
+  max_words?: number;
+  max_bloat_ratio?: number;
 }
 
 export interface RevisionRequest {
@@ -324,6 +328,8 @@ export interface RevisionRequest {
   next_review_context: ReviewContext;
   safer_revision_target: string;
   prompt: string;
+  max_words?: number;
+  max_bloat_ratio?: number;
 }
 
 // ─── Shadow telemetry ─────────────────────────────────────────────────────

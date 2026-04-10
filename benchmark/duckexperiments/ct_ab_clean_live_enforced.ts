@@ -10,6 +10,7 @@ import type {
   OrchestratorResult,
   ReviewContext,
   RevisionRequest,
+  TemporalReasoningRegistry,
 } from '../../src/orchestrator/index.js';
 import { PROMPTS } from './manifest.js';
 
@@ -34,6 +35,10 @@ interface CalibrationLock {
   profileId: string;
 }
 
+interface TemporalLock {
+  reasoningRegistry: TemporalReasoningRegistry;
+}
+
 interface PassRecord {
   stage: PassStage;
   promptText: string;
@@ -46,6 +51,26 @@ interface PassRecord {
   calibrationEnvelope: OrchestratorEnvelope | null;
   calibrationResult: OrchestratorResult | null;
   reviewContextUsed: ReviewContext | null;
+}
+
+interface PassMetrics {
+  durationMs: number;
+  durationApiMs: number | null;
+  totalCostUsd: number;
+  outputTokens: number;
+  inputTokens: number;
+  cacheReadInputTokens: number;
+  cacheCreationInputTokens: number;
+  numTurns: number | null;
+}
+
+interface RevisionDelta {
+  revisionDurationDeltaMs: number;
+  revisionApiDurationDeltaMs: number | null;
+  revisionOutputTokenDelta: number;
+  revisionCostDeltaUsd: number;
+  finalAnswerCharDelta: number;
+  revisionBloatRatio: number | null;
 }
 
 interface RunRecord {
@@ -64,6 +89,7 @@ interface RunRecord {
   finalAcceptedResponseText: string | null;
   lastAttemptedResponseText: string | null;
   humanReviewReason: string | null;
+  revisionDelta: RevisionDelta | null;
 }
 
 const __filename = fileURLToPath(import.meta.url);
@@ -72,11 +98,11 @@ const repoRoot = resolve(__dirname, '..', '..');
 
 const reportPath = resolve(
   repoRoot,
-  'docs/reports/ct_ab_clean_live_enforced_prompt_classifier_2026-04-09.md',
+  'docs/reports/ct_ab_clean_live_enforced_prompt_classifier_2026-04-10_topology.md',
 );
 const outDir = resolve(
   repoRoot,
-  'benchmark/duckexperiments/.ct_ab_clean_live_enforced_prompt_classifier_2026-04-09',
+  'benchmark/duckexperiments/.ct_ab_clean_live_enforced_prompt_classifier_2026-04-10_topology',
 );
 const calibrationDbPath = resolve(outDir, 'ct_calibration.sqlite');
 
@@ -188,6 +214,9 @@ function buildRevisionPrompt(
     '- The answer text you send to CT should be the same answer you return. Do not materially change it after the final CT call.',
     '- This is the final allowed model revision for this prompt.',
     '- If the original claim cannot be supported safely, narrow or withdraw it instead of inventing detail.',
+    ...(revisionRequest.max_words
+      ? [`- The corrected response must stay under ${revisionRequest.max_words} words.`]
+      : []),
     '',
     'Return only the revised user-facing answer. Do not narrate tool usage.',
     '',
@@ -319,6 +348,87 @@ function extractResultEvent(events: unknown[]): unknown {
   );
 }
 
+function toNumber(value: unknown): number | null {
+  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+function extractPassMetrics(pass: PassRecord): PassMetrics | null {
+  if (!pass.resultEvent || typeof pass.resultEvent !== 'object') {
+    return null;
+  }
+
+  const event = pass.resultEvent as Record<string, unknown>;
+  const usage =
+    event.usage && typeof event.usage === 'object'
+      ? (event.usage as Record<string, unknown>)
+      : null;
+
+  const durationMs = toNumber(event.duration_ms);
+  const totalCostUsd = toNumber(event.total_cost_usd);
+  const outputTokens = toNumber(usage?.output_tokens);
+  const inputTokens = toNumber(usage?.input_tokens);
+  const cacheReadInputTokens = toNumber(usage?.cache_read_input_tokens);
+  const cacheCreationInputTokens = toNumber(usage?.cache_creation_input_tokens);
+
+  if (
+    durationMs === null ||
+    totalCostUsd === null ||
+    outputTokens === null ||
+    inputTokens === null ||
+    cacheReadInputTokens === null ||
+    cacheCreationInputTokens === null
+  ) {
+    return null;
+  }
+
+  return {
+    durationMs,
+    durationApiMs: toNumber(event.duration_api_ms),
+    totalCostUsd,
+    outputTokens,
+    inputTokens,
+    cacheReadInputTokens,
+    cacheCreationInputTokens,
+    numTurns: toNumber(event.num_turns),
+  };
+}
+
+function computeRevisionDelta(
+  initialPass: PassRecord,
+  revisionPass: PassRecord | null,
+): RevisionDelta | null {
+  if (!revisionPass) return null;
+
+  const initialMetrics = extractPassMetrics(initialPass);
+  const revisionMetrics = extractPassMetrics(revisionPass);
+  if (!initialMetrics || !revisionMetrics) return null;
+
+  return {
+    revisionDurationDeltaMs: revisionMetrics.durationMs - initialMetrics.durationMs,
+    revisionApiDurationDeltaMs:
+      initialMetrics.durationApiMs !== null && revisionMetrics.durationApiMs !== null
+        ? revisionMetrics.durationApiMs - initialMetrics.durationApiMs
+        : null,
+    revisionOutputTokenDelta:
+      revisionMetrics.outputTokens - initialMetrics.outputTokens,
+    revisionCostDeltaUsd:
+      revisionMetrics.totalCostUsd - initialMetrics.totalCostUsd,
+    finalAnswerCharDelta:
+      revisionPass.finalResponseText.length - initialPass.finalResponseText.length,
+    revisionBloatRatio:
+      initialMetrics.outputTokens > 0
+        ? revisionMetrics.outputTokens / initialMetrics.outputTokens
+        : null,
+  };
+}
+
+function countWords(text: string): number {
+  return text
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length;
+}
+
 function stripContext(value: unknown): unknown {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return value;
@@ -379,6 +489,7 @@ function calibrateRun(
   toolCalls: ToolCallRecord[],
   reviewContext: ReviewContext,
   lockedCalibration: CalibrationLock | null,
+  lockedTemporal: TemporalLock | null,
 ): { envelope: OrchestratorEnvelope | null; result: OrchestratorResult | null } {
   const envelope = buildCalibrationEnvelope({
     finalResponseText,
@@ -404,6 +515,13 @@ function calibrateRun(
       session_depth: sessionDepth,
       db_path: calibrationDbPath,
     },
+    ...(lockedTemporal
+      ? {
+          temporal: {
+            reasoning_registry: lockedTemporal.reasoningRegistry,
+          },
+        }
+      : {}),
   });
 
   return { envelope, result };
@@ -421,6 +539,8 @@ function runClaudePass(input: {
   promptText: string;
   reviewContext: ReviewContext | null;
   lockedCalibration?: CalibrationLock | null;
+  lockedTemporal?: TemporalLock | null;
+  deferCalibration?: boolean;
 }): PassRecord {
   ensureDir(input.workdir);
   const args = buildArgs(input.promptText, input.sessionControl);
@@ -454,7 +574,7 @@ function runClaudePass(input: {
   const toolCalls = parseToolCalls(events);
   const finalResponseText = extractFinalResponse(events);
   const calibration =
-    input.arm === 'B' && input.reviewContext
+    !input.deferCalibration && input.arm === 'B' && input.reviewContext
       ? calibrateRun(
           input.round,
           input.promptId,
@@ -463,6 +583,7 @@ function runClaudePass(input: {
           toolCalls,
           input.reviewContext,
           input.lockedCalibration ?? null,
+          input.lockedTemporal ?? null,
         )
       : { envelope: null, result: null };
 
@@ -549,6 +670,7 @@ function runOne(
       finalAcceptedResponseText: initialPass.finalResponseText,
       lastAttemptedResponseText: initialPass.finalResponseText,
       humanReviewReason: null,
+      revisionDelta: null,
     };
   }
 
@@ -571,6 +693,7 @@ function runOne(
       lastAttemptedResponseText: initialPass.finalResponseText,
       humanReviewReason:
         'Initial CT-enabled pass produced no usable CT tool calls, so no calibration envelope could be built.',
+      revisionDelta: null,
     };
   }
 
@@ -584,6 +707,12 @@ function runOne(
       ? {
           promptFamily: initialCalibration.calibration.prompt_family,
           profileId: initialCalibration.calibration.profile_id,
+        }
+      : null;
+  const lockedTemporal =
+    initialCalibration.temporal_registry
+      ? {
+          reasoningRegistry: initialCalibration.temporal_registry,
         }
       : null;
 
@@ -604,6 +733,7 @@ function runOne(
       finalAcceptedResponseText: initialPass.finalResponseText,
       lastAttemptedResponseText: initialPass.finalResponseText,
       humanReviewReason: null,
+      revisionDelta: null,
     };
   }
 
@@ -619,10 +749,16 @@ function runOne(
     promptText: buildRevisionPrompt(promptId, revisionRequest),
     reviewContext: revisionRequest.next_review_context,
     lockedCalibration,
+    lockedTemporal,
+    deferCalibration: true,
   });
 
-  const revisionCalibration = revisionPass.calibrationResult;
-  if (!revisionCalibration) {
+  const revisionDelta = computeRevisionDelta(initialPass, revisionPass);
+  const revisionWordCount = countWords(revisionPass.finalResponseText);
+  if (
+    revisionRequest.max_words !== undefined &&
+    revisionWordCount > revisionRequest.max_words
+  ) {
     return {
       round,
       arm,
@@ -639,7 +775,74 @@ function runOne(
       finalAcceptedResponseText: null,
       lastAttemptedResponseText: revisionPass.finalResponseText,
       humanReviewReason:
+        `Revision exceeded ${revisionRequest.max_words}-word limit (${revisionWordCount} words).`,
+      revisionDelta,
+    };
+  }
+
+  if (
+    revisionRequest.max_bloat_ratio !== undefined &&
+    revisionDelta?.revisionBloatRatio !== null &&
+    revisionDelta !== null &&
+    revisionDelta.revisionBloatRatio > revisionRequest.max_bloat_ratio
+  ) {
+    return {
+      round,
+      arm,
+      promptId,
+      sessionMode,
+      sessionDepth,
+      workdir,
+      preDraftPass,
+      initialPass,
+      revisionRequest,
+      revisionPass,
+      finalPolicyDecision: 'HUMAN_REVIEW',
+      finalOutcome: 'human_review',
+      finalAcceptedResponseText: null,
+      lastAttemptedResponseText: revisionPass.finalResponseText,
+      humanReviewReason:
+        `Revision bloat ratio (${revisionDelta.revisionBloatRatio.toFixed(2)}x) exceeded ${revisionRequest.max_bloat_ratio.toFixed(1)} threshold. Model is hallucinating filler.`,
+      revisionDelta,
+    };
+  }
+
+  const calibratedRevision = calibrateRun(
+    round,
+    promptId,
+    sessionDepth,
+    revisionPass.finalResponseText,
+    revisionPass.toolCalls,
+    revisionRequest.next_review_context,
+    lockedCalibration,
+    lockedTemporal,
+  );
+  const calibratedRevisionPass: PassRecord = {
+    ...revisionPass,
+    calibrationEnvelope: calibratedRevision.envelope,
+    calibrationResult: calibratedRevision.result,
+  };
+
+  const revisionCalibration = calibratedRevisionPass.calibrationResult;
+  if (!revisionCalibration) {
+    return {
+      round,
+      arm,
+      promptId,
+      sessionMode,
+      sessionDepth,
+      workdir,
+      preDraftPass,
+      initialPass,
+      revisionRequest,
+      revisionPass: calibratedRevisionPass,
+      finalPolicyDecision: 'HUMAN_REVIEW',
+      finalOutcome: 'human_review',
+      finalAcceptedResponseText: null,
+      lastAttemptedResponseText: calibratedRevisionPass.finalResponseText,
+      humanReviewReason:
         'Revision pass produced no usable CT tool calls, so the bounded rewrite could not be verified.',
+      revisionDelta,
     };
   }
 
@@ -654,13 +857,14 @@ function runOne(
       preDraftPass,
       initialPass,
       revisionRequest,
-      revisionPass,
+      revisionPass: calibratedRevisionPass,
       finalPolicyDecision: 'HUMAN_REVIEW',
       finalOutcome: 'human_review',
       finalAcceptedResponseText: null,
-      lastAttemptedResponseText: revisionPass.finalResponseText,
+      lastAttemptedResponseText: calibratedRevisionPass.finalResponseText,
       humanReviewReason:
         'The single allowed revision still failed the calibrated CT gate at iteration 2.',
+      revisionDelta,
     };
   }
 
@@ -674,12 +878,13 @@ function runOne(
     preDraftPass,
     initialPass,
     revisionRequest,
-    revisionPass,
+    revisionPass: calibratedRevisionPass,
     finalPolicyDecision: revisionCalibration.policy_decision,
     finalOutcome: 'accepted',
-    finalAcceptedResponseText: revisionPass.finalResponseText,
-    lastAttemptedResponseText: revisionPass.finalResponseText,
+    finalAcceptedResponseText: calibratedRevisionPass.finalResponseText,
+    lastAttemptedResponseText: calibratedRevisionPass.finalResponseText,
     humanReviewReason: null,
+    revisionDelta,
   };
 }
 
@@ -721,6 +926,66 @@ function toolMetricsSummary(toolCall: ToolCallRecord): string[] {
   lines.push(`- warning_count: \`${warnings.length}\``);
   lines.push(`- blocking_issue_count: \`${blocking.length}\``);
   return lines;
+}
+
+function formatSignedInteger(value: number): string {
+  return `${value >= 0 ? '+' : ''}${value}`;
+}
+
+function formatSignedUsd(value: number): string {
+  return `${value >= 0 ? '+' : '-'}$${Math.abs(value).toFixed(4)}`;
+}
+
+function formatBloatRatio(value: number | null): string {
+  return value === null ? 'n/a' : `${value.toFixed(2)}x`;
+}
+
+function summariseRevisionDeltas(runs: RunRecord[]): {
+  withDeltas: RevisionDelta[];
+  averageDurationDeltaMs: number | null;
+  averageOutputTokenDelta: number | null;
+  averageCostDeltaUsd: number | null;
+  averageAnswerCharDelta: number | null;
+  averageBloatRatio: number | null;
+  bloatOverOneCount: number;
+  bloatOverOnePointTwoCount: number;
+} {
+  const withDeltas = runs
+    .map(run => run.revisionDelta)
+    .filter((delta): delta is RevisionDelta => delta !== null);
+  const withBloat = withDeltas.filter(
+    delta => delta.revisionBloatRatio !== null,
+  );
+
+  const average = (values: number[]): number | null =>
+    values.length > 0
+      ? values.reduce((sum, value) => sum + value, 0) / values.length
+      : null;
+
+  return {
+    withDeltas,
+    averageDurationDeltaMs: average(
+      withDeltas.map(delta => delta.revisionDurationDeltaMs),
+    ),
+    averageOutputTokenDelta: average(
+      withDeltas.map(delta => delta.revisionOutputTokenDelta),
+    ),
+    averageCostDeltaUsd: average(
+      withDeltas.map(delta => delta.revisionCostDeltaUsd),
+    ),
+    averageAnswerCharDelta: average(
+      withDeltas.map(delta => delta.finalAnswerCharDelta),
+    ),
+    averageBloatRatio: average(
+      withBloat.map(delta => delta.revisionBloatRatio as number),
+    ),
+    bloatOverOneCount: withBloat.filter(
+      delta => (delta.revisionBloatRatio as number) > 1,
+    ).length,
+    bloatOverOnePointTwoCount: withBloat.filter(
+      delta => (delta.revisionBloatRatio as number) > 1.2,
+    ).length,
+  };
 }
 
 function calibrationSummary(pass: PassRecord, arm: Arm): string[] {
@@ -773,17 +1038,38 @@ function buildPassSection(pass: PassRecord, arm: Arm): string[] {
     '',
     fenced(pass.finalResponseText, 'text'),
     '',
-    '**Claude Invocation Args**',
-    '',
-    fenced(JSON.stringify(pass.args, null, 2), 'json'),
-    '',
-    '**Result Event**',
-    '',
-    fenced(JSON.stringify(pass.resultEvent, null, 2), 'json'),
-    '',
-    '**CT Call Records**',
-    '',
   ];
+
+  const passMetrics = extractPassMetrics(pass);
+  if (passMetrics) {
+    sections.push('**Pass Telemetry**');
+    sections.push('');
+    sections.push(`- duration_ms: \`${passMetrics.durationMs}\``);
+    sections.push(
+      `- duration_api_ms: \`${passMetrics.durationApiMs ?? 'n/a'}\``,
+    );
+    sections.push(`- output_tokens: \`${passMetrics.outputTokens}\``);
+    sections.push(`- input_tokens: \`${passMetrics.inputTokens}\``);
+    sections.push(
+      `- cache_read_input_tokens: \`${passMetrics.cacheReadInputTokens}\``,
+    );
+    sections.push(
+      `- cache_creation_input_tokens: \`${passMetrics.cacheCreationInputTokens}\``,
+    );
+    sections.push(`- total_cost_usd: \`$${passMetrics.totalCostUsd.toFixed(4)}\``);
+    sections.push('');
+  }
+
+  sections.push('**Claude Invocation Args**');
+  sections.push('');
+  sections.push(fenced(JSON.stringify(pass.args, null, 2), 'json'));
+  sections.push('');
+  sections.push('**Result Event**');
+  sections.push('');
+  sections.push(fenced(JSON.stringify(pass.resultEvent, null, 2), 'json'));
+  sections.push('');
+  sections.push('**CT Call Records**');
+  sections.push('');
 
   if (pass.toolCalls.length === 0) {
     sections.push('No CT tool calls were made in this pass.');
@@ -871,6 +1157,30 @@ function buildRunSection(run: RunRecord): string[] {
     sections.push('');
   }
 
+  if (run.revisionDelta) {
+    sections.push('**Revision Delta**');
+    sections.push('');
+    sections.push(
+      `- revision_duration_delta_ms: \`${formatSignedInteger(run.revisionDelta.revisionDurationDeltaMs)}\``,
+    );
+    sections.push(
+      `- revision_api_duration_delta_ms: \`${run.revisionDelta.revisionApiDurationDeltaMs === null ? 'n/a' : formatSignedInteger(run.revisionDelta.revisionApiDurationDeltaMs)}\``,
+    );
+    sections.push(
+      `- revision_output_token_delta: \`${formatSignedInteger(run.revisionDelta.revisionOutputTokenDelta)}\``,
+    );
+    sections.push(
+      `- revision_cost_delta_usd: \`${formatSignedUsd(run.revisionDelta.revisionCostDeltaUsd)}\``,
+    );
+    sections.push(
+      `- final_answer_char_delta: \`${formatSignedInteger(run.revisionDelta.finalAnswerCharDelta)}\``,
+    );
+    sections.push(
+      `- revision_bloat_ratio: \`${formatBloatRatio(run.revisionDelta.revisionBloatRatio)}\``,
+    );
+    sections.push('');
+  }
+
   if (run.preDraftPass) {
     sections.push(...buildPassSection(run.preDraftPass, run.arm));
   }
@@ -901,6 +1211,14 @@ function pairSummary(a: RunRecord, b: RunRecord): string[] {
     `- Arm B prompt family source: \`${b.initialPass.calibrationResult?.calibration?.prompt_family_source ?? 'unknown'}\``,
     `- Arm B revision triggered: \`${b.revisionPass ? 'yes' : 'no'}\``,
     `- Arm B revision calibration decision: \`${b.revisionPass?.calibrationResult?.policy_decision ?? 'not_run'}\``,
+    ...(b.revisionDelta
+      ? [
+          `- Arm B revision duration delta: \`${formatSignedInteger(b.revisionDelta.revisionDurationDeltaMs)} ms\``,
+          `- Arm B revision output token delta: \`${formatSignedInteger(b.revisionDelta.revisionOutputTokenDelta)}\``,
+          `- Arm B revision cost delta: \`${formatSignedUsd(b.revisionDelta.revisionCostDeltaUsd)}\``,
+          `- Arm B revision bloat ratio: \`${formatBloatRatio(b.revisionDelta.revisionBloatRatio)}\``,
+        ]
+      : []),
     `- Arm B final enforced outcome: \`${b.finalOutcome}\``,
     `- Arm B final policy decision: \`${b.finalPolicyDecision}\``,
     ...(b.humanReviewReason
@@ -990,6 +1308,7 @@ function main(): void {
   const revisionResolvedCount = bRuns.filter(
     run => run.revisionPass !== null && run.finalOutcome === 'accepted',
   ).length;
+  const revisionDeltaSummary = summariseRevisionDeltas(bRuns);
   const humanReviewCount = bRuns.filter(
     run => run.finalOutcome === 'human_review',
   ).length;
@@ -1009,7 +1328,7 @@ function main(): void {
   const report: string[] = [
     '# Clean Live A/B CT Test With Prompt-Side Family Classification And Locked Revision Routing',
     '',
-    '- Date: 2026-04-09',
+    '- Date: 2026-04-10',
     '- Model: Claude Sonnet (`--model sonnet --effort low`)',
     '- Capture mode: `claude -p --verbose --output-format stream-json`',
     '- Arm A: CT disallowed',
@@ -1018,7 +1337,7 @@ function main(): void {
     '- Enforcement rule: if the first B-side calibrated result is `REVISE`, feed the deterministic `revision_request.prompt` back to Claude exactly once, then rerun CT on the revised answer using the revision request review context.',
     '- Final B-side rule: if the second pass still fails at iteration 2, escalate to `HUMAN_REVIEW` and do not release the answer.',
     '- Calibration routing is now inferred from the user prompt when `prompt_text` is supplied, with answer-side inference retained only as fallback.',
-    '- Calibration DB: `benchmark/duckexperiments/.ct_ab_clean_live_enforced_prompt_classifier_2026-04-09/ct_calibration.sqlite`',
+    '- Calibration DB: `benchmark/duckexperiments/.ct_ab_clean_live_enforced_prompt_classifier_2026-04-10_topology/ct_calibration.sqlite`',
     '- This report contains only real prompts, the pre-CT draft artifact, real CT tool inputs, real CT tool outputs, the orchestrator-produced revision request, and the final enforced release decision.',
     '',
     '## Headline Results',
@@ -1027,9 +1346,21 @@ function main(): void {
     `- Initial B runs flagged for REVISE: \`${initialReviseCount}\``,
     `- B revision turns actually executed: \`${revisionTriggeredCount}\``,
     `- B revisions resolved to PASS/WARN and were released: \`${revisionResolvedCount}\``,
+    `- Revisions with measurable deltas: \`${revisionDeltaSummary.withDeltas.length}\``,
+    `- Revisions with revision_bloat_ratio > 1.0: \`${revisionDeltaSummary.bloatOverOneCount}\``,
+    `- Revisions with revision_bloat_ratio > 1.2: \`${revisionDeltaSummary.bloatOverOnePointTwoCount}\``,
     `- B runs escalated to HUMAN_REVIEW: \`${humanReviewCount}\``,
     `- B runs where the pre-CT draft changed after CT: \`${preDraftChangedCount}\``,
     `- Final accepted B decisions: PASS=\`${finalPassCount}\`, WARN=\`${finalWarnCount}\``,
+    ...(revisionDeltaSummary.averageBloatRatio !== null
+      ? [
+          `- Average revision_bloat_ratio: \`${formatBloatRatio(revisionDeltaSummary.averageBloatRatio)}\``,
+          `- Average revision_output_token_delta: \`${formatSignedInteger(Math.round(revisionDeltaSummary.averageOutputTokenDelta ?? 0))}\``,
+          `- Average revision_duration_delta_ms: \`${formatSignedInteger(Math.round(revisionDeltaSummary.averageDurationDeltaMs ?? 0))}\``,
+          `- Average revision_cost_delta_usd: \`${formatSignedUsd(revisionDeltaSummary.averageCostDeltaUsd ?? 0)}\``,
+          `- Average final_answer_char_delta: \`${formatSignedInteger(Math.round(revisionDeltaSummary.averageAnswerCharDelta ?? 0))}\``,
+        ]
+      : []),
     '',
     '## Round Summaries',
     '',

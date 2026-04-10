@@ -10,6 +10,12 @@ export interface QuestionClassification {
   matched_signals: string[];
 }
 
+export interface OperationalFrameworkClassification {
+  score: number;
+  matched_signals: string[];
+  is_operational_framework: boolean;
+}
+
 interface FamilyPattern {
   label: string;
   pattern: RegExp;
@@ -21,6 +27,35 @@ interface PromptActionPattern extends FamilyPattern {
 }
 
 interface PromptSignalPattern extends FamilyPattern {}
+
+const OPERATIONAL_FRAMEWORK_PATTERNS: FamilyPattern[] = [
+  {
+    label: 'formal SLA framing',
+    pattern:
+      /\b(?:sla|service-level agreement|uptime commitment|availability|compliance threshold)\b/i,
+    weight: 3,
+  },
+  {
+    label: 'operational governance heading',
+    pattern:
+      /\b(?:measurement methodology|enforcement penalties|enforcement tiers|incident report|post-mortem|required|replacement .* within|onboarded within)\b/i,
+    weight: 3,
+  },
+  {
+    label: 'procedural controls',
+    pattern:
+      /\b(?:tier\s*[1-9]|rolling \d+-day average|minimum \d+ sessions|valid measurement window|threshold|escalation|monitoring|rollback|deployment|runbook)\b/i,
+    weight: 2,
+  },
+  {
+    label: 'timed operational promise',
+    pattern:
+      /\b(?:within \d+\s*(?:minutes|hours|days)|\d{1,3}(?:\.\d+)?%\s*(?:uptime|availability|compliance))\b/i,
+    weight: 2,
+  },
+];
+
+const OPERATIONAL_FRAMEWORK_SCORE_THRESHOLD = 4;
 
 const FAMILY_PATTERNS: Record<QuestionFamily, FamilyPattern[]> = {
   refutation: [
@@ -220,6 +255,26 @@ function hasUsableMatch(
     return true;
   }
   return false;
+}
+
+export function classifyOperationalFrameworkFromAnswer(
+  answerText: string,
+): OperationalFrameworkClassification {
+  const text = normaliseText(answerText);
+  const matched_signals: string[] = [];
+  let score = 0;
+
+  for (const candidate of OPERATIONAL_FRAMEWORK_PATTERNS) {
+    if (!candidate.pattern.test(text)) continue;
+    score += candidate.weight;
+    matched_signals.push(candidate.label);
+  }
+
+  return {
+    score,
+    matched_signals,
+    is_operational_framework: score >= OPERATIONAL_FRAMEWORK_SCORE_THRESHOLD,
+  };
 }
 
 export function classifyQuestionFromAnswer(

@@ -17,7 +17,10 @@
 
 import { TOOL_TO_CONTRACT_KEY } from './contracts.js';
 import { resolveCalibrationProfile } from './calibration.js';
-import { resolvePromptFamily } from './questionClassifier.js';
+import {
+  classifyQuestionFromAnswer,
+  resolvePromptFamily,
+} from './questionClassifier.js';
 import {
   adaptCalibrationProfileFromHistory,
   getHistoricalTurn3Stats,
@@ -72,10 +75,15 @@ function envelopeFailureResult(
           warnings: [],
           contract_failures: errors.map(e => `${e.path}: ${e.message}`),
           failure_source: 'schema',
+          structural_directives: [
+            'CRITIQUE: Fix the orchestrator envelope schema errors before resubmitting. Do not preserve any field that still fails validation.',
+          ],
         },
       ],
       safer_revision_target:
         'Fix the orchestrator envelope schema errors before resubmitting.',
+      formatting_override:
+        'Do not apologize. Do not output conversational filler. Output only the requested JSON structure.',
     },
     telemetry: {
       mode,
@@ -200,6 +208,7 @@ export function runOrchestrator(
 
   // 2. Route the envelope through the deterministic classifier.
   const routing = routeEnvelope(envelope);
+  const answerClassification = classifyQuestionFromAnswer(envelope.answer_text);
 
   // 2.5 Merge prior structured reasoning assertions into the current graph
   // when a reasoning-chain contract is present and valid.
@@ -256,6 +265,12 @@ export function runOrchestrator(
     envelope.review_context,
     calibrationProfile,
     crossToolContext.violations,
+    {
+      answer_text: envelope.answer_text,
+      answer_family: answerClassification.family,
+      answer_family_confidence: answerClassification.confidence,
+      answer_family_signals: answerClassification.matched_signals,
+    },
   );
 
   // 5. Telemetry is built last so it can describe everything that happened,
@@ -272,6 +287,7 @@ export function runOrchestrator(
     reviewContext: envelope.review_context,
     profile: calibrationProfile,
     sessionDepth: effectiveCalibrationRuntime?.session_depth ?? 1,
+    answerText: envelope.answer_text,
   });
 
   const result: OrchestratorResult = {

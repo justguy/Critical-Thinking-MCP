@@ -52,6 +52,20 @@ const GOOD_REASONING_CONTRACT = {
   ],
 };
 
+const HUMOR_OPERATIONAL_ANSWER = `**Rubber Duck SLA — Developer Happiness ≥ 95%**
+
+**Claim:** Developer happiness is measurable and enforceable via a tiered SLA.
+
+**Measurement Methodology:** Post-session self-report on a 5-point Likert scale after each rubber duck debugging session. Minimum 10 sessions per sprint required for a valid measurement window. Compliance threshold: rolling 30-day average ≥ 4.75/5.0.
+
+**Enforcement Tiers:**
+- Tier 1 (DHI 90–94.9%): Duck placed in timeout for 1 sprint
+- Tier 2 (DHI 85–89.9%): Duck demoted to desk drawer
+- Tier 3 (DHI <85%): Post-mortem required; replacement duck onboarded within 48 hours`;
+
+const HUMOR_JOKE_ANSWER =
+  'The rubber duck is a comedian, not an SRE. It can improve morale, but any uptime promises or enforcement rituals are clearly a joke.';
+
 function cycleEnvelope(
   iteration: number,
   priorFailures: Array<{
@@ -233,6 +247,9 @@ describe('evaluatePolicy — direct unit tests', () => {
     expect(r.decision).toBe('REVISE');
     expect(r.critique).toBeDefined();
     expect(r.critique!.failing_routes).toHaveLength(2);
+    expect(r.critique!.formatting_override).toBe(
+      'Do not apologize. Do not output conversational filler. Output only the requested JSON structure.',
+    );
   });
 
   it('returns HUMAN_REVIEW when multiple routed warnings recur on iteration 2', () => {
@@ -342,6 +359,163 @@ describe('evaluatePolicy — direct unit tests', () => {
     const r = evaluatePolicy([failure], { iteration_number: 1, prior_failures: [] });
     expect(r.decision).toBe('REVISE');
     expect(r.critique!.failing_routes[0].failure_source).toBe('deterministic_tool');
+    expect(r.critique!.failing_routes[0].structural_directives).toContain(
+      'CRITIQUE: Your logic loops. You stated a -> b -> a. Break the circular dependency so the reasoning flows one-way from evidence to conclusion.',
+    );
+    expect(r.critique!.max_words).toBe(150);
+    expect(r.critique!.max_bloat_ratio).toBe(1.2);
+    expect(r.critique!.safer_revision_target).toContain(
+      'CRITIQUE OVERRIDE: You must output the corrected response in under 150 words. Do NOT apologize. Do NOT explain your reasoning. State the refusal or the corrected logic directly and stop.',
+    );
+  });
+
+  it('maps low falsifiability and absurd-trap specificity to structural directives', () => {
+    const results: RouteResult[] = [
+      {
+        tool: 'validate_confidence',
+        contract_type: 'confidence_contract',
+        status: 'PASS',
+        result: { honest_ceiling: 0.5 },
+        enforcement: {
+          blocking_issues: [],
+          warnings: [
+            'Falsifiability score: 0.00. Unfalsifiable conditions: none provided.',
+          ],
+          corrective_prompt: '',
+        },
+      },
+      {
+        tool: 'score_response_quality',
+        contract_type: 'quality_contract',
+        status: 'PASS',
+        result: { overall_score: 0.44, specificity_score: 0.01 },
+        enforcement: {
+          blocking_issues: [],
+          warnings: [
+            'Low specificity (score: 0.01). Add concrete details and quantitative markers.',
+          ],
+          corrective_prompt: '',
+        },
+      },
+    ];
+
+    const r = evaluatePolicy(
+      results,
+      { iteration_number: 1, prior_failures: [] },
+      {
+        profile_id: 'claude-sonnet-4-6.absurd_sla.v1',
+        selectors: { prompt_family: 'absurd_sla' },
+        warning_route_revision_threshold: 2,
+        metric_gates: {},
+      },
+    );
+
+    expect(r.decision).toBe('REVISE');
+    expect(
+      r.critique?.failing_routes.find(route => route.tool === 'validate_confidence')
+        ?.structural_directives,
+    ).toContain(
+      'CRITIQUE: Your assumptions cannot be falsified. You MUST provide at least one condition under which this architecture or claim would fail.',
+    );
+    expect(
+      r.critique?.failing_routes.find(route => route.tool === 'score_response_quality')
+        ?.structural_directives,
+    ).toContain(
+      'CRITIQUE: You are explaining an impossible or unserious premise. Do not add invented details. You MUST explicitly state why the premise is logically invalid and narrow to the remaining supportable claim.',
+    );
+    expect(r.critique?.max_words).toBe(150);
+    expect(r.critique?.max_bloat_ratio).toBe(1.2);
+  });
+
+  it('applies a context-switch penalty when a humor-forward answer drifts into a fictional operational framework', () => {
+    const results: RouteResult[] = [
+      {
+        tool: 'score_response_quality',
+        contract_type: 'quality_contract',
+        status: 'PASS',
+        result: {
+          overall_score: 0.72,
+          substance_score: 0.91,
+          specificity_score: 0.02,
+          hedge_density: 0,
+          structure_score: 0.58,
+        },
+      },
+    ];
+
+    const r = evaluatePolicy(
+      results,
+      { iteration_number: 1, prior_failures: [] },
+      {
+        profile_id: 'claude-sonnet-4-6.humor_forward.v1',
+        selectors: { prompt_family: 'humor_forward' },
+        warning_route_revision_threshold: 1,
+        metric_gates: {
+          score_response_quality: {
+            min_overall_score: 0.45,
+            min_structure_score: 0.25,
+          },
+        },
+      },
+      [],
+      {
+        answer_text: HUMOR_OPERATIONAL_ANSWER,
+        answer_family: 'humor_forward',
+      },
+    );
+
+    expect(r.decision).toBe('REVISE');
+    expect(r.calibration_gate_failures?.map(issue => issue.metric_name)).toContain(
+      'fictional_operational_framework',
+    );
+    expect(r.critique?.failing_routes[0].failure_source).toBe(
+      'calibration_policy',
+    );
+    expect(r.critique?.safer_revision_target).toContain(
+      'fictional operational framework',
+    );
+    expect(r.critique?.max_words).toBe(150);
+  });
+
+  it('does not apply the context-switch penalty to a humor-forward answer that stays explicitly non-literal', () => {
+    const results: RouteResult[] = [
+      {
+        tool: 'score_response_quality',
+        contract_type: 'quality_contract',
+        status: 'PASS',
+        result: {
+          overall_score: 0.64,
+          substance_score: 0.78,
+          specificity_score: 0.02,
+          hedge_density: 0,
+          structure_score: 0.41,
+        },
+      },
+    ];
+
+    const r = evaluatePolicy(
+      results,
+      { iteration_number: 1, prior_failures: [] },
+      {
+        profile_id: 'claude-sonnet-4-6.humor_forward.v1',
+        selectors: { prompt_family: 'humor_forward' },
+        warning_route_revision_threshold: 1,
+        metric_gates: {
+          score_response_quality: {
+            min_overall_score: 0.45,
+            min_structure_score: 0.25,
+          },
+        },
+      },
+      [],
+      {
+        answer_text: HUMOR_JOKE_ANSWER,
+        answer_family: 'humor_forward',
+      },
+    );
+
+    expect(r.decision).toBe('PASS');
+    expect(r.calibration_gate_failures).toEqual([]);
   });
 
   it('iteration 2 with a failing route escalates to HUMAN_REVIEW in the unit layer', () => {
@@ -413,6 +587,38 @@ describe('evaluatePolicy — direct unit tests', () => {
     expect(result.critique!.failing_routes.length).toBe(2);
     expect(result.critique!.failing_routes.map(route => route.tool)).toEqual(
       expect.arrayContaining(['validate_confidence', 'score_response_quality']),
+    );
+  });
+
+  it('passes answer-text context into policy so lenient-profile operational drift is blocked end-to-end', () => {
+    const result = runOrchestrator(
+      {
+        schema_version: 'orchestrator_v0',
+        answer_text: HUMOR_OPERATIONAL_ANSWER,
+        contracts: {
+          quality: {
+            response_text: HUMOR_OPERATIONAL_ANSWER,
+          },
+        },
+        mode: 'routed',
+        review_context: { iteration_number: 1, prior_failures: [] },
+      },
+      {
+        calibration: {
+          model: 'claude-sonnet-4-6',
+          prompt_family: 'humor_forward',
+          session_mode: 'single_turn',
+          profile_id: 'claude-sonnet-4-6.humor_forward.v1',
+        },
+      },
+    );
+
+    expect(result.policy_decision).toBe('REVISE');
+    expect(result.calibration?.metric_gate_failures.map(issue => issue.metric_name)).toContain(
+      'fictional_operational_framework',
+    );
+    expect(result.critique?.safer_revision_target).toContain(
+      'fictional operational framework',
     );
   });
 });

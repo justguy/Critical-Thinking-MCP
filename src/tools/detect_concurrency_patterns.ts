@@ -24,6 +24,26 @@ export interface ConcurrencyInput {
   protections?: string[];
   delivery_model?: 'at_least_once' | 'at_most_once' | 'exactly_once';
   retry_behavior?: 'none' | 'automatic' | 'manual';
+  capacity_model?: {
+    throughput_per_sec?: number;
+    mean_latency_sec?: number;
+    capacity_slots?: number;
+    retry_count?: number;
+    timeout_sec?: number;
+    sla_sec?: number;
+  };
+  resource_allocation?: {
+    tasks: Array<{
+      id: string;
+      holds?: string[];
+      waits_for?: string[];
+    }>;
+    resources?: Array<{
+      id: string;
+      mode?: 'exclusive' | 'shared';
+      preemptible?: boolean;
+    }>;
+  };
 }
 
 interface DetectedPattern {
@@ -52,7 +72,7 @@ function validateInput(input: unknown): ConcurrencyInput {
   if (input === null || typeof input !== 'object') {
     throw new Error(
       'Input must be an object with "steps" (string[]). ' +
-      'Optional: "shared_resources", "protections", "delivery_model", "retry_behavior".'
+      'Optional: "shared_resources", "protections", "delivery_model", "retry_behavior", "capacity_model", "resource_allocation".'
     );
   }
 
@@ -74,6 +94,14 @@ function validateInput(input: unknown): ConcurrencyInput {
     protections: Array.isArray(obj.protections) ? obj.protections as string[] : [],
     delivery_model: typeof obj.delivery_model === 'string' ? obj.delivery_model as ConcurrencyInput['delivery_model'] : undefined,
     retry_behavior: typeof obj.retry_behavior === 'string' ? obj.retry_behavior as ConcurrencyInput['retry_behavior'] : undefined,
+    capacity_model:
+      obj.capacity_model && typeof obj.capacity_model === 'object'
+        ? obj.capacity_model as ConcurrencyInput['capacity_model']
+        : undefined,
+    resource_allocation:
+      obj.resource_allocation && typeof obj.resource_allocation === 'object'
+        ? obj.resource_allocation as ConcurrencyInput['resource_allocation']
+        : undefined,
   };
 }
 
@@ -190,6 +218,104 @@ function detectPatterns(input: ConcurrencyInput): DetectedPattern[] {
   return patterns;
 }
 
+function hasTaskCycle(adjacency: Map<string, Set<string>>): boolean {
+  const visiting = new Set<string>();
+  const visited = new Set<string>();
+
+  const visit = (taskId: string): boolean => {
+    if (visiting.has(taskId)) return true;
+    if (visited.has(taskId)) return false;
+
+    visiting.add(taskId);
+    for (const next of adjacency.get(taskId) ?? []) {
+      if (visit(next)) return true;
+    }
+    visiting.delete(taskId);
+    visited.add(taskId);
+    return false;
+  };
+
+  for (const taskId of adjacency.keys()) {
+    if (visit(taskId)) return true;
+  }
+  return false;
+}
+
+function detectDeadlockPattern(input: ConcurrencyInput): DetectedPattern[] {
+  const allocation = input.resource_allocation;
+  if (!allocation || allocation.tasks.length < 2) {
+    return [];
+  }
+
+  const resourceMode = new Map<string, 'exclusive' | 'shared'>();
+  const resourcePreemptible = new Map<string, boolean>();
+
+  for (const resource of allocation.resources ?? []) {
+    resourceMode.set(resource.id, resource.mode ?? 'exclusive');
+    resourcePreemptible.set(resource.id, resource.preemptible ?? false);
+  }
+
+  const holders = new Map<string, string[]>();
+  for (const task of allocation.tasks) {
+    for (const resourceId of task.holds ?? []) {
+      const current = holders.get(resourceId) ?? [];
+      current.push(task.id);
+      holders.set(resourceId, current);
+      if (!resourceMode.has(resourceId)) resourceMode.set(resourceId, 'exclusive');
+      if (!resourcePreemptible.has(resourceId)) resourcePreemptible.set(resourceId, false);
+    }
+  }
+
+  const holdAndWait = allocation.tasks.some(
+    task => (task.holds?.length ?? 0) > 0 && (task.waits_for?.length ?? 0) > 0,
+  );
+  if (!holdAndWait) {
+    return [];
+  }
+
+  const exclusiveResources = [...holders.keys()].filter(
+    resourceId => resourceMode.get(resourceId) !== 'shared',
+  );
+  if (exclusiveResources.length === 0) {
+    return [];
+  }
+
+  const noPreemption = allocation.tasks.some(task =>
+    (task.waits_for ?? []).some(resourceId => resourcePreemptible.get(resourceId) !== true),
+  );
+  if (!noPreemption) {
+    return [];
+  }
+
+  const adjacency = new Map<string, Set<string>>();
+  for (const task of allocation.tasks) {
+    adjacency.set(task.id, new Set<string>());
+  }
+
+  for (const task of allocation.tasks) {
+    for (const resourceId of task.waits_for ?? []) {
+      if (resourceMode.get(resourceId) === 'shared') continue;
+      for (const holderId of holders.get(resourceId) ?? []) {
+        if (holderId === task.id) continue;
+        adjacency.get(task.id)?.add(holderId);
+      }
+    }
+  }
+
+  if (!hasTaskCycle(adjacency)) {
+    return [];
+  }
+
+  return [
+    {
+      pattern: 'deadlock_risk',
+      description:
+        'Resource allocation graph satisfies the Coffman deadlock conditions: mutual exclusion, hold-and-wait, no preemption, and circular wait.',
+      severity: 'critical',
+    },
+  ];
+}
+
 // ====== Handler ======
 
 export function handleDetectConcurrencyPatterns(
@@ -199,6 +325,7 @@ export function handleDetectConcurrencyPatterns(
   const enforcementContext = (input as Record<string, unknown>)?.context as EnforcementContext | undefined;
   const parsed = validateInput(input);
   const detected = detectPatterns(parsed);
+  detected.push(...detectDeadlockPattern(parsed));
 
   const criticalCount = detected.filter(d => d.severity === 'critical').length;
   const blockingIssues: BlockingIssue[] = [];

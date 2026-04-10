@@ -235,6 +235,46 @@ export const CONCURRENCY_CONTRACT_SCHEMA = {
         sla_sec: { type: 'number', minimum: 0 },
       },
     },
+    resource_allocation: {
+      type: 'object',
+      required: ['tasks'],
+      additionalProperties: false,
+      properties: {
+        tasks: {
+          type: 'array',
+          minItems: 2,
+          items: {
+            type: 'object',
+            required: ['id'],
+            additionalProperties: false,
+            properties: {
+              id: { type: 'string', minLength: 1 },
+              holds: {
+                type: 'array',
+                items: { type: 'string', minLength: 1 },
+              },
+              waits_for: {
+                type: 'array',
+                items: { type: 'string', minLength: 1 },
+              },
+            },
+          },
+        },
+        resources: {
+          type: 'array',
+          items: {
+            type: 'object',
+            required: ['id'],
+            additionalProperties: false,
+            properties: {
+              id: { type: 'string', minLength: 1 },
+              mode: { type: 'string', enum: ['exclusive', 'shared'] },
+              preemptible: { type: 'boolean' },
+            },
+          },
+        },
+      },
+    },
   },
 } as const;
 

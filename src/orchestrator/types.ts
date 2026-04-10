@@ -206,6 +206,23 @@ export interface CapacityModel {
   sla_sec?: number;
 }
 
+export interface ResourceAllocationTask {
+  id: string;
+  holds?: string[];
+  waits_for?: string[];
+}
+
+export interface ResourceDescriptor {
+  id: string;
+  mode?: 'exclusive' | 'shared';
+  preemptible?: boolean;
+}
+
+export interface ResourceAllocationGraph {
+  tasks: ResourceAllocationTask[];
+  resources?: ResourceDescriptor[];
+}
+
 export interface ConcurrencyContract {
   steps: string[];
   shared_resources?: string[];
@@ -213,6 +230,7 @@ export interface ConcurrencyContract {
   delivery_model?: 'at_least_once' | 'at_most_once' | 'exactly_once';
   retry_behavior?: 'none' | 'automatic' | 'manual';
   capacity_model?: CapacityModel;
+  resource_allocation?: ResourceAllocationGraph;
 }
 
 export interface QualityContract {

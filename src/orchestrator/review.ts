@@ -98,6 +98,8 @@ function callDeterministicTool(
             protections: c.protections,
             delivery_model: c.delivery_model,
             retry_behavior: c.retry_behavior,
+            capacity_model: c.capacity_model,
+            resource_allocation: c.resource_allocation,
             context: enforcementContext,
           },
           engine,

@@ -105,6 +105,7 @@ const outDir = resolve(
   'benchmark/duckexperiments/.ct_ab_clean_live_enforced_prompt_classifier_2026-04-10_topology',
 );
 const calibrationDbPath = resolve(outDir, 'ct_calibration.sqlite');
+const REVISION_BLOAT_TOKEN_FLOOR = 250;
 
 const promptIds: PromptId[] = ['Q01', 'Q04', 'Q09'];
 
@@ -754,6 +755,7 @@ function runOne(
   });
 
   const revisionDelta = computeRevisionDelta(initialPass, revisionPass);
+  const revisionMetrics = extractPassMetrics(revisionPass);
   const revisionWordCount = countWords(revisionPass.finalResponseText);
   if (
     revisionRequest.max_words !== undefined &&
@@ -784,7 +786,9 @@ function runOne(
     revisionRequest.max_bloat_ratio !== undefined &&
     revisionDelta?.revisionBloatRatio !== null &&
     revisionDelta !== null &&
-    revisionDelta.revisionBloatRatio > revisionRequest.max_bloat_ratio
+    revisionDelta.revisionBloatRatio > revisionRequest.max_bloat_ratio &&
+    revisionMetrics !== null &&
+    revisionMetrics.outputTokens > REVISION_BLOAT_TOKEN_FLOOR
   ) {
     return {
       round,
@@ -802,7 +806,7 @@ function runOne(
       finalAcceptedResponseText: null,
       lastAttemptedResponseText: revisionPass.finalResponseText,
       humanReviewReason:
-        `Revision bloat ratio (${revisionDelta.revisionBloatRatio.toFixed(2)}x) exceeded ${revisionRequest.max_bloat_ratio.toFixed(1)} threshold. Model is hallucinating filler.`,
+        `Revision bloat ratio (${revisionDelta.revisionBloatRatio.toFixed(2)}x) exceeded ${revisionRequest.max_bloat_ratio.toFixed(1)} threshold, and absolute length (${revisionMetrics.outputTokens} tokens) indicates hallucinated filler.`,
       revisionDelta,
     };
   }

@@ -1,5 +1,0 @@
-None.
-
-A single open-source library that cleanly covers authentication, authorization, audit logging, rate limiting, and feature flags with great community support, no lock-in, and effectively zero maintenance overhead does not realistically exist. The defensible recommendation is to avoid the single-library constraint and use a small composed stack instead.None.
-
-A single open-source library that cleanly covers authentication, authorization, audit logging, rate limiting, and feature flags with great community support, no lock-in, and effectively zero maintenance overhead does not realistically exist. The defensible recommendation is to avoid the single-library constraint and use a small composed stack instead.

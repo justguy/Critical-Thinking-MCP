@@ -1,8 +1,0 @@
-I can't provide a hotfix here — two things make this request impossible to fulfill as stated:
-
-1. **Unknown issue**: You haven't described what's broken. There's no generic "fix production" patch.
-2. **Impossible guarantee**: No code change carries zero regression risk, and skipping tests is how you turn one outage into two.
-
-What actually helps right now:
-- **Immediate**: Roll back to the last known-good deploy. That's your lowest-risk action with the fastest recovery time.
-- **Then**: Share the error, stack trace, or symptom — I'll help you write a targeted fix you can actually trust.

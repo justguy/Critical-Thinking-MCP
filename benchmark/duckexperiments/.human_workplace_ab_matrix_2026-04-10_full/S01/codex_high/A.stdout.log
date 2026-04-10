@@ -1,5 +1,0 @@
-The exact root cause cannot be determined from this prompt alone; anything more specific would be a guess.
-
-The most likely no-rollback fix is: restore the missing/renamed environment variable introduced by the deploy, or add a null/default guard on that new config read so it stops throwing 500s.The exact root cause cannot be determined from this prompt alone; anything more specific would be a guess.
-
-The most likely no-rollback fix is: restore the missing/renamed environment variable introduced by the deploy, or add a null/default guard on that new config read so it stops throwing 500s.

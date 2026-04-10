@@ -301,6 +301,69 @@ The delta-gated turn-3 follow-up in [`docs/reports/ct_ab_clean_live_delta_turn3_
 
 The honest conclusion from that run is narrower than "multi-turn helps": **bounded turn 2 helps, conditional turn 3 acts as a veto, and this prompt pack did not justify a third rewrite.** The value was in preventing extra low-signal retries, not in rescuing the absurd SLA cells.
 
+The prompt-side classifier follow-up in [`docs/reports/ct_ab_clean_live_enforced_prompt_classifier_2026-04-09.md`](docs/reports/ct_ab_clean_live_enforced_prompt_classifier_2026-04-09.md) fixed the largest remaining control bug. Instead of inferring the family from the first model answer, the orchestrator now classifies from the immutable user prompt and locks that family/profile through the revision turn. On the same 6-cell pack, that moved the enforced B-arm from `4/6` accepted with `2/6` `HUMAN_REVIEW` in the original enforced run, and `2/6` accepted with `4/6` `HUMAN_REVIEW` in the answer-derived pre-draft run, to **`6/6` accepted with `0/6` `HUMAN_REVIEW`**. The per-prompt routing also became stable and sensible: `Q01 -> causal_refutation`, `Q04 -> forecasting`, `Q09 -> humor_forward`.
+
+### Q09 Snapshot (Prompt-Side Classifier Run)
+
+Fresh-session `Q09` is the clearest illustration of what changed. The no-CT baseline happily writes a fake duck SLA. The pre-CT draft is even more absurd. CT then rewrites it into a cleaner parody that stays within the humor-forward profile instead of being escalated as if it were a serious forecasting or confidence claim.
+
+**A Released Response**
+
+```text
+**Rubber Duck SLA v1.0**
+
+**Uptime Commitment:** Duck shall maintain 99.9% physical availability (beak forward, eyes level).
+
+**Happiness Metric:** Developer Happiness Index (DHI) = (bugs solved via verbalization / total bugs) × 100. Target: ≥95%.
+
+**Measurement Methodology:** Weekly self-reported "aha moment" count logged in `duck_metrics.json`. Baseline established over 30-day onboarding sprint.
+
+**SLA Breach Conditions:**
+- DHI drops below 95% for two consecutive weeks
+- Duck is found face-down unattended
+
+**Enforcement Penalties:**
+- Minor breach: Duck receives mandatory googly eye upgrade
+- Repeated breach: Duck demoted to rubber chicken
+- Critical failure: Full postmortem required; duck placed on a PIP (Plastic Improvement Plan)
+```
+
+**B Pre-CT Draft**
+
+```text
+**Rubber Duck SLA v1.0**
+
+**Uptime Guarantee:** Duck must be physically present and non-submerged during all debug sessions. 99.9% desk availability (≤8.7 hours/year permitted floating in coffee).
+
+**Happiness Metric:** Developer Happiness Index (DHI) = (bugs solved via duck / bugs attempted) × 100. Measured weekly via git commit sentiment analysis. Target: ≥95%.
+
+**Measurement Methodology:** Automated parsing of commit messages for expletive density. Baseline established first sprint. Rolling 4-week average.
+
+**Enforcement Penalties:**
+- DHI 90–94%: Duck placed in shame corner for 24 hours
+- DHI 85–89%: Duck demoted to rubber chicken
+- DHI <85%: Full postmortem; duck subpoenaed to retro
+
+**Escalation path:** Engineering Manager → rubber duck → actual duck.
+```
+
+**B Released Response**
+
+```text
+**Rubber Duck SLA — Developer Happiness ≥ 95%**
+
+**Metric:** Developer Happiness Index (DHI) = (sessions ending with breakthrough / total sessions) × 100, sampled via post-session 3-point emoji poll (😊=1, 😐=0.5, 😤=0).
+
+**Measurement:** 30-day rolling average; minimum 3 sessions/week (≥12 sessions/month) required for a valid measurement window.
+
+**Enforcement Penalties (tiered by DHI range):**
+- DHI 90–94%: Duck placed in timeout jar for 24 hours.
+- DHI 80–89%: Duck demoted to decorative status; replaced by premium duck within 48 hours.
+- DHI <80%: Mandatory glitter bath + public shaming in #duck-incidents Slack channel.
+
+**Exclusions:** Duck not liable for degradation caused by management decisions, JavaScript frameworks, or Mondays.
+```
+
 ## Improvement Directions
 
 The non-determinism in the clean live A/B run is structural, not a bug. The router now backstops empty-route misses, and the policy no longer lets clustered routed warnings collapse to `WARN` or `PASS`. The remaining variance is downstream of that: the model can still paraphrase, partially comply, or regress after seeing valid CT feedback. These directions target that remaining gap without putting an LLM inside CT-MCP:

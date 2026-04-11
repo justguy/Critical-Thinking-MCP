@@ -6,20 +6,21 @@
     <title>CT-MCP Beta 2 Benchmark Review</title>
     <style>
       :root {
-        --bg: #f4ecde;
-        --panel: rgba(255, 249, 239, 0.9);
-        --panel-strong: rgba(255, 251, 244, 0.97);
-        --border: rgba(86, 56, 35, 0.12);
-        --ink: #171412;
-        --muted: #6d5d4d;
-        --accent: #c75d2c;
-        --accent-soft: #f3cdb7;
-        --teal: #1f7b74;
-        --teal-soft: #d8f1eb;
-        --warn: #aa5a17;
-        --pass: #176544;
-        --review: #7f2739;
-        --shadow: 0 24px 70px rgba(79, 50, 30, 0.12);
+        --bg: #edf2f7;
+        --panel: rgba(251, 253, 255, 0.9);
+        --panel-strong: rgba(255, 255, 255, 0.97);
+        --border: rgba(15, 23, 42, 0.12);
+        --ink: #0f172a;
+        --muted: #526072;
+        --accent: #1d4ed8;
+        --accent-soft: rgba(29, 78, 216, 0.14);
+        --teal: #0f766e;
+        --teal-soft: rgba(15, 118, 110, 0.12);
+        --warn: #b45309;
+        --pass: #0f766e;
+        --review: #b91c1c;
+        --shadow: 0 18px 44px rgba(15, 23, 42, 0.08);
+        --radius: 18px;
       }
 
       * {
@@ -29,12 +30,14 @@
       body {
         margin: 0;
         min-height: 100vh;
-        font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+        font-family: "Avenir Next", "Segoe UI", sans-serif;
         color: var(--ink);
         background:
-          radial-gradient(circle at top left, rgba(255, 255, 255, 0.68), transparent 38%),
-          radial-gradient(circle at top right, rgba(243, 205, 183, 0.42), transparent 24%),
-          linear-gradient(180deg, #fbf4e9 0%, var(--bg) 100%);
+          linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+          radial-gradient(circle at top right, rgba(29, 78, 216, 0.12), transparent 24%),
+          linear-gradient(180deg, #f8fbfd 0%, var(--bg) 100%);
+        background-size: 32px 32px, 32px 32px, auto, auto;
       }
 
       a {
@@ -53,7 +56,7 @@
       .detail,
       .run-card {
         border: 1px solid var(--border);
-        border-radius: 28px;
+        border-radius: var(--radius);
         background: var(--panel);
         box-shadow: var(--shadow);
       }
@@ -62,18 +65,22 @@
         padding: 28px;
         display: grid;
         gap: 16px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 250, 255, 0.92)),
+          var(--panel);
       }
 
       .eyebrow {
         display: inline-flex;
         align-items: center;
         width: fit-content;
-        padding: 8px 12px;
-        border-radius: 999px;
-        background: rgba(199, 93, 44, 0.12);
+        padding: 7px 10px;
+        border-radius: 12px;
+        background: var(--accent-soft);
         color: var(--accent);
-        font-size: 0.8rem;
-        font-weight: 800;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.76rem;
+        font-weight: 700;
         letter-spacing: 0.08em;
         text-transform: uppercase;
       }
@@ -87,7 +94,8 @@
 
       h1 {
         font-size: clamp(2rem, 4vw, 3.6rem);
-        line-height: 0.96;
+        line-height: 0.98;
+        letter-spacing: -0.04em;
         max-width: 14ch;
       }
 
@@ -122,9 +130,9 @@
         justify-content: center;
         min-height: 42px;
         padding: 0 14px;
-        border-radius: 999px;
-        border: 1px solid rgba(86, 56, 35, 0.12);
-        background: rgba(255, 250, 243, 0.94);
+        border-radius: 12px;
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        background: rgba(255, 255, 255, 0.92);
         color: var(--ink);
         text-decoration: none;
         font-weight: 700;
@@ -133,7 +141,8 @@
       .hero-links a:hover,
       .chip:hover,
       .chip:focus-visible {
-        border-color: rgba(199, 93, 44, 0.4);
+        border-color: rgba(29, 78, 216, 0.4);
+        background: rgba(239, 246, 255, 0.96);
         outline: none;
       }
 
@@ -145,9 +154,9 @@
 
       .metric {
         padding: 18px;
-        border-radius: 22px;
-        background: linear-gradient(180deg, rgba(255, 251, 244, 0.98), rgba(250, 240, 229, 0.92));
-        border: 1px solid rgba(86, 56, 35, 0.09);
+        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 250, 255, 0.92));
+        border: 1px solid rgba(15, 23, 42, 0.09);
         display: grid;
         gap: 8px;
       }
@@ -252,8 +261,9 @@
       }
 
       .control label {
-        font-size: 0.82rem;
-        font-weight: 800;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.74rem;
+        font-weight: 700;
         letter-spacing: 0.08em;
         text-transform: uppercase;
         color: var(--accent);
@@ -263,9 +273,9 @@
       .control select {
         width: 100%;
         min-height: 46px;
-        border-radius: 16px;
-        border: 1px solid rgba(86, 56, 35, 0.12);
-        background: rgba(255, 251, 244, 0.96);
+        border-radius: 12px;
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        background: rgba(255, 255, 255, 0.94);
         color: var(--ink);
         padding: 0 14px;
         font: inherit;
@@ -297,9 +307,9 @@
 
       .provider-card {
         padding: 16px;
-        border-radius: 20px;
-        background: rgba(255, 250, 243, 0.92);
-        border: 1px solid rgba(86, 56, 35, 0.08);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.94);
+        border: 1px solid rgba(15, 23, 42, 0.08);
         display: grid;
         gap: 10px;
       }

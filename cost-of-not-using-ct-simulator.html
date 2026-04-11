@@ -6,19 +6,19 @@
     <title>Cost of Not Using CT Simulator</title>
     <style>
       :root {
-        --bg: #f6efe2;
-        --bg-deep: #efe2ca;
-        --card: rgba(255, 252, 246, 0.86);
-        --card-strong: rgba(255, 248, 238, 0.96);
-        --ink: #181514;
-        --muted: #695b4f;
-        --line: rgba(54, 40, 22, 0.12);
-        --accent: #c75d2c;
-        --accent-soft: #f2b766;
-        --teal: #1f7b74;
-        --danger: #942f18;
-        --shadow: 0 20px 50px rgba(51, 28, 8, 0.12);
-        --radius: 24px;
+        --bg: #eef3f8;
+        --bg-deep: #e4ebf3;
+        --card: rgba(251, 253, 255, 0.88);
+        --card-strong: rgba(255, 255, 255, 0.97);
+        --ink: #0f172a;
+        --muted: #526072;
+        --line: rgba(15, 23, 42, 0.12);
+        --accent: #1d4ed8;
+        --accent-soft: rgba(96, 165, 250, 0.24);
+        --teal: #0f766e;
+        --danger: #b45309;
+        --shadow: 0 18px 44px rgba(15, 23, 42, 0.08);
+        --radius: 18px;
       }
 
       * {
@@ -34,10 +34,13 @@
         min-height: 100vh;
         color: var(--ink);
         background:
-          radial-gradient(circle at top left, rgba(242, 183, 102, 0.38), transparent 34%),
-          radial-gradient(circle at 90% 12%, rgba(31, 123, 116, 0.18), transparent 24%),
-          linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
-        font-family: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+          linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+          radial-gradient(circle at 88% 12%, rgba(29, 78, 216, 0.14), transparent 24%),
+          radial-gradient(circle at top left, rgba(15, 118, 110, 0.08), transparent 34%),
+          linear-gradient(180deg, #f8fbfd 0%, var(--bg) 100%);
+        background-size: 34px 34px, 34px 34px, auto, auto, auto;
+        font-family: "Avenir Next", "Segoe UI", sans-serif;
       }
 
       body::before,
@@ -48,8 +51,8 @@
         width: 22rem;
         height: 22rem;
         border-radius: 50%;
-        filter: blur(8px);
-        opacity: 0.55;
+        filter: blur(10px);
+        opacity: 0.28;
         pointer-events: none;
         z-index: 0;
       }
@@ -57,13 +60,13 @@
       body::before {
         top: -6rem;
         right: -7rem;
-        background: radial-gradient(circle, rgba(199, 93, 44, 0.3), transparent 68%);
+        background: radial-gradient(circle, rgba(29, 78, 216, 0.2), transparent 68%);
       }
 
       body::after {
         bottom: -8rem;
         left: -7rem;
-        background: radial-gradient(circle, rgba(31, 123, 116, 0.22), transparent 68%);
+        background: radial-gradient(circle, rgba(15, 118, 110, 0.14), transparent 68%);
       }
 
       .page {
@@ -107,11 +110,12 @@
         align-items: center;
         gap: 8px;
         padding: 8px 12px;
-        border-radius: 999px;
-        background: rgba(255, 249, 240, 0.88);
-        border: 1px solid rgba(84, 51, 26, 0.08);
-        color: var(--danger);
-        font-size: 0.78rem;
+        border-radius: 12px;
+        background: rgba(239, 246, 255, 0.9);
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        color: var(--accent);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.76rem;
         font-weight: 700;
         letter-spacing: 0.08em;
         text-transform: uppercase;
@@ -121,23 +125,23 @@
       h2,
       h3 {
         margin: 0;
-        font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
-        font-weight: 700;
-        line-height: 0.95;
+        font-family: "Avenir Next", "Segoe UI", sans-serif;
+        font-weight: 750;
+        line-height: 0.98;
       }
 
       h1 {
-        font-size: clamp(2.6rem, 6vw, 5.6rem);
+        font-size: clamp(2.1rem, 4.8vw, 4.3rem);
         letter-spacing: -0.05em;
       }
 
       h2 {
-        font-size: clamp(1.5rem, 3vw, 2.3rem);
+        font-size: clamp(1.25rem, 2.4vw, 1.8rem);
         letter-spacing: -0.04em;
       }
 
       h3 {
-        font-size: 1.1rem;
+        font-size: 0.98rem;
         letter-spacing: -0.02em;
       }
 
@@ -152,10 +156,10 @@
         gap: 20px;
         padding: 28px;
         border: 1px solid var(--line);
-        border-radius: calc(var(--radius) + 8px);
+        border-radius: calc(var(--radius) + 4px);
         background:
-          linear-gradient(135deg, rgba(255, 249, 238, 0.94), rgba(255, 244, 225, 0.88)),
-          radial-gradient(circle at right top, rgba(242, 183, 102, 0.18), transparent 42%);
+          linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 249, 255, 0.92)),
+          radial-gradient(circle at right top, rgba(29, 78, 216, 0.12), transparent 42%);
         box-shadow: var(--shadow);
       }
 
@@ -180,9 +184,9 @@
         display: grid;
         gap: 14px;
         padding: 18px;
-        border-radius: 22px;
-        background: rgba(27, 21, 17, 0.93);
-        color: #f9f2e3;
+        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.96));
+        color: #eff6ff;
       }
 
       .hero-metric .label {
@@ -212,11 +216,11 @@
 
       .preset {
         appearance: none;
-        border: 1px solid rgba(84, 51, 26, 0.14);
-        background: rgba(255, 252, 247, 0.92);
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        background: rgba(255, 255, 255, 0.9);
         color: var(--ink);
         padding: 10px 14px;
-        border-radius: 999px;
+        border-radius: 12px;
         cursor: pointer;
         font-weight: 700;
         transition: transform 150ms ease, background 150ms ease, border-color 150ms ease;
@@ -225,8 +229,8 @@
       .preset:hover,
       .preset:focus-visible {
         transform: translateY(-1px);
-        background: rgba(255, 246, 231, 0.98);
-        border-color: rgba(199, 93, 44, 0.36);
+        background: rgba(239, 246, 255, 0.96);
+        border-color: rgba(29, 78, 216, 0.36);
         outline: none;
       }
 
@@ -238,8 +242,8 @@
         border: 1px solid var(--line);
         border-radius: var(--radius);
         background:
-          linear-gradient(135deg, rgba(255, 251, 244, 0.94), rgba(255, 246, 233, 0.9)),
-          radial-gradient(circle at top right, rgba(31, 123, 116, 0.08), transparent 34%);
+          linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(246, 250, 255, 0.92)),
+          radial-gradient(circle at top right, rgba(15, 118, 110, 0.08), transparent 34%);
         box-shadow: var(--shadow);
       }
 
@@ -260,11 +264,11 @@
 
       .example-chip {
         appearance: none;
-        border: 1px solid rgba(84, 51, 26, 0.14);
-        background: rgba(255, 252, 247, 0.92);
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        background: rgba(255, 255, 255, 0.9);
         color: var(--ink);
         padding: 10px 13px;
-        border-radius: 999px;
+        border-radius: 12px;
         cursor: pointer;
         font-weight: 700;
         line-height: 1.2;
@@ -275,9 +279,9 @@
       .example-chip:focus-visible,
       .example-chip.active {
         transform: translateY(-1px);
-        border-color: rgba(199, 93, 44, 0.36);
-        background: rgba(255, 242, 222, 0.98);
-        color: var(--danger);
+        border-color: rgba(29, 78, 216, 0.36);
+        background: rgba(239, 246, 255, 0.96);
+        color: var(--accent);
         outline: none;
       }
 
@@ -285,10 +289,10 @@
         display: grid;
         gap: 14px;
         padding: 20px;
-        border-radius: 24px;
-        border: 1px solid rgba(84, 51, 26, 0.1);
-        background: rgba(255, 252, 247, 0.92);
-        box-shadow: 0 18px 40px rgba(51, 28, 8, 0.08);
+        border-radius: 18px;
+        border: 1px solid rgba(15, 23, 42, 0.1);
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.07);
       }
 
       .example-meta {
@@ -312,12 +316,12 @@
       }
 
       .tier-pill {
-        background: rgba(199, 93, 44, 0.12);
-        color: var(--danger);
+        background: rgba(29, 78, 216, 0.12);
+        color: var(--accent);
       }
 
       .meta-pill {
-        background: rgba(31, 123, 116, 0.12);
+        background: rgba(15, 118, 110, 0.12);
         color: var(--teal);
       }
 
@@ -397,7 +401,7 @@
       }
 
       .results .card p {
-        color: rgba(248, 237, 217, 0.88);
+        color: var(--muted);
       }
 
       .ab-grid {
@@ -482,8 +486,8 @@
         gap: 12px;
         padding: 16px;
         border-radius: 20px;
-        background: rgba(255, 250, 242, 0.92);
-        border: 1px solid rgba(84, 51, 26, 0.06);
+        background: rgba(230, 238, 247, 0.92);
+        border: 1px solid rgba(15, 23, 42, 0.06);
       }
 
       .control-group h3 {
@@ -584,7 +588,7 @@
       }
 
       .tier-card h2 {
-        font-size: clamp(1.7rem, 2.4vw, 2.3rem);
+        font-size: clamp(1.35rem, 2vw, 1.8rem);
       }
 
       .tier-card.takeaway-card {
@@ -699,24 +703,24 @@
 
       .tone-warm {
         background:
-          linear-gradient(180deg, rgba(255, 249, 238, 0.98), rgba(248, 235, 215, 0.98));
+          linear-gradient(180deg, rgba(247, 250, 252, 0.98), rgba(237, 242, 247, 0.98));
       }
 
       .tone-dark {
         background:
-          linear-gradient(180deg, rgba(27, 21, 17, 0.96), rgba(42, 31, 20, 0.96));
-        color: #f8edd9;
+          linear-gradient(180deg, rgba(15, 23, 42, 0.97), rgba(30, 41, 59, 0.96));
+        color: #e5eefb;
       }
 
       .tone-dark p,
       .tone-dark .split-row .metric,
       .tone-dark .split-row .name {
-        color: #f8edd9;
+        color: #e5eefb;
       }
 
       .tone-dark .badge {
-        background: rgba(242, 183, 102, 0.12);
-        color: var(--accent-soft);
+        background: rgba(96, 165, 250, 0.14);
+        color: #dbeafe;
       }
 
       .formula {
@@ -731,8 +735,8 @@
       }
 
       .tone-dark .formula {
-        background: rgba(255, 255, 255, 0.06);
-        border-color: rgba(248, 237, 217, 0.16);
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(219, 234, 254, 0.18);
       }
 
       .footer-note {

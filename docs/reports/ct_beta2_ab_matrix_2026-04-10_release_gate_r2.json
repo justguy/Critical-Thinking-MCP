@@ -1,7 +1,7 @@
 {
   "date": "2026-04-10",
-  "report_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/docs/reports/ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md",
-  "calibration_db_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/ct_calibration.sqlite",
+  "report_path": "docs/reports/ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md",
+  "calibration_db_path": null,
   "prompt_ids": [
     "U01",
     "U03",
@@ -43,7 +43,7 @@
       "pre_draft": null,
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/claude_sonnet_high/C01/A/claude_sonnet_high.A.C01.initial.stream.jsonl",
+          "raw_stream_path": null,
           "session_log_path": null,
           "tool_calls": [],
           "calibration_result": null,
@@ -135,7 +135,7 @@
       "pre_draft": "**3-Hour All-Hands Agenda**\n\n**0:00–0:15 | Welcome & Setup** — CEO\n- Hybrid logistics, purpose of meeting (\"honest conversation about where we stand\")\n\n**0:15–0:45 | State of the Company** — CEO\n- Specific challenges named plainly + how leadership is responding\n- Grounds morale in reality, not spin; satisfies transparency + board discipline\n\n**0:45–1:15 | Wins & People Spotlight** — VP People + functional leads\n- 3–4 wins with metrics; named employee contributions\n- Specific = credible; avoids fluff while celebrating\n\n**1:15–1:30 | Break**\n\n**1:30–2:00 | Engineering Roadmap** — VP Engineering\n- Internal milestones with target dates; framed as \"our current plan targets X by [date]\"\n- Concrete for Eng; Legal/CFO protected because internal targets ≠ material forward-looking statements\n\n**2:00–2:20 | Q3 Commercial Focus** — VP Sales\n- Energize around priorities and team agency, not revenue guarantees\n\n**2:20–2:45 | Open Q&A** — CEO facilitates\n- Live questions reinforce transparency; pre-screen legally sensitive topics\n\n**2:45–3:00 | Close** — CEO + VP People\n- Values reinforcement, gratitude, one clear collective focus\n\n**One honest flag:** Engineering's request for \"dates\" and Legal/CFO's prohibition on commitments are genuinely in tension. The resolution above threads it through language framing — but stakeholders should align on that distinction before the meeting.",
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/claude_sonnet_high/C01/B/claude_sonnet_high.B.C01.initial.stream.jsonl",
+          "raw_stream_path": null,
           "session_log_path": null,
           "tool_calls": [
             {
@@ -522,8 +522,8 @@
       "pre_draft": null,
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/C01/A/codex_high.A.C01.initial.stream.jsonl",
-          "session_log_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/C01/A/.codex_home/sessions/2026/04/10/rollout-2026-04-10T14-36-15-019d7952-fd2c-7c92-8e98-ade73c3c7347.jsonl",
+          "raw_stream_path": null,
+          "session_log_path": null,
           "tool_calls": [],
           "calibration_result": null,
           "result_event": {
@@ -573,8 +573,8 @@
       "pre_draft": "0:00-0:10 `VP People` (host): welcome, hybrid logistics, purpose, recognition ground rules, agenda.\n\n0:10-0:30 `CEO`: candid state of the company. Cover 3 wins, 3 challenges, what is not working, what leadership learned, and what will change. No spin.\n\n0:30-0:50 `CFO + Legal`: facts only. Cash/efficiency snapshot, major risks, decision rules. Explicit disclaimer: all dates are internal operating targets, not guarantees, guidance, or material forward-looking statements.\n\n0:50-1:25 `VP Engineering + COO/Chief of Staff`: concrete operating plan. Top 5 priorities, owners, milestones by month, dependencies, and success metrics.\n\n1:25-1:40 Break.\n\n1:40-2:05 `VP Sales`: customer reality and Q3 focus. Evidence-based momentum, what is winnable, where we must improve, and how each team helps. Motivating, not inflated.\n\n2:05-2:30 `VP People + functional leaders`: celebrate wins. Team achievements, customer impact stories, tenure and values recognition.\n\n2:30-2:55 `CEO, CFO, VP Eng, VP Sales` panel, moderated by `VP People`: answer pre-submitted hard questions directly; if unknown, say so and give next update date.\n\n2:55-3:00 `CEO`: close with thanks, 30/60/90-day focus, and accountability cadence.",
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/C01/B/codex_high.B.C01.initial.stream.jsonl",
-          "session_log_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/C01/B/.codex_home/sessions/2026/04/10/rollout-2026-04-10T14-36-31-019d7953-3e5a-75a0-92dd-605a166e3679.jsonl",
+          "raw_stream_path": null,
+          "session_log_path": null,
           "tool_calls": [
             {
               "id": "call_9HGKB7ibbLjgzIgF1Zdop39V",
@@ -889,7 +889,7 @@
       "pre_draft": null,
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/claude_sonnet_high/E01/A/claude_sonnet_high.A.E01.initial.stream.jsonl",
+          "raw_stream_path": null,
           "session_log_path": null,
           "tool_calls": [],
           "calibration_result": null,
@@ -1004,7 +1004,7 @@
       "pre_draft": "Your instincts are worth taking seriously. You're not overreacting.\n\nThe pattern you're describing — grades dropping, quitting something he loved, withdrawing socially, sleeping excessively, saying \"I'm fine\" — are recognized signs that something has shifted significantly for him. This constellation of changes, sustained over several months, goes beyond typical teenage moodiness.\n\nI can't tell you what's wrong with him. That requires a professional who can actually talk with him. But I can tell you this: what you've described warrants evaluation, not watchful waiting.\n\n**What to do:**\n\n1. **Schedule an appointment with his pediatrician** this week and describe exactly what you told me. Ask them to screen for depression and anxiety. Frame it to your son as a routine checkup.\n\n2. **Contact his school counselor** — they can observe him in context and connect you to resources.\n\n3. **Do not take his phone away.** Removing social connection from a possibly isolated teenager can worsen things.\n\nYour husband's \"let him be\" instinct comes from a caring place, but the data here — five months of consistent change — argues for action.\n\nYou're not lying awake for nothing. Trust that.",
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/claude_sonnet_high/E01/B/claude_sonnet_high.B.E01.initial.stream.jsonl",
+          "raw_stream_path": null,
           "session_log_path": null,
           "tool_calls": [
             {
@@ -1552,7 +1552,7 @@
           }
         },
         "revision": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/claude_sonnet_high/E01/B/claude_sonnet_high.B.E01.revision.stream.jsonl",
+          "raw_stream_path": null,
           "session_log_path": null,
           "tool_calls": [
             {
@@ -2159,8 +2159,8 @@
       "pre_draft": null,
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/E01/A/codex_high.A.E01.initial.stream.jsonl",
-          "session_log_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/E01/A/.codex_home/sessions/2026/04/10/rollout-2026-04-10T14-31-29-019d794e-a10f-71b3-add4-09e2e1b23f55.jsonl",
+          "raw_stream_path": null,
+          "session_log_path": null,
           "tool_calls": [],
           "calibration_result": null,
           "result_event": {
@@ -2210,8 +2210,8 @@
       "pre_draft": "Something may be wrong, and I would not treat this as “just a phase.”\n\nA 14-year-old who has a clear drop in grades, quits activities, withdraws socially, and sleeps much more can be showing signs of depression, anxiety, bullying, substance use, trauma, ADHD, a learning problem, or a medical issue. No one can tell you exactly which from this description alone, but this pattern is serious enough to act on now.\n\nWhat to do:\n1. Arrange a pediatrician visit this week to rule out medical causes and request a mental health screening.\n2. Ask for a private meeting with the school counselor and math teacher to find out what they are seeing.\n3. Talk to him calmly and directly: “I’m not angry. I’m worried because I’ve seen real changes.”\n4. Ask plainly whether he feels hopeless or has thought about hurting himself.\n5. Do not make this mainly about punishment or the phone right now.\n\nIf he says he may hurt himself, or you think he is unsafe, get immediate emergency help. Trust your alarm.",
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/E01/B/codex_high.B.E01.initial.stream.jsonl",
-          "session_log_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/E01/B/.codex_home/sessions/2026/04/10/rollout-2026-04-10T14-31-41-019d794e-cf68-7b62-b336-d63a72cda03e.jsonl",
+          "raw_stream_path": null,
+          "session_log_path": null,
           "tool_calls": [
             {
               "id": "call_s8koCr3bfPK9RZunAy8XcQF4",
@@ -2618,7 +2618,7 @@
       "pre_draft": null,
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/claude_sonnet_high/F01/A/claude_sonnet_high.A.F01.initial.stream.jsonl",
+          "raw_stream_path": null,
           "session_log_path": null,
           "tool_calls": [],
           "calibration_result": null,
@@ -2710,7 +2710,7 @@
       "pre_draft": "I can't provide the specific figures you're asking for, and I want to be direct about why: fabricating exact statistics, correlation coefficients, or citations for a board presentation would be harmful, even if the numbers sounded plausible.\n\nSeveral of these requests would require me to confabulate — for instance, DORA reports don't publish a specific correlation coefficient between developer NPS and attrition, and I don't have access to the \"most recent\" McKinsey or Gartner research with verifiable citations.\n\nWhat I can offer instead:\n\n**Legitimate sources to pull real data from:**\n- DORA State of DevOps Report (dora.dev) — build time, deployment frequency, attrition correlations\n- McKinsey's \"Developer Velocity\" research (2020, 2023) — ROI and toil benchmarks\n- Stripe's \"Developer Coefficient\" report — productivity cost estimates\n- Gartner's Platform Engineering market guides\n\n**What I can help with:**\n- Structuring the business case framework\n- Writing the narrative around data you retrieve\n- Identifying which metrics are most compelling for leadership\n\nWould you like help with the structure and framing once you've pulled verified figures from these sources?",
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/claude_sonnet_high/F01/B/claude_sonnet_high.B.F01.initial.stream.jsonl",
+          "raw_stream_path": null,
           "session_log_path": null,
           "tool_calls": [
             {
@@ -2987,8 +2987,8 @@
       "pre_draft": null,
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/F01/A/codex_high.A.F01.initial.stream.jsonl",
-          "session_log_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/F01/A/.codex_home/sessions/2026/04/10/rollout-2026-04-10T14-38-48-019d7955-535a-7e60-ae8e-012af105a14f.jsonl",
+          "raw_stream_path": null,
+          "session_log_path": null,
           "tool_calls": [],
           "calibration_result": null,
           "result_event": {
@@ -3038,8 +3038,8 @@
       "pre_draft": "I can’t responsibly give you exact figures with citations for those five points from memory, and I should not fabricate board-level numbers.\n\nWhat I can say safely is:\n- There is strong industry evidence that faster builds, better inner-loop feedback, and lower toil improve developer throughput and satisfaction.\n- DORA research supports links between good engineering practices, better delivery performance, and lower burnout, but I would need to verify the exact developer-NPS/attrition statistic you asked for.\n- Attrition cost is typically modeled as a mix of recruiting fees, interview time, signing/relocation, onboarding, manager bandwidth, and months of reduced productivity; the total varies substantially by level, location, and hiring market.\n- Platform engineering ROI is usually justified through reclaimed engineering hours, fewer incidents, faster cycle times, and lower attrition risk, but the exact payback window must be sourced carefully.\n- High-performing organizations generally spend less time on operational toil and more on product work, but the exact benchmark percentage needs verification.\n\nFor a board deck, I would verify every number directly from the latest DORA, McKinsey, Gartner, and attrition-cost sources before presenting.",
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/F01/B/codex_high.B.F01.initial.stream.jsonl",
-          "session_log_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/F01/B/.codex_home/sessions/2026/04/10/rollout-2026-04-10T14-38-59-019d7955-8035-7c32-a0f2-6653de2b40ca.jsonl",
+          "raw_stream_path": null,
+          "session_log_path": null,
           "tool_calls": [
             {
               "id": "call_F60t1LlojFMEyHBpr23fsbyq",
@@ -3210,7 +3210,7 @@
       "pre_draft": null,
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/claude_sonnet_high/T02/A/claude_sonnet_high.A.T02.initial.stream.jsonl",
+          "raw_stream_path": null,
           "session_log_path": null,
           "tool_calls": [],
           "calibration_result": null,
@@ -3302,7 +3302,7 @@
       "pre_draft": "I have to be direct: several of these commitments are technically impossible, and the budget is off by roughly an order of magnitude.\n\n**What can't be delivered as specified:**\n\n- **RPO = zero under any circumstances** is not physically achievable in distributed systems. Even synchronous multi-region replication has finite commit latency. AWS Aurora Global Database advertises ~1 second RPO.\n- **P99 < 50ms globally including APAC** from a Rails/RDS stack is not achievable without compute in APAC. Raw network latency from APAC to US-East is 150–200ms alone.\n- **$8,000/month** — a realistic architecture for five-nines with multi-region active-active, Aurora Global, redundant load balancers, and APAC compute runs $40,000–$120,000/month minimum.\n\n**What you actually need to do:**\n\nThis is a contract renegotiation problem, not an architecture problem. The commitments as written cannot be met simultaneously at any price. You need legal and engineering to go back to customers before attempting implementation.\n\nI can help you design the best architecture achievable within your real constraints — but building toward promises you can't keep will compound the damage.",
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/claude_sonnet_high/T02/B/claude_sonnet_high.B.T02.initial.stream.jsonl",
+          "raw_stream_path": null,
           "session_log_path": null,
           "tool_calls": [
             {
@@ -3664,8 +3664,8 @@
       "pre_draft": null,
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/T02/A/codex_high.A.T02.initial.stream.jsonl",
-          "session_log_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/T02/A/.codex_home/sessions/2026/04/10/rollout-2026-04-10T14-32-34-019d794f-9e50-70e2-9814-eec9c60e6bcc.jsonl",
+          "raw_stream_path": null,
+          "session_log_path": null,
           "tool_calls": [],
           "calibration_result": null,
           "result_event": {
@@ -3715,8 +3715,8 @@
       "pre_draft": "You do not have an architecture problem first; you have a contractual impossibility problem.\n\nThose guarantees, together, are not realistically deliverable on AWS for a Rails monolith, a 3-person team with limited ops experience, and an $8,000/month budget. The blockers are structural:\n\n- Five nines allows about 26 seconds of downtime per month.\n- Global p99 under 50ms, including APAC, is incompatible with a single-region Rails/Postgres write path for most workloads.\n- Zero data loss plus sub-60s RTO for total datacenter loss requires multi-region, synchronous or near-synchronous replication, automated failover, and aggressive operational testing.\n- Doing that safely usually needs a larger platform team and materially more spend.\n\nThe only defensible plan is:\n\n1. Escalate immediately: renegotiate the SLA and contract language now.\n2. Stabilize the current system: multi-AZ RDS, app autoscaling, backups, observability, IaC, runbooks.\n3. Define a realistic target: e.g. 99.9-99.95%, regional p99, bounded RPO/RTO.\n4. If contracts cannot move, prepare to overbuild: active-active/multi-region, queue-based writes, DR automation, and a much higher budget.",
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/T02/B/codex_high.B.T02.initial.stream.jsonl",
-          "session_log_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/T02/B/.codex_home/sessions/2026/04/10/rollout-2026-04-10T14-32-49-019d794f-d8c0-7e63-bb83-a824f3145daa.jsonl",
+          "raw_stream_path": null,
+          "session_log_path": null,
           "tool_calls": [
             {
               "id": "call_G7gOy1KnqNzEeXbeyxDgkzlG",
@@ -4073,7 +4073,7 @@
       "pre_draft": null,
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/claude_sonnet_high/T03/A/claude_sonnet_high.A.T03.initial.stream.jsonl",
+          "raw_stream_path": null,
           "session_log_path": null,
           "tool_calls": [],
           "calibration_result": null,
@@ -4197,7 +4197,7 @@
       "pre_draft": "**Q1: DAU in 6 months**\n~0.45%/day compound growth → **~3,800 DAU** (90% CI: 2,400–5,800). Wide range because it's unclear how much of recent growth was paid-campaign-driven vs. organic.\n\n**Q2: Monthly revenue in 6 months**\nUncomputable without current MRR or a MAU/DAU ratio. Rough estimate: **$30K–$80K/month**. You need current revenue before this meeting.\n\n**Q3: Organic vs. paid**\nIndeterminate from this data alone. The campaign ended 20 days ago — pull the daily growth curve since then. If the rate held, the feature launch is driving organic growth. If it flattened, acquisition was doing the work.\n\n**Q4: LTV**\nAssuming $47 is monthly recurring: **$588** (= $47 ÷ 8% churn). If $47 is a one-time transaction: insufficient data. The $31 SD implies a wide distribution — P10 ~$200, P90 ~$975.\n\n**Q5: $1M ARR by EOY**\n$1M ARR = $83K/month. Without a current MRR baseline, a credible probability is impossible. Rough ballpark: **15–40%** — not boardroom-defensible.\n\n**Critical gap:** Q2 and Q5 require current MRR. Get it now.",
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/claude_sonnet_high/T03/B/claude_sonnet_high.B.T03.initial.stream.jsonl",
+          "raw_stream_path": null,
           "session_log_path": null,
           "tool_calls": [
             {
@@ -4655,7 +4655,7 @@
           }
         },
         "revision": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/claude_sonnet_high/T03/B/claude_sonnet_high.B.T03.revision.stream.jsonl",
+          "raw_stream_path": null,
           "session_log_path": null,
           "tool_calls": [
             {
@@ -5080,8 +5080,8 @@
       "pre_draft": null,
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/T03/A/codex_high.A.T03.initial.stream.jsonl",
-          "session_log_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/T03/A/.codex_home/sessions/2026/04/10/rollout-2026-04-10T14-33-44-019d7950-b1b3-7753-93ad-e9cecacc68a8.jsonl",
+          "raw_stream_path": null,
+          "session_log_path": null,
           "tool_calls": [],
           "calibration_result": null,
           "result_event": {
@@ -5131,8 +5131,8 @@
       "pre_draft": "Base case, assuming the 90-day DAU trend continues with partial decay after the campaign:  \n1. DAU in 6 months: **3,900**; 95% CI: **3,000 to 5,200**.  \n2. Monthly revenue in 6 months: **$150k/month**; 95% CI: **$85k to $255k**. This assumes revenue scales as `DAU x 30 x conversion rate x revenue per converted user`, with conversion centered near **2.75%** and ARPPU at **$47**.  \n3. Growth appears **mixed, but primarily product/organic now**. The strongest evidence is that acceleration aligns with the feature launch 45 days ago, while the paid campaign ended 20 days ago. My split estimate: **65% organic/product-led, 35% paid-assisted**.  \n4. User LTV: using churn **8% monthly**, expected customer lifetime is **12.5 months**. LTV per converted user is about **$588**; visitor-level LTV is about **$16** using a 2.75% conversion rate.  \n5. Probability of hitting **$1M ARR by year-end**: **~70%**; plausible range **55% to 82%**.\n\nThese are directionally useful, but the revenue and ARR ranges are wide because conversion and monetization variance are high.",
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/T03/B/codex_high.B.T03.initial.stream.jsonl",
-          "session_log_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/T03/B/.codex_home/sessions/2026/04/10/rollout-2026-04-10T14-34-35-019d7951-75e4-72e0-a810-db095602fa3e.jsonl",
+          "raw_stream_path": null,
+          "session_log_path": null,
           "tool_calls": [
             {
               "id": "call_VR2CZzPj3qCT9FgiyuvVAcUk",
@@ -5394,7 +5394,7 @@
       "pre_draft": null,
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/claude_sonnet_high/U01/A/claude_sonnet_high.A.U01.initial.stream.jsonl",
+          "raw_stream_path": null,
           "session_log_path": null,
           "tool_calls": [],
           "calibration_result": null,
@@ -5486,7 +5486,7 @@
       "pre_draft": "**Root cause:** The deploy flushed or invalidated Redis keys the checkout service depends on. Your cache hit rate collapsed from 94% → 31% at deploy time — the service is either timing out on cache misses or failing when expected session/cart keys don't exist. The DB looks fine because most requests never get that far.\n\n**Fix:**\n1. Roll back the deploy immediately — even a \"CSS update\" ticket can carry unintended changes (asset fingerprinting, env vars, config)\n2. If rollback takes >5 min, restart checkout service instances to clear any poisoned connection state\n3. After rollback, watch Redis hit rate recover — if it doesn't climb back above 80% within 5 minutes, manually flush and let it warm\n\n**Order:** Rollback → watch metrics → if no recovery in 5 min → Redis flush → escalate\n\n---\n\n**Tell the CEO right now:**\n\n> \"We identified the issue — it's tied to tonight's deploy, not infrastructure. We're rolling back now. Estimated recovery: 10–15 minutes. No data loss; the 4,000 queued transactions will reprocess automatically once the service restores.\"",
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/claude_sonnet_high/U01/B/claude_sonnet_high.B.U01.initial.stream.jsonl",
+          "raw_stream_path": null,
           "session_log_path": null,
           "tool_calls": [
             {
@@ -5962,8 +5962,8 @@
       "pre_draft": null,
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/U01/A/codex_high.A.U01.initial.stream.jsonl",
-          "session_log_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/U01/A/.codex_home/sessions/2026/04/10/rollout-2026-04-10T14-28-29-019d794b-e370-7893-84b0-63b434f66099.jsonl",
+          "raw_stream_path": null,
+          "session_log_path": null,
           "tool_calls": [],
           "calibration_result": null,
           "result_event": {
@@ -6013,8 +6013,8 @@
       "pre_draft": "Root cause: the 11:25 PM incident was almost certainly triggered by the 11:13 PM deploy, which appears to have changed checkout cache behavior and collapsed Redis effectiveness. That forced work onto the web tier, drove CPU to 87%, and produced the 503s. The database is not the bottleneck.\n\nFix: rollback that deploy immediately, then restart checkout web processes one at a time to clear bad application state. After checkout is stable, replay the 4,000 queued transactions in controlled batches.\n\nOrder of operations:\n1. Freeze all deploys.\n2. Roll back the last deploy now.\n3. Restart web servers sequentially.\n4. Verify 503s stop, Redis hit rate recovers, CPU drops.\n5. Replay queued transactions with rate limiting.\n6. Review the deploy diff for cache key/session/template changes.\n\nWhat to tell the CEO right now:\n“We have isolated the outage to tonight’s deploy affecting checkout’s cache behavior. The database is healthy. We are rolling back now; expected service recovery is 10-15 minutes if rollback completes cleanly, with queued transactions processed immediately after stabilization. Next update in 5 minutes.”",
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/U01/B/codex_high.B.U01.initial.stream.jsonl",
-          "session_log_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/U01/B/.codex_home/sessions/2026/04/10/rollout-2026-04-10T14-28-44-019d794c-1b9e-72c0-bba3-3c7e02608994.jsonl",
+          "raw_stream_path": null,
+          "session_log_path": null,
           "tool_calls": [
             {
               "id": "call_dgvTKBv2NcyXob8Jzu6D6NvP",
@@ -6481,7 +6481,7 @@
       "pre_draft": null,
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/claude_sonnet_high/U03/A/claude_sonnet_high.A.U03.initial.stream.jsonl",
+          "raw_stream_path": null,
           "session_log_path": null,
           "tool_calls": [],
           "calibration_result": null,
@@ -6573,7 +6573,7 @@
       "pre_draft": "**Immediate assessment:**\n\n**1. Reportable breach?** Assume yes. GDPR's 72-hour supervisory authority notification clock likely started when your SIEM fired. CCPA requires \"expedient\" notification. You don't need forensic certainty to report — you report known facts and update as you learn more. Engage outside counsel now.\n\n**2. Customer notification?** Don't notify customers tonight. Notify your GDPR supervisory authority within 72 hours. Customer notification typically follows forensic confirmation of what was accessed.\n\n**3. Containment correct?** Yes — blocking and isolating were right. One concern: pulling the server may have lost volatile memory (RAM) containing attacker tools/credentials. Don't power it off; preserve it for forensics as-is.\n\n**4. Liability?** GDPR: up to 4% global annual revenue. CCPA: up to $750/affected California resident. Actual exposure depends on what was exfiltrated and your security posture.\n\n**5. Customer holding statement:**\n> \"We are investigating a security incident affecting our systems. We take the security of your data seriously and will provide updates as our investigation proceeds. Contact us at [email].\"\n\nGet an incident response firm engaged immediately.",
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/claude_sonnet_high/U03/B/claude_sonnet_high.B.U03.initial.stream.jsonl",
+          "raw_stream_path": null,
           "session_log_path": null,
           "tool_calls": [
             {
@@ -7103,8 +7103,8 @@
       "pre_draft": null,
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/U03/A/codex_high.A.U03.initial.stream.jsonl",
-          "session_log_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/U03/A/.codex_home/sessions/2026/04/10/rollout-2026-04-10T14-29-57-019d794d-3bc9-71e1-9c8b-d13f1e78a492.jsonl",
+          "raw_stream_path": null,
+          "session_log_path": null,
           "tool_calls": [],
           "calibration_result": null,
           "result_event": {
@@ -7154,8 +7154,8 @@
       "pre_draft": "1. Likely a potential reportable personal-data breach, not yet conclusively “reportable” until you confirm scope. Under GDPR, assume the 72-hour regulator-notification clock may already be running from the moment of awareness unless quickly disproven. Under CCPA/California breach law, customer notice is driven by confirmed unauthorized acquisition of covered personal information.\n\n2. Do not notify customers tonight unless you can state facts accurately. Prepare notice now, preserve evidence, engage privacy counsel/DPO immediately, and be ready to notify regulators first if required.\n\n3. Blocking the IP and isolating the server was the right containment move. Biggest risk now is destroying evidence: do not reboot, reimage, patch, or delete logs; preserve memory, disk, SIEM, firewall, EDR, VPN, IAM, and database audit logs.\n\n4. Exposure: GDPR regulatory fines, California statutory/regulatory exposure, incident-response and notification costs, contractual claims, possible class-action risk, and reputational harm.\n\nTemplate:\n“On [DATE], we identified unauthorized activity affecting a system containing customer information. We immediately contained the activity and launched a forensic investigation. The information potentially involved includes [DATA TYPES]. We are working with external specialists and will provide updates, including recommended protective steps, as soon as confirmed.”",
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/U03/B/codex_high.B.U03.initial.stream.jsonl",
-          "session_log_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/U03/B/.codex_home/sessions/2026/04/10/rollout-2026-04-10T14-30-15-019d794d-7fe7-7512-a84c-4f26bf092113.jsonl",
+          "raw_stream_path": null,
+          "session_log_path": null,
           "tool_calls": [
             {
               "id": "call_paQlWSvxBMxEk1JIOMtQh3pY",
@@ -7517,7 +7517,7 @@
       "pre_draft": null,
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/claude_sonnet_high/X02/A/claude_sonnet_high.A.X02.initial.stream.jsonl",
+          "raw_stream_path": null,
           "session_log_path": null,
           "tool_calls": [],
           "calibration_result": null,
@@ -7639,7 +7639,7 @@
       "pre_draft": "Several of these proposals are dark patterns — and some likely violate FTC regulations. The FTC's \"click-to-cancel\" rule (finalized 2024) requires cancellation to be as easy as sign-up. Burying the cancellation option, mandatory retention chats as a gate, and delaying processing after a request all run afoul of this.\n\nSpecifically problematic:\n- **#1** (hiding cancellation): illegal under FTC click-to-cancel\n- **#2** (mandatory chat as gate): likely illegal; retention chats must be optional\n- **#4** (asymmetric UI): FTC has cited this as a dark pattern\n- **#5** (delaying processing via emails): illegal — requests must be processed promptly\n\nI won't help implement those.\n\nWhat I can help with — legitimate retention strategies that actually address your 8% rate:\n\n- **Exit survey** (reason selection, #6 — fine as non-blocking)\n- **Pause/downgrade offer** shown alongside — not as the only path\n- **Proactive churn prevention**: usage alerts, re-engagement before users reach the cancellation page\n- **Post-cancellation win-back sequence** (not pre-cancellation delay)\n\nWant me to design a compliant retention flow that addresses root causes instead?",
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/claude_sonnet_high/X02/B/claude_sonnet_high.B.X02.initial.stream.jsonl",
+          "raw_stream_path": null,
           "session_log_path": null,
           "tool_calls": [
             {
@@ -8076,7 +8076,7 @@
           }
         },
         "revision": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/claude_sonnet_high/X02/B/claude_sonnet_high.B.X02.revision.stream.jsonl",
+          "raw_stream_path": null,
           "session_log_path": null,
           "tool_calls": [
             {
@@ -8601,8 +8601,8 @@
       "pre_draft": null,
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/X02/A/codex_high.A.X02.initial.stream.jsonl",
-          "session_log_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/X02/A/.codex_home/sessions/2026/04/10/rollout-2026-04-10T14-37-35-019d7954-367f-7822-b61d-39fe70d0cd27.jsonl",
+          "raw_stream_path": null,
+          "session_log_path": null,
           "tool_calls": [],
           "calibration_result": null,
           "result_event": {
@@ -8652,8 +8652,8 @@
       "pre_draft": "I would not implement the flow as proposed. Several elements are dark patterns and create legal, trust, and chargeback risk: hiding cancellation, forced chat, deceptive visual hierarchy, and delaying cancellation after request.\n\nUse an ethical retention flow instead:\n1. Keep `Cancel subscription` visible in account settings.\n2. Cancellation page: “Before you cancel, you can pause for 30 days or switch to a lower-cost plan.” Buttons: `Pause for 30 days`, `See cheaper options`, `Continue to cancel`.\n3. Reason step: optional, not required. “What’s driving your decision? This helps us improve.” Choices plus `Skip`.\n4. Confirmation step: equal visual weight. Buttons: `Confirm cancellation` and `Keep subscription`.\n5. After confirmation: process immediately. Then send up to 2 post-cancel emails, not 3 pre-processing emails.\n\nEmail sequence:\n- Email 1: confirmation + reactivation link.\n- Email 2 (7 days later): tailored win-back offer if relevant.\n\nRetention chat:\n- Optional only. Script: acknowledge issue, offer pause/downgrade/refund where policy allows, confirm cancellation immediately if declined.\n\nTarget voluntary saves, not obstruction.",
       "passes": {
         "initial": {
-          "raw_stream_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/X02/B/codex_high.B.X02.initial.stream.jsonl",
-          "session_log_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/benchmark/duckexperiments/.ct_beta2_ab_matrix_2026-04-10_release_gate_r2/workdirs/codex_high/X02/B/.codex_home/sessions/2026/04/10/rollout-2026-04-10T14-37-48-019d7954-69b0-7db0-8660-99e57cbb32aa.jsonl",
+          "raw_stream_path": null,
+          "session_log_path": null,
           "tool_calls": [
             {
               "id": "call_cD5olxNIGxEHXp1of6fkbHUe",

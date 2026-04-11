@@ -139,12 +139,28 @@ describe('package.json metadata', () => {
 
 describe('Version consistency', () => {
   const pkg = JSON.parse(readFile('package.json'));
-  const serverSource = readFile('src/server.ts');
+  const serverSource = readFile('src/server-runtime.ts');
 
   it('server version matches package.json version', () => {
     const versionMatch = serverSource.match(/version:\s*'([^']+)'/);
     expect(versionMatch?.[1]).toBe(pkg.version);
   });
+});
+
+describe('Published beta2 artifacts are sanitized for public sharing', () => {
+  const artifactPaths = [
+    'docs/reports/ct_beta2_ab_matrix_2026-04-10_release_gate_r2.json',
+    'html/ct_beta2_ab_matrix_2026-04-10_release_gate_r2.json',
+  ];
+
+  for (const artifactPath of artifactPaths) {
+    it(`${artifactPath} does not embed local machine paths`, () => {
+      const artifact = readFile(artifactPath);
+      expect(artifact).not.toContain('/Users/');
+      expect(artifact).not.toContain('.codex_home/sessions/');
+      expect(artifact).not.toContain('/tmp/');
+    });
+  }
 });
 
 describe('Benchmark publication docs stay aligned with canonical results', () => {

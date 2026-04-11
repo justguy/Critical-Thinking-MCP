@@ -8,7 +8,7 @@ import {
   statSync,
   writeFileSync,
 } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { runOrchestrator } from '../../src/orchestrator/index.js';
@@ -142,6 +142,7 @@ const REVISION_BLOAT_TOKEN_FLOOR = 250;
 const DEFAULT_PROMPT_IDS = ['U01', 'U03', 'E01', 'T02', 'T03', 'C01', 'X02', 'F01'];
 const DEFAULT_MODEL_IDS = ['claude_sonnet_high', 'codex_high'];
 const STRESS_PROMPT_PACK_PATH = resolve(repoRoot, 'ct_stress_prompts.md');
+const REDACTED_PUBLIC_PATH = 'redacted_in_public_artifact';
 
 const MODELS: ModelProfile[] = [
   {
@@ -1623,8 +1624,8 @@ function buildPassSection(pass: PassRecord, arm: Arm): string[] {
     `- provider: \`${pass.provider}\``,
     `- model_id: \`${pass.modelId}\``,
     `- stage: \`${pass.stage}\``,
-    `- raw_stream_path: \`${pass.rawStreamPath}\``,
-    `- session_log_path: \`${pass.sessionLogPath ?? 'n/a'}\``,
+    `- raw_stream_path: \`${REDACTED_PUBLIC_PATH}\``,
+    `- session_log_path: \`${pass.sessionLogPath ? REDACTED_PUBLIC_PATH : 'n/a'}\``,
     `- actual_tools_fired: \`${pass.toolCalls.map(call => call.name).join(', ') || 'none'}\``,
     ...(pass.reviewContextUsed
       ? [
@@ -1936,8 +1937,8 @@ function buildJsonArtifact(
 ): Record<string, unknown> {
   return {
     date: today,
-    report_path: reportPath,
-    calibration_db_path: calibrationDbPath,
+    report_path: relative(repoRoot, reportPath),
+    calibration_db_path: null,
     prompt_ids: selectedPromptIds,
     model_ids: selectedModelIds,
     runs: runs.map(run => ({
@@ -1957,16 +1958,16 @@ function buildJsonArtifact(
       pre_draft: run.preDraftPass?.finalResponseText ?? null,
       passes: {
         initial: {
-          raw_stream_path: run.initialPass.rawStreamPath,
-          session_log_path: run.initialPass.sessionLogPath,
+          raw_stream_path: null,
+          session_log_path: null,
           tool_calls: run.initialPass.toolCalls,
           calibration_result: run.initialPass.calibrationResult,
           result_event: run.initialPass.resultEvent,
         },
         revision: run.revisionPass
           ? {
-              raw_stream_path: run.revisionPass.rawStreamPath,
-              session_log_path: run.revisionPass.sessionLogPath,
+              raw_stream_path: null,
+              session_log_path: null,
               tool_calls: run.revisionPass.toolCalls,
               calibration_result: run.revisionPass.calibrationResult,
               result_event: run.revisionPass.resultEvent,
@@ -2033,11 +2034,11 @@ function main(): void {
     '# CT-MCP Beta 2 A/B Release-Gate Matrix',
     '',
     `- Date: ${today}`,
-    `- Report path: \`${reportPath}\``,
-    `- JSON artifact path: \`${jsonPath}\``,
+    `- Report path: \`${relative(repoRoot, reportPath)}\``,
+    `- JSON artifact path: \`${relative(repoRoot, jsonPath)}\``,
     `- Stress prompt pack: \`ct_stress_prompts.md\``,
     `- Benchmark spec: \`docs/ct_mcp_beta2_benchmark.md\``,
-    `- Calibration DB: \`${calibrationDbPath}\``,
+    `- Calibration DB: \`${REDACTED_PUBLIC_PATH}\``,
     `- Prompt IDs: \`${selectedPromptIds.join(', ')}\``,
     `- Model IDs: \`${selectedModelIds.join(', ')}\``,
     `- Arms: \`${selectedArms.join(', ')}\``,

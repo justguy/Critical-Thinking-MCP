@@ -89,6 +89,8 @@ interface ToolSignalMetricRow {
   metric_value: number;
 }
 
+type SqliteRow = Record<string, unknown>;
+
 interface GateAdaptationMapping {
   tool: OrchestratorToolName;
   gate_key: string;
@@ -321,6 +323,15 @@ function computeStddev(values: number[], mean: number): number | null {
 
 function roundMetric(value: number): number {
   return Math.round(value * 10000) / 10000;
+}
+
+function asSqliteRows(value: unknown): SqliteRow[] {
+  return value as SqliteRow[];
+}
+
+function toFiniteNumber(value: unknown): number | null {
+  const candidate = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(candidate) ? candidate : null;
 }
 
 function deriveReleasedLabel(
@@ -745,10 +756,14 @@ export function getReleasedMetricWindowStats(
           ORDER BY r.recorded_at DESC, r.id DESC
         `,
       )
-      .all(...params) as MetricSampleRow[];
+      .all(...params);
     const values = rows
-      .map(row => Number(row.metric_value))
-      .filter(value => Number.isFinite(value));
+      .flatMap(row => {
+        const metricValue = toFiniteNumber(
+          (row as SqliteRow).metric_value,
+        );
+        return metricValue === null ? [] : [metricValue];
+      });
 
     if (values.length === 0) {
       return {
@@ -853,16 +868,30 @@ export function getTurnSalvageStats(
           ORDER BY recorded_at ASC, id ASC
         `,
       )
-      .all(...params) as TurnChainRow[];
+      .all(...params);
 
     const chains = new Map<
       string,
       Partial<Record<number, TurnChainRow>>
     >();
-    for (const row of rows) {
-      const chain = chains.get(row.turn_chain_id) ?? {};
-      chain[row.iteration_number] = row;
-      chains.set(row.turn_chain_id, chain);
+    for (const row of asSqliteRows(rows)) {
+      const turnChainId =
+        typeof row.turn_chain_id === 'string' ? row.turn_chain_id : null;
+      const iterationNumber = toFiniteNumber(row.iteration_number);
+      const released = toFiniteNumber(row.released);
+      if (turnChainId === null || iterationNumber === null || released === null) {
+        continue;
+      }
+      const typedRow: TurnChainRow = {
+        turn_chain_id: turnChainId,
+        iteration_number: iterationNumber,
+        released,
+        selected_metric_value: toFiniteNumber(row.selected_metric_value),
+        delta_from_prior_turn: toFiniteNumber(row.delta_from_prior_turn),
+      };
+      const chain = chains.get(typedRow.turn_chain_id) ?? {};
+      chain[typedRow.iteration_number] = typedRow;
+      chains.set(typedRow.turn_chain_id, chain);
     }
 
     let pairedChainCount = 0;
@@ -974,14 +1003,23 @@ export function getToolRedundancyRecommendations(
           ORDER BY r.id ASC
         `,
       )
-      .all(...params) as ToolSignalMetricRow[];
+      .all(...params);
 
     const runSignals = new Map<number, Map<OrchestratorToolName, boolean>>();
-    for (const row of rows) {
-      const toolSignals = runSignals.get(row.run_id) ?? new Map();
-      const current = toolSignals.get(row.tool_name) ?? false;
-      toolSignals.set(row.tool_name, current || row.metric_value > 0);
-      runSignals.set(row.run_id, toolSignals);
+    for (const row of asSqliteRows(rows)) {
+      const runId = toFiniteNumber(row.run_id);
+      const toolName =
+        typeof row.tool_name === 'string'
+          ? (row.tool_name as OrchestratorToolName)
+          : null;
+      const metricValue = toFiniteNumber(row.metric_value);
+      if (runId === null || toolName === null || metricValue === null) {
+        continue;
+      }
+      const toolSignals = runSignals.get(runId) ?? new Map();
+      const current = toolSignals.get(toolName) ?? false;
+      toolSignals.set(toolName, current || metricValue > 0);
+      runSignals.set(runId, toolSignals);
     }
 
     const pairStats = new Map<

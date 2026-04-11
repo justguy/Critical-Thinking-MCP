@@ -87,9 +87,11 @@ The assumption "concurrent usage events will be processed in order" couldn't sta
 - **detect_concurrency_patterns** — Check-then-act, missing idempotency, lost updates, dual writes, explicit deadlock risk from structured resource-allocation graphs.
 - **detect_drift** — CUSUM trend analysis on numeric sequences.
 
-## The Control Plane (Beta 2)
+## Experimental: Internal Orchestrator (v0)
 
-The public package is still the nine deterministic MCP tools. Beta 2 adds an internal control plane under `src/orchestrator/` that locks prompt family before generation and then applies four additional guardrails on top of the tool surface:
+The public package is still the nine deterministic MCP tools. Beta 2 also includes an experimental internal orchestrator under `src/orchestrator/` that locks prompt family before generation and then applies four additional guardrails on top of the tool surface.
+
+Not a workflow engine, control plane, or production orchestration platform.
 
 - **Structural critique.** Low scores are translated into direct repair commands such as "state the invalid premise", "provide a falsification condition", or "break the cycle" instead of asking the model to optimize against floating-point metrics.
 - **Context-switch penalty.** Lenient families like `humor_forward` and `forecasting` lose that leniency when an answer drifts into a fictional operational framework such as a fake SLA, protocol, or rollout plan.

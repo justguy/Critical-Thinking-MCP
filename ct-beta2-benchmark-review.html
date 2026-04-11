@@ -547,7 +547,7 @@
       .detail-head h2 {
         font-size: clamp(1.6rem, 3vw, 2.4rem);
         line-height: 0.98;
-        max-width: 18ch;
+        max-width: 28ch;
       }
 
       .detail-actions {
@@ -1051,10 +1051,15 @@
               summary, and lets you inspect where the orchestrator bounded, salvaged, or
               escalated each case.
             </p>
+            <p>
+              <strong>A arm</strong> is the same model answering without the Beta 2 control
+              plane. <strong>B arm</strong> is the controlled path where CT-MCP reviews,
+              repairs, and if needed halts the answer before release.
+            </p>
             <div class="hero-links">
-              <a href="./ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md">Open markdown report</a>
+              <a href="https://github.com/justguy/Critical-Thinking-MCP/blob/orchestrator/v0-experimental-0.1.0-beta.2/docs/reports/ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md" target="_blank" rel="noreferrer">Open markdown report</a>
               <a href="./ct_beta2_ab_matrix_2026-04-10_release_gate_r2.json">Open machine JSON</a>
-              <a href="./ct_mcp_beta2_semantic_audit_packet.md">Open audit packet</a>
+              <a href="https://github.com/justguy/Critical-Thinking-MCP/blob/orchestrator/v0-experimental-0.1.0-beta.2/docs/ct_mcp_beta2_semantic_audit_packet.md" target="_blank" rel="noreferrer">Open audit packet</a>
             </div>
           </div>
 
@@ -1075,7 +1080,7 @@
           <div class="filters">
             <div class="control">
               <label for="search">Search prompt or title</label>
-              <input id="search" type="search" placeholder="Q04, T03, contradiction, humor..." />
+              <input id="search" type="search" placeholder="T03, cancellation, ARR, contradiction..." />
             </div>
 
             <div class="filter-row">
@@ -1121,7 +1126,7 @@
                 <button class="chip active" type="button" data-chip="all">All B-arm runs</button>
                 <button class="chip" type="button" data-chip="audit">Human audit priority</button>
                 <button class="chip" type="button" data-chip="review">Escalations only</button>
-                <button class="chip" type="button" data-chip="bloat">Bloat over 1.2x</button>
+                <button class="chip" type="button" data-chip="bloat" id="bloat-chip">Bloat over 1.2x</button>
               </div>
             </div>
           </div>
@@ -1149,8 +1154,8 @@
               <h2 id="detail-title">Select a run</h2>
             </div>
             <div class="detail-actions">
-              <a id="detail-report-link" href="./ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md">Open report</a>
-              <a href="./ct_mcp_beta2_semantic_audit_packet.md">Open audit packet</a>
+              <a id="detail-report-link" href="https://github.com/justguy/Critical-Thinking-MCP/blob/orchestrator/v0-experimental-0.1.0-beta.2/docs/reports/ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md" target="_blank" rel="noreferrer">Open report</a>
+              <a href="https://github.com/justguy/Critical-Thinking-MCP/blob/orchestrator/v0-experimental-0.1.0-beta.2/docs/ct_mcp_beta2_semantic_audit_packet.md" target="_blank" rel="noreferrer">Open audit packet</a>
               <button class="tab" type="button" id="open-raw-dialog">Open raw artifact</button>
             </div>
           </div>
@@ -1211,18 +1216,22 @@
     <script>
       const DATA_PATH = "./ct_beta2_ab_matrix_2026-04-10_release_gate_r2.json";
       const PROMPT_DATA_PATH = "./ct_beta2_prompt_text.json";
-      const REPORT_PATH = "./ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md";
-      const AUDIT_PATH = "./ct_mcp_beta2_semantic_audit_packet.md";
+      const REPORT_PATH = "https://github.com/justguy/Critical-Thinking-MCP/blob/orchestrator/v0-experimental-0.1.0-beta.2/docs/reports/ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md";
+      const AUDIT_PATH = "https://github.com/justguy/Critical-Thinking-MCP/blob/orchestrator/v0-experimental-0.1.0-beta.2/docs/ct_mcp_beta2_semantic_audit_packet.md";
       const METRIC_EXPLAINERS = {
         accepted: "How many B-arm runs ended in a bounded release instead of being halted.",
         humanReview: "How many runs the control plane stopped and escalated rather than pretending it had a safe answer.",
         revisionTurns: "How many B-arm runs needed one repair pass after CT flagged a structural problem.",
-        averageBloat: "How much longer a revision became than the first answer. Higher is only bad when the answer also becomes expensive or noisy.",
+        warningsReleased: "How many runs were released with a warning instead of a full pass. These are bounded answers that stayed useful but still carried caveats.",
         initialOutput: "How many answer tokens the model used on its first scored pass.",
         initialDuration: "How long the first scored pass took end to end.",
+        initialApiDuration: "How long the model/API portion of the first scored pass took.",
+        initialOverhead: "Approximate CT-MCP and orchestration overhead on the first scored pass. This is total time minus model/API time.",
         initialCost: "Estimated API spend for the first scored pass.",
         revisionOutput: "How many tokens the repair pass used, if a repair happened.",
         revisionDuration: "How long the repair pass took, if there was one.",
+        revisionApiDuration: "How long the model/API portion of the repair pass took, if there was one.",
+        revisionOverhead: "Approximate CT-MCP and orchestration overhead on the repair pass, if there was one.",
         revisionCost: "Estimated API spend for the repair pass.",
         bloatRatio: "Revision length divided by first-pass length. It spots answers that get wordier instead of cleaner.",
         tokenDelta: "Extra or fewer output tokens after the repair pass.",
@@ -1282,6 +1291,7 @@
         modelFilter: document.getElementById("model-filter"),
         decisionFilter: document.getElementById("decision-filter"),
         revisionFilter: document.getElementById("revision-filter"),
+        bloatChip: document.getElementById("bloat-chip"),
       };
 
       function fmtMoney(value) {
@@ -1353,9 +1363,19 @@
               revisionDurationDeltaMs: run.revision_delta?.revision_duration_delta_ms ?? null,
               revisionCostDeltaUsd: run.revision_delta?.revision_cost_delta_usd ?? null,
               initialDurationMs: initialEvent.duration_ms ?? null,
+              initialApiDurationMs: initialEvent.duration_api_ms ?? null,
+              initialOverheadMs:
+                typeof initialEvent.duration_ms === "number" && typeof initialEvent.duration_api_ms === "number"
+                  ? initialEvent.duration_ms - initialEvent.duration_api_ms
+                  : null,
               initialCostUsd: initialEvent.total_cost_usd ?? null,
               initialOutputTokens: initialEvent.usage?.output_tokens ?? null,
               revisionDurationMs: revisionEvent.duration_ms ?? null,
+              revisionApiDurationMs: revisionEvent.duration_api_ms ?? null,
+              revisionOverheadMs:
+                typeof revisionEvent.duration_ms === "number" && typeof revisionEvent.duration_api_ms === "number"
+                  ? revisionEvent.duration_ms - revisionEvent.duration_api_ms
+                  : null,
               revisionCostUsd: revisionEvent.total_cost_usd ?? null,
               revisionOutputTokens: revisionEvent.usage?.output_tokens ?? null,
               expectedTerminal: expectation.preferredTerminal || "n/a",
@@ -1391,8 +1411,9 @@
         const accepted = runs.filter((run) => run.outcome === "accepted").length;
         const revisions = runs.filter((run) => run.hasRevision).length;
         const escalations = runs.filter((run) => run.decision === "HUMAN_REVIEW").length;
+        const warns = runs.filter((run) => run.decision === "WARN").length;
         const avgBloat = average(runs.map((run) => run.revisionBloatRatio));
-        return { total: runs.length, accepted, revisions, escalations, avgBloat };
+        return { total: runs.length, accepted, revisions, escalations, warns, avgBloat };
       }
 
       function providerSummary(runs, provider) {
@@ -1403,7 +1424,7 @@
           accepted: subset.filter((run) => run.outcome === "accepted").length,
           revisions: subset.filter((run) => run.hasRevision).length,
           escalations: subset.filter((run) => run.decision === "HUMAN_REVIEW").length,
-          avgBloat: average(subset.map((run) => run.revisionBloatRatio)),
+          warns: subset.filter((run) => run.decision === "WARN").length,
         };
       }
 
@@ -1425,7 +1446,19 @@
         return state.data.bRuns.filter((run) => {
           const q = state.filters.search.trim().toLowerCase();
           if (q) {
-            const hay = `${run.promptId} ${run.promptTitle} ${run.model} ${run.provider}`.toLowerCase();
+            const hay = [
+              run.promptId,
+              run.promptTitle,
+              run.model,
+              run.provider,
+              run.promptText,
+              run.expectedSafeAnswerShape,
+              run.expectedTerminal,
+              run.acceptableFallback,
+              ...(run.wrongWinsToWatchFor || []),
+            ]
+              .join(" ")
+              .toLowerCase();
             if (!hay.includes(q)) return false;
           }
           if (state.filters.provider !== "all" && run.provider !== state.filters.provider) return false;
@@ -1460,10 +1493,10 @@
             tip: METRIC_EXPLAINERS.revisionTurns,
           },
           {
-            label: "Average bloat",
-            value: fmtRatio(summary.avgBloat),
-            copy: "Relative revision growth should be read alongside absolute size. Bloat is only dangerous when it becomes operationally expensive.",
-            tip: METRIC_EXPLAINERS.averageBloat,
+            label: "Warnings released",
+            value: `${summary.warns}`,
+            copy: "These runs were still released, but with visible caveats instead of a full clean pass.",
+            tip: METRIC_EXPLAINERS.warningsReleased,
           },
         ];
 
@@ -1483,6 +1516,21 @@
           .join("");
       }
 
+      function syncQuickQueueVisibility() {
+        const hasHighBloat = state.data.bRuns.some(
+          (run) => typeof run.revisionBloatRatio === "number" && run.revisionBloatRatio > 1.2
+        );
+        if (els.bloatChip) {
+          els.bloatChip.hidden = !hasHighBloat;
+        }
+        if (!hasHighBloat && state.chip === "bloat") {
+          state.chip = "all";
+          document.querySelectorAll("[data-chip]").forEach((node) => {
+            node.classList.toggle("active", node.dataset.chip === "all");
+          });
+        }
+      }
+
       function renderProviderCards() {
         els.providerStack.innerHTML = state.data.providers
           .map((provider) => {
@@ -1497,7 +1545,7 @@
                   <div><span>Accepted</span><strong>${summary.accepted}/${summary.total}</strong></div>
                   <div><span>Revisions</span><strong>${summary.revisions}</strong></div>
                   <div><span>Escalations</span><strong>${summary.escalations}</strong></div>
-                  <div><span>Avg bloat</span><strong>${fmtRatio(summary.avgBloat)}</strong></div>
+                  <div><span>Warnings</span><strong>${summary.warns}</strong></div>
                 </div>
               </article>
             `;
@@ -1829,31 +1877,38 @@
           )
           .join("");
 
-        const metricsGrid = [
+        const baseMetrics = [
           { label: "Initial output", value: fmtTokens(activeRun.initialOutputTokens), key: "initialOutput" },
-          { label: "Initial duration", value: fmtMs(activeRun.initialDurationMs), key: "initialDuration" },
+          { label: "Initial CT overhead", value: fmtMs(activeRun.initialOverheadMs), key: "initialOverhead" },
+          { label: "Initial model time", value: fmtMs(activeRun.initialApiDurationMs), key: "initialApiDuration" },
           { label: "Initial cost", value: fmtMoney(activeRun.initialCostUsd), key: "initialCost" },
-          { label: "Revision output", value: fmtTokens(activeRun.revisionOutputTokens), key: "revisionOutput" },
-          { label: "Revision duration", value: fmtMs(activeRun.revisionDurationMs), key: "revisionDuration" },
-          { label: "Revision cost", value: fmtMoney(activeRun.revisionCostUsd), key: "revisionCost" },
-          { label: "Bloat ratio", value: fmtRatio(activeRun.revisionBloatRatio), key: "bloatRatio" },
-          {
-            label: "Token delta",
-            value:
-              activeRun.revisionOutputTokenDelta == null
-                ? "n/a"
-                : `${activeRun.revisionOutputTokenDelta > 0 ? "+" : ""}${fmtTokens(activeRun.revisionOutputTokenDelta)}`,
-            key: "tokenDelta",
-          },
-          {
-            label: "Latency delta",
-            value:
-              activeRun.revisionDurationDeltaMs == null
-                ? "n/a"
-                : `${activeRun.revisionDurationDeltaMs > 0 ? "+" : ""}${fmtMs(activeRun.revisionDurationDeltaMs)}`,
-            key: "latencyDelta",
-          },
-        ]
+        ];
+        const revisionMetrics = activeRun.hasRevision
+          ? [
+              { label: "Revision output", value: fmtTokens(activeRun.revisionOutputTokens), key: "revisionOutput" },
+              { label: "Revision CT overhead", value: fmtMs(activeRun.revisionOverheadMs), key: "revisionOverhead" },
+              { label: "Revision model time", value: fmtMs(activeRun.revisionApiDurationMs), key: "revisionApiDuration" },
+              { label: "Revision cost", value: fmtMoney(activeRun.revisionCostUsd), key: "revisionCost" },
+              { label: "Bloat ratio", value: fmtRatio(activeRun.revisionBloatRatio), key: "bloatRatio" },
+              {
+                label: "Token delta",
+                value:
+                  activeRun.revisionOutputTokenDelta == null
+                    ? "n/a"
+                    : `${activeRun.revisionOutputTokenDelta > 0 ? "+" : ""}${fmtTokens(activeRun.revisionOutputTokenDelta)}`,
+                key: "tokenDelta",
+              },
+              {
+                label: "Latency delta",
+                value:
+                  activeRun.revisionDurationDeltaMs == null
+                    ? "n/a"
+                    : `${activeRun.revisionDurationDeltaMs > 0 ? "+" : ""}${fmtMs(activeRun.revisionDurationDeltaMs)}`,
+                key: "latencyDelta",
+              },
+            ]
+          : [];
+        const metricsGrid = [...baseMetrics, ...revisionMetrics]
           .map(
             (item) => `
               <div class="insight">
@@ -2006,7 +2061,14 @@
             nav: "Mechanics",
             kicker: "Step 10",
             title: "Run mechanics",
-            body: `<div class="insight-grid">${metricsGrid}</div>`,
+            body: `
+              <div class="insight-grid">${metricsGrid}</div>
+              ${
+                activeRun.hasRevision
+                  ? ""
+                  : `<p class="section-copy">No revision pass was needed for this run, so revision-only deltas are omitted.</p>`
+              }
+            `,
           },
           {
             id: "section-wrong-wins",
@@ -2023,8 +2085,8 @@
             body: `
               <p class="section-copy">${escapeHtml(abSummary)}</p>
               <div class="section-meta">
-                <a href="${REPORT_PATH}">Open markdown report</a>
-                <a href="${AUDIT_PATH}">Open audit packet</a>
+                <a href="${REPORT_PATH}" target="_blank" rel="noreferrer">Open markdown report</a>
+                <a href="${AUDIT_PATH}" target="_blank" rel="noreferrer">Open audit packet</a>
               </div>
             `,
           },
@@ -2285,6 +2347,7 @@
           state.promptTexts = promptTexts;
           state.data = normalizeData(raw, promptTexts);
           renderHeadline();
+          syncQuickQueueVisibility();
           renderProviderCards();
           populateFilters();
           bindControls();

@@ -360,6 +360,7 @@
         grid-auto-columns: minmax(308px, 338px);
         gap: 14px;
         overflow-x: auto;
+        padding-top: 6px;
         padding-bottom: 6px;
         scroll-snap-type: x proximity;
       }
@@ -578,6 +579,8 @@
         border-radius: 24px;
         background: rgba(255, 251, 244, 0.9);
         border: 1px solid rgba(86, 56, 35, 0.08);
+        --rail-progress: 0%;
+        isolation: isolate;
       }
 
       .step-rail::before {
@@ -588,6 +591,20 @@
         bottom: 28px;
         width: 2px;
         background: linear-gradient(180deg, rgba(199, 93, 44, 0.4), rgba(31, 123, 116, 0.22));
+        z-index: 0;
+      }
+
+      .step-rail::after {
+        content: "";
+        position: absolute;
+        left: 26px;
+        top: 28px;
+        width: 2px;
+        height: var(--rail-progress);
+        max-height: calc(100% - 56px);
+        background: linear-gradient(180deg, rgba(199, 93, 44, 0.95), rgba(31, 123, 116, 0.72));
+        transition: height 160ms ease;
+        z-index: 0;
       }
 
       .step-rail {
@@ -605,6 +622,7 @@
         text-align: left;
         cursor: pointer;
         font: inherit;
+        z-index: 1;
       }
 
       .step-link::before {
@@ -618,10 +636,15 @@
         background: #fff8ef;
         border: 2px solid rgba(199, 93, 44, 0.58);
         box-shadow: 0 0 0 5px rgba(199, 93, 44, 0.08);
+        z-index: 2;
       }
 
       .step-link.active::before {
         background: var(--accent);
+      }
+
+      .step-link.active strong {
+        color: var(--accent);
       }
 
       .step-link strong {
@@ -671,6 +694,22 @@
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
+      }
+
+      .finding-summary {
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: linear-gradient(180deg, rgba(255, 244, 234, 0.96), rgba(255, 250, 244, 0.98));
+        border: 1px solid rgba(199, 93, 44, 0.14);
+        display: grid;
+        gap: 6px;
+      }
+
+      .finding-summary strong {
+        color: var(--accent);
+        font-size: 0.84rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
       }
 
       .finding-badges {
@@ -1195,6 +1234,8 @@
         promptTexts: {},
         selectedId: null,
         detailModelId: null,
+        detailObserver: null,
+        stepSyncLockedUntil: 0,
         chip: "all",
         filters: {
           search: "",
@@ -1566,6 +1607,23 @@
           });
         });
 
+        const revisionPrompt = run?.rawRun?.passes?.initial?.calibration_result?.revision_request?.prompt || run?.revisionCritique || "";
+        const rawFindingBlock = revisionPrompt.match(/Raw findings:\s*([\s\S]*?)(?:\n\nFormatting discipline:|$)/i)?.[1] || "";
+        rawFindingBlock
+          .split("\n")
+          .map((line) => compactLine(line.replace(/^-+\s*/, "")))
+          .filter(Boolean)
+          .forEach((message, idx) => {
+            findings.push({
+              id: `packet-${idx}-${slugify(message)}`,
+              tool: message.split(":")[0] || "ct-packet",
+              severity: /Calibration gate requires/i.test(message) ? "gate" : "warning",
+              summary: summarizeFindingText(message),
+              detail: message,
+              quote: quoteFromAnswer(run.lastAttemptedAnswer || run.bPreDraft || "", message),
+            });
+          });
+
         const deduped = [];
         const seen = new Set();
         findings.forEach((item) => {
@@ -1587,6 +1645,56 @@
             ${section.body}
           </section>
         `;
+      }
+
+      function setActiveStep(targetId) {
+        const buttons = [...els.detailStepRail.querySelectorAll("[data-step-target]")];
+        if (!buttons.length) return;
+        let activeIndex = 0;
+        buttons.forEach((button, index) => {
+          const active = button.dataset.stepTarget === targetId;
+          button.classList.toggle("active", active);
+          if (active) activeIndex = index;
+        });
+        const maxIndex = Math.max(buttons.length - 1, 1);
+        const progress = `${(activeIndex / maxIndex) * 100}%`;
+        els.detailStepRail.style.setProperty("--rail-progress", progress);
+      }
+
+      function bindStepObserver() {
+        if (state.detailObserver) {
+          window.removeEventListener("scroll", state.detailObserver, { passive: true });
+          state.detailObserver = null;
+        }
+        const sections = [...els.detailFlowSections.querySelectorAll(".flow-section")];
+        if (!sections.length) return;
+        let ticking = false;
+        const syncStepFromScroll = () => {
+          ticking = false;
+          if (Date.now() < state.stepSyncLockedUntil) return;
+          const anchor = Math.min(window.innerHeight * 0.24, 220);
+          let best = sections[0];
+          let bestDistance = Number.POSITIVE_INFINITY;
+          sections.forEach((section) => {
+            const rect = section.getBoundingClientRect();
+            const distance = Math.abs(rect.top - anchor);
+            if (rect.top <= anchor + 12) {
+              best = section;
+              bestDistance = distance;
+            } else if (bestDistance === Number.POSITIVE_INFINITY && distance < bestDistance) {
+              best = section;
+              bestDistance = distance;
+            }
+          });
+          if (best?.id) setActiveStep(best.id);
+        };
+        state.detailObserver = () => {
+          if (ticking) return;
+          ticking = true;
+          window.requestAnimationFrame(syncStepFromScroll);
+        };
+        window.addEventListener("scroll", state.detailObserver, { passive: true });
+        syncStepFromScroll();
       }
 
       function renderFilterSummary() {
@@ -1766,21 +1874,30 @@
         const ctFindings = extractCtFindings(activeRun);
         const ctBadges = ctFindings.length
           ? `
-              <div class="finding-badges">
-                ${ctFindings
-                  .slice(0, 6)
-                  .map(
-                    (finding) => `
-                      <span class="finding-badge">
-                        ${escapeHtml(finding.tool)}
-                        <strong>${escapeHtml(finding.summary || finding.severity)}</strong>
-                      </span>
-                    `
-                  )
-                  .join("")}
+              <div class="finding-summary">
+                <strong>CT flagged on this pass</strong>
+                <p class="section-copy">These are the concrete issues that triggered a warning, gate failure, or revision request before the payload below.</p>
+                <div class="finding-badges">
+                  ${ctFindings
+                    .slice(0, 6)
+                    .map(
+                      (finding) => `
+                        <span class="finding-badge">
+                          ${escapeHtml(finding.tool)}
+                          <strong>${escapeHtml(finding.summary || finding.severity)}</strong>
+                        </span>
+                      `
+                    )
+                    .join("")}
+                </div>
               </div>
             `
-          : `<p class="section-copy">No explicit CT issues were recorded on the first scored pass for this run.</p>`;
+          : `
+              <div class="finding-summary">
+                <strong>CT flagged on this pass</strong>
+                <p class="section-copy">No explicit issues were recorded on the first scored pass for this run.</p>
+              </div>
+            `;
         const ctFindingList = ctFindings.length
           ? `
               <div class="finding-list">
@@ -1924,6 +2041,8 @@
           )
           .join("");
         els.detailFlowSections.innerHTML = sections.map(sectionMarkup).join("");
+        setActiveStep(sections[0].id);
+        bindStepObserver();
 
         els.detailModelTabs.querySelectorAll("[data-detail-model]").forEach((button) => {
           button.addEventListener("click", () => {
@@ -1937,7 +2056,8 @@
 
         els.detailStepRail.querySelectorAll("[data-step-target]").forEach((button) => {
           button.addEventListener("click", () => {
-            els.detailStepRail.querySelectorAll("[data-step-target]").forEach((node) => node.classList.toggle("active", node === button));
+            state.stepSyncLockedUntil = Date.now() + 700;
+            setActiveStep(button.dataset.stepTarget);
             const target = document.getElementById(button.dataset.stepTarget);
             if (target) {
               target.scrollIntoView({ behavior: "smooth", block: "start" });

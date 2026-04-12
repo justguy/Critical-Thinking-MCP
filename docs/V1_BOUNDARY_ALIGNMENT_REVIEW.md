@@ -140,6 +140,73 @@ Matches the requirements doc verbatim. Every field wired end-to-end.
 6. **`score_response_quality.context` scope note.** A one-line doc note calling out the `context` object's enforcement-loop scope could close a minor secondary confusion vector.
 7. **Staging benchmark against Phalanx.** Owned by Phalanx; flagged here so it is not forgotten at adoption time.
 
+---
+
+## Post-Integration Hardening Pass
+
+**Branch:** `ct/post-phalanx-integration-hardening`
+**Base:** `integration/ct-mcp-v1-boundary-alignment` @ `834ef59`
+**Date:** 2026-04-12
+
+This section distinguishes what was already integration-ready at the `834ef59` merge point versus what was improved in a dedicated hardening pass while Phalanx begins integration.
+
+### What Was Already Integration-Ready (at 834ef59)
+
+All items in "Remaining Non-Blocking Follow-ups" (numbered 1–7 in the earlier section) were explicitly non-blocking. Phalanx could integrate immediately against `834ef59`. The following were stable and complete:
+
+- Envelope contract: input validation, sub-payload dispatch for all four tools, pre-dispatch rejection of minimum-violating inputs (matching underlying CT tool validators exactly)
+- Boundary assertions for R-2, R-3, R-4, R-5, R-8 non-ownership: all CI-enforced
+- `CtVerdict` output shape: deterministic `objection_id` (SHA-256), `claim_ref` field present in type (though unpopulated), `mechanism_versions` per-tool pinning
+- Transport soft-fail: `WARN` verdict + `phalanx_ct_mcp_transport` objection, never re-throws
+- `integrate_phalanx_check` MCP tool: all four sub-payloads exposed in public schema with correct minimums
+
+### What This Hardening Pass Improved
+
+**Slice A — `claim_ref` populated honestly (done)**
+
+`claim_ref` was typed but always unset. Now:
+- `mapToolResultToObjections` passes through `claim_ref` from raw blocking issues when the tool supplies one. The `computeObjectionId` hash includes `claim_ref || ''` for stability.
+- `validate_reasoning_chain` populates `claim_ref` on `cycle_detection` (first cycle node id) and `orphan_detection` (first orphaned node id) blocking issues.
+- `validate_confidence` populates `claim_ref: 'assumption:<index>'` on inflation/falsification blocking issues anchored to the first offending assumption.
+- `claim_ref` remains absent when a blocking issue has no honest node-level anchor (e.g., `consistency` violations).
+
+**Slice B — Structured warning mechanism names (done)**
+
+`mapToolResultToObjections` previously used `${toolName}_warning` for all warnings. Now:
+- Tools can additively emit `warning_issues: Array<{mechanism, description}>` alongside `warnings: string[]`.
+- The adapter promotes structured `warning_issues` to stable mechanism keys.
+- Plain string `warnings` still fall back to `${toolName}_warning` — fully backward-compatible.
+- Tests assert both paths.
+
+**Slice C — Clean `piece_id` JSON Schema (done)**
+
+`integrate_phalanx_check.inputSchema.properties.piece_id` previously used `type: ['string', 'null'] as unknown as 'string'` (an unsafe cast workaround). Replaced with `oneOf: [{ type: 'string' as const }, { type: 'null' as const }]`. Runtime behavior unchanged. `npx tsc --noEmit` clean — no unsafe casts introduced.
+
+**Slice D — Clarify `score_response_quality.context` scope (done)**
+
+`docs/PHALANX_INTEGRATION_CONTRACT.md` now has an explicit `## context Object Scope` section stating that the `context` field on all CT-MCP tools is enforcement-loop metadata only (fields like `previous_response_text`, `previous_response_hash`, `iteration_number`), not repo-grounding or seam-validation input. The `score_response_quality` tool definition's `context` property description in `src/mcp/tool-definitions.ts` also notes this inline. The R-5 boundary assertion in `tests/boundary/non_ownership_r2_r5_r8.test.ts` (`disclaimer strings present in tool descriptions`) continues to pass.
+
+**Slice E — Narrow output-shape guard (done)**
+
+Added adapter-level fixture assertions in `tests/integration/phalanx_envelope.test.ts` (`output-shape guard — adapter consumes tool output shapes correctly` describe block). Asserts that `mapToolResultToObjections` correctly consumes ENFORCEMENT_FAIL and PASS shapes for all four envelope-supported tools (`validate_confidence`, `validate_reasoning_chain`, `check_plan_validity`, `detect_concurrency_patterns`), plus verifies correct `claim_ref` pass-through for the reasoning-chain fixture. Stays narrow — no registry added.
+
+### Hardening Pass Verification
+
+- Test count: 411 → 425 (+14 new tests)
+- `npm test`: 425/425 passing, 25 test files
+- `npx tsc --noEmit`: clean
+- Boundary suite: 37/37 passing (no assertions loosened)
+- `integrate_phalanx_check` contract minimums unchanged: `response_text ≥ 10`, `claims.nodes ≥ 2`, `claims.edges ≥ 1`, `steps.steps ≥ 2`
+- No new dependencies added
+
+### Remaining Non-Blocking Follow-ups (Post-Hardening)
+
+1. **Staging benchmark against Phalanx.** Owned by Phalanx; flagged here so it is not forgotten at adoption time.
+2. **Slice 2 Zod strict-parsing.** Still disproportionate to introduce; remains deferred.
+3. **`validate_confidence` warning-to-`warning_issues` migration.** The `validate_confidence` tool still emits only plain-string `warnings[]`. A future pass could emit `warning_issues: [{mechanism: 'falsifiability', ...}]` from the tool directly (rather than relying on Phalanx to pattern-match). This is a pure improvement, not a correctness gap.
+
+---
+
 ## Merge Guidance
 
 The integration branch `integration/ct-mcp-v1-boundary-alignment` already contains all three slices plus the minimum-alignment fix on top of beta.2 HEAD. It merges cleanly; `npm test` and `npx tsc --noEmit` are both green. Fast-forward or merge it into the target branch.

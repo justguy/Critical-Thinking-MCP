@@ -16,11 +16,18 @@ interface RawBlockingIssue {
   mechanism: string;
   description: string;
   severity?: string;
+  claim_ref?: string;
+}
+
+interface RawWarningIssue {
+  mechanism: string;
+  description: string;
 }
 
 interface RawEnforcement {
   blocking_issues?: RawBlockingIssue[];
   warnings?: string[];
+  warning_issues?: RawWarningIssue[];
   corrective_prompt?: string;
 }
 
@@ -32,18 +39,19 @@ interface RawToolResult {
 // ====== Deterministic objection_id ======
 
 /**
- * Returns first 32 hex chars of SHA-256(callId + "|" + toolName + "|" + mechanism + "|" + message).
- * Inputs are sorted by key before hashing to ensure stability even if the
- * call site assembles them in different orders.
+ * Returns first 32 hex chars of SHA-256(callId + "|" + toolName + "|" + mechanism + "|" + message + "|" + claimRef).
+ * Including claim_ref in the hash ensures IDs are stable and unique when the same
+ * mechanism fires for different claim references within the same call.
  */
 export function computeObjectionId(
   callId: string,
   toolName: string,
   mechanism: string,
   message: string,
+  claimRef?: string,
 ): string {
   // Concatenate in a fixed, unambiguous order using pipe separators
-  const raw = `${callId}|${toolName}|${mechanism}|${message}`;
+  const raw = `${callId}|${toolName}|${mechanism}|${message}|${claimRef ?? ''}`;
   return createHash('sha256').update(raw, 'utf8').digest('hex').slice(0, 32);
 }
 
@@ -77,6 +85,9 @@ export function mapToolResultToObjections(
 
       const mechanism = typeof issue.mechanism === 'string' ? issue.mechanism : 'unknown';
       const message = typeof issue.description === 'string' ? issue.description : '';
+      const claim_ref = typeof issue.claim_ref === 'string' && issue.claim_ref.length > 0
+        ? issue.claim_ref
+        : undefined;
 
       const severityRaw = issue.severity;
       const severity: ObjectionSeverity =
@@ -84,19 +95,44 @@ export function mapToolResultToObjections(
           ? severityRaw
           : 'blocking';
 
-      const objection_id = computeObjectionId(callId, toolName, mechanism, message);
+      const objection_id = computeObjectionId(callId, toolName, mechanism, message, claim_ref);
 
-      objections.push({
+      const objection: CtObjection = {
         objection_id,
         mechanism,
         severity,
         message,
         evidence: { tool: toolName, raw_issue: issue as unknown as Record<string, unknown> },
-      });
+      };
+      if (claim_ref !== undefined) {
+        objection.claim_ref = claim_ref;
+      }
+      objections.push(objection);
     }
   }
 
-  // Warnings are always surfaced as "warning" severity objections
+  // Structured warning_issues: prefer stable mechanism names when the tool supplies them.
+  // Backward-compatible: tools that only emit warnings[] still work via the fallback below.
+  const warningIssues = result.enforcement?.warning_issues ?? [];
+  for (const wi of warningIssues) {
+    if (!wi || typeof wi !== 'object') continue;
+    const mechanism = typeof wi.mechanism === 'string' && wi.mechanism.length > 0
+      ? wi.mechanism
+      : `${toolName}_warning`;
+    const message = typeof wi.description === 'string' ? wi.description : '';
+    if (message.length === 0) continue;
+
+    const objection_id = computeObjectionId(callId, toolName, mechanism, message);
+    objections.push({
+      objection_id,
+      mechanism,
+      severity: 'warning',
+      message,
+      evidence: { tool: toolName },
+    });
+  }
+
+  // Unstructured string warnings: fallback to ${toolName}_warning synthetic mechanism name.
   const warnings = result.enforcement?.warnings ?? [];
   for (const warning of warnings) {
     if (typeof warning !== 'string' || warning.length === 0) continue;

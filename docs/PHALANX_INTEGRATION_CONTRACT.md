@@ -195,6 +195,19 @@ src/integration/phalanx/
 | `steps` | `check_plan_validity` | Plan structure / circular dependency / resource conflict |
 | `operations` | `detect_concurrency_patterns` | Concurrency hazard patterns |
 
+## `context` Object Scope
+
+The `context` field accepted by CT-MCP tools (including `score_response_quality`,
+`validate_confidence`, `validate_reasoning_chain`, and others) is **iterative
+enforcement-loop metadata only**. Its fields — `previous_response_text`,
+`previous_response_hash`, `iteration_number`, `failure_counts_by_mechanism`, etc.
+— let CT-MCP escalate corrective prompts and detect stalls across multiple
+caller-driven iterations.
+
+`context` is **not** a repo-grounding or seam-validation input. It carries no
+repository state, file paths, symbols, or seam references. Repo-level grounding
+and seam validation are Phalanx-owned (R-5); CT-MCP has no file-system access.
+
 ## Non-Goals (V1)
 
 The following requirements are **Phalanx-owned** in V1 and are explicitly out of

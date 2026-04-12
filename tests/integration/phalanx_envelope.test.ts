@@ -1217,3 +1217,383 @@ describe('CT tool minimum alignment — pre-dispatch rejection', () => {
     expect(invoker).not.toHaveBeenCalled();
   });
 });
+
+// ====== Slice A hardening: claim_ref populated / absent ======
+
+describe('claim_ref on blocking objections', () => {
+  it('cycle_detection objection carries claim_ref anchored to the first cycle node', async () => {
+    const cycleResult = {
+      status: 'ENFORCEMENT_FAIL' as const,
+      enforcement: {
+        blocking_issues: [
+          {
+            mechanism: 'cycle_detection',
+            description: 'Found 1 circular reasoning cycle(s): n1 -> n2 -> n1',
+            severity: 'blocking' as const,
+            claim_ref: 'n1',
+          },
+        ],
+        warnings: [],
+        corrective_prompt: 'Remove the cycle.',
+      },
+    };
+
+    const invoker: ToolInvoker = vi.fn().mockResolvedValue(cycleResult);
+    const call = makeCall({
+      payload: {
+        claims: {
+          nodes: [
+            { id: 'n1', label: 'A', type: 'claim' as const },
+            { id: 'n2', label: 'B', type: 'claim' as const },
+          ],
+          edges: [
+            { from: 'n1', to: 'n2', relation: 'supports' as const },
+            { from: 'n2', to: 'n1', relation: 'supports' as const },
+          ],
+        },
+      },
+    });
+
+    const verdict = await invokePhalanxContract(call, invoker);
+
+    const cycleObj = verdict.objections.find(o => o.mechanism === 'cycle_detection');
+    expect(cycleObj).toBeDefined();
+    expect(cycleObj!.claim_ref).toBe('n1');
+  });
+
+  it('orphan_detection objection carries claim_ref anchored to the orphaned node id', async () => {
+    const orphanResult = {
+      status: 'ENFORCEMENT_FAIL' as const,
+      enforcement: {
+        blocking_issues: [
+          {
+            mechanism: 'orphan_detection',
+            description: '1 conclusion(s) have no supporting evidence or claims: cn1',
+            severity: 'blocking' as const,
+            claim_ref: 'cn1',
+          },
+        ],
+        warnings: [],
+        corrective_prompt: 'Add support for the orphaned conclusion.',
+      },
+    };
+
+    const invoker: ToolInvoker = vi.fn().mockResolvedValue(orphanResult);
+    const call = makeCall({
+      payload: {
+        claims: {
+          nodes: [
+            { id: 'e1', label: 'Evidence', type: 'evidence' as const },
+            { id: 'cn1', label: 'Orphaned conclusion', type: 'conclusion' as const },
+          ],
+          edges: [{ from: 'e1', to: 'cn1', relation: 'supports' as const }],
+        },
+      },
+    });
+
+    const verdict = await invokePhalanxContract(call, invoker);
+
+    const orphanObj = verdict.objections.find(o => o.mechanism === 'orphan_detection');
+    expect(orphanObj).toBeDefined();
+    expect(orphanObj!.claim_ref).toBe('cn1');
+  });
+
+  it('confidence_product inflation objection carries claim_ref assumption:0', async () => {
+    const inflationResult = {
+      status: 'ENFORCEMENT_FAIL' as const,
+      enforcement: {
+        blocking_issues: [
+          {
+            mechanism: 'confidence_product',
+            description: 'Inflation detected — claimed confidence exceeds honest ceiling by 0.500.',
+            severity: 'blocking' as const,
+            claim_ref: 'assumption:0',
+          },
+        ],
+        warnings: [],
+        corrective_prompt: 'Reduce claimed confidence.',
+      },
+    };
+
+    const invoker: ToolInvoker = vi.fn().mockResolvedValue(inflationResult);
+    const verdict = await invokePhalanxContract(makeCall(), invoker);
+
+    const inflationObj = verdict.objections.find(o => o.mechanism === 'confidence_product');
+    expect(inflationObj).toBeDefined();
+    expect(inflationObj!.claim_ref).toBe('assumption:0');
+  });
+
+  it('blocking issue without claim_ref in raw output does not get claim_ref on objection', async () => {
+    const noRefResult = {
+      status: 'ENFORCEMENT_FAIL' as const,
+      enforcement: {
+        blocking_issues: [
+          {
+            mechanism: 'consistency',
+            description: 'Consistency violation detected.',
+            severity: 'blocking' as const,
+            // No claim_ref field
+          },
+        ],
+        warnings: [],
+        corrective_prompt: 'Fix the inconsistency.',
+      },
+    };
+
+    const invoker: ToolInvoker = vi.fn().mockResolvedValue(noRefResult);
+    const verdict = await invokePhalanxContract(makeCall(), invoker);
+
+    const consistencyObj = verdict.objections.find(o => o.mechanism === 'consistency');
+    expect(consistencyObj).toBeDefined();
+    expect(consistencyObj!.claim_ref).toBeUndefined();
+  });
+
+  it('claim_ref is stable across identical calls (deterministic)', async () => {
+    const resultWithRef = {
+      status: 'ENFORCEMENT_FAIL' as const,
+      enforcement: {
+        blocking_issues: [
+          {
+            mechanism: 'orphan_detection',
+            description: '1 conclusion(s) have no supporting evidence or claims: cn1',
+            severity: 'blocking' as const,
+            claim_ref: 'cn1',
+          },
+        ],
+        warnings: [],
+        corrective_prompt: '',
+      },
+    };
+
+    const call = makeCall({
+      payload: {
+        claims: {
+          nodes: [
+            { id: 'e1', label: 'Evidence', type: 'evidence' as const },
+            { id: 'cn1', label: 'Orphaned', type: 'conclusion' as const },
+          ],
+          edges: [{ from: 'e1', to: 'cn1', relation: 'supports' as const }],
+        },
+      },
+    });
+
+    const invoker1: ToolInvoker = vi.fn().mockResolvedValue(resultWithRef);
+    const invoker2: ToolInvoker = vi.fn().mockResolvedValue(resultWithRef);
+
+    const v1 = await invokePhalanxContract(call, invoker1);
+    const v2 = await invokePhalanxContract(call, invoker2);
+
+    expect(v1.objections[0].objection_id).toBe(v2.objections[0].objection_id);
+    expect(v1.objections[0].claim_ref).toBe(v2.objections[0].claim_ref);
+  });
+});
+
+// ====== Slice B hardening: structured warning mechanism names ======
+
+describe('warning mechanism names', () => {
+  it('structured warning_issues produce stable mechanism name (not toolName_warning)', () => {
+    const resultWithStructuredWarnings = {
+      status: 'PASS' as const,
+      enforcement: {
+        blocking_issues: [],
+        warnings: [],
+        warning_issues: [
+          { mechanism: 'falsifiability', description: 'Falsifiability score low: 0.30.' },
+        ],
+        corrective_prompt: '',
+      },
+    };
+
+    const objections = mapToolResultToObjections(
+      'validate_confidence',
+      resultWithStructuredWarnings,
+      'call-structured',
+    );
+
+    expect(objections).toHaveLength(1);
+    expect(objections[0].mechanism).toBe('falsifiability');
+    expect(objections[0].severity).toBe('warning');
+    expect(objections[0].message).toContain('Falsifiability score low');
+  });
+
+  it('unstructured string warnings fall back to toolName_warning mechanism', () => {
+    const resultWithStringWarnings = {
+      status: 'PASS' as const,
+      enforcement: {
+        blocking_issues: [],
+        warnings: ['Low grounding score (0.30). Most conclusions are not traceable to evidence nodes.'],
+        corrective_prompt: '',
+      },
+    };
+
+    const objections = mapToolResultToObjections(
+      'validate_reasoning_chain',
+      resultWithStringWarnings,
+      'call-string-warn',
+    );
+
+    expect(objections).toHaveLength(1);
+    expect(objections[0].mechanism).toBe('validate_reasoning_chain_warning');
+    expect(objections[0].severity).toBe('warning');
+  });
+
+  it('when both warning_issues and warnings are present, both are emitted', () => {
+    const resultWithBoth = {
+      status: 'PASS' as const,
+      enforcement: {
+        blocking_issues: [],
+        warnings: ['A string warning.'],
+        warning_issues: [{ mechanism: 'falsifiability', description: 'Falsifiability check failed.' }],
+        corrective_prompt: '',
+      },
+    };
+
+    const objections = mapToolResultToObjections(
+      'validate_confidence',
+      resultWithBoth,
+      'call-both',
+    );
+
+    expect(objections).toHaveLength(2);
+    expect(objections.some(o => o.mechanism === 'falsifiability')).toBe(true);
+    expect(objections.some(o => o.mechanism === 'validate_confidence_warning')).toBe(true);
+  });
+
+  it('structured warning_issues objection_id is deterministic', () => {
+    const result = {
+      status: 'PASS' as const,
+      enforcement: {
+        blocking_issues: [],
+        warnings: [],
+        warning_issues: [{ mechanism: 'falsifiability', description: 'Consistent description.' }],
+        corrective_prompt: '',
+      },
+    };
+
+    const objs1 = mapToolResultToObjections('validate_confidence', result, 'call-det');
+    const objs2 = mapToolResultToObjections('validate_confidence', result, 'call-det');
+
+    expect(objs1[0].objection_id).toBe(objs2[0].objection_id);
+  });
+});
+
+// ====== Slice E: Narrow output-shape guard for the four envelope-supported tools ======
+// These assertions use known fixture shapes that mirror what the real tool handlers emit.
+// They verify that mapToolResultToObjections correctly consumes each tool's output shape
+// without requiring the full EnforcementEngine instantiation.
+
+describe('output-shape guard — adapter consumes tool output shapes correctly', () => {
+  const CALL_ID = 'shape-guard-call';
+
+  it('validate_confidence ENFORCEMENT_FAIL shape produces blocking objection with expected fields', () => {
+    // Fixture mirrors actual validate_confidence ENFORCEMENT_FAIL output shape
+    const raw = {
+      status: 'ENFORCEMENT_FAIL' as const,
+      honest_ceiling: 0.4,
+      claimed_confidence: 0.9,
+      gap: 0.5,
+      inflation_detected: true,
+      dependency_weights: [1],
+      falsifiability: { score: 1, passes: true, unfalsifiable: [] },
+      assumption_count: 1,
+      context_used: false,
+      enforcement: {
+        blocking_issues: [
+          { mechanism: 'confidence_product', description: 'Inflation detected.', severity: 'blocking' as const },
+        ],
+        warnings: [],
+        corrective_prompt: 'Fix it.',
+      },
+    };
+
+    const objs = mapToolResultToObjections('validate_confidence', raw, CALL_ID);
+    expect(objs).toHaveLength(1);
+    expect(objs[0].severity).toBe('blocking');
+    expect(objs[0].mechanism).toBe('confidence_product');
+    expect(objs[0].evidence).toMatchObject({ tool: 'validate_confidence' });
+  });
+
+  it('validate_reasoning_chain ENFORCEMENT_FAIL shape produces blocking objection with expected fields', () => {
+    // Fixture mirrors actual validate_reasoning_chain ENFORCEMENT_FAIL output shape
+    const raw = {
+      status: 'ENFORCEMENT_FAIL' as const,
+      cycles: [{ path: ['n1', 'n2', 'n1'] }],
+      orphaned_conclusions: [],
+      grounding_score: 0,
+      node_count: 2,
+      edge_count: 2,
+      context_used: false,
+      enforcement: {
+        blocking_issues: [
+          { mechanism: 'cycle_detection', description: 'Found 1 cycle.', severity: 'blocking' as const, claim_ref: 'n1' },
+        ],
+        warnings: [],
+        corrective_prompt: 'Remove cycle.',
+      },
+    };
+
+    const objs = mapToolResultToObjections('validate_reasoning_chain', raw, CALL_ID);
+    expect(objs).toHaveLength(1);
+    expect(objs[0].severity).toBe('blocking');
+    expect(objs[0].mechanism).toBe('cycle_detection');
+    expect(objs[0].claim_ref).toBe('n1');
+  });
+
+  it('check_plan_validity ENFORCEMENT_FAIL shape produces blocking objection with expected fields', () => {
+    // Fixture mirrors actual check_plan_validity ENFORCEMENT_FAIL output shape
+    const raw = {
+      status: 'ENFORCEMENT_FAIL' as const,
+      is_valid: false,
+      circular_dependencies: [['s1', 's2', 's1']],
+      missing_prerequisites: [],
+      resource_conflicts: [],
+      completeness_score: 0,
+      critical_path: [],
+      step_count: 2,
+      context_used: false,
+      enforcement: {
+        blocking_issues: [
+          { mechanism: 'circular_dependency', description: 'Cycle: s1->s2->s1.', severity: 'blocking' as const },
+        ],
+        warnings: [],
+        corrective_prompt: 'Fix dependency cycle.',
+      },
+    };
+
+    const objs = mapToolResultToObjections('check_plan_validity', raw, CALL_ID);
+    expect(objs).toHaveLength(1);
+    expect(objs[0].severity).toBe('blocking');
+    expect(objs[0].mechanism).toBe('circular_dependency');
+    expect(objs[0].evidence).toMatchObject({ tool: 'check_plan_validity' });
+  });
+
+  it('detect_concurrency_patterns ENFORCEMENT_FAIL shape produces blocking objection with expected fields', () => {
+    // Fixture mirrors actual detect_concurrency_patterns ENFORCEMENT_FAIL output shape
+    const raw = {
+      status: 'ENFORCEMENT_FAIL' as const,
+      patterns_detected: ['check_then_act'],
+      hazard_count: 1,
+      enforcement: {
+        blocking_issues: [
+          { mechanism: 'check_then_act', description: 'Check-then-act pattern detected.', severity: 'blocking' as const },
+        ],
+        warnings: [],
+        corrective_prompt: 'Use atomic compare-and-swap.',
+      },
+    };
+
+    const objs = mapToolResultToObjections('detect_concurrency_patterns', raw, CALL_ID);
+    expect(objs).toHaveLength(1);
+    expect(objs[0].severity).toBe('blocking');
+    expect(objs[0].mechanism).toBe('check_then_act');
+    expect(objs[0].evidence).toMatchObject({ tool: 'detect_concurrency_patterns' });
+  });
+
+  it('all four tools produce empty objections on PASS with no enforcement', () => {
+    const passShape = { status: 'PASS' as const };
+    const tools = ['validate_confidence', 'validate_reasoning_chain', 'check_plan_validity', 'detect_concurrency_patterns'];
+    for (const tool of tools) {
+      expect(mapToolResultToObjections(tool, passShape, CALL_ID)).toHaveLength(0);
+    }
+  });
+});

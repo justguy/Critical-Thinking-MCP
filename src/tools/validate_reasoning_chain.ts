@@ -448,21 +448,24 @@ export function handleValidateReasoningChain(
     });
   }
 
-  // Cycles are blocking
+  // Cycles are blocking — anchor claim_ref to the first node in the first cycle
   if (cycles.length > 0) {
+    const firstCycleNode = cycles[0].path[0];
     blockingIssues.push({
       mechanism: 'cycle_detection',
       description: `Found ${cycles.length} circular reasoning cycle(s): ${cycles.map(c => c.path.join(' -> ')).join('; ')}`,
       severity: 'blocking',
+      ...(firstCycleNode ? { claim_ref: firstCycleNode } : {}),
     });
   }
 
-  // Orphaned conclusions are blocking
+  // Orphaned conclusions are blocking — anchor claim_ref to the first orphaned node id
   if (orphanedConclusions.length > 0) {
     blockingIssues.push({
       mechanism: 'orphan_detection',
       description: `${orphanedConclusions.length} conclusion(s) have no supporting evidence or claims: ${orphanedConclusions.join(', ')}`,
       severity: 'blocking',
+      claim_ref: orphanedConclusions[0],
     });
   }
 

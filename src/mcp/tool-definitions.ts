@@ -462,7 +462,7 @@ Optionally pass "context" with prior iteration data for escalation and stall det
         },
         context: {
           type: 'object' as const,
-          description: 'Optional caller-provided context for iterative enforcement. Include prior failure counts, iteration history, and previous response data to enable escalation and stall detection. Omit for one-shot usage.',
+          description: 'Optional caller-provided context for iterative enforcement (enforcement-loop metadata only — not repo-grounding input). Include prior failure counts, iteration history, and previous response data to enable escalation and stall detection. Omit for one-shot usage.',
           properties: {
             iteration_number: { type: 'number' as const, description: 'Current iteration (1-based)' },
             failure_counts_by_mechanism: {
@@ -710,7 +710,7 @@ Optional fields:
           description: 'Phalanx pipeline phase that initiated this check',
         },
         piece_id: {
-          type: ['string', 'null'] as unknown as 'string',
+          oneOf: [{ type: 'string' as const }, { type: 'null' as const }],
           description: 'Piece identifier (string or null)',
         },
         run_id: {

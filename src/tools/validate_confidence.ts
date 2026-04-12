@@ -154,6 +154,8 @@ export function handleValidateConfidence(
 
   // Fix 3: Unified mechanism name — use 'confidence_product', put "inflation detected" in description
   // Inflation detection: gap > 0.15 is blocking
+  // claim_ref: anchor to the first assumption index (the confidence product is a product of all,
+  // but the first assumption is the most natural anchor for Phalanx rebuttal UI targeting).
   if (cpResult.inflation_detected && cpResult.gap > 0.15) {
     blockingIssues.push({
       mechanism: 'confidence_product',
@@ -163,11 +165,22 @@ export function handleValidateConfidence(
         `claimed: ${cpResult.claimed_confidence?.toFixed(3) ?? 'unknown'}. ` +
         `Reduce claimed confidence or strengthen assumptions.`,
       severity: 'blocking',
+      claim_ref: 'assumption:0',
     });
   }
 
-  // Fix 2 continued: If ANY assumption was capped and claimed confidence is high, make it blocking
+  // Fix 2 continued: If ANY assumption was capped and claimed confidence is high, make it blocking.
+  // claim_ref: anchor to the first capped assumption index.
   if (cappedWarnings.length > 0 && cpResult.claimed_confidence !== null && cpResult.claimed_confidence > 0.7) {
+    const firstCappedIndex = adjustedAssumptions.findIndex(
+      (a, i) => {
+        const orig = assumptions[i];
+        return (
+          (!orig.falsification_condition || orig.falsification_condition.length === 0) &&
+          orig.confidence > 0.3
+        );
+      },
+    );
     blockingIssues.push({
       mechanism: 'confidence_product',
       description:
@@ -175,6 +188,7 @@ export function handleValidateConfidence(
         `but response claims high confidence (${cpResult.claimed_confidence.toFixed(3)}). ` +
         `Add falsification conditions or reduce claimed confidence.`,
       severity: 'blocking',
+      ...(firstCappedIndex >= 0 ? { claim_ref: `assumption:${firstCappedIndex}` } : {}),
     });
   }
 
@@ -192,11 +206,16 @@ export function handleValidateConfidence(
       b => b.mechanism === 'confidence_product' && b.description.includes('lack falsification conditions'),
     );
     if (!alreadyBlocked) {
+      // claim_ref: first assumption that lacks a falsification condition
+      const firstUnfalsifiableIndex = assumptions.findIndex(
+        a => !a.falsification_condition || a.falsification_condition.length === 0,
+      );
       blockingIssues.push({
         mechanism: 'confidence_product',
         description:
           'Majority of assumptions lack falsification conditions with high claimed confidence',
         severity: 'blocking',
+        ...(firstUnfalsifiableIndex >= 0 ? { claim_ref: `assumption:${firstUnfalsifiableIndex}` } : {}),
       });
     }
   }

@@ -26,6 +26,8 @@ export interface BlockingIssue {
   mechanism: string;
   description: string;
   severity: 'blocking' | 'warning';
+  /** Optional reference to a specific claim/node id this issue is grounded in. */
+  claim_ref?: string;
 }
 
 export interface EnforcementResult {

@@ -694,4 +694,97 @@ Optional fields:
       required: ['steps'],
     },
   },
+  {
+    name: 'integrate_phalanx_check',
+    description: 'Normalized Phalanx integration envelope: accepts a PhalanxCtCall and returns a CtVerdict by routing to the appropriate ct-mcp tools.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        call_id: {
+          type: 'string' as const,
+          description: 'Unique identifier for this call, used for deterministic objection_id derivation',
+        },
+        phase: {
+          type: 'string' as const,
+          enum: ['planning', 'blueprint_convergence', 'execution_retry', 'verification', 'closeout'],
+          description: 'Phalanx pipeline phase that initiated this check',
+        },
+        piece_id: {
+          type: ['string', 'null'] as unknown as 'string',
+          description: 'Piece identifier (string or null)',
+        },
+        run_id: {
+          type: 'string' as const,
+          description: 'Run identifier for traceability',
+        },
+        payload: {
+          type: 'object' as const,
+          description: 'Check payload — supply assumptions for validate_confidence and/or claims for validate_reasoning_chain',
+          properties: {
+            assumptions: {
+              type: 'object' as const,
+              description: 'Confidence check payload (validate_confidence)',
+              properties: {
+                assumptions: {
+                  type: 'array' as const,
+                  items: {
+                    type: 'object' as const,
+                    properties: {
+                      description: { type: 'string' as const },
+                      confidence: { type: 'number' as const, minimum: 0, maximum: 1 },
+                      falsification_condition: { type: 'string' as const },
+                    },
+                    required: ['description', 'confidence'],
+                  },
+                  minItems: 1,
+                },
+                response_text: { type: 'string' as const, minLength: 10 },
+              },
+              required: ['assumptions', 'response_text'],
+            },
+            claims: {
+              type: 'object' as const,
+              description: 'Reasoning chain payload (validate_reasoning_chain)',
+              properties: {
+                nodes: {
+                  type: 'array' as const,
+                  items: {
+                    type: 'object' as const,
+                    properties: {
+                      id: { type: 'string' as const },
+                      label: { type: 'string' as const },
+                      type: {
+                        type: 'string' as const,
+                        enum: ['claim', 'evidence', 'conclusion', 'assumption'],
+                      },
+                    },
+                    required: ['id', 'label', 'type'],
+                  },
+                  minItems: 2,
+                },
+                edges: {
+                  type: 'array' as const,
+                  items: {
+                    type: 'object' as const,
+                    properties: {
+                      from: { type: 'string' as const },
+                      to: { type: 'string' as const },
+                      relation: {
+                        type: 'string' as const,
+                        enum: ['supports', 'implies', 'contradicts', 'requires'],
+                      },
+                    },
+                    required: ['from', 'to', 'relation'],
+                  },
+                  minItems: 1,
+                },
+              },
+              required: ['nodes', 'edges'],
+            },
+          },
+        },
+      },
+      required: ['call_id', 'phase', 'piece_id', 'run_id', 'payload'],
+    },
+  },
 ];

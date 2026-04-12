@@ -92,3 +92,7 @@ logic.
 | `score_response_quality` | Substance, specificity, hedging, structure, entity grounding | Verify external facts |
 | `check_plan_validity` | Cycle detection, missing prerequisites, resource conflicts, critical path | Assess plan feasibility or business desirability |
 | `detect_drift` | CUSUM drift detection, monotonic progress tracking | Predict future trends |
+
+## Phalanx Integration Boundary
+
+CT-MCP exposes a normalized integration envelope for Project Phalanx via the `integrate_phalanx_check` MCP tool and the `invokePhalanxContract` function in `src/integration/phalanx/`. The envelope accepts a `PhalanxCtCall`, routes to `validate_confidence` (R-6) and/or `validate_reasoning_chain` (R-7) based on payload shape, and returns a deterministic `CtVerdict` with stable `objection_id` hashes, soft-fail transport-error handling, and `mechanism_versions` pinned to `SERVER_INFO.version`. Phalanx owns all pipeline gates, state-machine transitions, and closure truth; CT-MCP is a signal provider only. See [`docs/PHALANX_INTEGRATION_CONTRACT.md`](docs/PHALANX_INTEGRATION_CONTRACT.md) for the full contract specification.

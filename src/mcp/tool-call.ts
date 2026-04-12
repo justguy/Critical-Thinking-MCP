@@ -11,6 +11,8 @@ import { handleScoreResponseQuality } from '../tools/score_response_quality.js';
 import { handleValidateConfidence } from '../tools/validate_confidence.js';
 import { handleVerifyArithmetic } from '../tools/verify_arithmetic.js';
 import { handleDetectConcurrencyPatterns } from '../tools/detect_concurrency_patterns.js';
+import { invokePhalanxContract } from '../integration/phalanx/index.js';
+import { PhalanxContractInputError } from '../integration/phalanx/types.js';
 
 import { TOOLS } from './tool-definitions.js';
 
@@ -51,9 +53,46 @@ function isValidationError(err: unknown, message: string): boolean {
   );
 }
 
+/**
+ * Build a ToolInvoker backed by the real EnforcementEngine-based tool handlers.
+ * This is the production path; tests inject their own mock invoker.
+ */
+function makeRealToolInvoker(): (toolName: string, args: unknown) => Promise<unknown> {
+  return async (toolName: string, args: unknown): Promise<unknown> => {
+    const handler = TOOL_HANDLERS[toolName];
+    if (!handler) {
+      throw new Error(`No handler for tool: ${toolName}`);
+    }
+    const engine = new EnforcementEngine();
+    return handler(args, engine);
+  };
+}
+
 export function registerToolHandlers(server: Server): void {
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
+
+    // Route integrate_phalanx_check through the dedicated async envelope
+    if (name === 'integrate_phalanx_check') {
+      try {
+        const verdict = await invokePhalanxContract(args, makeRealToolInvoker());
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: JSON.stringify(verdict, null, 2),
+            },
+          ],
+        };
+      } catch (err) {
+        if (err instanceof PhalanxContractInputError) {
+          throw new McpError(ErrorCode.InvalidParams, err.message);
+        }
+        const message = err instanceof Error ? err.message : String(err);
+        throw new McpError(ErrorCode.InternalError, message);
+      }
+    }
+
     const handler = TOOL_HANDLERS[name];
 
     if (!handler) {

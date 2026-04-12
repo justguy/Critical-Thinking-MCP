@@ -2,7 +2,7 @@
  * mapping.ts — Pure functions to map raw tool output to CtObjection[].
  *
  * Deterministic: same input → same output.
- * objection_id = first 32 hex chars of SHA-256(callId | toolName | mechanism | message).
+ * objection_id = first 32 hex chars of SHA-256(callId | toolName | mechanism | message | claimRef).
  * No mutable module-level state.
  */
 

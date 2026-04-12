@@ -153,9 +153,9 @@ export function handleValidateConfidence(
   warnings.push(...cappedWarnings);
 
   // Fix 3: Unified mechanism name — use 'confidence_product', put "inflation detected" in description
-  // Inflation detection: gap > 0.15 is blocking
-  // claim_ref: anchor to the first assumption index (the confidence product is a product of all,
-  // but the first assumption is the most natural anchor for Phalanx rebuttal UI targeting).
+  // Inflation detection: gap > 0.15 is blocking.
+  // Do not attach claim_ref here: aggregate inflation is grounded in the product of all assumptions,
+  // not one specific assumption.
   if (cpResult.inflation_detected && cpResult.gap > 0.15) {
     blockingIssues.push({
       mechanism: 'confidence_product',
@@ -165,7 +165,6 @@ export function handleValidateConfidence(
         `claimed: ${cpResult.claimed_confidence?.toFixed(3) ?? 'unknown'}. ` +
         `Reduce claimed confidence or strengthen assumptions.`,
       severity: 'blocking',
-      claim_ref: 'assumption:0',
     });
   }
 

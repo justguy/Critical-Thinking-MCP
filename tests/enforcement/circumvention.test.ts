@@ -413,6 +413,47 @@ describe('Circumvention Tests', () => {
     expect(result.grounding_score).toBe(1);
   });
 
+  it('Test 17d: cycle_detection carries claim_ref for the first cycle node in real handler output', () => {
+    const engine = new EnforcementEngine();
+
+    const result = handleValidateReasoningChain(
+      {
+        nodes: [
+          { id: 'n1', label: 'A', type: 'claim' },
+          { id: 'n2', label: 'B', type: 'claim' },
+        ],
+        edges: [
+          { from: 'n1', to: 'n2', relation: 'supports' },
+          { from: 'n2', to: 'n1', relation: 'supports' },
+        ],
+      },
+      engine,
+    );
+
+    expect(result.status).toBe('ENFORCEMENT_FAIL');
+    const cycleIssue = result.enforcement?.blocking_issues.find(issue => issue.mechanism === 'cycle_detection');
+    expect(cycleIssue?.claim_ref).toBe('n1');
+  });
+
+  it('Test 17e: orphan_detection carries claim_ref for the orphaned conclusion in real handler output', () => {
+    const engine = new EnforcementEngine();
+
+    const result = handleValidateReasoningChain(
+      {
+        nodes: [
+          { id: 'e1', label: 'Evidence', type: 'evidence' },
+          { id: 'cn1', label: 'Orphaned conclusion', type: 'conclusion' },
+        ],
+        edges: [{ from: 'e1', to: 'e1', relation: 'supports' }],
+      },
+      engine,
+    );
+
+    expect(result.status).toBe('ENFORCEMENT_FAIL');
+    const orphanIssue = result.enforcement?.blocking_issues.find(issue => issue.mechanism === 'orphan_detection');
+    expect(orphanIssue?.claim_ref).toBe('cn1');
+  });
+
   // ─── Test 18: Second failure produces schema-fill, not repeat instruction ─
 
   it('Test 18: second failure of same mechanism produces FILL IN THIS TEMPLATE', () => {
@@ -491,5 +532,55 @@ describe('Circumvention Tests', () => {
       // Should NOT contain schema-fill (that's escalation)
       expect(result.corrective_prompt).not.toContain('FILL IN THIS TEMPLATE');
     }
+  });
+
+  it('Test 21: aggregate confidence inflation does not attach a misleading claim_ref', () => {
+    const engine = new EnforcementEngine();
+    const input = {
+      assumptions: [
+        {
+          description: 'The system can sustain 100 requests per second',
+          confidence: 0.6,
+          falsification_condition: 'Fails when throughput drops below 100 requests/s for 5 minutes',
+        },
+        {
+          description: 'The primary database stays under 50ms p95 latency',
+          confidence: 0.6,
+          falsification_condition: 'Fails when p95 latency exceeds 50ms for 5 consecutive minutes',
+        },
+      ],
+      response_text: 'I am 95% confident this architecture will succeed in production.',
+    };
+
+    const result = handleValidateConfidence(input, engine);
+    expect(result.status).toBe('ENFORCEMENT_FAIL');
+    const inflationIssue = result.enforcement?.blocking_issues.find(issue =>
+      issue.mechanism === 'confidence_product' && issue.description.includes('Inflation detected')
+    );
+    expect(inflationIssue).toBeDefined();
+    expect(inflationIssue?.claim_ref).toBeUndefined();
+  });
+
+  it('Test 22: assumption-scoped falsification block carries claim_ref in real handler output', () => {
+    const engine = new EnforcementEngine();
+    const input = {
+      assumptions: [
+        { description: 'The system will handle load', confidence: 0.9 },
+        {
+          description: 'The cache refresh completes within 50ms',
+          confidence: 0.8,
+          falsification_condition: 'Fails when cache refresh exceeds 50ms for 1% of requests',
+        },
+      ],
+      response_text: 'I am 90% confident this architecture will succeed under production load.',
+    };
+
+    const result = handleValidateConfidence(input, engine);
+    expect(result.status).toBe('ENFORCEMENT_FAIL');
+    const scopedIssue = result.enforcement?.blocking_issues.find(issue =>
+      issue.mechanism === 'confidence_product' &&
+      issue.description.includes('lack falsification conditions')
+    );
+    expect(scopedIssue?.claim_ref).toBe('assumption:0');
   });
 });

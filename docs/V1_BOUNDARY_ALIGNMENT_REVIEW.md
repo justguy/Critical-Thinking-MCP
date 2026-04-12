@@ -8,7 +8,7 @@
 
 ## Status
 
-**Ready for integration.** An earlier review round had shipped a pass-looking report while three contract gaps remained. Those three gaps were closed in a revision round, and a fourth residual gap — a minimum-value mismatch between the Phalanx envelope/schema and the underlying CT tool validators — was surfaced and is now also closed in this integration round. The merged state passes `npm test` (411 tests) and `npx tsc --noEmit` cleanly.
+**Ready for integration.** An earlier review round had shipped a pass-looking report while three contract gaps remained. Those three gaps were closed in a revision round, and a fourth residual gap — a minimum-value mismatch between the Phalanx envelope/schema and the underlying CT tool validators — was surfaced and is now also closed. The current hardening branch state passes `npm test` (429 tests) and `npx tsc --noEmit` cleanly.
 
 ## Review Trail (oldest to newest)
 
@@ -20,7 +20,7 @@
 
 4. **Reviewer found a residual alignment gap.** The Phalanx envelope/schema still had looser minimums than the underlying CT tool validators on four fields: `assumptions.response_text` (tool: ≥10, envelope: ≥1), `claims.nodes` (tool: ≥2, envelope: ≥1), `claims.edges` (tool: ≥1, envelope: 0 allowed), `steps.steps` (tool: ≥2, envelope: ≥1). That meant malformed Phalanx inputs at those boundary values could still bypass envelope rejection and soft-fail to WARN at the tool layer.
 
-5. **This integration round closed the residual alignment gap.** All four minimums now match exactly in both `envelope.ts validateCall` and the MCP schema on `integrate_phalanx_check`. Eight new tests lock the alignment in. Final count: 411 tests, type-check clean.
+5. **This integration round closed the residual alignment gap.** All four minimums now match exactly in both `envelope.ts validateCall` and the MCP schema on `integrate_phalanx_check`. Eight new tests locked the alignment in at the integration point. The later hardening pass extends that coverage further. Final integration count: 411 tests, type-check clean.
 
 ## Branches
 
@@ -93,7 +93,7 @@ Four banned contract-drift tool names asserted absent (Slice 2). `detect_drift.d
 | 2 | Stateless | PASS | No module-level mutable state in the integration module; `toolInvoker` passed per call. |
 | 3 | Structured input only | PASS | `PhalanxCtCall` and all four sub-payloads validated via dedicated typed validators. Minimums now match the underlying tools. |
 | 4 | Fast enough | PASS (no load test) | Envelope is a thin mapping layer; one await per invoked tool. Staging benchmark recommended before Phalanx adoption. |
-| 5 | No false-positive drift | PASS | 411 tests pass on the integration merge; no regression vs beta.2. |
+| 5 | No false-positive drift | PASS | 429 tests pass on the current hardening branch; no regression vs beta.2. |
 | 6 | No capability inflation | PASS | 45+ CI-enforced boundary assertions across Slices 2 and 3; disclaimers inline on confusable tool descriptions. |
 
 ## Contract Fidelity
@@ -130,7 +130,7 @@ Matches the requirements doc verbatim. Every field wired end-to-end.
 3. *"`validate_confidence` and `validate_reasoning_chain` remain cleanly integrated and do not drift."* **PASS** — wrapped without source modification; input shapes preserved; envelope minimums now match their native minimums.
 4. *"Minor-version CT-MCP upgrades always pass a staging benchmark before branch adoption."* **PASS (documented)** — `mechanism_versions` in every verdict enables Phalanx-side pinning.
 
-## Remaining Non-Blocking Follow-ups
+## Historical Non-Blocking Follow-ups At 834ef59
 
 1. **`claim_ref` not populated.** Optional per spec; wire it when a blocking issue ties to a specific `ClaimNode.id` or an assumption hash.
 2. **Warning-mechanism naming is synthesized.** Envelope uses `${toolName}_warning` when a tool emits unstructured warnings. Surface real mechanism names from the underlying tool in a follow-up when structured warnings ship.
@@ -156,7 +156,7 @@ All items in "Remaining Non-Blocking Follow-ups" (numbered 1–7 in the earlier 
 
 - Envelope contract: input validation, sub-payload dispatch for all four tools, pre-dispatch rejection of minimum-violating inputs (matching underlying CT tool validators exactly)
 - Boundary assertions for R-2, R-3, R-4, R-5, R-8 non-ownership: all CI-enforced
-- `CtVerdict` output shape: deterministic `objection_id` (SHA-256), `claim_ref` field present in type (though unpopulated), `mechanism_versions` per-tool pinning
+- `CtVerdict` output shape: deterministic `objection_id` (SHA-256), `claim_ref` field present in type, `mechanism_versions` per-tool pinning
 - Transport soft-fail: `WARN` verdict + `phalanx_ct_mcp_transport` objection, never re-throws
 - `integrate_phalanx_check` MCP tool: all four sub-payloads exposed in public schema with correct minimums
 
@@ -167,7 +167,7 @@ All items in "Remaining Non-Blocking Follow-ups" (numbered 1–7 in the earlier 
 `claim_ref` was typed but always unset. Now:
 - `mapToolResultToObjections` passes through `claim_ref` from raw blocking issues when the tool supplies one. The `computeObjectionId` hash includes `claim_ref || ''` for stability.
 - `validate_reasoning_chain` populates `claim_ref` on `cycle_detection` (first cycle node id) and `orphan_detection` (first orphaned node id) blocking issues.
-- `validate_confidence` populates `claim_ref: 'assumption:<index>'` on inflation/falsification blocking issues anchored to the first offending assumption.
+- `validate_confidence` populates `claim_ref: 'assumption:<index>'` only on assumption-scoped falsification blocks. Aggregate inflation remains unanchored because it is grounded in the product of all assumptions, not one specific assumption.
 - `claim_ref` remains absent when a blocking issue has no honest node-level anchor (e.g., `consistency` violations).
 
 **Slice B — Structured warning mechanism names (done)**
@@ -188,12 +188,12 @@ All items in "Remaining Non-Blocking Follow-ups" (numbered 1–7 in the earlier 
 
 **Slice E — Narrow output-shape guard (done)**
 
-Added adapter-level fixture assertions in `tests/integration/phalanx_envelope.test.ts` (`output-shape guard — adapter consumes tool output shapes correctly` describe block). Asserts that `mapToolResultToObjections` correctly consumes ENFORCEMENT_FAIL and PASS shapes for all four envelope-supported tools (`validate_confidence`, `validate_reasoning_chain`, `check_plan_validity`, `detect_concurrency_patterns`), plus verifies correct `claim_ref` pass-through for the reasoning-chain fixture. Stays narrow — no registry added.
+Added adapter-level fixture assertions in `tests/integration/phalanx_envelope.test.ts` (`output-shape guard — adapter consumes tool output shapes correctly` describe block). Asserts that `mapToolResultToObjections` correctly consumes ENFORCEMENT_FAIL and PASS shapes for all four envelope-supported tools (`validate_confidence`, `validate_reasoning_chain`, `check_plan_validity`, `detect_concurrency_patterns`). Separate real-handler tests in `tests/enforcement/circumvention.test.ts` verify that `validate_reasoning_chain` and `validate_confidence` emit the intended `claim_ref` anchors. Stays narrow — no registry added.
 
 ### Hardening Pass Verification
 
-- Test count: 411 → 425 (+14 new tests)
-- `npm test`: 425/425 passing, 25 test files
+- Test count: 411 → 429 (+18 new tests)
+- `npm test`: 429/429 passing, 25 test files
 - `npx tsc --noEmit`: clean
 - Boundary suite: 37/37 passing (no assertions loosened)
 - `integrate_phalanx_check` contract minimums unchanged: `response_text ≥ 10`, `claims.nodes ≥ 2`, `claims.edges ≥ 1`, `steps.steps ≥ 2`
@@ -202,7 +202,7 @@ Added adapter-level fixture assertions in `tests/integration/phalanx_envelope.te
 ### Remaining Non-Blocking Follow-ups (Post-Hardening)
 
 1. **Staging benchmark against Phalanx.** Owned by Phalanx; flagged here so it is not forgotten at adoption time.
-2. **Slice 2 Zod strict-parsing.** Still disproportionate to introduce; remains deferred.
+2. **Additional strict-parsing dependency.** Still disproportionate to introduce for this boundary layer; remains deferred.
 3. **`validate_confidence` warning-to-`warning_issues` migration.** The `validate_confidence` tool still emits only plain-string `warnings[]`. A future pass could emit `warning_issues: [{mechanism: 'falsifiability', ...}]` from the tool directly (rather than relying on Phalanx to pattern-match). This is a pure improvement, not a correctness gap.
 
 ---

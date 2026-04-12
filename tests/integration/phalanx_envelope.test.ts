@@ -1298,14 +1298,14 @@ describe('claim_ref on blocking objections', () => {
     expect(orphanObj!.claim_ref).toBe('cn1');
   });
 
-  it('confidence_product inflation objection carries claim_ref assumption:0', async () => {
-    const inflationResult = {
+  it('confidence_product assumption-scoped objection carries claim_ref assumption:0', async () => {
+    const cappedResult = {
       status: 'ENFORCEMENT_FAIL' as const,
       enforcement: {
         blocking_issues: [
           {
             mechanism: 'confidence_product',
-            description: 'Inflation detected — claimed confidence exceeds honest ceiling by 0.500.',
+            description: '1 assumption(s) lack falsification conditions — confidence was capped to 0.3, but response claims high confidence (0.900). Add falsification conditions or reduce claimed confidence.',
             severity: 'blocking' as const,
             claim_ref: 'assumption:0',
           },
@@ -1315,12 +1315,12 @@ describe('claim_ref on blocking objections', () => {
       },
     };
 
-    const invoker: ToolInvoker = vi.fn().mockResolvedValue(inflationResult);
+    const invoker: ToolInvoker = vi.fn().mockResolvedValue(cappedResult);
     const verdict = await invokePhalanxContract(makeCall(), invoker);
 
-    const inflationObj = verdict.objections.find(o => o.mechanism === 'confidence_product');
-    expect(inflationObj).toBeDefined();
-    expect(inflationObj!.claim_ref).toBe('assumption:0');
+    const confidenceObj = verdict.objections.find(o => o.mechanism === 'confidence_product');
+    expect(confidenceObj).toBeDefined();
+    expect(confidenceObj!.claim_ref).toBe('assumption:0');
   });
 
   it('blocking issue without claim_ref in raw output does not get claim_ref on objection', async () => {

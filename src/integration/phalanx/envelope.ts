@@ -117,8 +117,10 @@ function validateAssumptions(raw: unknown, path: string): ConfidenceAssumptions 
     }
   }
 
-  if (!isNonEmptyString(obj.response_text)) {
-    throw new PhalanxContractInputError(`${path}.response_text must be a non-empty string`);
+  if (!isString(obj.response_text) || obj.response_text.length < 10) {
+    throw new PhalanxContractInputError(
+      `${path}.response_text must be a string of at least 10 characters (matches validate_confidence minimum)`,
+    );
   }
 
   return raw as ConfidenceAssumptions;
@@ -135,8 +137,10 @@ function validateClaims(raw: unknown, path: string): ClaimGraph {
 
   const obj = raw as Record<string, unknown>;
 
-  if (!Array.isArray(obj.nodes) || (obj.nodes as unknown[]).length === 0) {
-    throw new PhalanxContractInputError(`${path}.nodes must be a non-empty array`);
+  if (!Array.isArray(obj.nodes) || (obj.nodes as unknown[]).length < 2) {
+    throw new PhalanxContractInputError(
+      `${path}.nodes must be an array of at least 2 nodes (matches validate_reasoning_chain minimum)`,
+    );
   }
 
   const nodeIds = new Set<string>();
@@ -166,8 +170,10 @@ function validateClaims(raw: unknown, path: string): ClaimGraph {
     nodeIds.add(n.id);
   }
 
-  if (!Array.isArray(obj.edges)) {
-    throw new PhalanxContractInputError(`${path}.edges must be an array`);
+  if (!Array.isArray(obj.edges) || (obj.edges as unknown[]).length < 1) {
+    throw new PhalanxContractInputError(
+      `${path}.edges must be an array of at least 1 edge (matches validate_reasoning_chain minimum)`,
+    );
   }
 
   for (let i = 0; i < (obj.edges as unknown[]).length; i++) {
@@ -222,8 +228,10 @@ function validateSteps(raw: unknown, path: string): PlanSteps {
 
   const obj = raw as Record<string, unknown>;
 
-  if (!Array.isArray(obj.steps) || (obj.steps as unknown[]).length === 0) {
-    throw new PhalanxContractInputError(`${path}.steps must be a non-empty array`);
+  if (!Array.isArray(obj.steps) || (obj.steps as unknown[]).length < 2) {
+    throw new PhalanxContractInputError(
+      `${path}.steps must be an array of at least 2 steps (matches check_plan_validity minimum)`,
+    );
   }
 
   for (let i = 0; i < (obj.steps as unknown[]).length; i++) {

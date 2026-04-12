@@ -1057,3 +1057,163 @@ describe('malformed operations sub-payload', () => {
     ).resolves.toBeDefined();
   });
 });
+
+// ======================================================================
+// CT tool minimum alignment — envelope must reject inputs that the
+// underlying CT tools would themselves reject. These tests lock in the
+// four specific minimums (response_text length, nodes count, edges
+// count, steps count) so malformed inputs throw PhalanxContractInputError
+// pre-dispatch instead of reaching the tool and becoming soft-fail WARN.
+// ======================================================================
+
+describe('CT tool minimum alignment — pre-dispatch rejection', () => {
+  function callWith(payload: unknown) {
+    return {
+      call_id: 'min-align',
+      phase: 'planning' as const,
+      piece_id: null,
+      run_id: 'r',
+      payload,
+    };
+  }
+
+  it('rejects assumptions.response_text shorter than 10 chars (matches validate_confidence minimum)', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    const bad = callWith({
+      assumptions: {
+        assumptions: [{ description: 'ok', confidence: 0.5 }],
+        response_text: 'too short',
+      },
+    });
+    await expect(invokePhalanxContract(bad, invoker)).rejects.toBeInstanceOf(
+      PhalanxContractInputError,
+    );
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('accepts assumptions.response_text of exactly 10 chars', async () => {
+    const invoker: ToolInvoker = vi.fn().mockResolvedValue(PASS_TOOL_RESULT);
+    const call = callWith({
+      assumptions: {
+        assumptions: [{ description: 'ok', confidence: 0.5 }],
+        response_text: 'x'.repeat(10),
+      },
+    });
+    await expect(invokePhalanxContract(call, invoker)).resolves.toBeDefined();
+    expect(invoker).toHaveBeenCalledOnce();
+  });
+
+  it('rejects claims.nodes with only 1 node (matches validate_reasoning_chain minimum)', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    const bad = callWith({
+      claims: {
+        nodes: [{ id: 'n1', label: 'sole node', type: 'claim' }],
+        edges: [],
+      },
+    });
+    await expect(invokePhalanxContract(bad, invoker)).rejects.toBeInstanceOf(
+      PhalanxContractInputError,
+    );
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('rejects claims.edges empty (matches validate_reasoning_chain minimum)', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    const bad = callWith({
+      claims: {
+        nodes: [
+          { id: 'n1', label: 'A', type: 'claim' },
+          { id: 'n2', label: 'B', type: 'claim' },
+        ],
+        edges: [],
+      },
+    });
+    await expect(invokePhalanxContract(bad, invoker)).rejects.toBeInstanceOf(
+      PhalanxContractInputError,
+    );
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('accepts claims with exactly 2 nodes and 1 edge', async () => {
+    const invoker: ToolInvoker = vi.fn().mockResolvedValue(PASS_TOOL_RESULT);
+    const call = callWith({
+      claims: {
+        nodes: [
+          { id: 'n1', label: 'A', type: 'evidence' },
+          { id: 'n2', label: 'B', type: 'claim' },
+        ],
+        edges: [{ from: 'n1', to: 'n2', relation: 'supports' }],
+      },
+    });
+    await expect(invokePhalanxContract(call, invoker)).resolves.toBeDefined();
+    expect(invoker).toHaveBeenCalledOnce();
+  });
+
+  it('rejects steps.steps with only 1 step (matches check_plan_validity minimum)', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    const bad = callWith({
+      steps: {
+        steps: [{ id: 's1', description: 'lone step', dependencies: [] }],
+      },
+    });
+    await expect(invokePhalanxContract(bad, invoker)).rejects.toBeInstanceOf(
+      PhalanxContractInputError,
+    );
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('accepts steps with exactly 2 steps', async () => {
+    const invoker: ToolInvoker = vi.fn().mockResolvedValue(STEPS_PASS_TOOL_RESULT);
+    const call = callWith({
+      steps: {
+        steps: [
+          { id: 's1', description: 'first', dependencies: [] },
+          { id: 's2', description: 'second', dependencies: ['s1'] },
+        ],
+      },
+    });
+    await expect(invokePhalanxContract(call, invoker)).resolves.toBeDefined();
+    expect(invoker).toHaveBeenCalledOnce();
+  });
+
+  it('rejection happens before any tool dispatch on every minimum violation', async () => {
+    const invoker: ToolInvoker = vi.fn();
+
+    const cases: unknown[] = [
+      callWith({
+        assumptions: {
+          assumptions: [{ description: 'ok', confidence: 0.5 }],
+          response_text: 'short',
+        },
+      }),
+      callWith({
+        claims: {
+          nodes: [{ id: 'n1', label: 'A', type: 'claim' }],
+          edges: [],
+        },
+      }),
+      callWith({
+        claims: {
+          nodes: [
+            { id: 'n1', label: 'A', type: 'claim' },
+            { id: 'n2', label: 'B', type: 'claim' },
+          ],
+          edges: [],
+        },
+      }),
+      callWith({
+        steps: {
+          steps: [{ id: 's1', description: 'x', dependencies: [] }],
+        },
+      }),
+    ];
+
+    for (const c of cases) {
+      await expect(invokePhalanxContract(c, invoker)).rejects.toBeInstanceOf(
+        PhalanxContractInputError,
+      );
+    }
+
+    expect(invoker).not.toHaveBeenCalled();
+  });
+});

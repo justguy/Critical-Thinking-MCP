@@ -32,12 +32,12 @@ type PhalanxCtCall = {
         confidence: number;      // 0.0 – 1.0
         falsification_condition?: string;
       }>;
-      response_text: string;     // non-empty
+      response_text: string;     // minimum length 10 (matches validate_confidence)
     };
     // Supply claims to invoke validate_reasoning_chain (R-7)
     claims?: {
-      nodes: Array<{ id: string; label: string; type: "claim"|"evidence"|"conclusion"|"assumption" }>;
-      edges: Array<{ from: string; to: string; relation: "supports"|"implies"|"contradicts"|"requires" }>;
+      nodes: Array<{ id: string; label: string; type: "claim"|"evidence"|"conclusion"|"assumption" }>; // minItems 2
+      edges: Array<{ from: string; to: string; relation: "supports"|"implies"|"contradicts"|"requires" }>; // minItems 1
       // NOTE: edge from/to values must refer to node ids present in nodes
     };
     // Supply steps to invoke check_plan_validity (plan structure check)
@@ -47,7 +47,7 @@ type PhalanxCtCall = {
         description: string;
         dependencies: string[];
         resources?: string[];
-      }>;
+      }>;                          // minItems 2 (matches check_plan_validity)
     };
     // Supply operations to invoke detect_concurrency_patterns (concurrency hazard check)
     operations?: {
@@ -107,6 +107,7 @@ ID. Phalanx can safely use these as stable keys for rebuttal tracking.
 | Transport error / tool throws | Soft-fail → `WARN` verdict with `phalanx_ct_mcp_transport` objection; never re-throws |
 | Malformed `PhalanxCtCall` input | Throws `PhalanxContractInputError` before any tool dispatch |
 | Malformed sub-payload (assumptions, claims, steps, or operations) | `PhalanxContractInputError` with field path in message; no tool is invoked |
+| Sub-payload violates the underlying tool's minimum (e.g., `response_text` < 10 chars, `nodes` < 2, `edges` < 1, `steps` < 2) | `PhalanxContractInputError` pre-dispatch — envelope minimums match tool minimums, so malformed payloads never reach the tool |
 | None of `assumptions`, `claims`, `steps`, `operations` in payload | `PhalanxContractInputError` |
 
 CT-MCP outages must not hard-block the Phalanx pipeline; the soft-fail WARN

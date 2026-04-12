@@ -8,9 +8,10 @@ The authoritative requirements are in the Phalanx repository at
 
 CT-MCP acts as a deterministic signal provider inside Phalanx's critic stack.
 Phalanx owns all pipeline gates, state-machine transitions, and closure truth.
-CT-MCP contributes specific deterministic checks (R-6 confidence ceiling, R-7
-reasoning chain) where it is already strong and stable enough to help block or
-warn before downstream LLM critics run.
+CT-MCP contributes specific deterministic checks (R-6 confidence ceiling,
+R-7 reasoning chain, plan validity, and concurrency hazard detection) where
+it is already strong and stable enough to help block or warn before downstream
+LLM critics run.
 
 ## Input Contract (Phalanx -> CT-MCP)
 
@@ -31,22 +32,41 @@ type PhalanxCtCall = {
         confidence: number;      // 0.0 – 1.0
         falsification_condition?: string;
       }>;
-      response_text: string;     // min 10 chars
+      response_text: string;     // non-empty
     };
     // Supply claims to invoke validate_reasoning_chain (R-7)
     claims?: {
       nodes: Array<{ id: string; label: string; type: "claim"|"evidence"|"conclusion"|"assumption" }>;
       edges: Array<{ from: string; to: string; relation: "supports"|"implies"|"contradicts"|"requires" }>;
+      // NOTE: edge from/to values must refer to node ids present in nodes
+    };
+    // Supply steps to invoke check_plan_validity (plan structure check)
+    steps?: {
+      steps: Array<{
+        id: string;
+        description: string;
+        dependencies: string[];
+        resources?: string[];
+      }>;
+    };
+    // Supply operations to invoke detect_concurrency_patterns (concurrency hazard check)
+    operations?: {
+      steps: string[];           // non-empty; ordered operation descriptions
+      shared_resources?: string[];
+      protections?: string[];
+      delivery_model?: "at_least_once" | "at_most_once" | "exactly_once";
+      retry_behavior?: "none" | "automatic" | "manual";
     };
   };
 };
 ```
 
-**At least one of `assumptions` or `claims` must be present.** Supplying neither
-throws a `PhalanxContractInputError` before any tool dispatch.
+**At least one of `assumptions`, `claims`, `steps`, or `operations` must be present.**
+Supplying none throws a `PhalanxContractInputError` before any tool dispatch.
 
-Both can be present simultaneously; the envelope dispatches to both tools and
-merges results.
+Multiple sub-payloads can be present simultaneously; the envelope dispatches to
+all applicable tools and merges results. The final verdict is the worst severity
+across all tool invocations.
 
 ## Normalized Adapter Output Contract (CT-MCP -> Phalanx)
 
@@ -86,7 +106,8 @@ ID. Phalanx can safely use these as stable keys for rebuttal tracking.
 |---|---|
 | Transport error / tool throws | Soft-fail → `WARN` verdict with `phalanx_ct_mcp_transport` objection; never re-throws |
 | Malformed `PhalanxCtCall` input | Throws `PhalanxContractInputError` before any tool dispatch |
-| Neither `assumptions` nor `claims` in payload | `PhalanxContractInputError` |
+| Malformed sub-payload (assumptions, claims, steps, or operations) | `PhalanxContractInputError` with field path in message; no tool is invoked |
+| None of `assumptions`, `claims`, `steps`, `operations` in payload | `PhalanxContractInputError` |
 
 CT-MCP outages must not hard-block the Phalanx pipeline; the soft-fail WARN
 verdict lets Phalanx decide whether to retry or proceed with a degraded signal.
@@ -163,6 +184,15 @@ src/integration/phalanx/
   failure.ts    — transportFailureVerdict (soft-fail path)
   index.ts      — public exports
 ```
+
+## Tool Routing Summary
+
+| Payload key | Invokes tool | Requirements |
+|---|---|---|
+| `assumptions` | `validate_confidence` | R-6 confidence ceiling |
+| `claims` | `validate_reasoning_chain` | R-7 reasoning chain |
+| `steps` | `check_plan_validity` | Plan structure / circular dependency / resource conflict |
+| `operations` | `detect_concurrency_patterns` | Concurrency hazard patterns |
 
 ## Non-Goals (V1)
 

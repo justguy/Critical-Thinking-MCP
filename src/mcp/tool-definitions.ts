@@ -696,7 +696,7 @@ Optional fields:
   },
   {
     name: 'integrate_phalanx_check',
-    description: 'Normalized Phalanx integration envelope: accepts a PhalanxCtCall and returns a CtVerdict by routing to the appropriate ct-mcp tools.',
+    description: 'Normalized Phalanx integration envelope: accepts a PhalanxCtCall and returns a CtVerdict by routing to the appropriate ct-mcp tools. Supply at least one of: assumptions (validate_confidence), claims (validate_reasoning_chain), steps (check_plan_validity), or operations (detect_concurrency_patterns).',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -719,7 +719,7 @@ Optional fields:
         },
         payload: {
           type: 'object' as const,
-          description: 'Check payload — supply assumptions for validate_confidence and/or claims for validate_reasoning_chain',
+          description: 'Check payload — supply at least one of: assumptions, claims, steps, or operations',
           properties: {
             assumptions: {
               type: 'object' as const,
@@ -738,7 +738,7 @@ Optional fields:
                   },
                   minItems: 1,
                 },
-                response_text: { type: 'string' as const, minLength: 10 },
+                response_text: { type: 'string' as const, minLength: 1 },
               },
               required: ['assumptions', 'response_text'],
             },
@@ -760,7 +760,7 @@ Optional fields:
                     },
                     required: ['id', 'label', 'type'],
                   },
-                  minItems: 2,
+                  minItems: 1,
                 },
                 edges: {
                   type: 'array' as const,
@@ -776,10 +776,72 @@ Optional fields:
                     },
                     required: ['from', 'to', 'relation'],
                   },
-                  minItems: 1,
                 },
               },
               required: ['nodes', 'edges'],
+            },
+            steps: {
+              type: 'object' as const,
+              description: 'Plan validity check payload (check_plan_validity)',
+              properties: {
+                steps: {
+                  type: 'array' as const,
+                  items: {
+                    type: 'object' as const,
+                    properties: {
+                      id: { type: 'string' as const, description: 'Unique step identifier' },
+                      description: { type: 'string' as const, description: 'What this step does' },
+                      dependencies: {
+                        type: 'array' as const,
+                        items: { type: 'string' as const },
+                        description: 'IDs of steps that must complete before this one',
+                      },
+                      resources: {
+                        type: 'array' as const,
+                        items: { type: 'string' as const },
+                        description: 'Optional resource identifiers this step uses',
+                      },
+                    },
+                    required: ['id', 'description', 'dependencies'],
+                  },
+                  minItems: 1,
+                  description: 'Array of plan steps',
+                },
+              },
+              required: ['steps'],
+            },
+            operations: {
+              type: 'object' as const,
+              description: 'Concurrency hazard check payload (detect_concurrency_patterns)',
+              properties: {
+                steps: {
+                  type: 'array' as const,
+                  items: { type: 'string' as const },
+                  minItems: 1,
+                  description: 'Ordered sequence of operation steps (strings)',
+                },
+                shared_resources: {
+                  type: 'array' as const,
+                  items: { type: 'string' as const },
+                  description: 'Named shared state or resources accessed by multiple steps',
+                },
+                protections: {
+                  type: 'array' as const,
+                  items: { type: 'string' as const },
+                  description: 'Concurrency protections in place (locks, transactions, idempotency keys)',
+                },
+                delivery_model: {
+                  type: 'string' as const,
+                  enum: ['at_least_once', 'at_most_once', 'exactly_once'],
+                  description: 'Message delivery guarantee',
+                },
+                retry_behavior: {
+                  type: 'string' as const,
+                  enum: ['none', 'automatic', 'manual'],
+                  description: 'Retry behavior on failure',
+                },
+              },
+              required: ['steps'],
             },
           },
         },

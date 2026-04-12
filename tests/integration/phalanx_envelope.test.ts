@@ -254,14 +254,14 @@ describe('malformed input path', () => {
     expect(invoker).not.toHaveBeenCalled();
   });
 
-  it('throws PhalanxContractInputError when payload has neither assumptions nor claims', async () => {
+  it('throws PhalanxContractInputError when payload has none of the four sub-payloads', async () => {
     const invoker: ToolInvoker = vi.fn();
     const bad = {
       call_id: 'x',
       phase: 'planning',
       piece_id: null,
       run_id: 'r',
-      payload: { operations: { steps: ['step1'] } },
+      payload: {},
     };
     await expect(invokePhalanxContract(bad, invoker)).rejects.toBeInstanceOf(
       PhalanxContractInputError,
@@ -472,5 +472,588 @@ describe('mapToolResultToObjections', () => {
   it('handles non-object raw gracefully (returns empty)', () => {
     const result = mapToolResultToObjections('tool', null, 'call-1');
     expect(result).toHaveLength(0);
+  });
+});
+
+// ====== steps dispatch ======
+
+const STEPS_PASS_TOOL_RESULT = {
+  status: 'PASS' as const,
+  circular_dependencies: [],
+  missing_prerequisites: [],
+  resource_conflicts: [],
+  completeness_score: 1,
+  critical_path: ['s1', 's2'],
+};
+
+const STEPS_BLOCK_TOOL_RESULT = {
+  status: 'ENFORCEMENT_FAIL' as const,
+  enforcement: {
+    blocking_issues: [
+      {
+        mechanism: 'circular_dependency',
+        description: 'Circular dependency detected: s1 -> s2 -> s1',
+        severity: 'blocking' as const,
+      },
+    ],
+    warnings: [],
+    corrective_prompt: 'Remove the cycle.',
+  },
+};
+
+const VALID_STEPS_PAYLOAD = {
+  steps: [
+    { id: 's1', description: 'Initialize DB', dependencies: [] },
+    { id: 's2', description: 'Run migrations', dependencies: ['s1'] },
+  ],
+};
+
+describe('steps dispatch', () => {
+  it('invokes check_plan_validity with the correct args', async () => {
+    const invoker: ToolInvoker = vi.fn().mockResolvedValue(STEPS_PASS_TOOL_RESULT);
+    const call = makeCall({ payload: { steps: VALID_STEPS_PAYLOAD } });
+
+    await invokePhalanxContract(call, invoker);
+
+    expect(invoker).toHaveBeenCalledWith(
+      'check_plan_validity',
+      expect.objectContaining({ steps: VALID_STEPS_PAYLOAD.steps }),
+    );
+  });
+
+  it('returns PASS verdict when check_plan_validity returns PASS', async () => {
+    const invoker: ToolInvoker = vi.fn().mockResolvedValue(STEPS_PASS_TOOL_RESULT);
+    const verdict = await invokePhalanxContract(makeCall({ payload: { steps: VALID_STEPS_PAYLOAD } }), invoker);
+
+    expect(verdict.verdict).toBe('PASS');
+    expect(verdict.objections).toHaveLength(0);
+  });
+
+  it('returns BLOCK verdict when check_plan_validity returns ENFORCEMENT_FAIL', async () => {
+    const invoker: ToolInvoker = vi.fn().mockResolvedValue(STEPS_BLOCK_TOOL_RESULT);
+    const verdict = await invokePhalanxContract(makeCall({ payload: { steps: VALID_STEPS_PAYLOAD } }), invoker);
+
+    expect(verdict.verdict).toBe('BLOCK');
+    expect(verdict.objections.some(o => o.mechanism === 'circular_dependency')).toBe(true);
+  });
+
+  it('mechanism_versions contains check_plan_validity when steps dispatched', async () => {
+    const invoker: ToolInvoker = vi.fn().mockResolvedValue(STEPS_PASS_TOOL_RESULT);
+    const verdict = await invokePhalanxContract(makeCall({ payload: { steps: VALID_STEPS_PAYLOAD } }), invoker);
+
+    expect(verdict.mechanism_versions).toHaveProperty('check_plan_validity');
+  });
+});
+
+// ====== operations dispatch ======
+
+const OPS_PASS_TOOL_RESULT = {
+  status: 'PASS' as const,
+  patterns_detected: [],
+  hazard_count: 0,
+};
+
+const OPS_BLOCK_TOOL_RESULT = {
+  status: 'ENFORCEMENT_FAIL' as const,
+  enforcement: {
+    blocking_issues: [
+      {
+        mechanism: 'check_then_act',
+        description: 'Check-then-act pattern detected.',
+        severity: 'blocking' as const,
+      },
+    ],
+    warnings: [],
+    corrective_prompt: 'Use atomic compare-and-swap.',
+  },
+};
+
+const VALID_OPERATIONS_PAYLOAD = {
+  steps: ['Read balance', 'Check balance >= cost', 'Write balance'],
+  shared_resources: ['balance'],
+  protections: [],
+};
+
+describe('operations dispatch', () => {
+  it('invokes detect_concurrency_patterns with the correct args', async () => {
+    const invoker: ToolInvoker = vi.fn().mockResolvedValue(OPS_PASS_TOOL_RESULT);
+    const call = makeCall({ payload: { operations: VALID_OPERATIONS_PAYLOAD } });
+
+    await invokePhalanxContract(call, invoker);
+
+    expect(invoker).toHaveBeenCalledWith(
+      'detect_concurrency_patterns',
+      expect.objectContaining({
+        steps: VALID_OPERATIONS_PAYLOAD.steps,
+        shared_resources: VALID_OPERATIONS_PAYLOAD.shared_resources,
+        protections: VALID_OPERATIONS_PAYLOAD.protections,
+      }),
+    );
+  });
+
+  it('returns PASS verdict when detect_concurrency_patterns returns PASS', async () => {
+    const invoker: ToolInvoker = vi.fn().mockResolvedValue(OPS_PASS_TOOL_RESULT);
+    const verdict = await invokePhalanxContract(makeCall({ payload: { operations: VALID_OPERATIONS_PAYLOAD } }), invoker);
+
+    expect(verdict.verdict).toBe('PASS');
+    expect(verdict.objections).toHaveLength(0);
+  });
+
+  it('returns BLOCK verdict when detect_concurrency_patterns returns ENFORCEMENT_FAIL', async () => {
+    const invoker: ToolInvoker = vi.fn().mockResolvedValue(OPS_BLOCK_TOOL_RESULT);
+    const verdict = await invokePhalanxContract(makeCall({ payload: { operations: VALID_OPERATIONS_PAYLOAD } }), invoker);
+
+    expect(verdict.verdict).toBe('BLOCK');
+    expect(verdict.objections.some(o => o.mechanism === 'check_then_act')).toBe(true);
+  });
+
+  it('forwards optional fields (delivery_model, retry_behavior) when present', async () => {
+    const invoker: ToolInvoker = vi.fn().mockResolvedValue(OPS_PASS_TOOL_RESULT);
+    const payload = {
+      operations: {
+        steps: ['op1', 'op2'],
+        delivery_model: 'at_least_once' as const,
+        retry_behavior: 'automatic' as const,
+      },
+    };
+
+    await invokePhalanxContract(makeCall({ payload }), invoker);
+
+    expect(invoker).toHaveBeenCalledWith(
+      'detect_concurrency_patterns',
+      expect.objectContaining({
+        delivery_model: 'at_least_once',
+        retry_behavior: 'automatic',
+      }),
+    );
+  });
+
+  it('mechanism_versions contains detect_concurrency_patterns when operations dispatched', async () => {
+    const invoker: ToolInvoker = vi.fn().mockResolvedValue(OPS_PASS_TOOL_RESULT);
+    const verdict = await invokePhalanxContract(makeCall({ payload: { operations: VALID_OPERATIONS_PAYLOAD } }), invoker);
+
+    expect(verdict.mechanism_versions).toHaveProperty('detect_concurrency_patterns');
+  });
+});
+
+// ====== All four sub-payloads ======
+
+describe('all four sub-payloads present', () => {
+  const allFourPayload = {
+    assumptions: {
+      assumptions: [{ description: 'Service is up', confidence: 0.9 }],
+      response_text: 'All systems go.',
+    },
+    claims: {
+      nodes: [
+        { id: 'n1', label: 'Evidence', type: 'evidence' as const },
+        { id: 'n2', label: 'Claim', type: 'claim' as const },
+      ],
+      edges: [{ from: 'n1', to: 'n2', relation: 'supports' as const }],
+    },
+    steps: {
+      steps: [
+        { id: 's1', description: 'Step 1', dependencies: [] },
+        { id: 's2', description: 'Step 2', dependencies: ['s1'] },
+      ],
+    },
+    operations: {
+      steps: ['Read', 'Write'],
+      shared_resources: ['db'],
+    },
+  };
+
+  it('invokes all four tools when all sub-payloads are present', async () => {
+    const invoker: ToolInvoker = vi.fn().mockResolvedValue(STEPS_PASS_TOOL_RESULT);
+    await invokePhalanxContract(makeCall({ payload: allFourPayload }), invoker);
+
+    const calledTools = (invoker as ReturnType<typeof vi.fn>).mock.calls.map(
+      (c: unknown[]) => c[0],
+    );
+    expect(calledTools).toContain('validate_confidence');
+    expect(calledTools).toContain('validate_reasoning_chain');
+    expect(calledTools).toContain('check_plan_validity');
+    expect(calledTools).toContain('detect_concurrency_patterns');
+    expect(calledTools).toHaveLength(4);
+  });
+
+  it('verdict is worst-severity across all four tools', async () => {
+    const invoker: ToolInvoker = vi.fn()
+      .mockResolvedValueOnce(PASS_TOOL_RESULT)          // validate_confidence → PASS
+      .mockResolvedValueOnce(STEPS_PASS_TOOL_RESULT)    // validate_reasoning_chain → PASS (reuses result shape)
+      .mockResolvedValueOnce(STEPS_BLOCK_TOOL_RESULT)   // check_plan_validity → BLOCK
+      .mockResolvedValueOnce(OPS_PASS_TOOL_RESULT);     // detect_concurrency_patterns → PASS
+
+    const verdict = await invokePhalanxContract(makeCall({ payload: allFourPayload }), invoker);
+
+    expect(verdict.verdict).toBe('BLOCK');
+    expect(verdict.objections.some(o => o.mechanism === 'circular_dependency')).toBe(true);
+  });
+
+  it('mechanism_versions contains all four tools', async () => {
+    const invoker: ToolInvoker = vi.fn().mockResolvedValue(STEPS_PASS_TOOL_RESULT);
+    const verdict = await invokePhalanxContract(makeCall({ payload: allFourPayload }), invoker);
+
+    expect(verdict.mechanism_versions).toHaveProperty('validate_confidence');
+    expect(verdict.mechanism_versions).toHaveProperty('validate_reasoning_chain');
+    expect(verdict.mechanism_versions).toHaveProperty('check_plan_validity');
+    expect(verdict.mechanism_versions).toHaveProperty('detect_concurrency_patterns');
+  });
+});
+
+// ====== Sub-payload malformed input validation ======
+
+describe('malformed assumptions sub-payload', () => {
+  function badAssumptionsCall(assumptions: unknown) {
+    return {
+      call_id: 'x',
+      phase: 'planning',
+      piece_id: null,
+      run_id: 'r',
+      payload: { assumptions },
+    };
+  }
+
+  it('throws when assumptions.assumptions is not an array', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(badAssumptionsCall({ assumptions: 'not-array', response_text: 'ok' }), invoker),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when an assumption element has missing description', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(
+        badAssumptionsCall({ assumptions: [{ confidence: 0.5 }], response_text: 'ok' }),
+        invoker,
+      ),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when an assumption description is an empty string', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(
+        badAssumptionsCall({ assumptions: [{ description: '', confidence: 0.5 }], response_text: 'ok' }),
+        invoker,
+      ),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when confidence is out of [0,1] range', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(
+        badAssumptionsCall({ assumptions: [{ description: 'ok', confidence: 1.5 }], response_text: 'ok' }),
+        invoker,
+      ),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when confidence is the wrong type', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(
+        badAssumptionsCall({ assumptions: [{ description: 'ok', confidence: 'high' }], response_text: 'ok' }),
+        invoker,
+      ),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when response_text is missing', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(
+        badAssumptionsCall({ assumptions: [{ description: 'ok', confidence: 0.5 }] }),
+        invoker,
+      ),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when response_text is empty', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(
+        badAssumptionsCall({ assumptions: [{ description: 'ok', confidence: 0.5 }], response_text: '' }),
+        invoker,
+      ),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when falsification_condition is wrong type', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(
+        badAssumptionsCall({
+          assumptions: [{ description: 'ok', confidence: 0.5, falsification_condition: 42 }],
+          response_text: 'ok',
+        }),
+        invoker,
+      ),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+});
+
+describe('malformed claims sub-payload', () => {
+  function badClaimsCall(claims: unknown) {
+    return {
+      call_id: 'x',
+      phase: 'planning',
+      piece_id: null,
+      run_id: 'r',
+      payload: { claims },
+    };
+  }
+
+  it('throws when nodes is not an array', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(badClaimsCall({ nodes: 'bad', edges: [] }), invoker),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when nodes is an empty array', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(badClaimsCall({ nodes: [], edges: [] }), invoker),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when a node has an invalid type enum value', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(
+        badClaimsCall({ nodes: [{ id: 'n1', label: 'x', type: 'invalid_type' }], edges: [] }),
+        invoker,
+      ),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when a node has missing required field (id)', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(
+        badClaimsCall({ nodes: [{ label: 'x', type: 'claim' }], edges: [] }),
+        invoker,
+      ),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when an edge has invalid relation enum value', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(
+        badClaimsCall({
+          nodes: [{ id: 'n1', label: 'x', type: 'claim' }],
+          edges: [{ from: 'n1', to: 'n1', relation: 'bad_relation' }],
+        }),
+        invoker,
+      ),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when an edge from references a missing node id', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(
+        badClaimsCall({
+          nodes: [{ id: 'n1', label: 'x', type: 'claim' }],
+          edges: [{ from: 'MISSING', to: 'n1', relation: 'supports' }],
+        }),
+        invoker,
+      ),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when an edge to references a missing node id', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(
+        badClaimsCall({
+          nodes: [{ id: 'n1', label: 'x', type: 'claim' }],
+          edges: [{ from: 'n1', to: 'MISSING', relation: 'supports' }],
+        }),
+        invoker,
+      ),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when edges is not an array', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(
+        badClaimsCall({ nodes: [{ id: 'n1', label: 'x', type: 'claim' }], edges: 'bad' }),
+        invoker,
+      ),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+});
+
+describe('malformed steps sub-payload', () => {
+  function badStepsCall(steps: unknown) {
+    return {
+      call_id: 'x',
+      phase: 'planning',
+      piece_id: null,
+      run_id: 'r',
+      payload: { steps },
+    };
+  }
+
+  it('throws when steps.steps is not an array', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(badStepsCall({ steps: 'bad' }), invoker),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when steps.steps is empty', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(badStepsCall({ steps: [] }), invoker),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when a step is missing required field description', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(badStepsCall({ steps: [{ id: 's1', dependencies: [] }] }), invoker),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when a step dependencies is not an array', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(
+        badStepsCall({ steps: [{ id: 's1', description: 'x', dependencies: 'not-array' }] }),
+        invoker,
+      ),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when a step resources is wrong type', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(
+        badStepsCall({
+          steps: [{ id: 's1', description: 'x', dependencies: [], resources: 'bad' }],
+        }),
+        invoker,
+      ),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+});
+
+describe('malformed operations sub-payload', () => {
+  function badOpsCall(operations: unknown) {
+    return {
+      call_id: 'x',
+      phase: 'planning',
+      piece_id: null,
+      run_id: 'r',
+      payload: { operations },
+    };
+  }
+
+  it('throws when operations.steps is not an array', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(badOpsCall({ steps: 'bad' }), invoker),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when operations.steps is empty', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(badOpsCall({ steps: [] }), invoker),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when operations.steps contains non-strings', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(badOpsCall({ steps: [42, 'ok'] }), invoker),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when delivery_model has invalid enum value', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(badOpsCall({ steps: ['op1'], delivery_model: 'maybe_once' }), invoker),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when retry_behavior has invalid enum value', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(badOpsCall({ steps: ['op1'], retry_behavior: 'sometimes' }), invoker),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when shared_resources is wrong type', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(badOpsCall({ steps: ['op1'], shared_resources: 'not-array' }), invoker),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('throws when protections is wrong type', async () => {
+    const invoker: ToolInvoker = vi.fn();
+    await expect(
+      invokePhalanxContract(badOpsCall({ steps: ['op1'], protections: 123 }), invoker),
+    ).rejects.toBeInstanceOf(PhalanxContractInputError);
+    expect(invoker).not.toHaveBeenCalled();
+  });
+
+  it('does NOT throw for a valid operations payload with all optional fields', async () => {
+    const invoker: ToolInvoker = vi.fn().mockResolvedValue(OPS_PASS_TOOL_RESULT);
+    await expect(
+      invokePhalanxContract(
+        {
+          call_id: 'x',
+          phase: 'planning',
+          piece_id: null,
+          run_id: 'r',
+          payload: {
+            operations: {
+              steps: ['op1', 'op2'],
+              shared_resources: ['db'],
+              protections: ['mutex'],
+              delivery_model: 'exactly_once',
+              retry_behavior: 'none',
+            },
+          },
+        },
+        invoker,
+      ),
+    ).resolves.toBeDefined();
   });
 });

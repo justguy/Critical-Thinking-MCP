@@ -189,7 +189,7 @@ Also reports monotonic progress: is_improving, is_stalling, is_declining.
 
 Optional field: "drift_sensitivity" (number, default 0.5).
 
-Optionally pass "context" with prior iteration data for escalation and stall detection.`,
+Optionally pass "context" with prior iteration data for escalation and stall detection. Numeric-series drift only; NOT a retry-contract drift detector (see Phalanx R-8).`,
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -441,7 +441,7 @@ Dimensions:
 
 Returns the weakest dimension with targeted improvement advice.
 
-Optionally pass "context" with prior iteration data for escalation and stall detection.`,
+Optionally pass "context" with prior iteration data for escalation and stall detection. Entity grounding here is scoped to response-text entities; NOT repo-level seam, symbol, or file-existence checking (see Phalanx R-5).`,
     inputSchema: {
       type: 'object' as const,
       properties: {

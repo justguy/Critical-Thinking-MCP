@@ -1,0 +1,96 @@
+{
+  "schema_version": "v1.0",
+  "scenario_id": "tea_004_constraint_paradox",
+  "artifact_ids": {
+    "pass1": "tea_004_constraint_paradox:pass1_answer:4f74affa5728",
+    "pass2": "tea_004_constraint_paradox:pass2_critique:501e79103830",
+    "pass3": "tea_004_constraint_paradox:pass3_repair:e8a3f97ab1d7"
+  },
+  "rule_profile_version": "v1_provisional",
+  "capability_mode": "external_only",
+  "scoring_timestamp": "2026-04-07T18:41:31.774Z",
+  "core_final_score": 0.49999999999999994,
+  "calibration_augmented_score": null,
+  "arbiter_pass_status": "AVAILABLE",
+  "arbiter_metadata": {
+    "arbiter_model_id": "gemini-3.1-pro-preview",
+    "arbiter_provider": "gemini",
+    "official_run_attested": false,
+    "certified": false,
+    "official_score_eligible": false,
+    "certification_label": null
+  },
+  "leaderboard_status": "unofficial_custom_arbiter",
+  "score_components": [
+    {
+      "component_id": "contradiction_overlap",
+      "raw_score": 0.6666666666666666,
+      "weight": 0.22,
+      "weighted_score": 0.14666666666666667
+    },
+    {
+      "component_id": "gap_closure",
+      "raw_score": 0,
+      "weight": 0.18,
+      "weighted_score": 0
+    },
+    {
+      "component_id": "premise_rejection",
+      "raw_score": 0.9,
+      "weight": 0.12,
+      "weighted_score": 0.108
+    },
+    {
+      "component_id": "repair_quality",
+      "raw_score": 0.6,
+      "weight": 0.12,
+      "weighted_score": 0.072
+    },
+    {
+      "component_id": "type_discipline",
+      "raw_score": 0.2,
+      "weight": 0.1,
+      "weighted_score": 0.020000000000000004
+    },
+    {
+      "component_id": "causal_integrity",
+      "raw_score": 1,
+      "weight": 0.1,
+      "weighted_score": 0.1
+    },
+    {
+      "component_id": "consistency",
+      "raw_score": 0.16666666666666663,
+      "weight": 0.08,
+      "weighted_score": 0.01333333333333333
+    },
+    {
+      "component_id": "external_calibration",
+      "raw_score": 0.5,
+      "weight": 0.08,
+      "weighted_score": 0.04
+    }
+  ],
+  "caps_applied": [
+    {
+      "rule_id": "repair_quality_cap_low_gcr",
+      "field": "repair_quality",
+      "applied_value": "partial",
+      "reason": "Gap closure rate below substantive threshold."
+    }
+  ],
+  "conflicts": [
+    {
+      "field": "repair_quality",
+      "deterministic_value": "cap:max_partial@gcr<0.8",
+      "arbiter_value": "substantive",
+      "resolution": "capped_to_partial"
+    }
+  ],
+  "audit_trace": [
+    {
+      "trace_type": "reconciler",
+      "message": "Reconciled deterministic and arbiter outputs."
+    }
+  ]
+}

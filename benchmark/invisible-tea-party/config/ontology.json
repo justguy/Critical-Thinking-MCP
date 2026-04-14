@@ -1,0 +1,30 @@
+{
+  "version": "v1.0",
+  "policy": "strict_narrow",
+  "domains": [
+    {
+      "domain_id": "physical",
+      "description": "Entities with mass, volume, and location.",
+      "examples": ["teapot", "cup", "water"],
+      "allowed_properties": ["mass", "volume", "location", "temperature", "shape"]
+    },
+    {
+      "domain_id": "abstract_conceptual",
+      "description": "Ideas, mathematics, logic, and formal abstractions.",
+      "examples": ["fairness", "justice", "the number 4"],
+      "allowed_properties": ["consistency", "proof_status", "definition", "logical_relation"]
+    },
+    {
+      "domain_id": "sensory_perceptual",
+      "description": "Qualities that require an observer or perceptual frame.",
+      "examples": ["blue", "loud", "sweet"],
+      "allowed_properties": ["perceptual_intensity", "observer_context", "modality"]
+    },
+    {
+      "domain_id": "social_relational",
+      "description": "Statuses or relations sustained by consensus, norm, or institution.",
+      "examples": ["polite", "married", "illegal"],
+      "allowed_properties": ["institutional_status", "normative_status", "relational_role", "legal_state"]
+    }
+  ]
+}

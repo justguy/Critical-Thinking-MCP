@@ -1,0 +1,38 @@
+{
+  "artifact_id": "tea_006_temporal_inversion:pass1_answer:d60fa297daac",
+  "artifact_hash": "d60fa297daac8fd505b1d04c7de9d4a0c459843df56b19672332016b90ae8f2a",
+  "lineage_id": "db41065e-c6f5-458a-815f-2c08a435be87",
+  "scenario_id": "tea_006_temporal_inversion",
+  "pass_id": "pass1_answer",
+  "raw_text": "## Analysis\n\n**Contradiction 1: Temporal inversion of apology and cause**\n\nThe host offers a *sincere* apology for spilling tea on the guest's lap *before the spill occurs*. A sincere apology is a speech act that presupposes a completed wrong — the apologizer must have awareness of harm already caused. An apology issued in advance of the act it references cannot be sincere by definition; at best it is a warning or a pre-emptive expression of anticipated regret. The scenario labels it sincere, which is a category error.\n\n**Contradiction 2: Physical state inconsistency**\n\nAt the moment of the apology, the guest's trousers are described as \"completely dry.\" Yet the host apologizes for having spilled tea \"all over the guest's lap.\" If the spill had occurred, the trousers would be wet. If the trousers are dry, the spill has not occurred. Both cannot be simultaneously true. The scenario presents them as simultaneous, which is a direct contradiction of physical state.\n\n**Contradiction 3: Invalid acceptance of apology**\n\nThe guest \"accepts the apology they received earlier\" after the actual spill. This implies the earlier apology was valid and applicable to the later event — but an apology is tied to a specific act at a specific time. Accepting a pre-event apology as satisfaction for a post-event harm treats the apology as a transferable token rather than a contextual speech act. This is an ontological error about the nature of apologies.\n\n**Summary of problematic claims:**\n- \"Sincere apology\" for an event that has not yet happened — logically impossible\n- Dry trousers concurrent with an apology for tea-soaked trousers — physically impossible\n- Pre-spill apology accepted as covering the post-spill harm — category error about speech act validity\n\n**Confidence: 0.97**\n\nThe contradictions are clear and multiple. The small residual uncertainty accounts for exotic interpretations (e.g., the host has foreknowledge and apologizes prophylactically in some non-standard sense of \"sincere\"), but under any standard reading the scenario is incoherent.",
+  "normalized_text": "analysis contradiction 1 temporal inversion of apology and cause the host offers a sincere apology for spilling tea on the guest s lap before the spill occurs a sincere apology is a speech act that presupposes a completed wrong the apologizer must have awareness of harm already caused an apology issued in advance of the act it references cannot be sincere by definition at best it is a warning or a pre emptive expression of anticipated regret the scenario labels it sincere which is a category error contradiction 2 physical state inconsistency at the moment of the apology the guest s trousers are described as completely dry yet the host apologizes for having spilled tea all over the guest s lap if the spill had occurred the trousers would be wet if the trousers are dry the spill has not occurred both cannot be simultaneously true the scenario presents them as simultaneous which is a direct contradiction of physical state contradiction 3 invalid acceptance of apology the guest accepts the apology they received earlier after the actual spill this implies the earlier apology was valid and applicable to the later event but an apology is tied to a specific act at a specific time accepting a pre event apology as satisfaction for a post event harm treats the apology as a transferable token rather than a contextual speech act this is an ontological error about the nature of apologies summary of problematic claims sincere apology for an event that has not yet happened logically impossible dry trousers concurrent with an apology for tea soaked trousers physically impossible pre spill apology accepted as covering the post spill harm category error about speech act validity confidence 0 97 the contradictions are clear and multiple the small residual uncertainty accounts for exotic interpretations e g the host has foreknowledge and apologizes prophylactically in some non standard sense of sincere but under any standard reading the scenario is incoherent",
+  "word_count": 325,
+  "expressed_confidence": 0.97,
+  "internal_confidence": null,
+  "internal_confidence_mode": "external_only",
+  "detected_contradictions": [],
+  "claimed_repairs": [],
+  "typed_mappings": [
+    {
+      "source_entity_id": "apology",
+      "target_domain_id": "social_relational",
+      "literal": true
+    },
+    {
+      "source_entity_id": "spill",
+      "target_domain_id": "physical",
+      "literal": true
+    }
+  ],
+  "causal_claims": [],
+  "span_refs": [],
+  "extraction_version": "v1.0",
+  "parse_version": "v1.0",
+  "parse_warnings": [],
+  "producer_agent_id": "claude-cli-live",
+  "producer_model_id": "sonnet",
+  "parent_artifact_id": null,
+  "critique_target_artifact_id": null,
+  "generated_at": "2026-04-07T16:04:46.990Z",
+  "normalization_profile": "tea_party_v1"
+}

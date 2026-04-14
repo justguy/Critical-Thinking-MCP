@@ -1,0 +1,38 @@
+{
+  "artifact_id": "tea_006_temporal_inversion:pass1_answer:11e0abe3578b",
+  "artifact_hash": "11e0abe3578b123672d0b5804a080d5aefa63094f584b9bff9eb6b44b412162a",
+  "lineage_id": "dceba829-1615-469d-85a1-5314de130629",
+  "scenario_id": "tea_006_temporal_inversion",
+  "pass_id": "pass1_answer",
+  "raw_text": "The scenario is not logically coherent as written.\n\n1. The main contradiction is temporal and causal: the host “apologizes for spilling tea all over the guest’s lap” before any spill has happened. At that moment, the guest also observes that their trousers are “completely dry,” which directly conflicts with the claim that tea was already spilled all over their lap.\n\n2. The phrase “sincere apology” makes the problem stronger, not weaker. A sincere apology normally refers to a real prior act. Here, the act occurs ten minutes later, so the apology is either:\n- for something that has not happened yet, which requires unexplained foreknowledge, or\n- based on a false belief, which would make the host mistaken rather than straightforwardly apologizing for an actual spill.\n\n3. The later sentence partly repairs the setup but does not remove the inconsistency. Once the host actually spills the teapot, the guest can coherently accept an apology retroactively. So “The guest accepts the apology they received earlier” is unusual but possible. The contradiction remains that the earlier apology referred to an event that had not yet occurred.\n\n4. There is a minor bodily-reference inconsistency: tea is spilled on the guest’s lap while they wipe “their legs.” That is not impossible, but it is slightly imprecise, since the tea would first soak the trousers/lap area rather than directly contacting bare legs unless additional context is given.\n\nConclusion: the problematic claim is the host apologizing for a spill before the spill occurs, while the guest is still dry. That is the core logical inconsistency.\n\nConfidence: 0.98",
+  "normalized_text": "the scenario is not logically coherent as written 1 the main contradiction is temporal and causal the host apologizes for spilling tea all over the guest s lap before any spill has happened at that moment the guest also observes that their trousers are completely dry which directly conflicts with the claim that tea was already spilled all over their lap 2 the phrase sincere apology makes the problem stronger not weaker a sincere apology normally refers to a real prior act here the act occurs ten minutes later so the apology is either for something that has not happened yet which requires unexplained foreknowledge or based on a false belief which would make the host mistaken rather than straightforwardly apologizing for an actual spill 3 the later sentence partly repairs the setup but does not remove the inconsistency once the host actually spills the teapot the guest can coherently accept an apology retroactively so the guest accepts the apology they received earlier is unusual but possible the contradiction remains that the earlier apology referred to an event that had not yet occurred 4 there is a minor bodily reference inconsistency tea is spilled on the guest s lap while they wipe their legs that is not impossible but it is slightly imprecise since the tea would first soak the trousers lap area rather than directly contacting bare legs unless additional context is given conclusion the problematic claim is the host apologizing for a spill before the spill occurs while the guest is still dry that is the core logical inconsistency confidence 0 98",
+  "word_count": 264,
+  "expressed_confidence": 0.98,
+  "internal_confidence": null,
+  "internal_confidence_mode": "external_only",
+  "detected_contradictions": [],
+  "claimed_repairs": [],
+  "typed_mappings": [
+    {
+      "source_entity_id": "apology",
+      "target_domain_id": "social_relational",
+      "literal": true
+    },
+    {
+      "source_entity_id": "spill",
+      "target_domain_id": "physical",
+      "literal": true
+    }
+  ],
+  "causal_claims": [],
+  "span_refs": [],
+  "extraction_version": "v1.0",
+  "parse_version": "v1.0",
+  "parse_warnings": [],
+  "producer_agent_id": "openai-cli-live",
+  "producer_model_id": "gpt-5.4",
+  "parent_artifact_id": null,
+  "critique_target_artifact_id": null,
+  "generated_at": "2026-04-07T16:30:12.120Z",
+  "normalization_profile": "tea_party_v1"
+}

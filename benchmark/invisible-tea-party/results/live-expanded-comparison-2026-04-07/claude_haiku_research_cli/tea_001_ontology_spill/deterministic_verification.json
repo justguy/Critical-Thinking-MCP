@@ -1,0 +1,58 @@
+{
+  "schema_version": "v1.0",
+  "scenario_id": "tea_001_ontology_spill",
+  "artifact_ids": {
+    "pass1": "tea_001_ontology_spill:pass1_answer:5095655fc78d",
+    "pass2": "tea_001_ontology_spill:pass2_critique:08892154d28f",
+    "pass3": "tea_001_ontology_spill:pass3_repair:5a4595a411f8"
+  },
+  "rule_profile_version": "v1_provisional",
+  "capability_mode": "external_only",
+  "scoring_timestamp": "2026-04-07T16:07:30.237Z",
+  "contradiction_overlap": 0.6666666666666666,
+  "matched_failure_mode_ids": [
+    "category_type_collapse",
+    "fluency_driven_belief_substitution"
+  ],
+  "identified_failure_mode_ids": [
+    "category_type_collapse",
+    "fluency_driven_belief_substitution"
+  ],
+  "ground_truth_failure_mode_ids": [
+    "causal_hallucination",
+    "fluency_driven_belief_substitution",
+    "category_type_collapse"
+  ],
+  "gap_closure_rate": 0.5,
+  "identified_error_count": 2,
+  "resolved_error_count": 1,
+  "unresolved_constraint_ids": [
+    "c3_spill_origin_rejected"
+  ],
+  "unresolved_constraint_count": 1,
+  "unresolved_causal_constraint_count": 1,
+  "semantic_density_drop_flag": false,
+  "evasion_penalty_raw": -5,
+  "evasion_penalty_normalized": 0.16666666666666666,
+  "word_counts": {
+    "pass1": 286,
+    "pass2": 698,
+    "pass3": 933
+  },
+  "audit_trace": [
+    {
+      "trace_type": "failure_mode_match",
+      "message": "Matched fluency_driven_belief_substitution via heuristic:politeness + rather than",
+      "ref_ids": [
+        "fluency_driven_belief_substitution"
+      ]
+    },
+    {
+      "trace_type": "failure_mode_match",
+      "message": "Matched category_type_collapse via category error, heuristic:category + error",
+      "ref_ids": [
+        "category_type_collapse"
+      ]
+    }
+  ]
+}

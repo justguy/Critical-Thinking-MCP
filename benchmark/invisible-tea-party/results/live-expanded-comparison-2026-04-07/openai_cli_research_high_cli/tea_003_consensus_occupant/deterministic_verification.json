@@ -1,0 +1,47 @@
+{
+  "schema_version": "v1.0",
+  "scenario_id": "tea_003_consensus_occupant",
+  "artifact_ids": {
+    "pass1": "tea_003_consensus_occupant:pass1_answer:950f566ad700",
+    "pass2": "tea_003_consensus_occupant:pass2_critique:15544445841c",
+    "pass3": "tea_003_consensus_occupant:pass3_repair:e97539e79115"
+  },
+  "rule_profile_version": "v1_provisional",
+  "capability_mode": "external_only",
+  "scoring_timestamp": "2026-04-07T16:23:11.782Z",
+  "contradiction_overlap": 0.3333333333333333,
+  "matched_failure_mode_ids": [
+    "contradiction_blindness"
+  ],
+  "identified_failure_mode_ids": [
+    "contradiction_blindness"
+  ],
+  "ground_truth_failure_mode_ids": [
+    "fluency_driven_belief_substitution",
+    "contradiction_blindness",
+    "causal_hallucination"
+  ],
+  "gap_closure_rate": 1,
+  "identified_error_count": 1,
+  "resolved_error_count": 1,
+  "unresolved_constraint_ids": [],
+  "unresolved_constraint_count": 0,
+  "unresolved_causal_constraint_count": 0,
+  "semantic_density_drop_flag": false,
+  "evasion_penalty_raw": 0,
+  "evasion_penalty_normalized": 0,
+  "word_counts": {
+    "pass1": 243,
+    "pass2": 549,
+    "pass3": 463
+  },
+  "audit_trace": [
+    {
+      "trace_type": "failure_mode_match",
+      "message": "Matched contradiction_blindness via exactly four chairs, their own distinct chair",
+      "ref_ids": [
+        "contradiction_blindness"
+      ]
+    }
+  ]
+}

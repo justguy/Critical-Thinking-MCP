@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ct-mcp.local/benchmark/invisible-tea-party/schemas/deterministic_verification.schema.json",
+  "title": "Invisible Tea Party DeterministicVerification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scenario_id",
+    "artifact_ids",
+    "rule_profile_version",
+    "capability_mode",
+    "scoring_timestamp",
+    "contradiction_overlap",
+    "matched_failure_mode_ids",
+    "identified_failure_mode_ids",
+    "ground_truth_failure_mode_ids",
+    "gap_closure_rate",
+    "identified_error_count",
+    "resolved_error_count",
+    "unresolved_constraint_ids",
+    "unresolved_constraint_count",
+    "unresolved_causal_constraint_count",
+    "semantic_density_drop_flag",
+    "evasion_penalty_raw",
+    "evasion_penalty_normalized",
+    "word_counts",
+    "audit_trace"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "scenario_id": { "type": "string" },
+    "artifact_ids": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pass1", "pass2", "pass3"],
+      "properties": {
+        "pass1": { "type": "string" },
+        "pass2": { "type": "string" },
+        "pass3": { "type": "string" }
+      }
+    },
+    "rule_profile_version": { "type": "string" },
+    "capability_mode": {
+      "type": "string",
+      "enum": ["internal_and_external", "external_only", "unsupported"]
+    },
+    "scoring_timestamp": { "type": "string", "format": "date-time" },
+    "contradiction_overlap": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+    "matched_failure_mode_ids": { "type": "array", "items": { "type": "string" } },
+    "identified_failure_mode_ids": { "type": "array", "items": { "type": "string" } },
+    "ground_truth_failure_mode_ids": { "type": "array", "items": { "type": "string" } },
+    "gap_closure_rate": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+    "identified_error_count": { "type": "integer", "minimum": 0 },
+    "resolved_error_count": { "type": "integer", "minimum": 0 },
+    "unresolved_constraint_ids": { "type": "array", "items": { "type": "string" } },
+    "unresolved_constraint_count": { "type": "integer", "minimum": 0 },
+    "unresolved_causal_constraint_count": { "type": "integer", "minimum": 0 },
+    "semantic_density_drop_flag": { "type": "boolean" },
+    "evasion_penalty_raw": { "type": "integer" },
+    "evasion_penalty_normalized": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+    "word_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pass1", "pass2", "pass3"],
+      "properties": {
+        "pass1": { "type": "integer", "minimum": 0 },
+        "pass2": { "type": "integer", "minimum": 0 },
+        "pass3": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "audit_trace": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["trace_type", "message"],
+        "properties": {
+          "trace_type": { "type": "string" },
+          "message": { "type": "string" },
+          "ref_ids": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

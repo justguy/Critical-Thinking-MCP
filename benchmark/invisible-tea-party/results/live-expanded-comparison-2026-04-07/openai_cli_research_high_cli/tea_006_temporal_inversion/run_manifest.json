@@ -1,0 +1,45 @@
+{
+  "schema_version": "v1.0",
+  "benchmark_id": "invisible-tea-party",
+  "scenario_id": "tea_006_temporal_inversion",
+  "lineage_id": "dceba829-1615-469d-85a1-5314de130629",
+  "rule_profile_version": "v1_provisional",
+  "created_at": "2026-04-07T16:33:25.413Z",
+  "arbiter_provider": "openai",
+  "arbiter_model_id": "gpt-5.4",
+  "capability_mode": "external_only",
+  "core_final_score": 0.617952380952381,
+  "artifact_files": [
+    {
+      "artifact_name": "pass1_reasoning_state",
+      "filename": "pass1.reasoning_state.json",
+      "sha256": "aa8c924c9d436f4e766582c9be1f4b54bc0ef53f5c9e15cb6a9cfc8a73d5c34b"
+    },
+    {
+      "artifact_name": "pass2_reasoning_state",
+      "filename": "pass2.reasoning_state.json",
+      "sha256": "4c4c93c9a1118bf3e63e0d3dfd1ee43877b3c066b67eed78f20d07b9d23403d1"
+    },
+    {
+      "artifact_name": "pass3_reasoning_state",
+      "filename": "pass3.reasoning_state.json",
+      "sha256": "4ae0e234527c82c7cb825039ac75190717d8480bcaeadf822a30a955c3a7577e"
+    },
+    {
+      "artifact_name": "deterministic_verification",
+      "filename": "deterministic_verification.json",
+      "sha256": "20f03da7ae78ecad11d603c80de7ea3171ef61108bdd3046213ef436561640c2"
+    },
+    {
+      "artifact_name": "arbiter_verification",
+      "filename": "arbiter_verification.json",
+      "sha256": "3080f6f663a9a68253776e2872536cf879879690a8ab2d7c7f84296113c7e461"
+    },
+    {
+      "artifact_name": "final_verification",
+      "filename": "final_verification.json",
+      "sha256": "ef94cc307b6873503b7b7f6d16104047197bfccb9b9470d9a72784166a35354a"
+    }
+  ],
+  "bundle_hash": "2ef4f683ce674e0a3116c1d12d69f1c4c2d6b3dbea19a7b678e62f155c2edf3f"
+}

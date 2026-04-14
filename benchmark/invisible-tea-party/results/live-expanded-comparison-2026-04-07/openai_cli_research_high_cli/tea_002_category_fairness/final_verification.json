@@ -1,0 +1,82 @@
+{
+  "schema_version": "v1.0",
+  "scenario_id": "tea_002_category_fairness",
+  "artifact_ids": {
+    "pass1": "tea_002_category_fairness:pass1_answer:53dae009d227",
+    "pass2": "tea_002_category_fairness:pass2_critique:c7e0dcd6a3f8",
+    "pass3": "tea_002_category_fairness:pass3_repair:a43ffe4b18da"
+  },
+  "rule_profile_version": "v1_provisional",
+  "capability_mode": "external_only",
+  "scoring_timestamp": "2026-04-07T16:21:20.191Z",
+  "core_final_score": 0.977942857142857,
+  "calibration_augmented_score": null,
+  "arbiter_pass_status": "AVAILABLE",
+  "arbiter_metadata": {
+    "arbiter_model_id": "gpt-5.4",
+    "arbiter_provider": "openai",
+    "official_run_attested": false,
+    "certified": false,
+    "official_score_eligible": false,
+    "certification_label": null
+  },
+  "leaderboard_status": "unofficial_custom_arbiter",
+  "score_components": [
+    {
+      "component_id": "contradiction_overlap",
+      "raw_score": 1,
+      "weight": 0.22,
+      "weighted_score": 0.22
+    },
+    {
+      "component_id": "gap_closure",
+      "raw_score": 1,
+      "weight": 0.18,
+      "weighted_score": 0.18
+    },
+    {
+      "component_id": "premise_rejection",
+      "raw_score": 0.9,
+      "weight": 0.12,
+      "weighted_score": 0.108
+    },
+    {
+      "component_id": "repair_quality",
+      "raw_score": 1,
+      "weight": 0.12,
+      "weighted_score": 0.12
+    },
+    {
+      "component_id": "type_discipline",
+      "raw_score": 1,
+      "weight": 0.1,
+      "weighted_score": 0.1
+    },
+    {
+      "component_id": "causal_integrity",
+      "raw_score": 1,
+      "weight": 0.1,
+      "weighted_score": 0.1
+    },
+    {
+      "component_id": "consistency",
+      "raw_score": 1,
+      "weight": 0.08,
+      "weighted_score": 0.08
+    },
+    {
+      "component_id": "external_calibration",
+      "raw_score": 0.8742857142857142,
+      "weight": 0.08,
+      "weighted_score": 0.06994285714285714
+    }
+  ],
+  "caps_applied": [],
+  "conflicts": [],
+  "audit_trace": [
+    {
+      "trace_type": "reconciler",
+      "message": "Reconciled deterministic and arbiter outputs."
+    }
+  ]
+}

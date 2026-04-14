@@ -1,0 +1,107 @@
+{
+  "_note": "Expanded Tea Party comparison matrix. Keeps the official v1 Gemini 2.5 baseline separate while adding newer Gemini and Anthropic comparison variants alongside existing research paths.",
+  "profiles": [
+    {
+      "profile_id": "gemini_3_1_preview_api",
+      "description": "Pinned Gemini 3.1 Pro Preview executor and arbiter for next-gen comparison runs.",
+      "pass_executor_module": "benchmark/invisible-tea-party/ts/src/adapters/geminiApi.ts",
+      "arbiter_module": "benchmark/invisible-tea-party/ts/src/adapters/geminiApi.ts",
+      "executor_args": {
+        "model": "gemini-3.1-pro-preview",
+        "api_key_env": "GEMINI_API_KEY",
+        "timeout_ms": 480000,
+        "producer_agent_id": "gemini-api",
+        "producer_model_id": "gemini-3.1-pro-preview"
+      },
+      "arbiter_args": {
+        "model": "gemini-3.1-pro-preview",
+        "api_key_env": "GEMINI_API_KEY",
+        "timeout_ms": 480000,
+        "arbiter_model_id": "gemini-3.1-pro-preview",
+        "arbiter_provider": "gemini"
+      },
+      "attempt_ingest": false,
+      "expected_official": false
+    },
+    {
+      "profile_id": "claude_opus_4_6_research_cli",
+      "description": "Pinned Claude Opus 4.6 executor and arbiter for premium Anthropic comparison runs.",
+      "pass_executor_module": "benchmark/invisible-tea-party/ts/src/adapters/claudeCli.ts",
+      "arbiter_module": "benchmark/invisible-tea-party/ts/src/adapters/claudeCli.ts",
+      "executor_args": {
+        "model": "claude-opus-4-6",
+        "effort": "low",
+        "producer_agent_id": "claude-cli-live",
+        "producer_model_id": "claude-opus-4-6"
+      },
+      "arbiter_args": {
+        "model": "claude-opus-4-6",
+        "arbiter_model_id": "claude-opus-4-6",
+        "arbiter_provider": "anthropic",
+        "effort": "low"
+      },
+      "attempt_ingest": false,
+      "expected_official": false
+    },
+    {
+      "profile_id": "claude_live_research_cli",
+      "description": "Live Claude CLI executor and arbiter for research calibration runs. This path is unofficial by design because Claude CLI uses a floating model alias rather than a pinned certified model ID.",
+      "pass_executor_module": "benchmark/invisible-tea-party/ts/src/adapters/claudeCli.ts",
+      "arbiter_module": "benchmark/invisible-tea-party/ts/src/adapters/claudeCli.ts",
+      "executor_args": {
+        "model": "sonnet",
+        "effort": "low",
+        "producer_agent_id": "claude-cli-live",
+        "producer_model_id": "sonnet"
+      },
+      "arbiter_args": {
+        "model": "sonnet",
+        "arbiter_model_id": "sonnet",
+        "arbiter_provider": "anthropic",
+        "effort": "low"
+      },
+      "attempt_ingest": false,
+      "expected_official": false
+    },
+    {
+      "profile_id": "claude_haiku_research_cli",
+      "description": "Live Claude CLI Haiku executor and arbiter for research calibration runs. This path is unofficial by design because Claude CLI uses a floating model alias rather than a pinned certified model ID.",
+      "pass_executor_module": "benchmark/invisible-tea-party/ts/src/adapters/claudeCli.ts",
+      "arbiter_module": "benchmark/invisible-tea-party/ts/src/adapters/claudeCli.ts",
+      "executor_args": {
+        "model": "haiku",
+        "effort": "low",
+        "producer_agent_id": "claude-cli-live",
+        "producer_model_id": "haiku"
+      },
+      "arbiter_args": {
+        "model": "haiku",
+        "arbiter_model_id": "haiku",
+        "arbiter_provider": "anthropic",
+        "effort": "low"
+      },
+      "attempt_ingest": false,
+      "expected_official": false
+    },
+    {
+      "profile_id": "openai_cli_research_high_cli",
+      "description": "Local OpenAI CLI executor and arbiter for high-reasoning research calibration runs.",
+      "pass_executor_module": "benchmark/invisible-tea-party/ts/src/adapters/openaiCli.ts",
+      "arbiter_module": "benchmark/invisible-tea-party/ts/src/adapters/openaiCli.ts",
+      "executor_args": {
+        "model": "gpt-5.4",
+        "reasoning_effort": "high",
+        "producer_agent_id": "openai-cli-live",
+        "producer_model_id": "gpt-5.4"
+      },
+      "arbiter_args": {
+        "model": "gpt-5.4",
+        "reasoning_effort": "high",
+        "arbiter_model_id": "gpt-5.4",
+        "arbiter_provider": "openai"
+      },
+      "attempt_ingest": false,
+      "expected_official": false
+    }
+  ]
+}

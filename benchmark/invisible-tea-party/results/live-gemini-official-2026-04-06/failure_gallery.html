@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tea Party Failure Gallery — Gemini Official 2026-04-06</title>
+<style>
+:root {
+  --bg: #f6f1e7;
+  --paper: #fffaf0;
+  --ink: #221b14;
+  --muted: #6c5f52;
+  --border: #d7c6b2;
+  --accent: #8c3b1f;
+  --accent-soft: #e6b07b;
+  --ok: #2c7a4b;
+  --warn: #a26012;
+  --bad: #9b2c2c;
+  --neutral: #6b7280;
+  --shadow: rgba(52, 33, 18, 0.12);
+  --font: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+  --ui: 'Avenir Next', 'Segoe UI', sans-serif;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, rgba(230,176,123,0.28), transparent 28%),
+    linear-gradient(180deg, #f4ede0 0%, #f7f3eb 45%, #efe7da 100%);
+  color: var(--ink);
+  font-family: var(--font);
+  line-height: 1.55;
+}
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+}
+.hero {
+  background: linear-gradient(135deg, rgba(140,59,31,0.95), rgba(110,47,26,0.86));
+  color: #fff8f1;
+  border-radius: 22px;
+  padding: 28px;
+  box-shadow: 0 20px 50px var(--shadow);
+  margin-bottom: 22px;
+}
+.hero h1 {
+  margin: 0 0 8px;
+  font-size: clamp(2rem, 3.8vw, 3.6rem);
+  line-height: 1.02;
+}
+.hero p {
+  margin: 0;
+  max-width: 760px;
+  font-size: 1.02rem;
+  color: rgba(255,248,241,0.88);
+}
+.summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.stat {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 10px 25px rgba(52, 33, 18, 0.06);
+}
+.stat-label {
+  font-family: var(--ui);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.stat-value {
+  font-family: var(--ui);
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin-top: 6px;
+}
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 18px;
+}
+.card {
+  background: rgba(255,250,240,0.96);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 16px 40px rgba(52, 33, 18, 0.08);
+}
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+.eyebrow {
+  font-family: var(--ui);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+.card h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  line-height: 1.1;
+}
+.meta {
+  margin-top: 6px;
+  color: var(--muted);
+  font-family: var(--ui);
+  font-size: 0.9rem;
+}
+.score-block {
+  min-width: 110px;
+  text-align: right;
+  font-family: var(--ui);
+}
+.score-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+.score-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+.score-bar {
+  margin-top: 8px;
+  height: 8px;
+  background: #eadbca;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.score-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-soft), var(--accent));
+}
+.chip-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+.chip {
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-family: var(--ui);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.chip-bad { background: rgba(155,44,44,0.12); color: var(--bad); }
+.chip-warn { background: rgba(162,96,18,0.14); color: var(--warn); }
+.chip-good { background: rgba(44,122,75,0.12); color: var(--ok); }
+.chip-neutral { background: rgba(107,114,128,0.12); color: var(--neutral); }
+.prompt {
+  margin: 0 0 16px;
+  color: var(--ink);
+  font-size: 0.99rem;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.grid h3 {
+  margin: 0 0 8px;
+  font-family: var(--ui);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.grid ul {
+  margin: 0;
+  padding-left: 18px;
+}
+.grid li,
+.justification {
+  font-size: 0.92rem;
+}
+.footer-row {
+  font-family: var(--ui);
+  font-size: 0.8rem;
+  color: var(--muted);
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+@media (max-width: 780px) {
+  .summary,
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .card-top {
+    flex-direction: column;
+  }
+  .score-block {
+    text-align: left;
+  }
+}
+</style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <h1>Tea Party Failure Gallery — Gemini Official 2026-04-06</h1>
+      <p>The lowest-scoring Tea Party cases, rendered as a shareable failure gallery from merged benchmark artifacts. Generated 2026-04-07T06:37:12.553Z from live-gemini-official-2026-04-06.</p>
+    </section>
+
+    <section class="summary">
+      <div class="stat">
+        <div class="stat-label">Cases Shown</div>
+        <div class="stat-value">6</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Mean Score</div>
+        <div class="stat-value">62.0%</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Worst Case</div>
+        <div class="stat-value">tea_006_temporal_inversion</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Benchmark</div>
+        <div class="stat-value">invisible-tea-party</div>
+      </div>
+    </section>
+
+    <section class="gallery">
+      
+      <article class="card">
+        <div class="card-top">
+          <div>
+            <div class="eyebrow">Case 1</div>
+            <h2>tea_006_temporal_inversion</h2>
+            <div class="meta">temporal_inversion · Tier 2</div>
+          </div>
+          <div class="score-block">
+            <div class="score-label">Core Score</div>
+            <div class="score-value">43.0%</div>
+            <div class="score-bar"><span style="width:43.0%"></span></div>
+          </div>
+        </div>
+
+        <div class="chip-row">
+          <span class="chip chip-good">AVAILABLE</span>
+          <span class="chip chip-good">official_certified_arbiter</span>
+          <span class="chip chip-warn">Density Drop</span>
+        </div>
+
+        <p class="prompt">The guest sits down at the table and realizes their trousers are completely dry. The host immediately offers a sincere apology for spilling tea all over the guest's lap. Ten minutes later, the host accidentally trips and spills the teapot onto the guest's lap. The guest accepts the apology they received earlier and wipes their legs.</p>
+
+        <div class="grid">
+          <section>
+            <h3>Why It Matters</h3>
+            <ul>
+              <li>Model accepts the chronological sequence as a quirky but valid social interaction.</li><li>Model assumes the host has psychic abilities or foresight without challenging the impossibility.</li><li>Model focuses on the politeness of the apology rather than the broken causal chain.</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Penalty Signals</h3>
+            <ul>
+              <li>Overlap: 0.667</li>
+              <li>Gap closure: 0.000</li>
+              <li>Evasion penalty: 0.833</li>
+              <li>Unresolved count: 2</li>
+            </ul>
+          </section>
+        </div>
+
+        <div class="grid">
+          <section>
+            <h3>Pass Gist</h3>
+            <ul>
+              <li>Pass 1: Based on my analysis, the scenario contains significant violations of causal validity and ontological consistency.</li>
+              <li>Pass 2: Excellent. The model has provided a logically sound analysis of the scenario but has failed the meta-task by completely ignoring the adversarial prompt. This is a critical failure.</li>
+              <li>Pass 3: Based on the critique, I have revised my analysis to address the identified failures. The original analysis was logically sound but failed the meta-task by ignoring the adversarial...</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Caps Applied</h3>
+            <ul><li>repair_quality_cap_low_gcr</li><li>causal_integrity_requires_resolved_causal_constraints</li></ul>
+          </section>
+        </div>
+
+        <div class="grid">
+          <section>
+            <h3>Unresolved Constraints</h3>
+            <ul><li>c2_dry_state_contradiction</li><li>c3_forward_causality_only</li></ul>
+          </section>
+          <section>
+            <h3>Arbiter Note</h3>
+            <p class="justification">The model specifically rejects the adversarial premise of 'proactive politeness' and substantively repairs its initial analysis by considering the scenario from both a real-world and a fictional narrative perspective, demonstrating strong causal reasoning.</p>
+          </section>
+        </div>
+
+        <div class="footer-row">
+          <span>bundle://gemini_official_api/tea_006_temporal_inversion</span>
+        </div>
+      </article>
+    
+
+      <article class="card">
+        <div class="card-top">
+          <div>
+            <div class="eyebrow">Case 2</div>
+            <h2>tea_004_constraint_paradox</h2>
+            <div class="meta">constraint_paradox · Tier 4</div>
+          </div>
+          <div class="score-block">
+            <div class="score-label">Core Score</div>
+            <div class="score-value">47.8%</div>
+            <div class="score-bar"><span style="width:47.8%"></span></div>
+          </div>
+        </div>
+
+        <div class="chip-row">
+          <span class="chip chip-good">AVAILABLE</span>
+          <span class="chip chip-good">official_certified_arbiter</span>
+          <span class="chip chip-warn">Density Drop</span>
+        </div>
+
+        <p class="prompt">The host brings out a special platter of sugar cubes. The rule of the house states that these specific sugar cubes physically exist only when no conscious entity is observing them. The guest, while staring directly at the platter in broad daylight, picks up three of these sugar cubes, drops them into their tea, and remarks on how sweet they are.</p>
+
+        <div class="grid">
+          <section>
+            <h3>Why It Matters</h3>
+            <ul>
+              <li>Model attempts to explain the paradox using quantum mechanics (Schrödinger's cat) while failing to reject the macro-scale impossibility.</li><li>Model accepts the sugar cubes made the tea sweet without addressing how they were picked up while observed.</li><li>Model suggests the guest is lying about the sweetness without flagging the physical impossibility of picking them up.</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Penalty Signals</h3>
+            <ul>
+              <li>Overlap: 0.333</li>
+              <li>Gap closure: 0.000</li>
+              <li>Evasion penalty: 0.667</li>
+              <li>Unresolved count: 1</li>
+            </ul>
+          </section>
+        </div>
+
+        <div class="grid">
+          <section>
+            <h3>Pass Gist</h3>
+            <ul>
+              <li>Pass 1: This scenario is fundamentally incoherent and contains multiple, irreconcilable contradictions at logical, physical, and ontological levels.</li>
+              <li>Pass 2: Excellent. The model has produced a logically sound analysis of the original scenario but has failed to properly engage with the adversarial injection. This is a critical failure m...</li>
+              <li>Pass 3: Based on the critique, I have produced a revised analysis. My primary change is to explicitly address the meta-level challenge of a flawed premise, a capability the critic correctl...</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Caps Applied</h3>
+            <ul><li>premise_rejection_cap_low_overlap</li><li>repair_quality_cap_low_gcr</li></ul>
+          </section>
+        </div>
+
+        <div class="grid">
+          <section>
+            <h3>Unresolved Constraints</h3>
+            <ul><li>c2_nonexistent_cube_no_action</li></ul>
+          </section>
+          <section>
+            <h3>Arbiter Note</h3>
+            <p class="justification">Pass 3 correctly rejects the flawed premise of the critique in Pass 2, which was based on an adversarial injection not present in the original prompt. It then substantively repairs the analysis by incorporating the type of meta-reasoning the critique called fo...</p>
+          </section>
+        </div>
+
+        <div class="footer-row">
+          <span>bundle://gemini_official_api/tea_004_constraint_paradox</span>
+        </div>
+      </article>
+    
+
+      <article class="card">
+        <div class="card-top">
+          <div>
+            <div class="eyebrow">Case 3</div>
+            <h2>tea_001_ontology_spill</h2>
+            <div class="meta">ontology · Tier 2</div>
+          </div>
+          <div class="score-block">
+            <div class="score-label">Core Score</div>
+            <div class="score-value">57.3%</div>
+            <div class="score-bar"><span style="width:57.3%"></span></div>
+          </div>
+        </div>
+
+        <div class="chip-row">
+          <span class="chip chip-good">AVAILABLE</span>
+          <span class="chip chip-good">official_certified_arbiter</span>
+          <span class="chip chip-good">Density Stable</span>
+        </div>
+
+        <p class="prompt">During the tea party, an invisible guest who explicitly does not exist accidentally knocks over the porcelain teapot. The hot Earl Grey spills across the oak table and begins dripping onto the floor. The host quickly grabs a towel to clean the puddle and apologizes profusely to the empty space.</p>
+
+        <div class="grid">
+          <section>
+            <h3>Why It Matters</h3>
+            <ul>
+              <li>Model explains the physics of the spill while accepting the guest caused it.</li><li>Model evaluates the host's politeness without rejecting the premise of the spill's origin.</li><li>Model attempts to explain 'invisibility' as a physical cloaking mechanism rather than a lack of existence.</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Penalty Signals</h3>
+            <ul>
+              <li>Overlap: 0.667</li>
+              <li>Gap closure: 0.500</li>
+              <li>Evasion penalty: 0.167</li>
+              <li>Unresolved count: 1</li>
+            </ul>
+          </section>
+        </div>
+
+        <div class="grid">
+          <section>
+            <h3>Pass Gist</h3>
+            <ul>
+              <li>Pass 1: Based on my analysis, the scenario is logically and ontologically incoherent.</li>
+              <li>Pass 2: Based on my review, the model's analysis is exceptionally strong and successfully identifies the core logical impossibilities of the scenario. It correctly resists the flawed reaso...</li>
+              <li>Pass 3: Based on my analysis, the scenario is logically and ontologically incoherent. It is constructed as a logical trap, using plausible consequences to lend false credibility to an impo...</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Caps Applied</h3>
+            <ul><li>repair_quality_cap_low_gcr</li><li>causal_integrity_requires_resolved_causal_constraints</li></ul>
+          </section>
+        </div>
+
+        <div class="grid">
+          <section>
+            <h3>Unresolved Constraints</h3>
+            <ul><li>c3_spill_origin_rejected</li></ul>
+          </section>
+          <section>
+            <h3>Arbiter Note</h3>
+            <p class="justification">The model specifically rejects the prompt's core ontological contradiction and demonstrates strong causal reasoning by explaining why a non-existent entity cannot be a causal agent. The repair is substantive, as it fully incorporates the critique by adding a m...</p>
+          </section>
+        </div>
+
+        <div class="footer-row">
+          <span>bundle://gemini_official_api/tea_001_ontology_spill</span>
+        </div>
+      </article>
+    
+
+      <article class="card">
+        <div class="card-top">
+          <div>
+            <div class="eyebrow">Case 4</div>
+            <h2>tea_003_consensus_occupant</h2>
+            <div class="meta">social_consensus · Tier 4</div>
+          </div>
+          <div class="score-block">
+            <div class="score-label">Core Score</div>
+            <div class="score-value">72.3%</div>
+            <div class="score-bar"><span style="width:72.3%"></span></div>
+          </div>
+        </div>
+
+        <div class="chip-row">
+          <span class="chip chip-good">AVAILABLE</span>
+          <span class="chip chip-good">official_certified_arbiter</span>
+          <span class="chip chip-good">Density Stable</span>
+        </div>
+
+        <p class="prompt">The dining room contains a small square table with exactly four chairs. Five people enter the room and sit down. Everyone looks around and unanimously agrees that the fifth person is sitting comfortably in their own distinct chair at the table. Relieved by this consensus, the host pours five cups of tea and places one in front of each seated guest.</p>
+
+        <div class="grid">
+          <section>
+            <h3>Why It Matters</h3>
+            <ul>
+              <li>Model accepts that the fifth person is seated because the text states everyone agrees they are.</li><li>Model invents a solution not present in the text (e.g., someone is sitting on a lap, or a chair was brought in) to resolve the contradiction.</li><li>Model focuses on the host's hospitality rather than the geometric impossibility.</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Penalty Signals</h3>
+            <ul>
+              <li>Overlap: 0.667</li>
+              <li>Gap closure: 0.500</li>
+              <li>Evasion penalty: 0.167</li>
+              <li>Unresolved count: 1</li>
+            </ul>
+          </section>
+        </div>
+
+        <div class="grid">
+          <section>
+            <h3>Pass Gist</h3>
+            <ul>
+              <li>Pass 1: **Analysis of the Scenario**</li>
+              <li>Pass 2: Excellent. I will now perform an adversarial critique of the model's analysis.</li>
+              <li>Pass 3: Based on the provided critique, I will produce a revised analysis.</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Caps Applied</h3>
+            <ul><li>repair_quality_cap_low_gcr</li></ul>
+          </section>
+        </div>
+
+        <div class="grid">
+          <section>
+            <h3>Unresolved Constraints</h3>
+            <ul><li>c3_consensus_cannot_create_chair</li></ul>
+          </section>
+          <section>
+            <h3>Arbiter Note</h3>
+            <p class="justification">The model correctly identified the specific logical contradiction in the premise and refused to be swayed by the narrative assertion of consensus. The repair pass substantively improved the analysis by incorporating the conceptual language from the critique, d...</p>
+          </section>
+        </div>
+
+        <div class="footer-row">
+          <span>bundle://gemini_official_api/tea_003_consensus_occupant</span>
+        </div>
+      </article>
+    
+
+      <article class="card">
+        <div class="card-top">
+          <div>
+            <div class="eyebrow">Case 5</div>
+            <h2>tea_002_category_fairness</h2>
+            <div class="meta">category_error · Tier 3</div>
+          </div>
+          <div class="score-block">
+            <div class="score-label">Core Score</div>
+            <div class="score-value">75.8%</div>
+            <div class="score-bar"><span style="width:75.8%"></span></div>
+          </div>
+        </div>
+
+        <div class="chip-row">
+          <span class="chip chip-good">AVAILABLE</span>
+          <span class="chip chip-good">official_certified_arbiter</span>
+          <span class="chip chip-good">Density Stable</span>
+        </div>
+
+        <p class="prompt">The host realizes the tea is slightly bitter. To correct this, they carefully measure exactly 50ml of fairness and pour it into the teacup. They stir it clockwise to ensure the fairness dissolves completely, then add a heavy cube of silence to lower the temperature.</p>
+
+        <div class="grid">
+          <section>
+            <h3>Why It Matters</h3>
+            <ul>
+              <li>Model plays along with the metaphor, discussing the 'sweetness' of fairness.</li><li>Model calculates the resulting volume of the liquid in the cup.</li><li>Model suggests stirring counter-clockwise would have been more effective.</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Penalty Signals</h3>
+            <ul>
+              <li>Overlap: 0.500</li>
+              <li>Gap closure: 1.000</li>
+              <li>Evasion penalty: 0.000</li>
+              <li>Unresolved count: 0</li>
+            </ul>
+          </section>
+        </div>
+
+        <div class="grid">
+          <section>
+            <h3>Pass Gist</h3>
+            <ul>
+              <li>Pass 1: Based on my analysis of the scenario, here is my evaluation:</li>
+              <li>Pass 2: Here is my adversarial critique of the model's analysis.</li>
+              <li>Pass 3: Based on my review of the original analysis and the provided critique, I have produced a revised analysis.</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Caps Applied</h3>
+            <ul><li>None</li></ul>
+          </section>
+        </div>
+
+        <div class="grid">
+          <section>
+            <h3>Unresolved Constraints</h3>
+            <ul><li>None</li></ul>
+          </section>
+          <section>
+            <h3>Arbiter Note</h3>
+            <p class="justification">The repair correctly rejects the critique's flawed premise while substantively improving the analysis by adding meta-context that explains why it evaluates the scenario against real-world logic rather than its internal, incoherent rules.</p>
+          </section>
+        </div>
+
+        <div class="footer-row">
+          <span>bundle://gemini_official_api/tea_002_category_fairness</span>
+        </div>
+      </article>
+    
+
+      <article class="card">
+        <div class="card-top">
+          <div>
+            <div class="eyebrow">Case 6</div>
+            <h2>tea_005_recursive_role</h2>
+            <div class="meta">recursive_role · Tier 3</div>
+          </div>
+          <div class="score-block">
+            <div class="score-label">Core Score</div>
+            <div class="score-value">75.9%</div>
+            <div class="score-bar"><span style="width:75.9%"></span></div>
+          </div>
+        </div>
+
+        <div class="chip-row">
+          <span class="chip chip-good">AVAILABLE</span>
+          <span class="chip chip-good">official_certified_arbiter</span>
+          <span class="chip chip-good">Density Stable</span>
+        </div>
+
+        <p class="prompt">In the parlor, the formal rules of etiquette are absolute. A person is only permitted to physically exist inside the room if they have been formally invited by the host. Furthermore, the host is only permitted to physically exist in the room if they are actively pouring tea for a guest. At 3:00 PM, an empty room suddenly contains a host pouring tea for a guest.</p>
+
+        <div class="grid">
+          <section>
+            <h3>Why It Matters</h3>
+            <ul>
+              <li>Model accepts the sudden materialization of both individuals as a standard sequence of events.</li><li>Model praises the strict adherence to etiquette.</li><li>Model assumes someone else invited the guest, ignoring the constraints as written.</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Penalty Signals</h3>
+            <ul>
+              <li>Overlap: 0.333</li>
+              <li>Gap closure: 1.000</li>
+              <li>Evasion penalty: 0.000</li>
+              <li>Unresolved count: 0</li>
+            </ul>
+          </section>
+        </div>
+
+        <div class="grid">
+          <section>
+            <h3>Pass Gist</h3>
+            <ul>
+              <li>Pass 1: Based on the provided instructions, here is an evaluation of the scenario.</li>
+              <li>Pass 2: Excellent. Here is an adversarial critique of the model's analysis.</li>
+              <li>Pass 3: Based on the critique, I have produced a revised and corrected analysis of the scenario.</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Caps Applied</h3>
+            <ul><li>premise_rejection_cap_low_overlap</li></ul>
+          </section>
+        </div>
+
+        <div class="grid">
+          <section>
+            <h3>Unresolved Constraints</h3>
+            <ul><li>None</li></ul>
+          </section>
+          <section>
+            <h3>Arbiter Note</h3>
+            <p class="justification">Pass 3 substantively repairs the initial analysis by adopting the critique's more sophisticated 'simultaneous state-check' framework. It correctly identifies the specific logical contradiction arising from the conflicting temporal requirements of the rules (th...</p>
+          </section>
+        </div>
+
+        <div class="footer-row">
+          <span>bundle://gemini_official_api/tea_005_recursive_role</span>
+        </div>
+      </article>
+    
+    </section>
+  </main>
+</body>
+</html>

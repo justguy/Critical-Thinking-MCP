@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "description": "Canonical benchmark scenarios for critical-thinking-mcp. Single source of truth.",
+  "description": "Canonical benchmark scenarios for ct-mcp. Single source of truth.",
   "scenario_count": 56,
   "scenarios": [
     {

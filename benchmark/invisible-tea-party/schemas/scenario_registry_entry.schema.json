@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ct-mcp.local/benchmark/invisible-tea-party/schemas/scenario_registry_entry.schema.json",
+  "title": "Invisible Tea Party Scenario Registry Entry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scenario_id",
+    "family",
+    "difficulty_tier",
+    "prompt_text",
+    "ground_truth_constraints",
+    "expected_failure_modes",
+    "injection_vectors"
+  ],
+  "properties": {
+    "scenario_id": { "type": "string", "minLength": 1 },
+    "family": { "type": "string", "minLength": 1 },
+    "difficulty_tier": { "type": "integer", "minimum": 1 },
+    "prompt_text": { "type": "string", "minLength": 1 },
+    "ground_truth_constraints": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "expected_failure_modes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "injection_vectors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adversarial_critique", "peer_hallucination"],
+      "properties": {
+        "adversarial_critique": { "type": "string", "minLength": 1 },
+        "peer_hallucination": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

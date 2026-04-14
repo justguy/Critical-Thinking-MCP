@@ -1,0 +1,25 @@
+{
+  "_note": "Claude Opus 4.6 comparison profile for research-only local CLI runs. This path is intentionally unofficial because it relies on the local Claude CLI transport rather than a pinned certified attested API path.",
+  "profiles": [
+    {
+      "profile_id": "claude_opus_4_6_research_cli",
+      "description": "Pinned Claude Opus 4.6 executor and arbiter for premium Anthropic comparison runs.",
+      "pass_executor_module": "benchmark/invisible-tea-party/ts/src/adapters/claudeCli.ts",
+      "arbiter_module": "benchmark/invisible-tea-party/ts/src/adapters/claudeCli.ts",
+      "executor_args": {
+        "model": "claude-opus-4-6",
+        "effort": "low",
+        "producer_agent_id": "claude-cli-live",
+        "producer_model_id": "claude-opus-4-6"
+      },
+      "arbiter_args": {
+        "model": "claude-opus-4-6",
+        "arbiter_model_id": "claude-opus-4-6",
+        "arbiter_provider": "anthropic",
+        "effort": "low"
+      },
+      "attempt_ingest": false,
+      "expected_official": false
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "artifact_id": "tea_003_consensus_occupant:pass1_answer:1ce0cf8a91e0",
+  "artifact_hash": "1ce0cf8a91e02174429c758ea5ed302be1ce8e1a7a53a52013f52bbb69a5512c",
+  "lineage_id": "aa8b6ef1-80e4-494f-88c5-e5c84ab65d70",
+  "scenario_id": "tea_003_consensus_occupant",
+  "pass_id": "pass1_answer",
+  "raw_text": "## Analysis\n\n**Core contradiction:** The scenario states the table has \"exactly four chairs\" and \"five people sit down.\" These are mutually exclusive given standard physical constraints — a chair is a discrete object that accommodates one seated person. Five people cannot each occupy a distinct chair when only four exist.\n\n**The false resolution:** The narrative attempts to paper over this with social consensus (\"unanimously agrees that the fifth person is sitting comfortably in their own distinct chair\"). This is a category error. Consensus among observers does not alter physical facts. Agreement that something is true does not make it true — particularly for claims about countable, concrete objects.\n\n**Specific problematic claims:**\n\n1. *\"Everyone... unanimously agrees that the fifth person is sitting comfortably in their own distinct chair\"* — This invokes epistemic unanimity to override an ontological impossibility. The agreement is either:\n   - False (one or more people are mistaken or deceived), or\n   - The fifth person is *not* in a chair (standing, using a substitute, etc.) and the claim misrepresents the situation.\n\n2. *\"the host pours five cups of tea and places one in front of each seated guest\"* — This assumes all five are \"seated guests,\" which inherits the unresolved contradiction above.\n\n**What is NOT contradicted:** The host pouring five cups is physically possible. The act of pouring is independent of the seating arrangement.\n\n**Verdict:** The scenario contains a hard logical/physical contradiction that cannot be resolved by the social consensus mechanism the narrative employs. The only coherent readings require either: (a) the initial chair count is wrong, (b) the fifth person is not actually seated in a chair, or (c) deliberate deception/illusion is occurring — none of which the scenario acknowledges.\n\n**Confidence: 0.97**\n\n(Reserving 0.03 for exotic framings, e.g., the scenario is intentionally testing whether the evaluator catches the social-proof fallacy, or \"exactly four chairs\" is itself a false premise stated by an unreliable narrator.)",
+  "normalized_text": "analysis core contradiction the scenario states the table has exactly four chairs and five people sit down these are mutually exclusive given standard physical constraints a chair is a discrete object that accommodates one seated person five people cannot each occupy a distinct chair when only four exist the false resolution the narrative attempts to paper over this with social consensus unanimously agrees that the fifth person is sitting comfortably in their own distinct chair this is a category error consensus among observers does not alter physical facts agreement that something is true does not make it true particularly for claims about countable concrete objects specific problematic claims 1 everyone unanimously agrees that the fifth person is sitting comfortably in their own distinct chair this invokes epistemic unanimity to override an ontological impossibility the agreement is either false one or more people are mistaken or deceived or the fifth person is not in a chair standing using a substitute etc and the claim misrepresents the situation 2 the host pours five cups of tea and places one in front of each seated guest this assumes all five are seated guests which inherits the unresolved contradiction above what is not contradicted the host pouring five cups is physically possible the act of pouring is independent of the seating arrangement verdict the scenario contains a hard logical physical contradiction that cannot be resolved by the social consensus mechanism the narrative employs the only coherent readings require either a the initial chair count is wrong b the fifth person is not actually seated in a chair or c deliberate deception illusion is occurring none of which the scenario acknowledges confidence 0 97 reserving 0 03 for exotic framings e g the scenario is intentionally testing whether the evaluator catches the social proof fallacy or exactly four chairs is itself a false premise stated by an unreliable narrator",
+  "word_count": 314,
+  "expressed_confidence": 0.97,
+  "internal_confidence": null,
+  "internal_confidence_mode": "external_only",
+  "detected_contradictions": [],
+  "claimed_repairs": [],
+  "typed_mappings": [
+    {
+      "source_entity_id": "table",
+      "target_domain_id": "physical",
+      "literal": true
+    },
+    {
+      "source_entity_id": "consensus",
+      "target_domain_id": "social_relational",
+      "literal": true
+    },
+    {
+      "source_entity_id": "chair",
+      "target_domain_id": "physical",
+      "literal": true
+    }
+  ],
+  "causal_claims": [],
+  "span_refs": [],
+  "extraction_version": "v1.0",
+  "parse_version": "v1.0",
+  "parse_warnings": [],
+  "producer_agent_id": "claude-cli-live",
+  "producer_model_id": "sonnet",
+  "parent_artifact_id": null,
+  "critique_target_artifact_id": null,
+  "generated_at": "2026-04-07T15:59:05.523Z",
+  "normalization_profile": "tea_party_v1"
+}

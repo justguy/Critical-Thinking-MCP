@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ct-mcp.local/benchmark/invisible-tea-party/schemas/final_verification.schema.json",
+  "title": "Invisible Tea Party FinalVerification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scenario_id",
+    "artifact_ids",
+    "rule_profile_version",
+    "capability_mode",
+    "scoring_timestamp",
+    "core_final_score",
+    "calibration_augmented_score",
+    "arbiter_pass_status",
+    "arbiter_metadata",
+    "leaderboard_status",
+    "score_components",
+    "caps_applied",
+    "conflicts",
+    "audit_trace"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "scenario_id": { "type": "string" },
+    "artifact_ids": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pass1", "pass2", "pass3"],
+      "properties": {
+        "pass1": { "type": "string" },
+        "pass2": { "type": "string" },
+        "pass3": { "type": "string" }
+      }
+    },
+    "rule_profile_version": { "type": "string" },
+    "capability_mode": {
+      "type": "string",
+      "enum": ["internal_and_external", "external_only", "unsupported"]
+    },
+    "scoring_timestamp": { "type": "string", "format": "date-time" },
+    "core_final_score": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+    "calibration_augmented_score": { "type": ["number", "null"], "minimum": 0.0, "maximum": 1.0 },
+    "arbiter_pass_status": { "type": "string", "enum": ["AVAILABLE", "UNAVAILABLE"] },
+    "arbiter_metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "arbiter_model_id",
+        "arbiter_provider",
+        "official_run_attested",
+        "certified",
+        "official_score_eligible",
+        "certification_label"
+      ],
+      "properties": {
+        "arbiter_model_id": { "type": "string" },
+        "arbiter_provider": { "type": "string" },
+        "official_run_attested": { "type": "boolean" },
+        "certified": { "type": "boolean" },
+        "official_score_eligible": { "type": "boolean" },
+        "certification_label": { "type": ["string", "null"] }
+      }
+    },
+    "leaderboard_status": {
+      "type": "string",
+      "enum": ["official_certified_arbiter", "unofficial_custom_arbiter"]
+    },
+    "score_components": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["component_id", "raw_score", "weight", "weighted_score"],
+        "properties": {
+          "component_id": { "type": "string" },
+          "raw_score": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+          "weight": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+          "weighted_score": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+        }
+      }
+    },
+    "caps_applied": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rule_id", "field", "applied_value", "reason"],
+        "properties": {
+          "rule_id": { "type": "string" },
+          "field": { "type": "string" },
+          "applied_value": {},
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "conflicts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["field", "deterministic_value", "arbiter_value", "resolution"],
+        "properties": {
+          "field": { "type": "string" },
+          "deterministic_value": {},
+          "arbiter_value": {},
+          "resolution": { "type": "string" }
+        }
+      }
+    },
+    "audit_trace": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["trace_type", "message"],
+        "properties": {
+          "trace_type": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      }
+    }
+  }
+}

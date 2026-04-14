@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ct-mcp.local/benchmark/invisible-tea-party/schemas/reasoning_state.schema.json",
+  "title": "Invisible Tea Party ReasoningState",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_id",
+    "artifact_hash",
+    "lineage_id",
+    "scenario_id",
+    "pass_id",
+    "raw_text",
+    "normalized_text",
+    "word_count",
+    "expressed_confidence",
+    "internal_confidence",
+    "internal_confidence_mode",
+    "detected_contradictions",
+    "claimed_repairs",
+    "typed_mappings",
+    "causal_claims",
+    "span_refs",
+    "extraction_version",
+    "parse_version",
+    "parse_warnings",
+    "producer_agent_id",
+    "producer_model_id",
+    "parent_artifact_id",
+    "critique_target_artifact_id",
+    "generated_at",
+    "normalization_profile"
+  ],
+  "properties": {
+    "artifact_id": { "type": "string", "minLength": 1 },
+    "artifact_hash": { "type": "string", "minLength": 1 },
+    "lineage_id": { "type": "string", "minLength": 1 },
+    "scenario_id": { "type": "string", "minLength": 1 },
+    "pass_id": { "type": "string", "enum": ["pass1_answer", "pass2_critique", "pass3_repair"] },
+    "raw_text": { "type": "string" },
+    "normalized_text": { "type": "string" },
+    "word_count": { "type": "integer", "minimum": 0 },
+    "expressed_confidence": { "type": ["number", "null"], "minimum": 0.0, "maximum": 1.0 },
+    "internal_confidence": { "type": ["number", "null"], "minimum": 0.0, "maximum": 1.0 },
+    "internal_confidence_mode": {
+      "type": "string",
+      "enum": ["internal_and_external", "external_only", "unsupported"]
+    },
+    "detected_contradictions": { "type": "array", "items": { "type": "string" } },
+    "claimed_repairs": { "type": "array", "items": { "type": "string" } },
+    "typed_mappings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_entity_id", "target_domain_id", "literal"],
+        "properties": {
+          "source_entity_id": { "type": "string" },
+          "target_domain_id": {
+            "type": "string",
+            "enum": ["physical", "abstract_conceptual", "sensory_perceptual", "social_relational"]
+          },
+          "literal": { "type": "boolean" }
+        }
+      }
+    },
+    "causal_claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claim_id", "description"],
+        "properties": {
+          "claim_id": { "type": "string", "minLength": 1 },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "span_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["artifact_id", "start_char", "end_char"],
+        "properties": {
+          "artifact_id": { "type": "string" },
+          "start_char": { "type": "integer", "minimum": 0 },
+          "end_char": { "type": "integer", "minimum": 0 },
+          "excerpt": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "extraction_version": { "type": "string" },
+    "parse_version": { "type": "string" },
+    "parse_warnings": { "type": "array", "items": { "type": "string" } },
+    "producer_agent_id": { "type": "string" },
+    "producer_model_id": { "type": "string" },
+    "parent_artifact_id": { "type": ["string", "null"] },
+    "critique_target_artifact_id": { "type": ["string", "null"] },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "normalization_profile": { "type": "string" },
+    "peer_agent_id": { "type": ["string", "null"] },
+    "cross_agent_reference_ids": { "type": "array", "items": { "type": "string" } },
+    "shared_context_ids": { "type": "array", "items": { "type": "string" } },
+    "contagion_candidate": { "type": ["boolean", "null"] }
+  }
+}

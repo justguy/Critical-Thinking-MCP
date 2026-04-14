@@ -35,7 +35,7 @@ The CT-MCP MCP server should be configured in your MCP settings:
   "mcpServers": {
     "ct-mcp": {
       "command": "node",
-      "args": ["./node_modules/.bin/critical-thinking-mcp"]
+      "args": ["./node_modules/.bin/ct-mcp"]
     }
   }
 }

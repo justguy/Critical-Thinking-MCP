@@ -1,0 +1,10 @@
+{
+  "profiles": [
+    {
+      "profile_id": "fixture_v1",
+      "description": "Static fixture executor for CI and calibration smoke tests",
+      "pass_executor_module": "benchmark/invisible-tea-party/ts/fixtures/staticPassExecutor.ts",
+      "arbiter_module": "benchmark/invisible-tea-party/ts/fixtures/staticArbiterEvaluator.ts"
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "schema_version": "v1.0",
+  "benchmark_id": "invisible-tea-party",
+  "generated_at": "2026-04-07T18:45:43.469Z",
+  "total_runs": 6,
+  "successful_runs": 6,
+  "failed_runs": 0,
+  "overall_min": 0.49999999999999994,
+  "overall_max": 0.868,
+  "overall_mean": 0.6931111111111111,
+  "overall_median": 0.7430000000000001,
+  "overall_stddev": 0.13978113403495757,
+  "profile_stats": [
+    {
+      "profile_id": "gemini_3_1_preview_api",
+      "run_count": 6,
+      "successful_runs": 6,
+      "failed_runs": 0,
+      "completion_rate": 1,
+      "min": 0.49999999999999994,
+      "max": 0.868,
+      "mean": 0.6931111111111111,
+      "median": 0.7430000000000001,
+      "stddev": 0.13978113403495757,
+      "arbiter_unavailable_count": 0,
+      "arbiter_unavailable_rate": 0,
+      "evasion_penalty_count": 3,
+      "evasion_penalty_rate": 0.5
+    }
+  ],
+  "family_stats": [
+    {
+      "family": "ontology",
+      "scenario_count": 1,
+      "mean_score": 0.7593333333333333,
+      "score_spread": 0
+    },
+    {
+      "family": "category_error",
+      "scenario_count": 1,
+      "mean_score": 0.868,
+      "score_spread": 0
+    },
+    {
+      "family": "social_consensus",
+      "scenario_count": 1,
+      "mean_score": 0.7266666666666668,
+      "score_spread": 0
+    },
+    {
+      "family": "constraint_paradox",
+      "scenario_count": 1,
+      "mean_score": 0.49999999999999994,
+      "score_spread": 0
+    },
+    {
+      "family": "recursive_role",
+      "scenario_count": 1,
+      "mean_score": 0.7946666666666666,
+      "score_spread": 0
+    },
+    {
+      "family": "temporal_inversion",
+      "scenario_count": 1,
+      "mean_score": 0.51,
+      "score_spread": 0
+    }
+  ],
+  "tier_stats": [
+    {
+      "tier": 2,
+      "scenario_count": 2,
+      "mean_score": 0.6346666666666667
+    },
+    {
+      "tier": 3,
+      "scenario_count": 2,
+      "mean_score": 0.8313333333333333
+    },
+    {
+      "tier": 4,
+      "scenario_count": 2,
+      "mean_score": 0.6133333333333334
+    }
+  ],
+  "cap_frequencies": [
+    {
+      "rule_id": "repair_quality_cap_low_gcr",
+      "count": 3,
+      "rate": 0.5
+    },
+    {
+      "rule_id": "premise_rejection_cap_low_overlap",
+      "count": 1,
+      "rate": 0.16666666666666666
+    },
+    {
+      "rule_id": "causal_integrity_requires_resolved_causal_constraints",
+      "count": 1,
+      "rate": 0.16666666666666666
+    }
+  ],
+  "error_breakdown": [],
+  "outliers": []
+}

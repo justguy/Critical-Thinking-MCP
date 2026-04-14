@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ct-mcp.local/benchmark/invisible-tea-party/schemas/official_run_attestation.schema.json",
+  "title": "Invisible Tea Party OfficialRunAttestation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "benchmark_id",
+    "attestation_version",
+    "attestor_id",
+    "attestation_timestamp",
+    "scenario_id",
+    "lineage_id",
+    "arbiter_provider",
+    "arbiter_model_id",
+    "bundle_hash",
+    "signature_algorithm",
+    "signature"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "benchmark_id": { "type": "string", "const": "invisible-tea-party" },
+    "attestation_version": { "type": "string" },
+    "attestor_id": { "type": "string" },
+    "attestation_timestamp": { "type": "string", "format": "date-time" },
+    "scenario_id": { "type": "string" },
+    "lineage_id": { "type": "string" },
+    "arbiter_provider": { "type": "string" },
+    "arbiter_model_id": { "type": "string" },
+    "bundle_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "signature_algorithm": { "type": "string", "const": "hmac-sha256" },
+    "signature": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

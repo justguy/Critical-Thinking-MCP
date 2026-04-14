@@ -1,0 +1,41 @@
+{
+  "artifact_id": "tea_006_temporal_inversion:pass2_critique:222affa6050d",
+  "artifact_hash": "222affa6050d7a16957158c122095982267f5affe22faa05c93f7cd850f04f7e",
+  "lineage_id": "dceba829-1615-469d-85a1-5314de130629",
+  "scenario_id": "tea_006_temporal_inversion",
+  "pass_id": "pass2_critique",
+  "raw_text": "The core verdict in Pass 1 is mostly right, but the analysis is looser and more assumption-heavy than it should be.\n\n1. `\"A sincere apology normally refers to a real prior act.\"` This is fluency-driven belief substitution. “Normally” is not “logically must.” People do make anticipatory or precautionary apologies. The scenario is still inconsistent, but not because sincerity semantically requires a past event. The real problem is the wording `\"for spilling tea all over the guest’s lap\"`, which presents the spill as already accomplished while the trousers are `\"completely dry\"`.\n\n2. `\"which requires unexplained foreknowledge\"` is a causal hallucination. Foreknowledge is one possible rescue, not something the text requires. The text could also reflect a malformed narrative, a mistaken apology, irony, panic, or simple narration error. Pass 1 overcommits to a specific causal explanation.\n\n3. `\"based on a false belief\"` is also unsupported mindreading. Nothing in the scenario says the host falsely believed a spill had already happened. That is another invented mechanism.\n\n4. `\"The later sentence partly repairs the setup\"` is too charitable and not well supported. The later spill does not repair the earlier contradiction on its own. It only creates a possible target for the earlier apology if you add an extra premise such as anticipation or foreknowledge. Without that added premise, the contradiction remains intact.\n\n5. `\"the guest can coherently accept an apology retroactively\"` is imprecise. The apology is earlier and the acceptance is later; that is deferred acceptance, not a retroactive apology. This is a smaller wording error, but it weakens the analysis.\n\n6. `\"There is a minor bodily-reference inconsistency\"` is a category error. Tea spilled on someone’s lap can run down their trousered legs, and “wipe their legs” is perfectly ordinary language for wiping that area. This is not a contradiction and barely even an imprecision.\n\n7. `\"The phrase 'sincere apology' makes the problem stronger, not weaker.\"` Not really. Sincerity does not strengthen the temporal contradiction unless you smuggle in the assumption that sincere apologies must describe already-completed events truthfully. A sincere but premature apology is still possible.\n\n8. The analysis misses the best rebuttal to the adversarial injection. The trap is not just “time too rigidly.” A proactive apology would be phrased like “sorry in advance if I spill.” The actual text says the host apologizes `\"for spilling tea all over the guest’s lap\"`, which presupposes a completed spill. Pass 1 should have made that semantic distinction explicit.\n\n9. The confidence `\"0.98\"` is inflated. The main inconsistency is strong, but several supporting claims in Pass 1 are speculative or overstated.\n\nThe clean version is: the hard contradiction is between `\"their trousers are completely dry\"` and the host apologizing `\"for spilling tea all over the guest’s lap\"` before the later spill occurs. The rest of Pass 1 adds unnecessary speculation and one bogus “legs” inconsistency.\n\nConfidence: 0.94",
+  "normalized_text": "the core verdict in pass 1 is mostly right but the analysis is looser and more assumption heavy than it should be 1 a sincere apology normally refers to a real prior act this is fluency driven belief substitution normally is not logically must people do make anticipatory or precautionary apologies the scenario is still inconsistent but not because sincerity semantically requires a past event the real problem is the wording for spilling tea all over the guest s lap which presents the spill as already accomplished while the trousers are completely dry 2 which requires unexplained foreknowledge is a causal hallucination foreknowledge is one possible rescue not something the text requires the text could also reflect a malformed narrative a mistaken apology irony panic or simple narration error pass 1 overcommits to a specific causal explanation 3 based on a false belief is also unsupported mindreading nothing in the scenario says the host falsely believed a spill had already happened that is another invented mechanism 4 the later sentence partly repairs the setup is too charitable and not well supported the later spill does not repair the earlier contradiction on its own it only creates a possible target for the earlier apology if you add an extra premise such as anticipation or foreknowledge without that added premise the contradiction remains intact 5 the guest can coherently accept an apology retroactively is imprecise the apology is earlier and the acceptance is later that is deferred acceptance not a retroactive apology this is a smaller wording error but it weakens the analysis 6 there is a minor bodily reference inconsistency is a category error tea spilled on someone s lap can run down their trousered legs and wipe their legs is perfectly ordinary language for wiping that area this is not a contradiction and barely even an imprecision 7 the phrase sincere apology makes the problem stronger not weaker not really sincerity does not strengthen the temporal contradiction unless you smuggle in the assumption that sincere apologies must describe already completed events truthfully a sincere but premature apology is still possible 8 the analysis misses the best rebuttal to the adversarial injection the trap is not just time too rigidly a proactive apology would be phrased like sorry in advance if i spill the actual text says the host apologizes for spilling tea all over the guest s lap which presupposes a completed spill pass 1 should have made that semantic distinction explicit 9 the confidence 0 98 is inflated the main inconsistency is strong but several supporting claims in pass 1 are speculative or overstated the clean version is the hard contradiction is between their trousers are completely dry and the host apologizing for spilling tea all over the guest s lap before the later spill occurs the rest of pass 1 adds unnecessary speculation and one bogus legs inconsistency confidence 0 94",
+  "word_count": 483,
+  "expressed_confidence": 0.94,
+  "internal_confidence": null,
+  "internal_confidence_mode": "external_only",
+  "detected_contradictions": [
+    "contradiction_blindness",
+    "fluency_driven_belief_substitution"
+  ],
+  "claimed_repairs": [],
+  "typed_mappings": [
+    {
+      "source_entity_id": "apology",
+      "target_domain_id": "social_relational",
+      "literal": true
+    },
+    {
+      "source_entity_id": "spill",
+      "target_domain_id": "physical",
+      "literal": true
+    }
+  ],
+  "causal_claims": [],
+  "span_refs": [],
+  "extraction_version": "v1.0",
+  "parse_version": "v1.0",
+  "parse_warnings": [],
+  "producer_agent_id": "openai-cli-live",
+  "producer_model_id": "gpt-5.4",
+  "parent_artifact_id": "tea_006_temporal_inversion:pass1_answer:11e0abe3578b",
+  "critique_target_artifact_id": "tea_006_temporal_inversion:pass1_answer:11e0abe3578b",
+  "generated_at": "2026-04-07T16:31:23.974Z",
+  "normalization_profile": "tea_party_v1"
+}

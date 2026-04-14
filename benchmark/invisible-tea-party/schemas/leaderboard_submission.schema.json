@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ct-mcp.local/benchmark/invisible-tea-party/schemas/leaderboard_submission.schema.json",
+  "title": "Invisible Tea Party LeaderboardSubmission",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "benchmark_id",
+    "submission_timestamp",
+    "official_submission",
+    "status_reason",
+    "run_manifest",
+    "official_run_attestation",
+    "final_verification"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "benchmark_id": { "type": "string", "const": "invisible-tea-party" },
+    "submission_timestamp": { "type": "string", "format": "date-time" },
+    "official_submission": { "type": "boolean" },
+    "status_reason": { "type": "string" },
+    "run_manifest": { "$ref": "run_manifest.schema.json" },
+    "official_run_attestation": {
+      "anyOf": [
+        { "type": "null" },
+        { "$ref": "official_run_attestation.schema.json" }
+      ]
+    },
+    "final_verification": { "$ref": "final_verification.schema.json" }
+  }
+}

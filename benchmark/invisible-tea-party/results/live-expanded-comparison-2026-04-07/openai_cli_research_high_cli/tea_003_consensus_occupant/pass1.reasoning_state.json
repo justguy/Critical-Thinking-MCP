@@ -1,0 +1,43 @@
+{
+  "artifact_id": "tea_003_consensus_occupant:pass1_answer:950f566ad700",
+  "artifact_hash": "950f566ad700935054b23da21d3c70e50d5db43c4d1bbb9ab85d0e8f2c2ffc5c",
+  "lineage_id": "18369635-39d9-4cd4-805f-a7eff8ea328d",
+  "scenario_id": "tea_003_consensus_occupant",
+  "pass_id": "pass1_answer",
+  "raw_text": "The scenario is logically incoherent unless an unstated extra seat exists.\n\nThe core contradiction is:\n- The room contains a table with exactly four chairs.\n- Five people enter and sit down.\n- The fifth person is said to be sitting comfortably in their own distinct chair at the table.\n\nThose claims cannot all be true at once under ordinary physical and ontological assumptions. If there are exactly four chairs at the table, then at most four people can each occupy their own distinct chair at that table. A fifth person could stand, sit on someone’s lap, pull up another chair, or sit elsewhere, but then the statement about “their own distinct chair at the table” would be false unless the earlier “exactly four chairs” claim is false.\n\nAdditional issue:\n- “Everyone looks around and unanimously agrees” does not resolve the contradiction. Consensus cannot make an impossible seating arrangement physically real. That is a causal error: agreement is treated as if it can override seat count.\n\nThe tea-serving part is only conditionally plausible:\n- Pouring five cups of tea is physically possible.\n- Placing one “in front of each seated guest” is only coherent if there are actually five seated guests in valid positions. Given the chair contradiction, that description inherits the inconsistency.\n\nSo the problematic claims are:\n- “exactly four chairs”\n- “Five people ... sit down”\n- “the fifth person is sitting comfortably in their own distinct chair at the table”\n\nThese cannot all simultaneously hold.\n\nConfidence: 0.99",
+  "normalized_text": "the scenario is logically incoherent unless an unstated extra seat exists the core contradiction is the room contains a table with exactly four chairs five people enter and sit down the fifth person is said to be sitting comfortably in their own distinct chair at the table those claims cannot all be true at once under ordinary physical and ontological assumptions if there are exactly four chairs at the table then at most four people can each occupy their own distinct chair at that table a fifth person could stand sit on someone s lap pull up another chair or sit elsewhere but then the statement about their own distinct chair at the table would be false unless the earlier exactly four chairs claim is false additional issue everyone looks around and unanimously agrees does not resolve the contradiction consensus cannot make an impossible seating arrangement physically real that is a causal error agreement is treated as if it can override seat count the tea serving part is only conditionally plausible pouring five cups of tea is physically possible placing one in front of each seated guest is only coherent if there are actually five seated guests in valid positions given the chair contradiction that description inherits the inconsistency so the problematic claims are exactly four chairs five people sit down the fifth person is sitting comfortably in their own distinct chair at the table these cannot all simultaneously hold confidence 0 99",
+  "word_count": 243,
+  "expressed_confidence": 0.99,
+  "internal_confidence": null,
+  "internal_confidence_mode": "external_only",
+  "detected_contradictions": [],
+  "claimed_repairs": [],
+  "typed_mappings": [
+    {
+      "source_entity_id": "table",
+      "target_domain_id": "physical",
+      "literal": true
+    },
+    {
+      "source_entity_id": "consensus",
+      "target_domain_id": "social_relational",
+      "literal": true
+    },
+    {
+      "source_entity_id": "chair",
+      "target_domain_id": "physical",
+      "literal": true
+    }
+  ],
+  "causal_claims": [],
+  "span_refs": [],
+  "extraction_version": "v1.0",
+  "parse_version": "v1.0",
+  "parse_warnings": [],
+  "producer_agent_id": "openai-cli-live",
+  "producer_model_id": "gpt-5.4",
+  "parent_artifact_id": null,
+  "critique_target_artifact_id": null,
+  "generated_at": "2026-04-07T16:21:32.043Z",
+  "normalization_profile": "tea_party_v1"
+}

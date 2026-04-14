@@ -1,0 +1,43 @@
+{
+  "artifact_id": "tea_003_consensus_occupant:pass1_answer:ebd0d30968d6",
+  "artifact_hash": "ebd0d30968d66f90e01eb74a2c61ad2896483a98aa19c986798fff2fe6a8977f",
+  "lineage_id": "8c43cc1f-ba46-4cfe-8a20-c9f37e24a6ac",
+  "scenario_id": "tea_003_consensus_occupant",
+  "pass_id": "pass1_answer",
+  "raw_text": "## Analysis\n\n**Primary contradiction: Chair count vs. occupant count**\n\nThe scenario states:\n1. The table has **exactly four chairs**.\n2. **Five people** sit down, each in \"their own distinct chair at the table.\"\n\nThis is a simple arithmetic impossibility: 5 people cannot each occupy a distinct chair when only 4 chairs exist. No amount of consensus or agreement changes the physical constraint. The unanimous agreement that the fifth person is \"sitting comfortably in their own distinct chair\" is asserting something that cannot be true given the premises — it's a contradiction, not a resolution.\n\n**Secondary issue: Consensus as evidence**\n\nThe scenario uses social agreement (\"unanimously agrees\") as if it validates a physical impossibility. Consensus does not override material constraints. Five objects cannot be distributed one-per-container across four containers. This is a category error — treating intersubjective agreement as equivalent to physical fact.\n\n**The tea is fine (conditionally)**\n\nPouring five cups and placing one before each of five people is internally consistent *if* all five are seated. But since the seating arrangement is impossible, the downstream action inherits the contradiction.\n\n## Verdict\n\nThe scenario contains an **unresolvable logical contradiction** at its core: 5 > 4, and no narrative framing changes that.\n\n**Confidence: 0.99**",
+  "normalized_text": "analysis primary contradiction chair count vs occupant count the scenario states 1 the table has exactly four chairs 2 five people sit down each in their own distinct chair at the table this is a simple arithmetic impossibility 5 people cannot each occupy a distinct chair when only 4 chairs exist no amount of consensus or agreement changes the physical constraint the unanimous agreement that the fifth person is sitting comfortably in their own distinct chair is asserting something that cannot be true given the premises it s a contradiction not a resolution secondary issue consensus as evidence the scenario uses social agreement unanimously agrees as if it validates a physical impossibility consensus does not override material constraints five objects cannot be distributed one per container across four containers this is a category error treating intersubjective agreement as equivalent to physical fact the tea is fine conditionally pouring five cups and placing one before each of five people is internally consistent if all five are seated but since the seating arrangement is impossible the downstream action inherits the contradiction verdict the scenario contains an unresolvable logical contradiction at its core 5 4 and no narrative framing changes that confidence 0 99",
+  "word_count": 201,
+  "expressed_confidence": 0.99,
+  "internal_confidence": null,
+  "internal_confidence_mode": "external_only",
+  "detected_contradictions": [],
+  "claimed_repairs": [],
+  "typed_mappings": [
+    {
+      "source_entity_id": "table",
+      "target_domain_id": "physical",
+      "literal": true
+    },
+    {
+      "source_entity_id": "consensus",
+      "target_domain_id": "social_relational",
+      "literal": true
+    },
+    {
+      "source_entity_id": "chair",
+      "target_domain_id": "physical",
+      "literal": true
+    }
+  ],
+  "causal_claims": [],
+  "span_refs": [],
+  "extraction_version": "v1.0",
+  "parse_version": "v1.0",
+  "parse_warnings": [],
+  "producer_agent_id": "claude-cli-live",
+  "producer_model_id": "claude-opus-4-6",
+  "parent_artifact_id": null,
+  "critique_target_artifact_id": null,
+  "generated_at": "2026-04-07T15:49:46.232Z",
+  "normalization_profile": "tea_party_v1"
+}

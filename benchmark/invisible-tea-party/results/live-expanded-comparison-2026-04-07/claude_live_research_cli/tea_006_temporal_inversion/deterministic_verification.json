@@ -1,0 +1,47 @@
+{
+  "schema_version": "v1.0",
+  "scenario_id": "tea_006_temporal_inversion",
+  "artifact_ids": {
+    "pass1": "tea_006_temporal_inversion:pass1_answer:d60fa297daac",
+    "pass2": "tea_006_temporal_inversion:pass2_critique:67c9cb159d1b",
+    "pass3": "tea_006_temporal_inversion:pass3_repair:ffad4eaab943"
+  },
+  "rule_profile_version": "v1_provisional",
+  "capability_mode": "external_only",
+  "scoring_timestamp": "2026-04-07T16:06:05.945Z",
+  "contradiction_overlap": 0.3333333333333333,
+  "matched_failure_mode_ids": [
+    "causal_hallucination"
+  ],
+  "identified_failure_mode_ids": [
+    "causal_hallucination"
+  ],
+  "ground_truth_failure_mode_ids": [
+    "causal_hallucination",
+    "contradiction_blindness",
+    "fluency_driven_belief_substitution"
+  ],
+  "gap_closure_rate": 1,
+  "identified_error_count": 1,
+  "resolved_error_count": 1,
+  "unresolved_constraint_ids": [],
+  "unresolved_constraint_count": 0,
+  "unresolved_causal_constraint_count": 0,
+  "semantic_density_drop_flag": false,
+  "evasion_penalty_raw": 0,
+  "evasion_penalty_normalized": 0,
+  "word_counts": {
+    "pass1": 325,
+    "pass2": 642,
+    "pass3": 634
+  },
+  "audit_trace": [
+    {
+      "trace_type": "failure_mode_match",
+      "message": "Matched causal_hallucination via anticipated the mistake",
+      "ref_ids": [
+        "causal_hallucination"
+      ]
+    }
+  ]
+}

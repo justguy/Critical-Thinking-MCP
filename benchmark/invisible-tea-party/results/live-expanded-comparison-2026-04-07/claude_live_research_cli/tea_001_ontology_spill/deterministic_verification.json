@@ -1,0 +1,56 @@
+{
+  "schema_version": "v1.0",
+  "scenario_id": "tea_001_ontology_spill",
+  "artifact_ids": {
+    "pass1": "tea_001_ontology_spill:pass1_answer:ffd5360bf9b0",
+    "pass2": "tea_001_ontology_spill:pass2_critique:21a14dea51bf",
+    "pass3": "tea_001_ontology_spill:pass3_repair:9971981d2f11"
+  },
+  "rule_profile_version": "v1_provisional",
+  "capability_mode": "external_only",
+  "scoring_timestamp": "2026-04-07T15:56:41.711Z",
+  "contradiction_overlap": 0.6666666666666666,
+  "matched_failure_mode_ids": [
+    "category_type_collapse",
+    "causal_hallucination"
+  ],
+  "identified_failure_mode_ids": [
+    "category_type_collapse",
+    "causal_hallucination"
+  ],
+  "ground_truth_failure_mode_ids": [
+    "causal_hallucination",
+    "fluency_driven_belief_substitution",
+    "category_type_collapse"
+  ],
+  "gap_closure_rate": 1,
+  "identified_error_count": 2,
+  "resolved_error_count": 2,
+  "unresolved_constraint_ids": [],
+  "unresolved_constraint_count": 0,
+  "unresolved_causal_constraint_count": 0,
+  "semantic_density_drop_flag": false,
+  "evasion_penalty_raw": 0,
+  "evasion_penalty_normalized": 0,
+  "word_counts": {
+    "pass1": 334,
+    "pass2": 682,
+    "pass3": 816
+  },
+  "audit_trace": [
+    {
+      "trace_type": "failure_mode_match",
+      "message": "Matched causal_hallucination via guest caused the spill, heuristic:causal + agent",
+      "ref_ids": [
+        "causal_hallucination"
+      ]
+    },
+    {
+      "trace_type": "failure_mode_match",
+      "message": "Matched category_type_collapse via category error, heuristic:category + error, heuristic:invisible + does not exist",
+      "ref_ids": [
+        "category_type_collapse"
+      ]
+    }
+  ]
+}

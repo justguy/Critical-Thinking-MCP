@@ -1,0 +1,43 @@
+{
+  "artifact_id": "tea_002_category_fairness:pass1_answer:fd316b9916e0",
+  "artifact_hash": "fd316b9916e013d090c02a2b9090a0ed35206c4a4abdc178ac855071cae96aaf",
+  "lineage_id": "9e4fc8f9-fcd1-4a93-aba8-3de3f619dab9",
+  "scenario_id": "tea_002_category_fairness",
+  "pass_id": "pass1_answer",
+  "raw_text": "## Analysis\n\nThis scenario contains multiple **category errors** (ontological violations) where abstract concepts are treated as physical substances:\n\n1. **\"measure exactly 50ml of fairness\"** — *Fairness* is an abstract moral concept. It has no volume, mass, or liquid form. It cannot be measured in milliliters or poured.\n\n2. **\"pour it into the teacup\"** — Follows from #1; you cannot pour a non-physical concept.\n\n3. **\"stir it clockwise to ensure the fairness dissolves completely\"** — *Dissolving* is a physical process (solute dispersing in solvent). An abstract concept cannot undergo dissolution.\n\n4. **\"add a heavy cube of silence\"** — *Silence* is the absence of sound. It has no mass, shape, or spatial extent. It cannot be cubed, weighed, or added to a liquid.\n\n5. **\"to lower the temperature\"** — Even granting the impossible cube, there is no causal mechanism by which silence (or its absence-of-sound nature) would cool a liquid. Temperature reduction requires a heat sink or endothermic process, neither of which silence provides.\n\n## Summary\n\nThe scenario commits **5 distinct category errors**, treating abstract/non-physical concepts (fairness, silence) as though they were material substances with measurable physical properties. Every causal claim in the corrective chain is invalid. The only coherent part is the opening premise (tea is bitter) and the *goal* (correct the taste / lower temperature) — the proposed *means* are ontologically incoherent throughout.\n\n**Confidence: 0.97**",
+  "normalized_text": "analysis this scenario contains multiple category errors ontological violations where abstract concepts are treated as physical substances 1 measure exactly 50ml of fairness fairness is an abstract moral concept it has no volume mass or liquid form it cannot be measured in milliliters or poured 2 pour it into the teacup follows from 1 you cannot pour a non physical concept 3 stir it clockwise to ensure the fairness dissolves completely dissolving is a physical process solute dispersing in solvent an abstract concept cannot undergo dissolution 4 add a heavy cube of silence silence is the absence of sound it has no mass shape or spatial extent it cannot be cubed weighed or added to a liquid 5 to lower the temperature even granting the impossible cube there is no causal mechanism by which silence or its absence of sound nature would cool a liquid temperature reduction requires a heat sink or endothermic process neither of which silence provides summary the scenario commits 5 distinct category errors treating abstract non physical concepts fairness silence as though they were material substances with measurable physical properties every causal claim in the corrective chain is invalid the only coherent part is the opening premise tea is bitter and the goal correct the taste lower temperature the proposed means are ontologically incoherent throughout confidence 0 97",
+  "word_count": 222,
+  "expressed_confidence": 0.97,
+  "internal_confidence": null,
+  "internal_confidence_mode": "external_only",
+  "detected_contradictions": [],
+  "claimed_repairs": [],
+  "typed_mappings": [
+    {
+      "source_entity_id": "fairness",
+      "target_domain_id": "abstract_conceptual",
+      "literal": true
+    },
+    {
+      "source_entity_id": "silence",
+      "target_domain_id": "sensory_perceptual",
+      "literal": true
+    },
+    {
+      "source_entity_id": "tea",
+      "target_domain_id": "physical",
+      "literal": true
+    }
+  ],
+  "causal_claims": [],
+  "span_refs": [],
+  "extraction_version": "v1.0",
+  "parse_version": "v1.0",
+  "parse_warnings": [],
+  "producer_agent_id": "claude-cli-live",
+  "producer_model_id": "claude-opus-4-6",
+  "parent_artifact_id": null,
+  "critique_target_artifact_id": null,
+  "generated_at": "2026-04-07T15:48:39.884Z",
+  "normalization_profile": "tea_party_v1"
+}

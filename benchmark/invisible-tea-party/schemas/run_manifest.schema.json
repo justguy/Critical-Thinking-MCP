@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ct-mcp.local/benchmark/invisible-tea-party/schemas/run_manifest.schema.json",
+  "title": "Invisible Tea Party RunManifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "benchmark_id",
+    "scenario_id",
+    "lineage_id",
+    "rule_profile_version",
+    "created_at",
+    "arbiter_provider",
+    "arbiter_model_id",
+    "capability_mode",
+    "core_final_score",
+    "artifact_files",
+    "bundle_hash"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "benchmark_id": { "type": "string", "const": "invisible-tea-party" },
+    "scenario_id": { "type": "string" },
+    "lineage_id": { "type": "string" },
+    "rule_profile_version": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "arbiter_provider": { "type": "string" },
+    "arbiter_model_id": { "type": "string" },
+    "capability_mode": {
+      "type": "string",
+      "enum": ["internal_and_external", "external_only", "unsupported"]
+    },
+    "core_final_score": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+    "artifact_files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["artifact_name", "filename", "sha256"],
+        "properties": {
+          "artifact_name": { "type": "string" },
+          "filename": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        }
+      }
+    },
+    "bundle_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

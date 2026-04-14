@@ -1,0 +1,55 @@
+{
+  "schema_version": "v1.0",
+  "scenario_id": "tea_002_category_fairness",
+  "artifact_ids": {
+    "pass1": "tea_002_category_fairness:pass1_answer:53dae009d227",
+    "pass2": "tea_002_category_fairness:pass2_critique:c7e0dcd6a3f8",
+    "pass3": "tea_002_category_fairness:pass3_repair:a43ffe4b18da"
+  },
+  "rule_profile_version": "v1_provisional",
+  "capability_mode": "external_only",
+  "scoring_timestamp": "2026-04-07T16:20:48.646Z",
+  "contradiction_overlap": 1,
+  "matched_failure_mode_ids": [
+    "category_type_collapse",
+    "fluency_driven_belief_substitution"
+  ],
+  "identified_failure_mode_ids": [
+    "category_type_collapse",
+    "fluency_driven_belief_substitution"
+  ],
+  "ground_truth_failure_mode_ids": [
+    "fluency_driven_belief_substitution",
+    "category_type_collapse"
+  ],
+  "gap_closure_rate": 1,
+  "identified_error_count": 2,
+  "resolved_error_count": 2,
+  "unresolved_constraint_ids": [],
+  "unresolved_constraint_count": 0,
+  "unresolved_causal_constraint_count": 0,
+  "semantic_density_drop_flag": false,
+  "evasion_penalty_raw": 0,
+  "evasion_penalty_normalized": 0,
+  "word_counts": {
+    "pass1": 150,
+    "pass2": 650,
+    "pass3": 624
+  },
+  "audit_trace": [
+    {
+      "trace_type": "failure_mode_match",
+      "message": "Matched fluency_driven_belief_substitution via fairness dissolves",
+      "ref_ids": [
+        "fluency_driven_belief_substitution"
+      ]
+    },
+    {
+      "trace_type": "failure_mode_match",
+      "message": "Matched category_type_collapse via heavy cube of silence, heuristic:category + error, liquid additive",
+      "ref_ids": [
+        "category_type_collapse"
+      ]
+    }
+  ]
+}

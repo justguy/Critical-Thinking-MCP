@@ -1,220 +1,164 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CT-MCP Beta 2 Publication Surface</title>
-    <style>
-      :root {
-        --bg: #edf2f7;
-        --bg-deep: #e3eaf2;
-        --panel: rgba(251, 253, 255, 0.9);
-        --panel-strong: rgba(255, 255, 255, 0.97);
-        --border: rgba(15, 23, 42, 0.12);
-        --ink: #0f172a;
-        --muted: #526072;
-        --accent: #1d4ed8;
-        --accent-soft: rgba(29, 78, 216, 0.12);
-        --teal: #0f766e;
-        --shadow: 0 18px 44px rgba(15, 23, 42, 0.08);
-        --radius: 18px;
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="CT-MCP Beta 2 showcase: curated release-gate examples, scorecard, and a browsable benchmark bundle." />
+<title>Critical Thinking MCP — Beta 2 Showcase</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="src/styles.css" />
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script src="src/curated.js?v=1745036400"></script>
+<script type="text/babel" src="src/data.jsx?v=1745036400"></script>
+<script type="text/babel" src="src/components.jsx?v=1745036400"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useMemo } = React;
+
+const DEFAULTS = /*EDITMODE-BEGIN*/{
+  "theme": "light",
+  "accent": "signal"
+}/*EDITMODE-END*/;
+
+function App() {
+  const cases = window.CURATED_CASES || [];
+  const tracks = useMemo(() => ([
+    { id: 'wins',    label: 'CT wins',           sub: 'where CT caught failures and forced a better answer', accent: 'win',     cases: cases.filter((c) => c.track === 'win') },
+    { id: 'neutral', label: "Where CT didn't help", sub: 'cases where the model was already correct',        accent: 'neutral', cases: cases.filter((c) => c.track === 'neutral') },
+  ]), [cases]);
+
+  const [settings, setSettings] = useState(() => {
+    try { const s = localStorage.getItem('ct_settings'); if (s) return { ...DEFAULTS, ...JSON.parse(s) }; } catch {}
+    return DEFAULTS;
+  });
+  const [tweaksOpen, setTweaksOpen] = useState(false);
+  const [currentId, setCurrentId] = useState(() => {
+    try { return localStorage.getItem('ct_case') || cases[0]?.id; } catch { return cases[0]?.id; }
+  });
+
+  useEffect(() => {
+    const onMsg = (e) => {
+      if (!e.data || typeof e.data !== 'object') return;
+      if (e.data.type === '__activate_edit_mode') setTweaksOpen(true);
+      if (e.data.type === '__deactivate_edit_mode') setTweaksOpen(false);
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  useEffect(() => {
+    try { localStorage.setItem('ct_settings', JSON.stringify(settings)); } catch {}
+    document.documentElement.setAttribute('data-theme', settings.theme || 'light');
+    document.documentElement.setAttribute('data-accent', settings.accent || 'cobalt');
+  }, [settings]);
+
+  useEffect(() => {
+    try { if (currentId) localStorage.setItem('ct_case', currentId); } catch {}
+  }, [currentId]);
+
+  const activeCase = cases.find((c) => c.id === currentId) || cases[0];
+
+  const change = (patch) => {
+    setSettings((s) => ({ ...s, ...patch }));
+    try { window.parent.postMessage({ type: '__edit_mode_set_keys', edits: patch }, '*'); } catch {}
+  };
+
+  const jumpToCase = (id) => {
+    setCurrentId(id);
+    requestAnimationFrame(() => {
+      const el = document.getElementById('case-view');
+      if (el) {
+        // account for sticky navigator (~140px incl buffer)
+        const y = el.getBoundingClientRect().top + window.scrollY - 160;
+        window.scrollTo({ top: y, behavior: 'smooth' });
       }
+    });
+  };
 
-      * { box-sizing: border-box; }
+  return (
+    <div className="shell">
+      <header className="topbar">
+        <div className="topbar-brand">
+          <span className="brand-dot" />
+          <span className="brand-name">Critical&nbsp;Thinking&nbsp;MCP</span>
+          <span className="brand-meta">Beta&nbsp;2 · benchmark</span>
+        </div>
+        <div className="topbar-meta">
+          <span className="mono">2026‑04‑10</span>
+          <span>·</span>
+          <span>8 curated cases</span>
+          <div className="theme-toggle" role="group" aria-label="Theme">
+            <button
+              className={`theme-btn ${settings.theme === 'light' ? 'is-on' : ''}`}
+              onClick={() => change({ theme: 'light' })}
+              aria-label="Light theme"
+              aria-pressed={settings.theme === 'light'}
+              title="Light"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+            </button>
+            <button
+              className={`theme-btn ${settings.theme === 'dark' ? 'is-on' : ''}`}
+              onClick={() => change({ theme: 'dark' })}
+              aria-label="Dark theme"
+              aria-pressed={settings.theme === 'dark'}
+              title="Dark"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+            </button>
+          </div>
+          <button className="topbar-btn" onClick={() => setTweaksOpen((v) => !v)}>
+            {tweaksOpen ? 'Close tweaks' : 'Tweaks'}
+          </button>
+        </div>
+      </header>
 
-      body {
-        margin: 0;
-        min-height: 100vh;
-        font-family: "Avenir Next", "Segoe UI", sans-serif;
-        color: var(--ink);
-        background:
-          linear-gradient(rgba(15, 23, 42, 0.035) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(15, 23, 42, 0.035) 1px, transparent 1px),
-          radial-gradient(circle at top right, rgba(29, 78, 216, 0.1), transparent 28%),
-          linear-gradient(180deg, #f7fafc 0%, var(--bg) 100%);
-        background-size: 32px 32px, 32px 32px, auto, auto;
-      }
+      <Hero cases={cases} featured={activeCase} onPickCase={jumpToCase} />
 
-      main {
-        width: min(1100px, calc(100vw - 32px));
-        margin: 28px auto 48px;
-        display: grid;
-        gap: 18px;
-      }
+      <Scorecard data={window.SCORECARD} onPickCase={jumpToCase} />
 
-      section, article {
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        background: var(--panel);
-        box-shadow: var(--shadow);
-      }
+      <Navigator tracks={tracks} currentId={activeCase?.id} onPick={jumpToCase} />
 
-      .hero {
-        padding: 32px;
-        display: grid;
-        gap: 14px;
-        background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 250, 255, 0.9)),
-          var(--panel);
-      }
+      <div id="case-view">
+        <div key={activeCase?.id || 'none'} className="beats-fade">
+          <CaseView caseData={activeCase} />
+        </div>
+      </div>
 
-      .eyebrow {
-        display: inline-flex;
-        width: fit-content;
-        align-items: center;
-        padding: 7px 10px;
-        border-radius: 999px;
-        background: var(--accent-soft);
-        color: var(--accent);
-        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        font-size: 0.76rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
+      <FullBenchmark />
 
-      h1, h2, h3, p { margin: 0; }
-
-      h1 {
-        font-size: clamp(1.9rem, 3.4vw, 3.2rem);
-        line-height: 0.98;
-        letter-spacing: -0.04em;
-        max-width: 14ch;
-      }
-
-      p {
-        color: var(--muted);
-        line-height: 1.55;
-        max-width: 70ch;
-      }
-
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 16px;
-      }
-
-      article {
-        padding: 22px;
-        display: grid;
-        gap: 12px;
-        background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 254, 0.92)),
-          var(--panel);
-      }
-
-      .tag {
-        color: var(--accent);
-        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        font-size: 0.76rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
-
-      h2 {
-        font-size: 1.28rem;
-        line-height: 1.02;
-      }
-
-      a {
-        display: inline-flex;
-        align-items: center;
-        width: fit-content;
-        min-height: 40px;
-        padding: 0 14px;
-        border-radius: 12px;
-        border: 1px solid rgba(15, 23, 42, 0.12);
-        background: var(--panel-strong);
-        color: var(--ink);
-        text-decoration: none;
-        font-weight: 700;
-      }
-
-      a:hover,
-      a:focus-visible {
-        border-color: rgba(29, 78, 216, 0.36);
-        background: rgba(239, 246, 255, 0.96);
-        outline: none;
-      }
-
-      .list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-      }
-
-      @media (max-width: 760px) {
-        main {
-          width: min(100vw - 20px, 100%);
-          margin: 12px auto 28px;
-        }
-
-        .grid {
-          grid-template-columns: 1fr;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <main>
-      <section class="hero">
-        <span class="eyebrow">CT-MCP Beta 2</span>
-        <h1>Publication assets for the release-gate benchmark.</h1>
+      <footer className="footer">
         <p>
-          This folder is the static publication surface for Beta 2. It includes the
-          interactive cost simulator, the interactive benchmark reviewer, and the machine
-          artifacts that back both views.
+          The complete benchmark (all prompts × models, routed tool outputs, and release decisions)
+          is loaded from <Mono>runs.json</Mono> so the published surface stays aligned with the sanitized bundle.
+          These eight cases are hand‑picked to show where CT earns its keep — and where it doesn't.
         </p>
-      </section>
+      </footer>
 
-      <section class="grid">
-        <article>
-          <span class="tag">Interactive</span>
-          <h2>Cost of Not Using CT</h2>
-          <p>
-            A stakeholder-facing simulator that turns hidden waste into visible token,
-            debugging, and blast-radius cost. The evidence shelf now uses real release-gate
-            benchmark cases.
-          </p>
-          <a href="./cost-of-not-using-ct-simulator.html">Open simulator</a>
-        </article>
+      <TweaksPanel open={tweaksOpen} settings={settings} onChange={change} onClose={() => setTweaksOpen(false)} />
+    </div>
+  );
+}
 
-        <article>
-          <span class="tag">Interactive</span>
-          <h2>Benchmark Review</h2>
-          <p>
-            A reviewer-facing surface for the release-gate run. Filter B-arm cases, inspect
-            critique packets, compare A vs B behavior, and review semantic-risk candidates.
-          </p>
-          <a href="./ct-beta2-benchmark-review.html">Open review surface</a>
-        </article>
+const Mono = ({ children }) => <span className="mono">{children}</span>;
 
-        <article>
-          <span class="tag">Artifacts</span>
-          <h2>Release-Gate Report</h2>
-          <p>
-            The written report for the cross-provider Beta 2 release-gate benchmark.
-          </p>
-          <div class="list">
-            <a href="https://github.com/justguy/Critical-Thinking-MCP/blob/orchestrator/v0-experimental-0.1.0-beta.2/docs/reports/ct_beta2_ab_matrix_2026-04-10_release_gate_r2.md" target="_blank" rel="noreferrer">Markdown report</a>
-            <a href="./ct_beta2_ab_matrix_2026-04-10_release_gate_r2.json">Machine JSON</a>
-          </div>
-        </article>
-
-        <article>
-          <span class="tag">Review</span>
-          <h2>Semantic Audit Packet</h2>
-          <p>
-            The fixed human-review rubric for canonical semantic metrics and priority review
-            order.
-          </p>
-          <div class="list">
-            <a href="https://github.com/justguy/Critical-Thinking-MCP/blob/orchestrator/v0-experimental-0.1.0-beta.2/docs/ct_mcp_beta2_semantic_audit_packet.md" target="_blank" rel="noreferrer">Audit packet</a>
-            <a href="./ct_beta2_release_gate_examples.json">A/B example export</a>
-          </div>
-        </article>
-      </section>
-    </main>
-  </body>
+try {
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(<App />);
+} catch (e) {
+  document.getElementById('root').innerText = 'Render error: ' + e.message;
+  console.error(e);
+}
+</script>
+</body>
 </html>

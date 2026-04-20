@@ -1,0 +1,70 @@
+name: Bug report
+description: Report a reproducible defect in CT-MCP behavior, packaging, or transport.
+title: "[Bug]: "
+body:
+  - type: input
+    id: version
+    attributes:
+      label: CT-MCP version
+      description: Which published version or commit are you using?
+      placeholder: 0.1.0-beta.3
+    validations:
+      required: true
+
+  - type: input
+    id: client
+    attributes:
+      label: MCP client
+      description: Which host/client are you using?
+      placeholder: Claude Desktop, Cursor, custom client
+    validations:
+      required: true
+
+  - type: dropdown
+    id: transport
+    attributes:
+      label: Transport
+      options:
+        - stdio
+        - http
+        - not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the bug and the actual result.
+      placeholder: The tool returned a PASS even though...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+      placeholder: I expected the tool to flag...
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: Share the smallest structured input or sequence of steps that reproduces the issue.
+      placeholder: |
+        1. Start the server with...
+        2. Call validate_confidence with...
+        3. Observe...
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant output
+      description: Paste tool output, stack traces, or screenshots if useful.
+      render: shell
+    validations:
+      required: false

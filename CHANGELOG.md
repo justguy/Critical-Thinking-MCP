@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.1.0-beta.3 — 2026-04-15
+
+Third public beta.
+
+- narrows the Vitest publish gate to the canonical `tests/` tree instead of transient `.claude/worktrees/` copies
+- refreshes the npm package description with a clearer value proposition
+- bumps the published package and server version to `0.1.0-beta.3`
+
+## 0.1.0-beta.2 — 2026-04-08
+
+Second public beta.
+
+- adds a consolidated repo-level roadmap in `ROADMAP.md`
+- links the roadmap from the main `README.md`
+- bumps the published package and server version to `0.1.0-beta.2`
+
 ## 0.1.0-beta.1 — 2026-03-31
 
 First public beta.
@@ -16,4 +32,3 @@ First public beta.
 - Ungrounded entity detection
 - Claim classification for tool routing
 - Iterative enforcement with explicit caller-provided context
-

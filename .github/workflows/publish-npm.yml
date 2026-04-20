@@ -1,0 +1,72 @@
+name: Publish To npm
+
+on:
+  release:
+    types:
+      - published
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-npm-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Verify npm token is configured
+        run: |
+          if [ -z "${NODE_AUTH_TOKEN}" ]; then
+            echo "Missing NPM_TOKEN repository secret."
+            exit 1
+          fi
+
+      - name: Derive package metadata
+        id: package
+        run: |
+          node <<'EOF' >> "$GITHUB_OUTPUT"
+          const pkg = require('./package.json');
+          const version = pkg.version;
+          const prerelease = version.match(/-([0-9A-Za-z-]+)(?:\.\d+)?$/)?.[1] ?? 'latest';
+
+          console.log(`version=${version}`);
+          console.log(`dist_tag=${prerelease === 'latest' ? 'latest' : prerelease}`);
+          EOF
+
+      - name: Verify release tag matches package version
+        env:
+          PACKAGE_VERSION: ${{ steps.package.outputs.version }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          if [ "${RELEASE_TAG}" != "v${PACKAGE_VERSION}" ]; then
+            echo "Release tag ${RELEASE_TAG} does not match package.json version v${PACKAGE_VERSION}."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build package
+        run: npm run build
+
+      - name: Publish package
+        env:
+          NPM_DIST_TAG: ${{ steps.package.outputs.dist_tag }}
+        run: npm publish --access public --tag "${NPM_DIST_TAG}"

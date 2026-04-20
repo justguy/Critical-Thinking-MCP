@@ -85,6 +85,22 @@ describe('Required files exist', () => {
   it('benchmark/reports/BENCHMARK_REPORT.md exists', () => {
     expect(fileExists('benchmark/reports/BENCHMARK_REPORT.md')).toBe(true);
   });
+
+  it('html/index.html exists', () => {
+    expect(fileExists('html/index.html')).toBe(true);
+  });
+
+  it('html/runs.json exists', () => {
+    expect(fileExists('html/runs.json')).toBe(true);
+  });
+
+  it('html/src/components.jsx exists', () => {
+    expect(fileExists('html/src/components.jsx')).toBe(true);
+  });
+
+  it('html/src/curated.js exists', () => {
+    expect(fileExists('html/src/curated.js')).toBe(true);
+  });
 });
 
 describe('README content requirements', () => {
@@ -100,6 +116,17 @@ describe('README content requirements', () => {
       const items = limSection.split('\n').filter(l => /^\d+\./.test(l.trim()));
       expect(items.length).toBeGreaterThanOrEqual(5);
     }
+  });
+
+  it('publication section points at the current beta2 showcase bundle', () => {
+    expect(readme).toContain('html/index.html');
+    expect(readme).toContain('html/runs.json');
+  });
+
+  it('publication section no longer references retired standalone html prototypes', () => {
+    expect(readme).not.toContain('cost-of-not-using-ct-simulator.html');
+    expect(readme).not.toContain('ct-beta2-benchmark-review.html');
+    expect(readme).not.toContain('html/ct_beta2_ab_matrix_2026-04-10_release_gate_r2.json');
   });
 });
 
@@ -139,11 +166,54 @@ describe('package.json metadata', () => {
 
 describe('Version consistency', () => {
   const pkg = JSON.parse(readFile('package.json'));
-  const serverSource = readFile('src/server.ts');
+  const serverSource = readFile('src/server-runtime.ts');
 
   it('server version matches package.json version', () => {
     const versionMatch = serverSource.match(/version:\s*'([^']+)'/);
     expect(versionMatch?.[1]).toBe(pkg.version);
+  });
+});
+
+describe('Published beta2 artifacts are sanitized for public sharing', () => {
+  const artifactPaths = [
+    'docs/reports/ct_beta2_ab_matrix_2026-04-10_release_gate_r2.json',
+    'html/runs.json',
+  ];
+
+  for (const artifactPath of artifactPaths) {
+    it(`${artifactPath} does not embed local machine paths`, () => {
+      const artifact = readFile(artifactPath);
+      expect(artifact).not.toContain('/Users/');
+      expect(artifact).not.toContain('.codex_home/sessions/');
+      expect(artifact).not.toContain('/tmp/');
+    });
+  }
+
+  it('html/runs.json does not ship session metadata or internal telemetry fields', () => {
+    const artifact = readFile('html/runs.json');
+    expect(artifact).not.toContain('"session_id"');
+    expect(artifact).not.toContain('"session_log_path"');
+    expect(artifact).not.toContain('"raw_stream_path"');
+    expect(artifact).not.toContain('"permission_denials"');
+    expect(artifact).not.toContain('"modelUsage"');
+    expect(artifact).not.toContain('"total_cost_usd"');
+  });
+});
+
+describe('HTML publication surface stays aligned with the sanitized bundle', () => {
+  const indexHtml = readFile('html/index.html');
+
+  it('loads the fetch-based run bundle instead of the retired inline dump', () => {
+    expect(indexHtml).toContain('src/data.jsx');
+    expect(indexHtml).not.toContain('src/runs-data.js');
+    expect(indexHtml).toContain('runs.json');
+  });
+
+  it('uses production React assets for the published showcase', () => {
+    expect(indexHtml).not.toContain('react.development.js');
+    expect(indexHtml).not.toContain('react-dom.development.js');
+    expect(indexHtml).toContain('react.production.min.js');
+    expect(indexHtml).toContain('react-dom.production.min.js');
   });
 });
 

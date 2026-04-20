@@ -12,6 +12,10 @@ A stateless MCP server that applies deterministic mathematical enforcement to LL
 - `src/tools/*.ts` — 9 tool handlers: validate_reasoning_chain, check_numeric_claims, verify_arithmetic, detect_drift, evaluate_tradeoffs, check_plan_validity, score_response_quality, validate_confidence, detect_concurrency_patterns
 - `src/enforcement/types.ts` — all shared types including `EnforcementContext`
 
+## Integration Boundary Work
+
+Recent integration work adds a normalized adapter envelope over existing CT tools, tighter pre-dispatch validation aligned to underlying tool minimums, and explicit boundary tests around the public tool surface.
+
 ## Benchmark
 
 - `benchmark/scenarios.json` — 56 scenarios (42 defect + 14 clean control)

@@ -4,3 +4,5 @@ dist/
 .DS_Store
 .mcp.json
 dev/
+benchmark/duckexperiments/.ct_*/
+benchmark/duckexperiments/.human_workplace_*/

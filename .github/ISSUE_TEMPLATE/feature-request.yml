@@ -1,0 +1,44 @@
+name: Feature request
+description: Propose a new tool, capability, or integration improvement.
+title: "[Feature]: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What concrete failure mode or workflow gap are you trying to cover?
+      placeholder: We need a deterministic way to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Describe the behavior you want and what the output should look like.
+      placeholder: Add a tool that accepts... and returns...
+    validations:
+      required: true
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Example input or use case
+      description: Realistic sample inputs help scope the request.
+      placeholder: |
+        Input:
+        ...
+
+        Expected result:
+        ...
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: How do you handle this today?
+      placeholder: Today we work around it by...
+    validations:
+      required: false

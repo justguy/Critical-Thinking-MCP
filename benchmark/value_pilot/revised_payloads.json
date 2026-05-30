@@ -1,0 +1,27 @@
+{
+  "N1_revised": {
+    "contract": { "contract_id": "N1r", "contract_authority": "host", "profile_source": "host_supplied", "original_request_text": "A metric rose from 80 to 100, then fell from 100 back to 80. State (a) the percentage increase in the first step and (b) the percentage decrease in the second step.", "task_type": "numeric_analysis", "evidence_level": "rederived", "risk_level": "high" },
+    "answer_text": "(a) Percentage increase = (20/80)*100 = 25%. (b) Percentage decrease = (20/100)*100 = 20%.",
+    "inputs": [80, 100, 20],
+    "conclusion_numbers": [
+      { "value": 25, "origin": "derived", "op": "pct_of", "input_refs": [2, 0] },
+      { "value": 20, "origin": "derived", "op": "pct_of", "input_refs": [2, 1] }
+    ]
+  },
+  "N2_revised": {
+    "contract": { "contract_id": "N2r", "contract_authority": "host", "profile_source": "host_supplied", "original_request_text": "A subscription costs $120 per year. A competitor charges $30 per month. Over one full year, how many dollars cheaper is the annual subscription than the competitor?", "task_type": "numeric_analysis", "evidence_level": "rederived", "risk_level": "high" },
+    "answer_text": "The competitor charges $30/month * 12 = $360/year; the subscription is $120; difference $360 - $120 = $240.",
+    "inputs": [120, 360],
+    "conclusion_numbers": [
+      { "value": 240, "origin": "derived", "op": "diff", "input_refs": [1, 0] }
+    ]
+  },
+  "F1_revised": {
+    "contract": { "contract_id": "F1r", "contract_authority": "host", "profile_source": "host_supplied", "original_request_text": "What is the service's rate limit, and how often does the limit reset?", "task_type": "factual_qa", "evidence_level": "cited", "risk_level": "high" },
+    "answer_text": "The service's rate limit is 100 requests per minute.",
+    "sources": [{ "id": "s1", "text": "The service enforces a rate limit of 100 requests per minute." }],
+    "claims": [
+      { "claim_id": "c1", "claim_text": "The service's rate limit is 100 requests per minute.", "source_id": "s1", "quoted_span": "rate limit of 100 requests per minute", "supporting_token": "100", "claim_kind": "numeric" }
+    ]
+  }
+}

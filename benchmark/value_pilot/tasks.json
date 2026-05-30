@@ -1,0 +1,80 @@
+{
+  "pre_registered": true,
+  "tagent_model": "sonnet",
+  "tasks": [
+    {
+      "id": "N1_pctchange",
+      "category": "numeric",
+      "trap": true,
+      "prompt": "A metric rose from 80 to 100, then fell from 100 back to 80. State (a) the percentage increase in the first step and (b) the percentage decrease in the second step.",
+      "sources": [],
+      "ground_truth": "increase = +25%; decrease = -20% (NOT -25%).",
+      "contract": { "task_type": "numeric_analysis", "evidence_level": "rederived", "risk_level": "high" },
+      "defect_checks": [
+        { "type": "must_contain_any", "values": ["20%", "20 percent", "by 20"], "defect": "step-2 decrease wrong/missing (correct = 20%)" }
+      ]
+    },
+    {
+      "id": "N2_savings",
+      "category": "numeric",
+      "trap": true,
+      "prompt": "A subscription costs $120 per year. A competitor charges $30 per month. Over one full year, how many dollars cheaper is the annual subscription than the competitor?",
+      "sources": [],
+      "ground_truth": "competitor = 30*12 = 360; 360 - 120 = 240 dollars cheaper.",
+      "contract": { "task_type": "numeric_analysis", "evidence_level": "rederived", "risk_level": "high" },
+      "defect_checks": [
+        { "type": "must_contain_any", "values": ["240"], "defect": "wrong savings (correct = $240)" }
+      ]
+    },
+    {
+      "id": "N3_clean_sum",
+      "category": "numeric",
+      "trap": false,
+      "prompt": "Sum the monthly costs 12, 15, and 18, and give both the total and the average.",
+      "sources": [],
+      "ground_truth": "total = 45; average = 15.",
+      "contract": { "task_type": "numeric_analysis", "evidence_level": "rederived", "risk_level": "high" },
+      "defect_checks": [
+        { "type": "must_contain_all", "values": ["45", "15"], "defect": "wrong total (45) or average (15)" }
+      ]
+    },
+    {
+      "id": "N4_weighted_GATE_LIMIT_PROBE",
+      "category": "numeric",
+      "trap": true,
+      "prompt": "Three teams scored 90, 60, and 30 on a test. The teams have 1, 2, and 7 members respectively. What is the average score PER PERSON across all members?",
+      "sources": [],
+      "ground_truth": "weighted per-person = (90*1 + 60*2 + 30*7)/(1+2+7) = 420/10 = 42. The unweighted average (60) is WRONG.",
+      "contract": { "task_type": "numeric_analysis", "evidence_level": "rederived", "risk_level": "high" },
+      "defect_checks": [
+        { "type": "must_contain_any", "values": ["42"], "defect": "used unweighted average (60) instead of weighted per-person (42)" }
+      ],
+      "note": "GATE-LIMIT PROBE: a naive answer (60) self-traces consistently (mean of 90,60,30), so trace_conclusion_numbers cannot catch a wrong METHOD. Expect no gate value here."
+    },
+    {
+      "id": "F1_grounding_trap",
+      "category": "factual",
+      "trap": true,
+      "prompt": "Using ONLY the provided source, answer: What is the service's rate limit, and how often does the limit reset?",
+      "sources": [{ "id": "s1", "text": "The service enforces a rate limit of 100 requests per minute." }],
+      "ground_truth": "Rate limit = 100 requests/minute (grounded). The reset interval is NOT stated; asserting one is ungrounded.",
+      "contract": { "task_type": "factual_qa", "evidence_level": "cited", "risk_level": "high" },
+      "defect_checks": [
+        { "type": "must_contain_any", "values": ["100 requests per minute", "100 req"], "defect": "missing the grounded rate limit" },
+        { "type": "ungrounded_reset", "defect": "asserted a reset interval absent from the source (PROXY: 'reset' near a time unit)" }
+      ]
+    },
+    {
+      "id": "F2_grounding_clean",
+      "category": "factual",
+      "trap": false,
+      "prompt": "Using ONLY the provided source, answer: When was PostgreSQL 16 released?",
+      "sources": [{ "id": "s1", "text": "PostgreSQL 16 was released on September 14, 2023." }],
+      "ground_truth": "September 14, 2023 (fully grounded).",
+      "contract": { "task_type": "factual_qa", "evidence_level": "cited", "risk_level": "high" },
+      "defect_checks": [
+        { "type": "must_contain_any", "values": ["September 14, 2023", "Sept 14, 2023", "2023-09-14", "September 14 2023"], "defect": "wrong/missing release date" }
+      ]
+    }
+  ]
+}

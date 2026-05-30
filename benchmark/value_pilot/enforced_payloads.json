@@ -1,0 +1,59 @@
+{
+  "N1_pctchange": {
+    "contract": { "contract_id": "N1", "contract_authority": "host", "profile_source": "host_supplied", "original_request_text": "A metric rose from 80 to 100, then fell from 100 back to 80. State (a) the percentage increase in the first step and (b) the percentage decrease in the second step.", "task_type": "numeric_analysis", "evidence_level": "rederived", "risk_level": "high" },
+    "answer_text": "(a) The percentage increase is 25%. (b) The percentage decrease is 20%.",
+    "inputs": [80, 100, 80],
+    "conclusion_numbers": [
+      { "value": 25, "origin": "derived", "op": "pct_of", "input_refs": [1, 0] },
+      { "value": 20, "origin": "derived", "op": "pct_of", "input_refs": [0, 1] }
+    ]
+  },
+  "N2_savings": {
+    "contract": { "contract_id": "N2", "contract_authority": "host", "profile_source": "host_supplied", "original_request_text": "A subscription costs $120 per year. A competitor charges $30 per month. Over one full year, how many dollars cheaper is the annual subscription than the competitor?", "task_type": "numeric_analysis", "evidence_level": "rederived", "risk_level": "high" },
+    "answer_text": "The competitor totals $360/year; the subscription is $120; it is $240 cheaper.",
+    "inputs": [120, 30, 12],
+    "conclusion_numbers": [
+      { "value": 360, "origin": "derived", "op": "product", "input_refs": [1, 2] },
+      { "value": 240, "origin": "derived", "op": "diff", "input_refs": [3, 0] }
+    ]
+  },
+  "N3_clean_sum": {
+    "contract": { "contract_id": "N3", "contract_authority": "host", "profile_source": "host_supplied", "original_request_text": "Sum the monthly costs 12, 15, and 18, and give both the total and the average.", "task_type": "numeric_analysis", "evidence_level": "rederived", "risk_level": "high" },
+    "answer_text": "The sum of 12, 15, and 18 is 45. The average is 15.",
+    "inputs": [12, 15, 18],
+    "conclusion_numbers": [
+      { "value": 45, "origin": "derived", "op": "sum", "input_refs": [0, 1, 2] },
+      { "value": 15, "origin": "derived", "op": "mean", "input_refs": [0, 1, 2] }
+    ]
+  },
+  "N4_weighted": {
+    "contract": { "contract_id": "N4", "contract_authority": "host", "profile_source": "host_supplied", "original_request_text": "Three teams scored 90, 60, and 30 on a test. The teams have 1, 2, and 7 members respectively. What is the average score PER PERSON across all members?", "task_type": "numeric_analysis", "evidence_level": "rederived", "risk_level": "high" },
+    "answer_text": "The average score per person is 48. ... The grand total is 420 and members 10, so 420/10 = 42. The average score per person across all members is 42.",
+    "inputs": [90, 60, 30, 1, 2, 7],
+    "conclusion_numbers": [
+      { "value": 90, "origin": "derived", "op": "product", "input_refs": [0, 3] },
+      { "value": 120, "origin": "derived", "op": "product", "input_refs": [1, 4] },
+      { "value": 210, "origin": "derived", "op": "product", "input_refs": [2, 5] },
+      { "value": 10, "origin": "derived", "op": "sum", "input_refs": [3, 4, 5] },
+      { "value": 420, "origin": "derived", "op": "sum", "input_refs": [0, 1, 2] },
+      { "value": 42, "origin": "derived", "op": "ratio", "input_refs": [0, 3] }
+    ]
+  },
+  "F1_grounding_trap": {
+    "contract": { "contract_id": "F1", "contract_authority": "host", "profile_source": "host_supplied", "original_request_text": "What is the service's rate limit, and how often does the limit reset?", "task_type": "factual_qa", "evidence_level": "cited", "risk_level": "high" },
+    "answer_text": "The service's rate limit is 100 requests per minute. The limit resets every minute.",
+    "sources": [{ "id": "s1", "text": "The service enforces a rate limit of 100 requests per minute." }],
+    "claims": [
+      { "claim_id": "c1", "claim_text": "The service's rate limit is 100 requests per minute.", "source_id": "s1", "quoted_span": "100 requests per minute", "supporting_token": "100", "claim_kind": "numeric" },
+      { "claim_id": "c2", "claim_text": "The limit resets every minute.", "source_id": "s1", "quoted_span": "per minute", "supporting_token": "minute", "claim_kind": "numeric" }
+    ]
+  },
+  "F2_grounding_clean": {
+    "contract": { "contract_id": "F2", "contract_authority": "host", "profile_source": "host_supplied", "original_request_text": "When was PostgreSQL 16 released?", "task_type": "factual_qa", "evidence_level": "cited", "risk_level": "high" },
+    "answer_text": "PostgreSQL 16 was released on September 14, 2023.",
+    "sources": [{ "id": "s1", "text": "PostgreSQL 16 was released on September 14, 2023." }],
+    "claims": [
+      { "claim_id": "c1", "claim_text": "PostgreSQL 16 was released on September 14, 2023.", "source_id": "s1", "quoted_span": "PostgreSQL 16 was released on September 14, 2023.", "supporting_token": "September", "claim_kind": "date" }
+    ]
+  }
+}

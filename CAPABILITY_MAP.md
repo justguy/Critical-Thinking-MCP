@@ -92,3 +92,33 @@ logic.
 | `score_response_quality` | Substance, specificity, hedging, structure, entity grounding | Verify external facts |
 | `check_plan_validity` | Cycle detection, missing prerequisites, resource conflicts, critical path | Assess plan feasibility or business desirability |
 | `detect_drift` | CUSUM drift detection, monotonic progress tracking | Predict future trends |
+
+## Deliverable-Centric Layer (new — NOT yet benchmarked)
+
+A deliverable gate added in the working tree (public surface 9 → 11) for forcing agents to expose
+verifiable structure and confirm their own work. The agent drives it through two public tools —
+`plan_checks` (planner) and `finalize_deliverable` (keystone gate); the other seven rows below are
+**internal check primitives** that `finalize_deliverable` re-executes inline, not separately
+agent-callable tools. **It has no benchmark evidence yet** — the table above is the benchmark-backed
+assessment; the rows below are design-stage capability claims to be validated. Full record:
+`docs/designs/IMPLEMENTATION_CHANGES.md`. Design discipline: BLOCK only on unforgeable within-request
+signals (verbatim containment, re-derivation, interval/graph math); everything self-declared is WARNING;
+"done" is enforced host-side.
+
+| Tool | Does (BLOCK signal) | Does Not |
+|---|---|---|
+| `plan_checks` | Map a `deliverable_contract` → required/optional check suite (never blocks) | Decide truth; it plans, `finalize` gates |
+| `check_quote_grounding` | Verbatim span-in-source + token-in-span containment per claim | Verify the source is authoritative or true |
+| `check_claim_coverage` | Advisory: declared-claim coverage + unaccounted claim spans (never blocks) | Prove the claim list is complete |
+| `finalize_deliverable` | Re-run required checks inline; `must_include`/numeric-criterion substring gates | Prove the answer is correct |
+| `trace_conclusion_numbers` | Re-derive each output number from supplied inputs | Validate inputs' real-world accuracy |
+| `check_answer_against_constraints` | Evaluate restated `{field,op,value}` predicates on structured answer data | Author the constraints for you (agent supplies them) |
+| `check_freshness` | Interval arithmetic vs caller-supplied `eval_time` (host authority blocks) | Verify a date is truthful; read a clock |
+| `check_case_partition` | MECE interval/set math (overlap/gap) | Infer the partition from prose |
+| `check_profile_downgrade` | Advisory: declared `task_type` weaker than request/answer shape (never blocks) | Block; heuristic only |
+
+**New mechanisms** beyond the 15 above (working tree): marker precision split (`markers.ts`),
+confidence/hedge contradiction + widened extraction (`confidence_product.ts`), falsification↔assumption
+binding + tautology guard (`falsifiability_checker.ts`), vertex-disjoint max-flow + premise reconciliation
+(`validate_reasoning_chain.ts`), resource caps (`limits.ts`), deterministic check planner
+(`check_planner.ts`). All deterministic, stateless, no LLM calls.

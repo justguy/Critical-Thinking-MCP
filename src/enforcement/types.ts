@@ -181,3 +181,105 @@ export interface TradeoffOption {
     utility: number;
   }[];
 }
+
+// ====== Deliverable-centric types (factual-QA slice) ======
+//
+// These power the deliverable_contract spine, the plan_checks planner, and the
+// re-executing finalize_deliverable gate. Every consumer is a pure deterministic
+// function; nothing here introduces server state, keys, or an LLM. Per the design
+// catalog (docs/designs/robustness-additions.md, Part II): the only honest BLOCK
+// signals are WITHIN-REQUEST (verbatim containment, re-derivation, interval/graph
+// math). Self-declared fields (authority, claim list, contract criteria) are WARNING.
+
+export type TaskType =
+  | 'factual_qa'
+  | 'numeric_analysis'
+  | 'planning'
+  | 'decision'
+  | 'concurrency_design'
+  | 'reasoning'
+  | 'freeform';
+
+export type EvidenceLevel = 'none' | 'asserted' | 'cited' | 'rederived';
+export type RiskLevel = 'low' | 'medium' | 'high';
+
+export interface AcceptanceCriterion {
+  id: string;
+  text: string;
+  /** 'inline_check' = finalize RECOMPUTES this now; NOT "trust a prior tool result". */
+  kind: 'numeric' | 'structural' | 'coverage' | 'inline_check';
+  /** For numeric/structural: the exact value/token that must appear verbatim in answer_text. */
+  bound?: string;
+  /** Restate-and-diff anchor: should be a substring of contract.original_request_text. */
+  source_quote?: string;
+}
+
+export interface ContractClaim {
+  id: string;
+  text: string;
+}
+
+export interface DeliverableContract {
+  contract_id: string;
+  /** Who authored the obligations. Only meaningful if the HOST populates it (unverifiable by a pure fn). */
+  contract_authority: 'host' | 'user' | 'derived' | 'agent';
+  profile_source: 'host_supplied' | 'inferred' | 'agent_declared';
+  /** The external ask — the anchor that acceptance_criteria.source_quote must come from. */
+  original_request_text: string;
+  task_type: TaskType;
+  evidence_level: EvidenceLevel;
+  risk_level: RiskLevel;
+  /** Present only for time-sensitive deliverables. Drives check_freshness. */
+  freshness?: { max_age_seconds: number; requires_dated_sources: boolean };
+  acceptance_criteria?: AcceptanceCriterion[];
+  /** The load-bearing factual claims the deliverable rests on. */
+  claims?: ContractClaim[];
+  /** Exact-substring gates on answer_text (unforgeable). */
+  must_include?: string[];
+  must_not_include?: string[];
+  /** Field names that must appear in a structured answer (used by the constraint checker). */
+  required_fields?: string[];
+}
+
+export interface SourceManifestEntry {
+  id: string;
+  text: string;
+  /** Provenance — only meaningful when the HOST sets it; surfaced, never gates. */
+  origin?: 'host_supplied' | 'user_supplied' | 'agent_supplied' | 'retrieved_by_host';
+  authority_tier?: 'primary' | 'official' | 'secondary' | 'unknown';
+  retrieved_at?: string; // ISO-8601 UTC
+  published_at?: string; // ISO-8601 UTC
+}
+
+export type ClaimKind =
+  | 'numeric'
+  | 'date'
+  | 'entity'
+  | 'status'
+  | 'comparison'
+  | 'causal'
+  | 'recommendation';
+
+export interface GroundingClaim {
+  claim_id: string;
+  claim_text: string;
+  source_id: string;
+  quoted_span: string;
+  supporting_token: string;
+  claim_kind: ClaimKind;
+}
+
+// ====== Planner output ======
+
+export interface PlannedCheck {
+  check: string;
+  severity_on_fail: 'blocking' | 'warning';
+  reason: string;
+}
+
+export interface PlanResult {
+  required: PlannedCheck[];
+  optional: { check: string; reason: string }[];
+  /** The subset of required checks whose fail-signal is unforgeable — finalize re-runs these. */
+  finalize_required: string[];
+}

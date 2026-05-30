@@ -3,6 +3,47 @@
  * All functions are pure and deterministic — no LLM calls.
  */
 
+import { createHash } from 'node:crypto';
+
+/** Collapse runs of whitespace to a single space and trim. Basis for substring containment. */
+export function normalizeWhitespace(text: string): string {
+  return text.replace(/\s+/g, ' ').trim();
+}
+
+/** Deterministic SHA-256 hex digest. Keyless — usable only as a binding token, never as proof a check ran. */
+export function sha256Hex(text: string): string {
+  return createHash('sha256').update(text, 'utf8').digest('hex');
+}
+
+/** Canonical JSON with sorted object keys, so a hash over a structure is order-independent. */
+export function canonicalJson(value: unknown): string {
+  const sortKeys = (v: unknown): unknown => {
+    if (Array.isArray(v)) return v.map(sortKeys);
+    if (v && typeof v === 'object') {
+      const obj = v as Record<string, unknown>;
+      return Object.keys(obj)
+        .sort()
+        .reduce<Record<string, unknown>>((acc, k) => {
+          acc[k] = sortKeys(obj[k]);
+          return acc;
+        }, {});
+    }
+    return v;
+  };
+  return JSON.stringify(sortKeys(value));
+}
+
+/**
+ * Extract normalized numeric tokens from text for re-derivation / claim matching.
+ * Strips thousands separators; keeps the sign and decimals. Deterministic.
+ * Stop-lists obvious non-claim numbers (ordinals like "3rd", years inside "v2.0",
+ * bare section/step markers) is the CALLER's job — this returns every numeric literal.
+ */
+export function extractNumericTokens(text: string): string[] {
+  const matches = text.match(/-?\d[\d,]*(?:\.\d+)?/g) ?? [];
+  return matches.map(m => m.replace(/,/g, ''));
+}
+
 /** Lowercase word tokenization — strips non-alphanumeric characters. */
 export function tokenize(text: string): string[] {
   return text

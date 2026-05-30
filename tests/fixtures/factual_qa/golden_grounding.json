@@ -1,0 +1,20 @@
+{
+  "sources": [
+    {
+      "id": "s1",
+      "text": "Redis is single-threaded for command execution, though it uses background threads for some operations such as unlink and AOF rewrite.",
+      "origin": "host_supplied",
+      "authority_tier": "official"
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "c1",
+      "claim_text": "Redis executes commands single-threaded",
+      "source_id": "s1",
+      "quoted_span": "Redis is single-threaded for command execution",
+      "supporting_token": "single-threaded",
+      "claim_kind": "status"
+    }
+  ]
+}

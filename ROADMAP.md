@@ -12,9 +12,18 @@ They are related, but they do not move in lockstep.
 ### `ct-mcp` package
 
 - Current package version: `0.1.0-beta.3`
-- Current shipped surface: 9 deterministic, stateless MCP tools
+- Current **published** surface: 9 deterministic, stateless MCP tools
 - Current validation baseline: 56 benchmark scenarios (`42` defect, `14` clean control)
 - Current publication caveat: baseline and prompted benchmark conditions are still self-assessed
+
+#### Working-tree: deliverable-centric layer (unreleased, not yet benchmarked)
+
+A 9-tool deliverable-centric layer is implemented in the working tree (surface 9 → 18) but not yet
+published or benchmarked. It centers on a stateless `deliverable_contract`, a `plan_checks` planner, and a
+re-executing `finalize_deliverable` gate, plus grounding/number-tracing/constraint/freshness/partition
+checks and Tier-2 hardenings. Full record: `docs/designs/IMPLEMENTATION_CHANGES.md`; design rationale:
+`docs/designs/robustness-additions.md`; test plan: `docs/designs/STRESS_TEST_STRATEGY.md`. It does not
+change the published 9-tool benchmark surface.
 
 ### `Invisible Tea Party` benchmark
 
@@ -38,6 +47,12 @@ These are the clearest next improvements for the MCP server itself:
 - cross-tool routing via the existing claim classifier
 - chained arithmetic verification for multi-step formulas
 - escalate `ordering_assumption` from warning to blocking when no protections are listed
+
+Status note: several of these are now **prototyped in the working-tree deliverable-centric layer**
+(unreleased, unbenchmarked): the structured envelope + normalized verdict wrapper (`deliverable_contract`
++ `finalize_deliverable`), cross-tool routing via the claim classifier (`plan_checks`,
+`check_profile_downgrade`), and multi-step number provenance (`trace_conclusion_numbers`). They still need
+benchmarking and independent validation before any non-beta claim.
 
 The most important gate is independent human scoring. That is the explicit blocker for stronger non-beta benchmark claims.
 

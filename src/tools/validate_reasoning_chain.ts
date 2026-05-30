@@ -8,6 +8,7 @@
  */
 
 import type { EnforcementEngine } from '../enforcement/index.js';
+import { tokenize } from '../enforcement/index.js';
 import type {
   GraphNode,
   GraphEdge,
@@ -263,6 +264,125 @@ function computeGroundingScore(
   return totalPaths === 0 ? 1 : groundedPaths / totalPaths;
 }
 
+// ====== #11 Premise-usage reconciliation ======
+
+/**
+ * Reverse-reachable premises (evidence|assumption) of a conclusion via reverseAdj BFS.
+ */
+function reverseReachablePremises(
+  conclusionId: string,
+  reverseAdj: Map<string, string[]>,
+  nodeTypeById: Map<string, string>,
+): Set<string> {
+  const R = new Set<string>();
+  const visited = new Set<string>([conclusionId]);
+  const queue = [...(reverseAdj.get(conclusionId) ?? [])];
+  while (queue.length > 0) {
+    const v = queue.shift()!;
+    if (visited.has(v)) continue;
+    visited.add(v);
+    const t = nodeTypeById.get(v);
+    if (t === 'evidence' || t === 'assumption') R.add(v);
+    for (const p of reverseAdj.get(v) ?? []) if (!visited.has(p)) queue.push(p);
+  }
+  return R;
+}
+
+// ====== #10 Redundant evidence (vertex-disjoint max-flow / Menger) ======
+
+const SUPPORT_RELATIONS = new Set(['supports', 'implies', 'requires']);
+
+/**
+ * Count vertex-disjoint evidence→conclusion paths via max-flow with node splitting
+ * (each node v → v|in→v|out cap 1, except the conclusion sink which is uncapped).
+ * Returns the count and the evidence nodes that originated the disjoint paths.
+ */
+function maxFlowDisjointPaths(
+  conclusionId: string,
+  nodes: GraphNode[],
+  edges: GraphEdge[],
+  evidenceIds: string[],
+): { count: number; witnessEvidence: string[] } {
+  const cap = new Map<string, Map<string, number>>();
+  const addEdge = (u: string, v: string, c: number) => {
+    if (!cap.has(u)) cap.set(u, new Map());
+    if (!cap.has(v)) cap.set(v, new Map());
+    cap.get(u)!.set(v, (cap.get(u)!.get(v) ?? 0) + c);
+    if (!cap.get(v)!.has(u)) cap.get(v)!.set(u, 0); // reverse residual
+  };
+
+  for (const n of nodes) {
+    addEdge(`${n.id}|in`, `${n.id}|out`, n.id === conclusionId ? Infinity : 1);
+  }
+  for (const e of edges) {
+    if (SUPPORT_RELATIONS.has(e.relation)) addEdge(`${e.from}|out`, `${e.to}|in`, 1);
+  }
+  // Only ROOT evidence (no incoming support/implies/requires edge) is an independent
+  // source. Evidence derived from other evidence is not a second independent root, so
+  // it must NOT get its own source edge (else one root cause counts as two paths).
+  const hasSupportInto = new Set<string>();
+  for (const e of edges) if (SUPPORT_RELATIONS.has(e.relation)) hasSupportInto.add(e.to);
+  const rootEvidence = evidenceIds.filter(id => !hasSupportInto.has(id));
+
+  for (const eid of rootEvidence) addEdge('S', `${eid}|in`, 1);
+  addEdge(`${conclusionId}|out`, 'T', Infinity);
+
+  let flow = 0;
+  // Edmonds-Karp; each augmenting path has a unit bottleneck (source edges cap 1),
+  // so this terminates in ≤ |evidence| iterations.
+  for (;;) {
+    const parent = new Map<string, string>();
+    parent.set('S', 'S');
+    const queue = ['S'];
+    while (queue.length > 0) {
+      const u = queue.shift()!;
+      for (const [v, c] of cap.get(u) ?? []) {
+        if (c > 0 && !parent.has(v)) {
+          parent.set(v, u);
+          queue.push(v);
+        }
+      }
+    }
+    if (!parent.has('T')) break;
+
+    let bottleneck = Infinity;
+    for (let v = 'T'; v !== 'S'; v = parent.get(v)!) {
+      bottleneck = Math.min(bottleneck, cap.get(parent.get(v)!)!.get(v)!);
+    }
+    for (let v = 'T'; v !== 'S'; v = parent.get(v)!) {
+      const u = parent.get(v)!;
+      cap.get(u)!.set(v, cap.get(u)!.get(v)! - bottleneck);
+      cap.get(v)!.set(u, (cap.get(v)!.get(u) ?? 0) + bottleneck);
+    }
+    flow += bottleneck;
+  }
+
+  const witnessEvidence: string[] = [];
+  for (const eid of rootEvidence) {
+    if ((cap.get('S')?.get(`${eid}|in`) ?? 0) === 0) witnessEvidence.push(eid);
+  }
+  return { count: flow, witnessEvidence };
+}
+
+/**
+ * Two evidence labels are independent unless they are lexical near-duplicates. Uses
+ * unigram token-set Jaccard (not bigram) so word reordering can't fake independence,
+ * and falls back to exact-string distinctness for single-word labels (whose bigram
+ * sets are empty — where bigram Jaccard wrongly returns 1.0).
+ */
+function lexicallyDistinct(a: string, b: string): boolean {
+  const ta = new Set(tokenize(a));
+  const tb = new Set(tokenize(b));
+  if (ta.size === 0 || tb.size === 0) {
+    return a.trim().toLowerCase() !== b.trim().toLowerCase();
+  }
+  let inter = 0;
+  for (const t of ta) if (tb.has(t)) inter++;
+  const union = ta.size + tb.size - inter;
+  const sim = union === 0 ? 1 : inter / union;
+  return sim < 0.8;
+}
+
 // ====== Handler ======
 
 export function handleValidateReasoningChain(
@@ -369,6 +489,105 @@ export function handleValidateReasoningChain(
     warnings.push(
       `Low grounding score (${groundingScore.toFixed(2)}). Most conclusions are not traceable to evidence nodes.`
     );
+  }
+
+  // ── #11 Premise-usage reconciliation (opt-in via declared_support) ─────────
+  const nodeTypeById = new Map(nodes.map(n => [n.id, n.type]));
+  const nodeLabelById = new Map(nodes.map(n => [n.id, n.label]));
+  const evidenceIds = nodes.filter(n => n.type === 'evidence').map(n => n.id);
+
+  const declaredSupport = (input as any)?.declared_support;
+  if (Array.isArray(declaredSupport)) {
+    // Premise reachability must follow SUPPORT relations only — a `contradicts` edge is
+    // not a premise the conclusion rests on (matching #10's SUPPORT_RELATIONS).
+    const supportReverseAdj = new Map<string, string[]>();
+    for (const id of nodeIds) supportReverseAdj.set(id, []);
+    for (const edge of edges) {
+      if (SUPPORT_RELATIONS.has(edge.relation)) supportReverseAdj.get(edge.to)!.push(edge.from);
+    }
+
+    for (const entry of declaredSupport) {
+      const cid = entry?.conclusion_id;
+      const premiseIds: string[] = Array.isArray(entry?.premise_ids)
+        ? [...new Set(entry.premise_ids as string[])]
+        : [];
+      if (typeof cid !== 'string' || !nodeSet.has(cid)) continue;
+
+      const R = reverseReachablePremises(cid, supportReverseAdj, nodeTypeById);
+      const declaredSet = new Set(premiseIds);
+
+      // phantom: declared premise not reachable via support edges
+      for (const pid of premiseIds) {
+        if (!R.has(pid)) {
+          const reason = nodeSet.has(pid)
+            ? 'is not reachable from the conclusion via support edges (phantom dependency)'
+            : 'is not a node in the graph (unknown id)';
+          blockingIssues.push({
+            mechanism: 'premise_usage',
+            description: `Declared premise '${pid}' for conclusion '${cid}' ${reason}.`,
+            severity: 'blocking',
+          });
+        }
+      }
+
+      // undeclared DIRECT support predecessor (evidence|assumption) → blocking; transitive → warning
+      const directPrem = [
+        ...new Set(
+          (supportReverseAdj.get(cid) ?? []).filter(p => {
+            const t = nodeTypeById.get(p);
+            return t === 'evidence' || t === 'assumption';
+          }),
+        ),
+      ];
+      const directSet = new Set(directPrem);
+      for (const p of directPrem) {
+        if (!declaredSet.has(p)) {
+          blockingIssues.push({
+            mechanism: 'premise_usage',
+            description: `Conclusion '${cid}' directly depends on premise '${p}' but it was not declared.`,
+            severity: 'blocking',
+          });
+        }
+      }
+      for (const p of R) {
+        if (!declaredSet.has(p) && !directSet.has(p)) {
+          warnings.push(`Conclusion '${cid}' transitively rests on undeclared premise '${p}'.`);
+        }
+      }
+    }
+  }
+
+  // ── #10 Redundant evidence (opt-in via require_redundancy_for) ─────────────
+  const requireRedundancy = (input as any)?.require_redundancy_for;
+  if (Array.isArray(requireRedundancy)) {
+    for (const cid of requireRedundancy) {
+      if (typeof cid !== 'string' || nodeTypeById.get(cid) !== 'conclusion') continue;
+      const { count, witnessEvidence } = maxFlowDisjointPaths(cid, nodes, edges, evidenceIds);
+      if (count < 2) {
+        blockingIssues.push({
+          mechanism: 'redundant_evidence',
+          description: `Conclusion '${cid}' has only ${count} vertex-disjoint evidence path(s); ≥2 independent paths required.`,
+          severity: 'blocking',
+        });
+        continue;
+      }
+      // independence: at least two witness evidence must be lexically distinct
+      let independent = false;
+      for (let i = 0; i < witnessEvidence.length && !independent; i++) {
+        for (let j = i + 1; j < witnessEvidence.length && !independent; j++) {
+          if (lexicallyDistinct(nodeLabelById.get(witnessEvidence[i]) ?? '', nodeLabelById.get(witnessEvidence[j]) ?? '')) {
+            independent = true;
+          }
+        }
+      }
+      if (!independent) {
+        blockingIssues.push({
+          mechanism: 'redundant_evidence',
+          description: `Conclusion '${cid}' has ${count} paths but their evidence are near-duplicates (not independent support).`,
+          severity: 'blocking',
+        });
+      }
+    }
   }
 
   const hasFail = blockingIssues.length > 0;

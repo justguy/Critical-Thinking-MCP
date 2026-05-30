@@ -40,11 +40,11 @@ import { classifyClaim as _classifyClaim, classifyClaims as _classifyClaims } fr
 import { checkEntityGrounding as _checkEntityGrounding } from './entity_grounding.js';
 
 // ─── Re-exports for convenience ─────────────────────────────────────────────
-export { computeConfidenceProduct } from './confidence_product.js';
+export { computeConfidenceProduct, checkConfidenceHedgeConsistency } from './confidence_product.js';
 export { scoreSpecificity } from './specificity_scorer.js';
 export { checkConsistency } from './consistency_checker.js';
 export { detectHedging } from './hedge_detector.js';
-export { checkFalsifiability } from './falsifiability_checker.js';
+export { checkFalsifiability, checkFalsifiabilityBound, isTautological, isBoundToAssumption } from './falsifiability_checker.js';
 export { compareSteelman } from './steelman_similarity.js';
 export { checkRevision } from './revision_contrast.js';
 export { checkLoop } from './loop_governor.js';

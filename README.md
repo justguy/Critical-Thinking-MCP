@@ -126,6 +126,38 @@ Why CT-MCP mattered less here:
 - **detect_concurrency_patterns** — Check-then-act, missing idempotency, lost updates, dual writes, explicit deadlock risk from structured resource-allocation graphs.
 - **detect_drift** — CUSUM trend analysis on numeric sequences.
 
+These nine are the benchmarked, published surface. A newer **deliverable-centric layer** (below) is in
+development on top of them.
+
+## Deliverable-Centric Layer (in development — unreleased, not yet benchmarked)
+
+Two additional public tools form a **deliverable gate** on top of the nine analyzers (public surface
+9 → 11). They push an agent to expose verifiable structure and confirm its own work before an answer is
+releasable, and are **not part of the published package and have no benchmark evidence yet.** Same
+discipline as the core tools: a check may **block** only on an *unforgeable, within-request* signal
+(verbatim substring containment, numeric re-derivation, interval/set/graph math); everything self-declared
+is a *warning*; and because MCP tools are model-controlled, enforcing that an answer is "done" is
+ultimately host-side.
+
+- **plan_checks** — deterministic planner: maps a `deliverable_contract` (task type, evidence level, risk) to the obligations `finalize_deliverable` will enforce, so the agent knows which artifacts to prepare. Never blocks.
+- **finalize_deliverable** — the keystone gate: **re-executes** the contract's required checks inline (grounding, number tracing, constraints, freshness) and blocks on `must_include`/numeric-criterion substring failures; additionally verifies a *supplied* `case_partition` is MECE (blocks on overlap/gap) and emits a profile-downgrade **warning** when the declared task type understates the request/answer shape; returns an `answer_text_hash` binding token.
+
+The individual checks `finalize_deliverable` runs are **internal primitives**, not separately
+agent-callable tools — the agent supplies the artifacts (`sources`+`claims`, `inputs`+`conclusion_numbers`,
+`constraints`, `eval_time`) and the gate re-runs them:
+
+- **check_quote_grounding** — every factual claim must quote a verbatim span of a supplied source and name the supporting token inside it.
+- **trace_conclusion_numbers** — every number in the conclusion must re-derive from a separately-supplied input array.
+- **check_answer_against_constraints** — restate the question's hard constraints as `{field, op, value}` predicates and evaluate them against the structured answer.
+- **check_freshness** — staleness of dated sources by pure interval arithmetic against a caller-supplied evaluation time (no server clock).
+- **check_claim_coverage** *(advisory)* — which declared claims were grounded, plus unaccounted claim-like spans in the answer.
+- **check_case_partition** — checks a declared case split is MECE (no overlaps, no gaps) over a stated domain.
+- **check_profile_downgrade** *(advisory)* — flags when a declared task type is weaker than the request/answer shape implies.
+
+Details and rationale: [`docs/designs/robustness-additions.md`](docs/designs/robustness-additions.md),
+[`docs/designs/IMPLEMENTATION_CHANGES.md`](docs/designs/IMPLEMENTATION_CHANGES.md), and the test plan
+[`docs/designs/STRESS_TEST_STRATEGY.md`](docs/designs/STRESS_TEST_STRATEGY.md).
+
 ## Integration Envelopes
 
 The current beta line keeps the package centered on the nine deterministic tool primitives above. Integration-envelope work is aimed at making those tools easier to consume from stricter typed integrations without changing core tool semantics.

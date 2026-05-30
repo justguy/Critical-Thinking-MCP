@@ -1,0 +1,42 @@
+{
+  "contract": {
+    "contract_id": "q1",
+    "contract_authority": "host",
+    "profile_source": "host_supplied",
+    "original_request_text": "Is Redis single-threaded for command execution? Cite the docs.",
+    "task_type": "factual_qa",
+    "evidence_level": "cited",
+    "risk_level": "low",
+    "claims": [
+      { "id": "c1", "text": "Redis executes commands single-threaded" }
+    ],
+    "acceptance_criteria": [
+      {
+        "id": "ac1",
+        "text": "the single-threaded claim is cited",
+        "kind": "coverage",
+        "source_quote": "single-threaded for command execution"
+      }
+    ],
+    "must_include": ["single-threaded"]
+  },
+  "answer_text": "Redis is single-threaded for command execution [s1], so a single slow command can block the others until it completes.",
+  "sources": [
+    {
+      "id": "s1",
+      "text": "Redis is single-threaded for command execution, though it uses background threads for some operations such as unlink and AOF rewrite.",
+      "origin": "host_supplied",
+      "authority_tier": "official"
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "c1",
+      "claim_text": "Redis executes commands single-threaded",
+      "source_id": "s1",
+      "quoted_span": "Redis is single-threaded for command execution",
+      "supporting_token": "single-threaded",
+      "claim_kind": "status"
+    }
+  ]
+}

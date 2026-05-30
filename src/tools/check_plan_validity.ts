@@ -8,6 +8,7 @@
 
 import type { EnforcementEngine } from '../enforcement/index.js';
 import type { BlockingIssue, EnforcementContext, PlanStep } from '../enforcement/types.js';
+import { isHighPrecisionMeasurable } from '../enforcement/markers.js';
 
 // ====== Output Types ======
 
@@ -25,6 +26,7 @@ export interface PlanValidityOutput {
   completeness_score: number;
   critical_path: string[];
   step_count: number;
+  failure_branch_coverage?: number;
   context_used: boolean;
   enforcement?: {
     blocking_issues: BlockingIssue[];
@@ -340,6 +342,85 @@ export function handleCheckPlanValidity(
     }
   }
 
+  // ── Failure-branch coverage (opt-in via require_failure_branches) ──────────
+  // Off by default so existing callers are unaffected. When on: every effect-bearing
+  // step must declare on_failure {action, target?, detect?}; dangling targets and
+  // on_failure cycles BLOCK; undetectable signals WARN.
+  let failureBranchCoverage: number | undefined;
+  if ((input as any)?.require_failure_branches === true) {
+    // resources[] is the LOAD-BEARING (blocking) trigger; the verb lexicon is a secondary,
+    // advisory (warning-only) signal for description-only steps.
+    const EFFECT_VERBS = /\b(?:write|delete|deploy|create|update|charge|send|migrate|provision|mutate|commit|release|insert|drop|publish|notify|truncate|overwrite|remove|terminate|refund|revoke|push|execute|apply|wipe|put|post|issue)\b/i;
+    const ACTIONS = new Set(['abort', 'retry', 'rollback', 'compensate', 'goto']);
+    const TARGETED = new Set(['rollback', 'compensate', 'goto']);
+    const isBounded = (of: any) =>
+      typeof of.max_attempts === 'number' && isFinite(of.max_attempts) && of.max_attempts > 0;
+
+    const effectSteps = steps.filter(
+      s => (s.resources && s.resources.length > 0) || EFFECT_VERBS.test(s.description),
+    );
+
+    // Augmented graph for loop detection: dependency edges + UNBOUNDED on_failure target
+    // edges. A bounded retry/goto-to-earlier-step is normal control flow, so bounded edges
+    // are excluded (they can't loop forever).
+    const augAdj = new Map<string, string[]>();
+    for (const id of stepIds) augAdj.set(id, [...(adj.get(id) ?? [])]);
+    for (const s of steps) {
+      const of = (s as any).on_failure;
+      if (of && typeof of === 'object' && TARGETED.has(of.action) && !isBounded(of) && typeof of.target === 'string' && stepIdSet.has(of.target)) {
+        augAdj.get(s.id)!.push(of.target);
+      }
+    }
+
+    let covered = 0;
+    for (const s of effectSteps) {
+      const of = (s as any).on_failure;
+      if (!of || typeof of !== 'object' || typeof of.action !== 'string' || !ACTIONS.has(of.action)) {
+        if (s.resources && s.resources.length > 0) {
+          blockingIssues.push({
+            mechanism: 'failure_branch',
+            description: `Effect-bearing step "${s.id}" (uses resources) declares no on_failure handler.`,
+            severity: 'blocking',
+          });
+        } else {
+          warnings.push(`Step "${s.id}" looks effect-bearing but declares no on_failure handler.`);
+        }
+        continue;
+      }
+      if (TARGETED.has(of.action) && (typeof of.target !== 'string' || !stepIdSet.has(of.target))) {
+        blockingIssues.push({
+          mechanism: 'failure_branch',
+          description: `Step "${s.id}" on_failure target "${String(of.target)}" does not exist.`,
+          severity: 'blocking',
+        });
+        continue;
+      }
+      covered++;
+      // Unbounded in-place retry — the canonical infinite-retry shape (warning; the
+      // executor may bound it, so we can't prove it's infinite).
+      if (of.action === 'retry' && !isBounded(of)) {
+        warnings.push(`Step "${s.id}" retries with no max_attempts (potential unbounded retry).`);
+      }
+      if (!of.detect) {
+        warnings.push(`Step "${s.id}" on_failure has no detectable failure signal (detect).`);
+      } else if (!isHighPrecisionMeasurable(String(of.detect))) {
+        warnings.push(`Step "${s.id}" on_failure detect "${String(of.detect).slice(0, 40)}" lacks a measurable signal.`);
+      }
+    }
+    failureBranchCoverage = effectSteps.length === 0 ? 1 : Math.round((covered / effectSteps.length) * 1000) / 1000;
+
+    // Unbounded on_failure loops → WARNING (a back-edge alone isn't a proven defect; absence
+    // of a declared bound is a smell, not an unforgeable infinite loop).
+    if (!hasCycles) {
+      const augCycles = detectCycles(stepIds, augAdj);
+      if (augCycles.length > 0) {
+        warnings.push(
+          `Unbounded on_failure loop (add max_attempts): ${augCycles.map(c => c.join(' -> ')).join('; ')}.`,
+        );
+      }
+    }
+  }
+
   const hasFail = blockingIssues.length > 0;
   const correctivePrompt = hasFail
     ? engine.buildCorrectivePrompt(blockingIssues, warnings, 'check_plan_validity', undefined, context)
@@ -354,6 +435,7 @@ export function handleCheckPlanValidity(
     completeness_score: completenessScore,
     critical_path: criticalPath,
     step_count: steps.length,
+    failure_branch_coverage: failureBranchCoverage,
     context_used: !!context,
   };
 

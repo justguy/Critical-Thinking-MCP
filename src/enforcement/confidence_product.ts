@@ -5,7 +5,7 @@
  * correlated assumptions, then produces a dependency-weighted honest ceiling.
  */
 
-import type { Assumption, ConfidenceProductResult } from './types.js';
+import type { Assumption, ConfidenceProductResult, HedgeResult } from './types.js';
 import { jaccardSimilarity } from './utils.js';
 
 const CORRELATION_THRESHOLD = 0.5;
@@ -22,24 +22,78 @@ const INFLATION_GAP_THRESHOLD = 0.15;
  *   "somewhat confident"    → 0.5
  */
 function extractClaimedConfidence(text: string): number | null {
+  // Collect ALL stated-certainty signals and return the MAX — an agent that says
+  // "certain" once is making a high claim even amid hedges. Widening is purely
+  // additive over the legacy patterns (which are preserved), so it can only RAISE
+  // the detected confidence, never lower it.
+  const candidates: number[] = [];
+
   // "X% confident" or "X percent confident"
   const pctMatch = text.match(/(\d+(?:\.\d+)?)\s*%\s*confident/i);
-  if (pctMatch) return parseFloat(pctMatch[1]) / 100;
+  if (pctMatch) candidates.push(parseFloat(pctMatch[1]) / 100);
 
   // "confidence: 0.X" or "confidence: X%"
   const colonMatch = text.match(/confidence\s*:\s*(\d+(?:\.\d+)?)\s*(%)?/i);
   if (colonMatch) {
     const val = parseFloat(colonMatch[1]);
-    return colonMatch[2] ? val / 100 : (val > 1 ? val / 100 : val);
+    candidates.push(colonMatch[2] ? val / 100 : val > 1 ? val / 100 : val);
   }
 
-  // Qualitative phrases (checked in order of specificity)
-  const lower = text.toLowerCase();
-  if (/very\s+confident/i.test(lower)) return 0.9;
-  if (/fairly\s+confident/i.test(lower)) return 0.75;
-  if (/somewhat\s+confident/i.test(lower)) return 0.5;
+  // "p = 0.9" / "probability of 0.9" / "probability: 0.9"
+  const pMatch = text.match(/\b(?:p|probability)\s*(?:=|:|of)\s*(0?\.\d+|1(?:\.0+)?)\b/i);
+  if (pMatch) candidates.push(parseFloat(pMatch[1]));
 
-  return null;
+  // "9 out of 10" / "9/10"
+  const outOf = text.match(/\b(\d{1,2})\s*(?:out of|\/)\s*10\b/i);
+  if (outOf) {
+    const n = parseInt(outOf[1], 10);
+    if (n >= 0 && n <= 10) candidates.push(n / 10);
+  }
+
+  // Legacy qualitative phrases (preserved)
+  const lower = text.toLowerCase();
+  if (/very\s+confident/i.test(lower)) candidates.push(0.9);
+  if (/fairly\s+confident/i.test(lower)) candidates.push(0.75);
+  if (/somewhat\s+confident/i.test(lower)) candidates.push(0.5);
+
+  // New phrases — strong, low-false-positive forms only (anchored or unambiguous)
+  // to avoid firing on incidental prose like "this will probably help".
+  // Polarity guard: don't read a HIGH affirmative confidence off a negated phrase
+  // ("almost certainly NOT the cause") — that would feed a false confidence_hedge block.
+  const NEG = "(?!\\s+(?:not|no|never|none|n['’]?t))";
+  const STANCE = "(?:i\\s*a?m|i'm|we\\s*are|we're)\\s+(?:absolutely\\s+|completely\\s+|totally\\s+)?";
+  if (new RegExp(STANCE + '(?:certain|positive|sure)\\b' + NEG, 'i').test(text)) candidates.push(0.97);
+  if (new RegExp('\\balmost\\s+certain(?:ly)?\\b' + NEG, 'i').test(text)) candidates.push(0.9);
+  if (new RegExp('\\bhighly\\s+(?:likely|confident)\\b' + NEG, 'i').test(text)) candidates.push(0.9);
+  if (new RegExp(STANCE + 'confident\\b' + NEG, 'i').test(text)) candidates.push(0.8);
+
+  if (candidates.length === 0) return null;
+  return Math.max(...candidates);
+}
+
+/**
+ * Cross-check stated confidence against the response's own hedging. High claimed
+ * certainty wrapped in heavy hedges is an internal contradiction. Consumes the
+ * existing detectHedging output. WARNING at c≥0.8 + moderate/heavy hedging; BLOCK
+ * only at c≥0.9 + heavy hedging (an unambiguous self-contradiction).
+ */
+export interface ConfidenceHedgeResult {
+  contradiction: boolean;
+  severity: 'none' | 'warning' | 'blocking';
+}
+
+export function checkConfidenceHedgeConsistency(
+  claimedConfidence: number | null,
+  hedge: HedgeResult,
+): ConfidenceHedgeResult {
+  if (claimedConfidence === null) return { contradiction: false, severity: 'none' };
+  if (claimedConfidence >= 0.9 && hedge.severity === 'heavy') {
+    return { contradiction: true, severity: 'blocking' };
+  }
+  if (claimedConfidence >= 0.8 && (hedge.severity === 'moderate' || hedge.severity === 'heavy')) {
+    return { contradiction: true, severity: 'warning' };
+  }
+  return { contradiction: false, severity: 'none' };
 }
 
 /**

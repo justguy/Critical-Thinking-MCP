@@ -8,6 +8,11 @@
  */
 
 import type { EnforcementEngine } from '../enforcement/index.js';
+import {
+  checkConfidenceHedgeConsistency,
+  isTautological,
+  isBoundToAssumption,
+} from '../enforcement/index.js';
 import type {
   Assumption,
   BlockingIssue,
@@ -220,6 +225,47 @@ export function handleValidateConfidence(
     warnings.push(
       `Falsifiability score: ${falsifiabilityResult.score.toFixed(2)}. ` +
       `Unfalsifiable conditions: ${falsifiabilityResult.unfalsifiable.join('; ') || 'none provided'}.`
+    );
+  }
+
+  // Tier-2: bind each falsification condition to its assumption + tautology guard (WARNING-only).
+  for (const a of assumptions) {
+    const cond = a.falsification_condition;
+    if (!cond || cond.length === 0) continue;
+    if (isTautological(a.description, cond)) {
+      warnings.push(
+        `Assumption '${a.description.slice(0, 60)}' has a tautological / non-directional falsification ` +
+        `condition ("${cond.slice(0, 60)}"). State a measurable, directional condition.`,
+      );
+    } else if (!isBoundToAssumption(a.description, cond)) {
+      warnings.push(
+        `Assumption '${a.description.slice(0, 60)}' has a floating falsification condition not tied to its ` +
+        `subject. Name a component/identifier from the assumption inside the condition.`,
+      );
+    }
+  }
+
+  // Tier-2: confidence/hedge contradiction. High claimed certainty + heavy hedging is a
+  // self-contradiction. To keep validate_confidence backward-compatible (no NEW default
+  // BLOCK), this is WARNING-only by default; the BLOCK fires only in opt-in strict mode
+  // (input.strict === true). Confidence extraction + hedge detection are softer signals
+  // than containment/arithmetic, so blocking on them is gated until calibrated.
+  const strict = (input as any)?.strict === true;
+  const hedgeResult = engine.detectHedging(response_text);
+  const hedgeConsistency = checkConfidenceHedgeConsistency(cpResult.claimed_confidence, hedgeResult);
+  if (hedgeConsistency.severity === 'blocking' && strict) {
+    blockingIssues.push({
+      mechanism: 'confidence_hedge',
+      description:
+        `Claimed confidence ${cpResult.claimed_confidence?.toFixed(2)} contradicts heavy hedging ` +
+        `(density ${hedgeResult.hedge_density.toFixed(2)}). Lower the claim or remove the hedges.`,
+      severity: 'blocking',
+    });
+  } else if (hedgeConsistency.severity !== 'none') {
+    warnings.push(
+      `Claimed confidence ${cpResult.claimed_confidence?.toFixed(2)} sits alongside ${hedgeResult.severity} ` +
+      `hedging — reconcile the stated certainty with the hedged language` +
+      (hedgeConsistency.severity === 'blocking' ? ' (set strict=true to enforce as a block).' : '.'),
     );
   }
 

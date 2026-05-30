@@ -5,7 +5,8 @@
   "type": "module",
   "main": "dist/server.js",
   "bin": {
-    "ct-mcp": "dist/server.js"
+    "ct-mcp": "dist/server.js",
+    "ct-enforce": "dist/host/cli.js"
   },
   "files": [
     "dist",

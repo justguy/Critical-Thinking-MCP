@@ -33,7 +33,12 @@ these additions are new and **not yet benchmarked or independently validated**.
 - MCP structured output: `outputSchema` on the deliverable-gate tools + `structuredContent` in every response.
 - Resource caps (`limits.ts`): input-size rejection (`InvalidParams`) + diagnostic output truncation with a
   `truncation` report.
-- Shared `CONTEXT_PROPERTY` schema (deduped 7 copies). Tests: 158 → **281**.
+- **Reference host-enforcement layer** (`src/host/`, deterministic — no LLM/agent/network/clock): makes the
+  gate mandatory rather than advisory. `enforceDeliverable(spec, artifacts)` authors a host contract, runs
+  `finalize_deliverable`, verifies the anti-swap `answer_text_hash` against the surfaced text, and returns a
+  binding `RELEASE`/`REJECT` decision + `corrective_prompt`. New `ct-enforce` CLI (exit 0 RELEASE / 1 REJECT
+  / 2 bad input) for pipeline/CI gating. Docs: `docs/designs/HOST_ENFORCEMENT.md`.
+- Shared `CONTEXT_PROPERTY` schema (deduped 7 copies). Tests: 158 → **287**.
 - Design discipline: BLOCK only on unforgeable within-request signals (verbatim containment, re-derivation,
   interval/graph math); everything self-declared is WARNING; enforcement of "done" is host-side.
 

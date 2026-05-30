@@ -23,7 +23,7 @@ in `PILOT_DESIGN.md`. **Single run, n=6 → directional, not definitive.**
 - **Spurious warnings: 1** (F2: profile-downgrade heuristic misfired on a date).
 - **Clean first-pass: 2** (N3, F2).
 
-## Verdict: marginal-to-negative on THIS pilot — for diagnosable reasons
+## Run 1 (sonnet) verdict: marginal-to-negative on THIS pilot — for diagnosable reasons
 
 1. **Grounding has real, defensible value** (F1). A strong model still asserted an unsupported claim;
    the gate forced it out. This is the tool's core thesis working. *Caveat:* the catch was partly
@@ -54,3 +54,55 @@ n=6; one model; single non-deterministic run; tasks + objective checks authored 
    values, not only raw `inputs`) or it will keep false-blocking correct percentage/multi-step math.
 3. **Re-run against Haiku + fabrication-prone tasks** to measure value where the baseline actually errs.
 4. **Fix the profile-downgrade misfire on dates** (F2).
+
+---
+
+## Run 2 (haiku) — testing the pre-registered "weaker baseline → value" hypothesis
+
+Same 6 tasks, tagent = **haiku**, enforced arm gated **end-to-end through the shipped host layer**
+(`enforceDeliverable`, `host_batch.mjs`). This tested the Run-1 prediction that value appears against a
+weaker/error-prone tagent.
+
+**Baseline (haiku, ungated): 6/6 correct, 0 defects.** Haiku solved every task — including the −20%,
+weighted-average, and savings traps — and was *more* careful than sonnet on F1: it answered "the source
+does not specify how often the limit resets" (declined to fabricate) where sonnet asserted "resets every
+minute." (A grader proxy-regex false-fired on that correct decline; fixed to exclude negated statements —
+honest baseline is 0 defects.)
+
+**Enforced (haiku, real host gate):**
+| Task | Host decision | Note |
+|---|---|---|
+| N1 | **REJECT** (gate_block) | false-block: correct 25/20, %-change untraceable in op vocab |
+| N2 | RELEASE | correct (haiku pre-flattened 360/240 into inputs on its own) |
+| N3 | RELEASE | correct |
+| N4 | **REJECT** (gate_block) | false-block: correct 42, mis-traced 420 |
+| F1 | RELEASE | correct, no ungrounded claim (haiku declined) |
+| F2 | RELEASE | correct |
+
+**Net: 0 real defects to catch, 2 false-blocks of correct work.** The host gate itself behaved perfectly
+(correct RELEASE/REJECT, correct hash handling) — there was simply nothing to catch.
+
+## Combined verdict (two runs): **no deliverable-level value on this task set — and the ceiling is TASK difficulty, not model strength**
+
+The Run-1 hypothesis was **not supported**: a weaker tagent did not err more here. Both sonnet and haiku
+solve these toy tasks, so the gate has no real errors to catch and only imposes false-block cost on
+correct numeric answers (the op model can't express %-change/multi-step without flattening). The
+host-enforcement layer is **necessary and works**, but it cannot create value where the deliverables have
+no catchable defects.
+
+**This is a null result, reported as such — not fished further.** Trying more model/task combinations
+until value appears would be exactly the "show me what you want to see" failure mode to avoid.
+
+### What the gate's value actually rests on (proven elsewhere, not fished)
+The hand-built adversarial probe (`requests.jsonl`) — run through the real server — **does** block a
+fabricated quote (`quoted_span` absent from source) and a wrong sum (120+30 claimed as 200), and releases
+clean inputs. So the **mechanism demonstrably catches real fabrication/arithmetic errors when they occur.**
+The pilot's lesson is that **value is conditional on operating where those errors actually occur** — long-
+context synthesis, multi-source RAG, high-volume/agentic pipelines, adversarial inputs — none of which a
+6-task toy set reproduces.
+
+### The honest next experiment (not run here)
+A real error-density benchmark: a representative task distribution where capable models measurably fail
+(long-context grounding, multi-step financial math, retrieval with distractor sources), host-enforced via
+`ct-enforce`, scored on defects-prevented vs false-blocks. That — not another toy A/B — is what would
+move the verdict.

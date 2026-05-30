@@ -15,9 +15,11 @@ function grade(task, text) {
     } else if (c.type === 'must_contain_all') {
       if (!c.values.every(v => t.includes(norm(v)))) defects.push(c.defect);
     } else if (c.type === 'ungrounded_reset') {
-      if (/reset/i.test(text) && /(hour|minute|second|daily|hourly|per day|each day|every \d)/i.test(text)) {
-        defects.push(c.defect);
-      }
+      // Defect = AFFIRMATIVELY asserting a reset interval. A declined/negated statement
+      // ("the source does not specify how often it resets") is correct, not a defect.
+      const negated = /(does not|doesn'?t|not specif|unspecified|isn'?t specified|cannot|can'?t|no mention|not stated)/i.test(text);
+      const asserts = /resets?\s+(every|each|per|after|in|hourly|daily)/i.test(text) || /(hourly|daily)\s+reset/i.test(text);
+      if (asserts && !negated) defects.push(c.defect);
     }
   }
   return defects;

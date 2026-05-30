@@ -1,0 +1,26 @@
+{
+  "N1": {
+    "spec": { "contract_id": "N1h", "original_request_text": "A metric rose from 80 to 100, then fell from 100 back to 80. State (a) the percentage increase in the first step and (b) the percentage decrease in the second step.", "task_type": "numeric_analysis", "evidence_level": "rederived", "risk_level": "high" },
+    "artifacts": { "answer_text": "The metric rose from 80 to 100, an increase of 25%. Then it fell from 100 to 80, a decrease of 20%.", "inputs": [80, 100], "conclusion_numbers": [{ "value": 25, "origin": "derived", "op": "pct_of", "input_refs": [1, 0] }, { "value": 20, "origin": "derived", "op": "pct_of", "input_refs": [0, 1] }] }
+  },
+  "N2": {
+    "spec": { "contract_id": "N2h", "original_request_text": "A subscription costs $120 per year. A competitor charges $30 per month. Over one full year, how many dollars cheaper is the annual subscription than the competitor?", "task_type": "numeric_analysis", "evidence_level": "rederived", "risk_level": "high" },
+    "artifacts": { "answer_text": "The annual subscription is $240 cheaper ($360 - $120 = $240).", "inputs": [120, 30, 12, 360, 240], "conclusion_numbers": [{ "value": 360, "origin": "derived", "op": "product", "input_refs": [1, 2] }, { "value": 240, "origin": "derived", "op": "diff", "input_refs": [3, 0] }] }
+  },
+  "N3": {
+    "spec": { "contract_id": "N3h", "original_request_text": "Sum the monthly costs 12, 15, and 18, and give both the total and the average.", "task_type": "numeric_analysis", "evidence_level": "rederived", "risk_level": "high" },
+    "artifacts": { "answer_text": "The sum of the monthly costs 12, 15, and 18 is 45. The average is 15.", "inputs": [12, 15, 18], "conclusion_numbers": [{ "value": 45, "origin": "derived", "op": "sum", "input_refs": [0, 1, 2] }, { "value": 15, "origin": "derived", "op": "mean", "input_refs": [0, 1, 2] }] }
+  },
+  "N4": {
+    "spec": { "contract_id": "N4h", "original_request_text": "Three teams scored 90, 60, and 30 on a test. The teams have 1, 2, and 7 members respectively. What is the average score PER PERSON across all members?", "task_type": "numeric_analysis", "evidence_level": "rederived", "risk_level": "high" },
+    "artifacts": { "answer_text": "The average score per person across all members is 42. Total points: 90x1 + 60x2 + 30x7 = 420. Total members: 1 + 2 + 7 = 10. Average: 420/10 = 42.", "inputs": [90, 1, 60, 2, 30, 7, 420, 10], "conclusion_numbers": [{ "value": 420, "origin": "derived", "op": "sum", "input_refs": [0, 2, 4] }, { "value": 10, "origin": "derived", "op": "sum", "input_refs": [1, 3, 5] }, { "value": 42, "origin": "derived", "op": "ratio", "input_refs": [6, 7] }] }
+  },
+  "F1": {
+    "spec": { "contract_id": "F1h", "original_request_text": "What is the service's rate limit, and how often does the limit reset?", "task_type": "factual_qa", "evidence_level": "cited", "risk_level": "high", "claims": [{ "id": "c1", "text": "The service enforces a rate limit of 100 requests per minute." }] },
+    "artifacts": { "answer_text": "The service enforces a rate limit of 100 requests per minute. The source does not specify how often the limit resets.", "sources": [{ "id": "s1", "text": "The service enforces a rate limit of 100 requests per minute." }], "claims": [{ "claim_id": "c1", "claim_text": "The service enforces a rate limit of 100 requests per minute.", "source_id": "s1", "quoted_span": "The service enforces a rate limit of 100 requests per minute.", "supporting_token": "100", "claim_kind": "numeric" }] }
+  },
+  "F2": {
+    "spec": { "contract_id": "F2h", "original_request_text": "When was PostgreSQL 16 released?", "task_type": "factual_qa", "evidence_level": "cited", "risk_level": "high", "claims": [{ "id": "c1", "text": "PostgreSQL 16 was released on September 14, 2023." }] },
+    "artifacts": { "answer_text": "PostgreSQL 16 was released on September 14, 2023.", "sources": [{ "id": "s1", "text": "PostgreSQL 16 was released on September 14, 2023." }], "claims": [{ "claim_id": "c1", "claim_text": "PostgreSQL 16 was released on September 14, 2023", "source_id": "s1", "quoted_span": "PostgreSQL 16 was released on September 14, 2023", "supporting_token": "September", "claim_kind": "date" }] }
+  }
+}

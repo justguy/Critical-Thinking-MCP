@@ -122,36 +122,48 @@ export function planChecks(contract: {
     };
   });
 
-  // high risk pulls the first unforgeable optional check into required.
-  const optional = profile.optional.map(check => ({
+  let optional = profile.optional.map(check => ({
     check,
     reason: `Optional for task_type='${contract.task_type}'.`,
   }));
 
-  if (contract.risk_level === 'high') {
-    const promote = profile.optional.find(c => UNFORGEABLE_CHECKS.has(c));
-    if (promote && !required.some(r => r.check === promote)) {
-      required.push({
-        check: promote,
-        severity_on_fail: 'blocking',
-        reason: `Promoted from optional → required because risk_level='high'.`,
-      });
-    }
-  }
-
-  // freshness present → check_freshness is required; blocking iff dated sources are required
-  // (a stale/future source is then an arithmetic fact, unforgeable, at the caller-supplied eval time).
+  // freshness present in the contract → check_freshness is genuinely required; blocking iff dated
+  // sources are required (a stale/future source is then an arithmetic fact, unforgeable, at the
+  // caller-supplied eval time). Run this BEFORE the high-risk promotion so a contract-declared
+  // freshness obligation stays mandatory rather than being shadowed as verify-if-present.
   if (contract.freshness && !required.some(r => r.check === 'check_freshness')) {
     required.push({
       check: 'check_freshness',
       severity_on_fail: contract.freshness.requires_dated_sources ? 'blocking' : 'warning',
       reason: `Contract declares a freshness window (max_age_seconds=${contract.freshness.max_age_seconds}).`,
     });
+    optional = optional.filter(o => o.check !== 'check_freshness');
+  }
+
+  // high risk pulls the first unforgeable optional check in for extra rigor — but as
+  // VERIFY-IF-PRESENT, not a mandatory artifact. finalize re-executes it (and BLOCKS on failure)
+  // only when the caller supplies its artifacts; a missing artifact is NOT a block, because a
+  // high-risk deliverable may legitimately have no freshness/constraint dimension. (Promoting it to
+  // mandatory caused a systematic high-risk false-block on tasks with no such dimension.)
+  if (contract.risk_level === 'high') {
+    const promote = profile.optional.find(c => UNFORGEABLE_CHECKS.has(c));
+    if (promote && !required.some(r => r.check === promote)) {
+      required.push({
+        check: promote,
+        severity_on_fail: 'verify_if_present',
+        reason: `Verified-if-present because risk_level='high' — re-executed only if its artifacts are supplied; absence is not a block.`,
+      });
+      optional = optional.filter(o => o.check !== promote);
+    }
   }
 
   const finalize_required = required
     .filter(r => r.severity_on_fail === 'blocking' && UNFORGEABLE_CHECKS.has(r.check))
     .map(r => r.check);
 
-  return { required, optional, finalize_required };
+  const finalize_verify_if_present = required
+    .filter(r => r.severity_on_fail === 'verify_if_present' && UNFORGEABLE_CHECKS.has(r.check))
+    .map(r => r.check);
+
+  return { required, optional, finalize_required, finalize_verify_if_present };
 }

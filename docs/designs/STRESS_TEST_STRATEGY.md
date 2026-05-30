@@ -5,7 +5,7 @@
 > defined **oracle** (independent ground truth) or **invariant** (property that must hold), and a
 > **measurable pass/fail gate** — not "looks reasonable."
 >
-> Current baseline: 259 unit tests (example-based). This strategy adds the property/differential/fuzz/
+> Current baseline: 281 unit tests (example-based). This strategy adds the property/differential/fuzz/
 > corpus/determinism/mutation layers that example tests cannot reach.
 
 ## 0. The two numbers that decide success
@@ -110,7 +110,7 @@ wrong types, duplicate ids, self-loops, cyclic graphs, 10⁴-element `cases`, me
 
 Assertions: (a) **never** an unhandled throw — only `McpError InvalidParams` surfaces from the dispatcher;
 (b) never hangs (2 s per-call watchdog); (c) every `PASS`/`FAIL` `structuredContent` **validates against
-the tool's `outputSchema`** via `ajv` (already a dependency) — **all 18 tools now declare an
+the tool's `outputSchema`** via `ajv` (already a dependency) — **all 11 public tools declare an
 `outputSchema`, so this is a global gate over the whole surface** (the `truncation` field is permitted via
 `additionalProperties`). Plus a targeted **ReDoS** probe on every
 regex (falsifiability markers, claim extraction, and the `RegExp` built from field names in
@@ -156,7 +156,8 @@ Round-trip every tool over **both** transports (stdio + Streamable HTTP):
 - success ⇒ `content[0].text` parsed JSON deep-equals `structuredContent`;
 - `ENFORCEMENT_FAIL` ⇒ `isError: true` **and** `structuredContent` present;
 - invalid params ⇒ `McpError InvalidParams`;
-- `tools/list` returns 17 tools, each new one with an `outputSchema` that loads in `ajv`.
+- `tools/list` returns 11 public tools, each with an `outputSchema` that loads in `ajv`; the 7
+  internalized leaf checks are absent and return `McpError MethodNotFound` on dispatch.
 
 **Gate:** full round-trip green on both transports.
 

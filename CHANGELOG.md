@@ -13,6 +13,16 @@ these additions are new and **not yet benchmarked or independently validated**.
   are kept **internal**: `finalize_deliverable` re-executes the blocking ones inline, and they are not
   separately agent-callable. (Consolidated from an interim 18-tool surface — leaf checks are mechanisms,
   not jobs-to-be-done, so the agent drives the layer through the plan → finalize spine.)
+- `finalize_deliverable` now also folds in `check_profile_downgrade` as a WARNING (declared task_type vs
+  request/answer shape; never blocks) and verifies a *supplied* `case_partition` is MECE (blocks on
+  overlap/gap; absent = no obligation).
+- **Fixed a high-risk false-block.** `risk_level:'high'` previously force-promoted the first unforgeable
+  *optional* check (freshness for factual_qa, constraints for numeric_analysis) into mandatory
+  `finalize_required`, so `finalize` blocked on its missing artifacts even for tasks with no
+  freshness/constraint dimension — false-blocking every legitimate high-risk deliverable. The promotion
+  is now **verify-if-present**: re-executed and blocking on failure only when its artifacts are supplied;
+  a missing artifact never blocks. A contract-declared freshness window stays mandatory. New plan field
+  `finalize_verify_if_present`; regression suite `tests/tools/risk_promotion.test.ts`.
 - Tier-2 hardenings to `validate_confidence`: widened claimed-confidence extraction (returns max, polarity-
   guarded), confidence/hedge contradiction (warning by default; block under opt-in `strict`),
   falsification↔assumption binding, tautology/bare-negation guard. No new default BLOCK on existing tools.
@@ -23,7 +33,7 @@ these additions are new and **not yet benchmarked or independently validated**.
 - MCP structured output: `outputSchema` on the deliverable-gate tools + `structuredContent` in every response.
 - Resource caps (`limits.ts`): input-size rejection (`InvalidParams`) + diagnostic output truncation with a
   `truncation` report.
-- Shared `CONTEXT_PROPERTY` schema (deduped 7 copies). Tests: 158 → **269**.
+- Shared `CONTEXT_PROPERTY` schema (deduped 7 copies). Tests: 158 → **281**.
 - Design discipline: BLOCK only on unforgeable within-request signals (verbatim containment, re-derivation,
   interval/graph math); everything self-declared is WARNING; enforcement of "done" is host-side.
 

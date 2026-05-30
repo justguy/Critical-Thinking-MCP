@@ -485,7 +485,7 @@ Optional fields:
   // ─── Deliverable-centric factual-QA slice ──────────────────────────────────
   {
     name: 'plan_checks',
-    description: `Deterministic planner for the deliverable gate. Given a deliverable_contract (task_type, evidence_level, risk_level), returns the obligations this deliverable must satisfy: finalize_required lists the checks finalize_deliverable will RE-EXECUTE inline at the gate, plus advisory 'optional' considerations. Those checks are internal to finalize — you do NOT call them separately; use this to learn which artifacts to prepare for finalize_deliverable (sources+claims for grounding, inputs+conclusion_numbers for number tracing, constraints+structured_answer, eval_time for freshness). Pure lookup + policy — NEVER blocks.
+    description: `Deterministic planner for the deliverable gate. Given a deliverable_contract (task_type, evidence_level, risk_level), returns the obligations this deliverable must satisfy: finalize_required lists the checks finalize_deliverable will RE-EXECUTE inline at the gate (missing their artifacts is a BLOCK); finalize_verify_if_present lists checks (e.g. freshness/constraints pulled in at high risk) finalize re-runs ONLY if you supply their artifacts — absent artifacts never block; plus advisory 'optional' considerations. Those checks are internal to finalize — you do NOT call them separately; use this to learn which artifacts to prepare for finalize_deliverable (sources+claims for grounding, inputs+conclusion_numbers for number tracing, constraints+structured_answer, eval_time for freshness). Pure lookup + policy — NEVER blocks.
 
 REQUIRED INPUT FORMAT — copy this structure exactly:
 {"contract":{"task_type":"factual_qa","evidence_level":"cited","risk_level":"low"}}
@@ -517,6 +517,7 @@ risk_level: low | medium | high`,
         required: { type: 'array' as const, items: { type: 'object' as const } },
         optional: { type: 'array' as const, items: { type: 'object' as const } },
         finalize_required: { type: 'array' as const, items: { type: 'string' as const } },
+        finalize_verify_if_present: { type: 'array' as const, items: { type: 'string' as const } },
       },
       required: ['status', 'required', 'finalize_required'],
     },

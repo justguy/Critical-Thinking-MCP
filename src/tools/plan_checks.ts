@@ -95,6 +95,7 @@ export function handlePlanChecks(input: unknown): PlanChecksOutput {
     required: plan.required,
     optional: plan.optional,
     finalize_required: plan.finalize_required,
+    finalize_verify_if_present: plan.finalize_verify_if_present,
     context_used: !!context,
   };
 }

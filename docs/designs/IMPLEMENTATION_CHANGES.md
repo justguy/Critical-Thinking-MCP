@@ -3,7 +3,9 @@
 > **What this is:** a precise record of the **actual code changes** made (not the design intent — that's
 > in [`robustness-additions.md`](robustness-additions.md)). Everything below is in the working tree,
 > uncommitted, on top of `aa0fc93` (`ct-mcp@0.1.0-beta.3`). Verified: `tsc --noEmit` clean, `npm test` →
-> **269 passed**, stdio server lists **18 tools**. Includes the post-review revisions in §I.
+> **281 passed**, stdio server lists **11 public tools** (the 9 analyzers + the `plan_checks` →
+> `finalize_deliverable` spine; the 7 leaf checks are internalized). Includes the post-review revisions
+> in §I and the surface consolidation + high-risk false-block fix (see CHANGELOG).
 
 ## Summary
 

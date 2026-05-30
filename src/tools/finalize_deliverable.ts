@@ -144,6 +144,97 @@ function validateInput(input: unknown): {
   };
 }
 
+interface ReExecCtx {
+  contract: DeliverableContract;
+  answer_text: string;
+  sources: SourceManifestEntry[];
+  claims: GroundingClaim[];
+  inputs: number[] | null;
+  conclusion_numbers: unknown[] | null;
+  constraints: unknown[] | null;
+  structured_answer: Record<string, unknown> | null;
+  eval_time: unknown;
+}
+
+/**
+ * Re-execute one gate check inline. Returns:
+ *   - 'ran'         → executed; `issues` are its blocking results.
+ *   - 'missing'     → its artifacts were not supplied (`hint` names which).
+ *   - 'no_executor' → this build has no inline re-executor for it (e.g. verify_arithmetic).
+ * The CALLER decides what 'missing' means: a BLOCK for a mandatory finalize_required check,
+ * a harmless skip for a verify-if-present check.
+ */
+function reExecuteCheck(
+  check: string,
+  ctx: ReExecCtx,
+  engine: EnforcementEngine,
+): { kind: 'ran' | 'missing' | 'no_executor'; issues: BlockingIssue[]; hint?: string } {
+  const issues: BlockingIssue[] = [];
+  switch (check) {
+    case 'check_quote_grounding': {
+      if (ctx.sources.length === 0 || ctx.claims.length === 0) {
+        return { kind: 'missing', issues, hint: 'Required check_quote_grounding could not be re-executed: supply "sources" and "claims".' };
+      }
+      const grounding = handleCheckQuoteGrounding({ sources: ctx.sources, claims: ctx.claims }, engine);
+      const groundedIds = new Set(grounding.results.filter(r => r.grounded).map(r => r.claim_id));
+      for (const claim of ctx.contract.claims ?? []) {
+        if (!groundedIds.has(claim.id)) {
+          issues.push({
+            mechanism: 'finalize_grounding',
+            description: `Contract claim "${claim.id}" has no passing grounding result on re-execution.`,
+            severity: 'blocking',
+          });
+        }
+      }
+      for (const issue of grounding.enforcement?.blocking_issues ?? []) issues.push(issue);
+      return { kind: 'ran', issues };
+    }
+    case 'trace_conclusion_numbers': {
+      if (!ctx.inputs || !ctx.conclusion_numbers) {
+        return { kind: 'missing', issues, hint: 'Required trace_conclusion_numbers could not be re-executed: supply "inputs" and "conclusion_numbers".' };
+      }
+      const trace = handleTraceConclusionNumbers({ inputs: ctx.inputs, conclusion_numbers: ctx.conclusion_numbers, answer_text: ctx.answer_text }, engine);
+      for (const issue of trace.enforcement?.blocking_issues ?? []) issues.push(issue);
+      return { kind: 'ran', issues };
+    }
+    case 'check_answer_against_constraints': {
+      if (!ctx.constraints || !ctx.structured_answer) {
+        return { kind: 'missing', issues, hint: 'Required check_answer_against_constraints could not be re-executed: supply "constraints" and "structured_answer".' };
+      }
+      const cc = handleCheckAnswerAgainstConstraints(
+        {
+          answer: ctx.structured_answer,
+          constraints: ctx.constraints,
+          original_request_text: ctx.contract.original_request_text,
+          required_fields: ctx.contract.required_fields,
+        },
+        engine,
+      );
+      for (const issue of cc.enforcement?.blocking_issues ?? []) issues.push(issue);
+      return { kind: 'ran', issues };
+    }
+    case 'check_freshness': {
+      if (!ctx.contract.freshness || !ctx.eval_time || ctx.sources.length === 0) {
+        return { kind: 'missing', issues, hint: 'Required check_freshness could not be re-executed: supply "eval_time" and dated "sources".' };
+      }
+      const fresh = handleCheckFreshness(
+        {
+          eval_time: ctx.eval_time,
+          sources: ctx.sources,
+          max_age_seconds: ctx.contract.freshness.max_age_seconds,
+          requires_dated_sources: ctx.contract.freshness.requires_dated_sources,
+        },
+        engine,
+      );
+      for (const issue of fresh.enforcement?.blocking_issues ?? []) issues.push(issue);
+      return { kind: 'ran', issues };
+    }
+    default:
+      // A check this build cannot re-execute inline (e.g. verify_arithmetic).
+      return { kind: 'no_executor', issues };
+  }
+}
+
 export function handleFinalizeDeliverable(
   input: unknown,
   engine: EnforcementEngine,
@@ -163,104 +254,35 @@ export function handleFinalizeDeliverable(
   const blockingIssues: BlockingIssue[] = [];
   const warnings: string[] = [];
 
-  // ── Re-execute every finalize_required check INLINE (the unforgeable gate) ─
-  // Missing inputs for a required check is itself a BLOCK — you cannot release a
-  // deliverable whose required check could not be re-verified this turn.
+  // ── Re-execute the gate checks INLINE (the unforgeable gate) ───────────────
   const reExecuted: string[] = [];
+  const reExecCtx: ReExecCtx = { contract, answer_text, sources, claims, inputs, conclusion_numbers, constraints, structured_answer, eval_time };
+
+  // Mandatory (finalize_required): missing artifacts is itself a BLOCK — you cannot release a
+  // deliverable whose core required check could not be re-verified this turn.
   for (const check of plan.finalize_required) {
-    switch (check) {
-      case 'check_quote_grounding': {
-        if (sources.length === 0 || claims.length === 0) {
-          blockingIssues.push({
-            mechanism: 'finalize_missing_inputs',
-            description:
-              'Required check_quote_grounding could not be re-executed: supply "sources" and "claims".',
-            severity: 'blocking',
-          });
-          break;
-        }
-        const grounding = handleCheckQuoteGrounding({ sources, claims }, engine);
-        const groundedIds = new Set(grounding.results.filter(r => r.grounded).map(r => r.claim_id));
-        for (const claim of contract.claims ?? []) {
-          if (!groundedIds.has(claim.id)) {
-            blockingIssues.push({
-              mechanism: 'finalize_grounding',
-              description: `Contract claim "${claim.id}" has no passing grounding result on re-execution.`,
-              severity: 'blocking',
-            });
-          }
-        }
-        for (const issue of grounding.enforcement?.blocking_issues ?? []) blockingIssues.push(issue);
-        reExecuted.push(check);
-        break;
-      }
-      case 'trace_conclusion_numbers': {
-        if (!inputs || !conclusion_numbers) {
-          blockingIssues.push({
-            mechanism: 'finalize_missing_inputs',
-            description:
-              'Required trace_conclusion_numbers could not be re-executed: supply "inputs" and "conclusion_numbers".',
-            severity: 'blocking',
-          });
-          break;
-        }
-        const trace = handleTraceConclusionNumbers({ inputs, conclusion_numbers, answer_text }, engine);
-        for (const issue of trace.enforcement?.blocking_issues ?? []) blockingIssues.push(issue);
-        reExecuted.push(check);
-        break;
-      }
-      case 'check_answer_against_constraints': {
-        if (!constraints || !structured_answer) {
-          blockingIssues.push({
-            mechanism: 'finalize_missing_inputs',
-            description:
-              'Required check_answer_against_constraints could not be re-executed: supply "constraints" and "structured_answer".',
-            severity: 'blocking',
-          });
-          break;
-        }
-        const cc = handleCheckAnswerAgainstConstraints(
-          {
-            answer: structured_answer,
-            constraints,
-            original_request_text: contract.original_request_text,
-            required_fields: contract.required_fields,
-          },
-          engine,
-        );
-        for (const issue of cc.enforcement?.blocking_issues ?? []) blockingIssues.push(issue);
-        reExecuted.push(check);
-        break;
-      }
-      case 'check_freshness': {
-        if (!contract.freshness || !eval_time || sources.length === 0) {
-          blockingIssues.push({
-            mechanism: 'finalize_missing_inputs',
-            description:
-              'Required check_freshness could not be re-executed: supply "eval_time" and dated "sources".',
-            severity: 'blocking',
-          });
-          break;
-        }
-        const fresh = handleCheckFreshness(
-          {
-            eval_time,
-            sources,
-            max_age_seconds: contract.freshness.max_age_seconds,
-            requires_dated_sources: contract.freshness.requires_dated_sources,
-          },
-          engine,
-        );
-        for (const issue of fresh.enforcement?.blocking_issues ?? []) blockingIssues.push(issue);
-        reExecuted.push(check);
-        break;
-      }
-      default: {
-        // A required check this build cannot re-execute inline (e.g. verify_arithmetic).
-        warnings.push(
-          `finalize_required check "${check}" was not re-executed (no inline re-executor in this build) — run it separately.`,
-        );
-      }
+    const r = reExecuteCheck(check, reExecCtx, engine);
+    if (r.kind === 'missing') {
+      blockingIssues.push({ mechanism: 'finalize_missing_inputs', description: r.hint!, severity: 'blocking' });
+    } else if (r.kind === 'no_executor') {
+      warnings.push(
+        `finalize_required check "${check}" was not re-executed (no inline re-executor in this build) — run it separately.`,
+      );
+    } else {
+      for (const issue of r.issues) blockingIssues.push(issue);
+      reExecuted.push(check);
+    }
+  }
+
+  // Verify-if-present (finalize_verify_if_present): checks risk policy pulled in for extra rigor
+  // (e.g. freshness/constraints promoted at high risk). Re-execute and BLOCK on failure ONLY if the
+  // artifacts were supplied; a MISSING artifact is NOT a block — the deliverable may legitimately
+  // have no such dimension. This is what prevents the high-risk false-block.
+  for (const check of plan.finalize_verify_if_present) {
+    const r = reExecuteCheck(check, reExecCtx, engine);
+    if (r.kind === 'ran') {
+      for (const issue of r.issues) blockingIssues.push(issue);
+      reExecuted.push(check);
     }
   }
 

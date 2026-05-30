@@ -273,13 +273,24 @@ export interface GroundingClaim {
 
 export interface PlannedCheck {
   check: string;
-  severity_on_fail: 'blocking' | 'warning';
+  /**
+   * 'blocking'          → a failing result blocks, and finalize treats absent artifacts as a block.
+   * 'verify_if_present' → finalize re-runs it (blocking on failure) ONLY if its artifacts are
+   *                       supplied; absent artifacts are NOT a block (e.g. a high-risk-promoted
+   *                       optional check the deliverable may not need).
+   * 'warning'           → never blocks.
+   */
+  severity_on_fail: 'blocking' | 'verify_if_present' | 'warning';
   reason: string;
 }
 
 export interface PlanResult {
   required: PlannedCheck[];
   optional: { check: string; reason: string }[];
-  /** The subset of required checks whose fail-signal is unforgeable — finalize re-runs these. */
+  /** The subset of required checks whose fail-signal is unforgeable AND mandatory — finalize re-runs
+   *  these and blocks if their artifacts are missing. */
   finalize_required: string[];
+  /** Unforgeable checks finalize re-runs only if their artifacts are supplied (block on failure,
+   *  never on absence). */
+  finalize_verify_if_present: string[];
 }

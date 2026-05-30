@@ -1,8 +1,9 @@
 # Deliverable-Centric Robustness — Implementation (built + verified)
 
 > **Status:** implemented in the working tree (uncommitted), 2026-05-30. **Verified:** `tsc --noEmit`
-> clean; `npm test` → **259 passed** (101 new + 158 existing), incl. freshness suite green under
-> `TZ=Asia/Tokyo`; stdio MCP server lists **17 tools** (8 with `outputSchema`) and returns
+> clean; `npm test` → **281 passed**, incl. freshness suite green under
+> `TZ=Asia/Tokyo`; stdio MCP server lists **11 public tools** (all with `outputSchema`; the 7 leaf
+> checks are internalized behind the `plan_checks` → `finalize_deliverable` spine) and returns
 > `structuredContent`. **Covers all build-sequence steps (0–8)** in
 > [`robustness-additions.md`](robustness-additions.md): schema foundation, marker precision split,
 > factual-QA slice, host contract + freshness, constraints, numeric tracing, Tier-2 hardenings, and
@@ -96,15 +97,19 @@ const UNFORGEABLE_CHECKS = new Set([
 ```
 
 Policy: `evidence_level` `cited`/`rederived` makes grounding blocking; `risk_level` `medium`/`high`
-promotes unforgeable required checks to blocking; `high` pulls the first unforgeable optional into
-required. `finalize_required` = required ∩ blocking ∩ unforgeable. (`check_claim_coverage` is **never**
-in `finalize_required` — it's forgeable/advisory.)
+promotes unforgeable required checks to blocking; `high` pulls the first unforgeable optional check in
+as **verify-if-present** — `finalize` re-runs it (blocking on failure) only if its artifacts are
+supplied, and a *missing* artifact is **never** a block, so a high-risk deliverable with no
+freshness/constraint dimension is not false-blocked. `finalize_required` = required ∩ blocking ∩
+unforgeable (missing artifacts block); the verify-if-present checks are returned separately as
+`finalize_verify_if_present`. A **contract-declared** freshness window is mandatory (`finalize_required`),
+not verify-if-present. (`check_claim_coverage` is **never** in either — it's forgeable/advisory.)
 
 ## How to run / reproduce
 
 ```bash
 npm run build            # tsc → dist/
-npm test                 # vitest run → 174 passed
+npm test                 # vitest run → 281 passed
 npx vitest run tests/tools/factual_qa_slice.test.ts   # just the slice (16)
 ```
 
@@ -115,7 +120,7 @@ printf '%s\n' \
  '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
  '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}' \
  | node dist/server.js
-# → 13 tools; plan_checks/check_quote_grounding/check_claim_coverage/finalize_deliverable carry outputSchema
+# → 11 public tools; plan_checks + finalize_deliverable are the public deliverable spine (leaf checks internalized)
 ```
 
 ## Honest limits (carried from the design)

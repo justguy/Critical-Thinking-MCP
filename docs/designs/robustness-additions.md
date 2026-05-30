@@ -484,8 +484,12 @@ Static profile map (baseline; severity set by policy):
 **Policy layer** (deterministic; **can only raise to BLOCK the checks whose fail-signal is unforgeable**):
 `evidence_level` `cited`→grounding required+blocking, `rederived`→also number-tracing required+blocking;
 `risk_level` `medium`/`high`→promote unforgeable required checks to blocking on the recommended path;
-`freshness present`→add `check_freshness`, blocking iff `requires_dated_sources`. `plan_checks` itself
-never blocks (status always PASS — it plans).
+`high` also pulls the first unforgeable *optional* check in as **verify-if-present** (`finalize` re-runs
+it, blocking on failure, only if its artifacts are supplied — a missing artifact never blocks, so an
+unrelated high-risk deliverable is not false-blocked; returned as `finalize_verify_if_present`);
+`freshness present`→add `check_freshness`, blocking iff `requires_dated_sources` (a contract-declared
+freshness window is mandatory, not verify-if-present). `plan_checks` itself never blocks (status always
+PASS — it plans).
 
 **`check_profile_downgrade`** *(new, WARNING-only — guards the one weak point: the agent chooses
 `task_type`).* The planner is deterministic *given* a contract, but an agent can declare
@@ -703,7 +707,7 @@ vertical *before* writing the tool, then make the tool satisfy it. Sketches (abb
    (derived-evidence counted as independent, `contradicts` edges treated as premises, bounded-retry
    false-blocked) — all fixed + regression-tested. Existing graph/plan tests stay green (all extensions opt-in).
 
-**All build-sequence steps (0–8) are complete.** 17 tools, 259 tests, `tsc` + `npm test` green.
+**All build-sequence steps (0–8) are complete.** 11 public tools (7 leaf checks internalized), 281 tests, `tsc` + `npm test` green.
 
 Everything labeled "unforgeable" must rely on within-request containment / re-derivation / interval-graph
 math — **never** a hash. `tool-call.ts` may still emit a keyless **binding token**, honestly scoped as

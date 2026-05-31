@@ -5,7 +5,7 @@
 > (`verify_research_answer`, `audit_numeric_analysis`, …). That surface was deliberately
 > **rejected and removed.** The shipped branch exposes an **11-tool spine**, not façades.
 > This version is corrected to the branch. Verify everything yourself in Phase 0 — but the
-> corrected baselines below are: **11 public tools**, **275 passing tests**, `outputSchema`
+> corrected baselines below are: **11 public tools**, **296 passing tests**, `outputSchema`
 > on **all 11 public tools**, and **no façade tools and no env/debug surface modes**.
 
 You are taking over validation and proof-building for ct-mcp’s deliverable-centric robustness layer.
@@ -125,7 +125,7 @@ npm test
 
 Also run whatever command lists MCP tools over stdio. Confirm:
 
-* current test count (expected **275**; do not proceed if it is lower without explaining why),
+* current test count (expected **296**; do not proceed if it is lower without explaining why),
 * current **public** tool count (expected **11**),
 * that `tools/list` contains the 9 analyzers + `plan_checks` + `finalize_deliverable`,
 * that the 7 internal primitives are **absent** from `tools/list` and that calling one over MCP
@@ -454,8 +454,8 @@ Must test:
 
 4. Hash/binding token semantics:
 
-   * `answer_text_hash` changes iff normalized answer changes.
-   * Host wrapper must reject surfaced answer if its normalized hash differs from finalize’s `answer_text_hash`.
+   * `answer_text_hash` changes iff exact answer text changes.
+   * Host wrapper must reject surfaced answer if its exact-text hash differs from finalize’s `answer_text_hash`.
    * Hash must not be accepted as proof that a prior check ran.
 
 5. Weak contract handling:
@@ -701,7 +701,7 @@ A. Baseline tagent, no ct-mcp.
 B. ct-mcp available but advisory only (agent may call `plan_checks`/`finalize_deliverable`, but the host
    does **not** gate release on the verdict).
 C. **Host-enforced spine:** the host refuses to release unless `finalize_deliverable` returns PASS **and**
-   the normalized hash of the surfaced answer equals the returned `answer_text_hash`. The agent uses the
+   the exact-text hash of the surfaced answer equals the returned `answer_text_hash`. The agent uses the
    spine (`plan_checks` → prepare artifacts → `finalize_deliverable`).
 D. **Host-enforced spine + host-derived contract:** as C, but the host derives the `deliverable_contract`
    (`contract_authority:'host'`) from the user request rather than letting the agent declare it.
@@ -837,7 +837,7 @@ Do not invent results. If results are mixed, report them honestly.
 | ------------------------------ | --------: |
 | Typecheck                      | pass/fail |
 | Existing tests                 | pass/fail |
-| Existing test count            | N (expect 275) |
+| Existing test count            | N (expect 296) |
 | Public tools listed            | N (expect 11) |
 | Internal leaves hidden + MethodNotFound | yes/no |
 | Tools with outputSchema        | N (expect 11) |
@@ -947,7 +947,7 @@ Include rationale.
 
 Start by doing these in order:
 
-1. Run baseline typecheck and tests; confirm 275 tests, 11 public tools, 7 hidden leaves
+1. Run baseline typecheck and tests; confirm 296 tests, 11 public tools, 7 hidden leaves
    (`MethodNotFound`), outputSchema on all 11.
 2. Inspect tool definitions (`tool-definitions.ts`: `ALL_TOOLS` → `INTERNAL_TOOL_NAMES` filter → `TOOLS`)
    and the dispatcher (`tool-call.ts`: `TOOL_HANDLERS`); confirm `finalize_deliverable` re-executes the

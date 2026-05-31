@@ -1,7 +1,7 @@
 # Deliverable-Centric Robustness — Implementation (built + verified)
 
 > **Status:** implemented in the working tree (uncommitted), 2026-05-30. **Verified:** `tsc --noEmit`
-> clean; `npm test` → **281 passed**, incl. freshness suite green under
+> clean; `npm test` → **296 passed**, incl. freshness suite green under
 > `TZ=Asia/Tokyo`; stdio MCP server lists **11 public tools** (all with `outputSchema`; the 7 leaf
 > checks are internalized behind the `plan_checks` → `finalize_deliverable` spine) and returns
 > `structuredContent`. **Covers all build-sequence steps (0–8)** in
@@ -18,7 +18,7 @@
 >
 > **Steps 5–6 added:** `check_answer_against_constraints` (restate-and-diff predicate eval) and
 > `trace_conclusion_numbers` (re-derivation). `finalize_deliverable` now re-executes **any**
-> `finalize_required` check inline (grounding, number tracing, constraints), blocking when a required
+> `finalize_required` check inline (grounding, number tracing, arithmetic, constraints), blocking when a required
 > check's inputs are absent. Both new tools passed a per-tool adversarial subagent review; the confirmed
 > bugs were fixed + regression-tested:
 > - **trace tolerance bug** — the denominator was floored at 1, turning relative tolerance into a loose
@@ -109,7 +109,7 @@ not verify-if-present. (`check_claim_coverage` is **never** in either — it's f
 
 ```bash
 npm run build            # tsc → dist/
-npm test                 # vitest run → 281 passed
+npm test                 # vitest run → 296 passed
 npx vitest run tests/tools/factual_qa_slice.test.ts   # just the slice (16)
 ```
 
@@ -130,7 +130,7 @@ printf '%s\n' \
 - **`finalize` re-executes; it does not trust hashes.** No `witness_hash` chain. `answer_text_hash` and
   `source_manifest_hash` are binding tokens for the host to compare, never proof a check ran.
 - **`contract_authority`/`profile_source` are unverifiable by a pure fn** → surfaced as
-  `contract_strength` WARNING, never a gate. Strong guarantees require the **host** to author the contract.
+  `contract_strength` WARNING, never a gate. Stronger release assurance requires the **host** to author the contract.
 - **Adoption is host-side.** A non-cooperating agent can skip `finalize` or pass a trimmed `answer_text`;
   the `answer_text_hash` lets the host detect the latter. Enforcement = host honoring `ENFORCEMENT_FAIL`.
 
@@ -146,8 +146,8 @@ ct-mcp gives the host the structural hooks to meet them:
 2. **Host supplies `eval_time` with `authority: "host"`.** Only then can `check_freshness` BLOCK; an
    agent-supplied time is warning-only. Use ISO-8601 with `Z`/offset or epoch-ms (offset-less datetimes
    are rejected as non-deterministic).
-3. **Host verifies `answer_text_hash`.** `finalize` returns `sha256(normalize(answer_text))`; the host
-   recomputes it over the answer it actually surfaces and refuses to ship on mismatch — this closes the
+3. **Host verifies `answer_text_hash`.** `finalize` returns `sha256(answer_text)` over exact text; the host
+   recomputes it over the exact answer it actually surfaces and refuses to ship on mismatch — this closes the
    "called `finalize` with a trimmed answer" gap.
 4. **Host gates release on `finalize` PASS.** A system-prompt / harness rule ("no final answer until
    `finalize_deliverable` returns PASS") or the experimental orchestrator is the actual enforcement;
@@ -160,10 +160,10 @@ contract = derive_contract(user_request)            # authority: host
 plan     = plan_checks(contract)                     # which checks are required
 ... agent produces answer + grounding artifacts ...
 verdict  = finalize_deliverable({ contract, answer_text, eval_time: {value, authority:'host'},
-                                  sources, claims, inputs, conclusion_numbers, constraints,
+                                  sources, claims, inputs, conclusion_numbers, arithmetic_checks, constraints,
                                   structured_answer })
 if verdict.status != 'PASS': reject / send corrective_prompt back to the agent
-if sha256(normalize(surfaced_answer)) != verdict.answer_text_hash: reject   # anti-swap
+if sha256(surfaced_answer) != verdict.answer_text_hash: reject   # anti-swap
 release(surfaced_answer)
 ```
 

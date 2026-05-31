@@ -4,7 +4,9 @@
 deliverable defects vs an unguarded baseline, at acceptable false-block / friction cost?
 
 **Real, not mocked.** Tagent = Claude subagents (model **sonnet**, held constant across both arms).
-Gate = the **actual branch MCP server** (`node dist/server.js`) driven over JSON-RPC by `gate.mjs`.
+This pre-registration covers Run 1; Run 2 (haiku) reused the same tasks as a follow-up. Gate = the
+**actual branch MCP server** (`npm run build` immediately before `node dist/server.js`) driven over
+JSON-RPC by `gate.mjs`.
 Grading = **objective** pre-specified checks in `tasks.json` (`grader.mjs`); no LLM judge as oracle.
 n = 6 → directional, not definitive.
 

@@ -1,8 +1,9 @@
 # Value Pilot — Results (real tagent, real branch MCP gate)
 
-**Setup:** 6 tasks, tagent = Claude **sonnet** (constant across arms), gate = the actual branch server
-(`node dist/server.js`) via `gate_batch.mjs`, objective grading (`grader.mjs`), metrics pre-registered
-in `PILOT_DESIGN.md`. **Single run, n=6 → directional, not definitive.**
+**Setup:** 6 toy tasks, two tagent runs (Claude **sonnet** and **haiku**), gate = the actual branch server
+(`npm run build` immediately before `node dist/server.js`) / host layer, objective proxy grading
+(`grader.mjs`), metrics pre-registered for Run 1 in `PILOT_DESIGN.md`. **Two 6-task runs → directional,
+not definitive.**
 
 ## Per-task outcome
 
@@ -33,7 +34,8 @@ in `PILOT_DESIGN.md`. **Single run, n=6 → directional, not definitive.**
 2. **Numeric tracing had poor cost/benefit here.** Zero real numeric errors to catch (ceiling effect —
    sonnet got every number right, including the −20% and weighted-average traps), yet it false-blocked
    3 correct answers because its op model can't express %-change or multi-step derivations. The fix
-   (flatten intermediates into `inputs`) resolves the block but **weakens the guarantee to the last op**.
+   (flatten intermediates into `inputs`) resolved that historical block but narrowed checked numeric
+   coverage; newer gate hardening blocks unanchored flattened inputs and requires `arithmetic_checks`.
 3. **Ceiling effect dominates.** Guardrail value scales with baseline error rate; against sonnet on these
    tasks the numeric headroom was ~0.
 
@@ -44,8 +46,9 @@ catches. They just didn't occur here because the tagent didn't make those errors
 against a weaker/error-prone tagent** — which is the obvious next experiment.
 
 ## Caveats
-n=6; one model; single non-deterministic run; tasks + objective checks authored by the evaluator
-(pre-registered, with a deliberate null-probe N4 and clean controls). F1's defect used a proxy regex.
+Two non-deterministic 6-task runs on the same toy task set; tasks + objective checks authored by the
+evaluator (Run 1 pre-registered, with a deliberate null-probe N4 and clean controls). F1's defect used a
+proxy regex, and the grader is substring/proxy-based rather than a structured truth oracle.
 
 ## Actionable implications
 1. **Grounding is the value driver — invest there**, and close the verbatim-but-irrelevant-span gap

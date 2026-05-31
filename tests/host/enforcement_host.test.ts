@@ -62,7 +62,12 @@ describe('enforceDeliverable', () => {
   it('RELEASES a correct high-risk numeric deliverable with NO constraints/freshness artifacts', () => {
     const d = enforceDeliverable(
       { contract_id: 'h2', original_request_text: 'What is 120 plus 30?', task_type: 'numeric_analysis', evidence_level: 'rederived', risk_level: 'high' },
-      { answer_text: 'The total is 150.', inputs: [120, 30], conclusion_numbers: [{ value: 150, origin: 'derived', op: 'sum', input_refs: [0, 1] }] },
+      {
+        answer_text: 'The total is 150.',
+        inputs: [120, 30],
+        conclusion_numbers: [{ value: 150, origin: 'derived', op: 'sum', input_refs: [0, 1] }],
+        arithmetic_checks: [{ claim_type: 'sum', values: [120, 30], claimed_result: 150 }],
+      },
     );
     expect(d.decision).toBe('RELEASE');
   });
@@ -70,9 +75,24 @@ describe('enforceDeliverable', () => {
   it('REJECTS a wrong number (re-derivation mismatch)', () => {
     const d = enforceDeliverable(
       { contract_id: 'h3', original_request_text: 'What is 120 plus 30?', task_type: 'numeric_analysis', evidence_level: 'rederived', risk_level: 'high' },
-      { answer_text: 'The total is 200.', inputs: [120, 30], conclusion_numbers: [{ value: 200, origin: 'derived', op: 'sum', input_refs: [0, 1] }] },
+      {
+        answer_text: 'The total is 200.',
+        inputs: [120, 30],
+        conclusion_numbers: [{ value: 200, origin: 'derived', op: 'sum', input_refs: [0, 1] }],
+        arithmetic_checks: [{ claim_type: 'sum', values: [120, 30], claimed_result: 200 }],
+      },
     );
     expect(d.decision).toBe('REJECT');
     expect(d.reason).toBe('gate_block');
+  });
+
+  it('REJECTS whitespace-significant surfaced swaps with exact anti-swap hash', () => {
+    const d = enforceDeliverable(
+      { contract_id: 'h4', original_request_text: 'Return exact Python snippet.', task_type: 'freeform', evidence_level: 'none', risk_level: 'low' },
+      { answer_text: 'if is_admin:\n    allow()\nelse:\n    deny()' },
+      { surfaced_answer: 'if is_admin: allow() else: deny()' },
+    );
+    expect(d.decision).toBe('REJECT');
+    expect(d.reason).toBe('hash_mismatch');
   });
 });

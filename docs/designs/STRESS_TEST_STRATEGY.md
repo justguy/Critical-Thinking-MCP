@@ -144,7 +144,7 @@ freshness) → finalize_deliverable`:
   `finalize` return `PASS` while a `finalize_required` check would fail — missing inputs for a required
   check must always BLOCK (no silent skip). Fuzz the finalize inputs to try to find a bypass.
 - **Host-contract scenarios:** agent-authored contract → `contract_strength: weak_agent_declared`;
-  `answer_text_hash` changes iff the normalized answer changes (anti-swap binding token);
+  `answer_text_hash` changes iff the exact answer text changes (anti-swap binding token);
   `eval_time.authority='agent'` never blocks.
 
 **Gate:** every scenario asserts its terminal verdict; the chokepoint property holds under fuzzing.

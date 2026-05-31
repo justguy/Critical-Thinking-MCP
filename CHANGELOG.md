@@ -3,8 +3,9 @@
 ## Unreleased — deliverable-centric robustness layer
 
 Working-tree changes, not yet published. Full record: `docs/designs/IMPLEMENTATION_CHANGES.md`;
-test plan: `docs/designs/STRESS_TEST_STRATEGY.md`. The published 9-tool benchmark surface is unchanged;
-these additions are new and **not yet benchmarked or independently validated**.
+test plan: `docs/designs/STRESS_TEST_STRATEGY.md`. The original 9 analyzer tools remain the
+benchmark-backed surface; the two-tool deliverable gate has only directional value-pilot evidence, not a
+definitive product-value benchmark.
 
 - Public tool surface 9 → **11**: a deliverable gate of two new public tools — `plan_checks` (planner)
   and `finalize_deliverable` (keystone gate) — on top of the nine analyzers. The seven deterministic
@@ -21,8 +22,13 @@ these additions are new and **not yet benchmarked or independently validated**.
   `finalize_required`, so `finalize` blocked on its missing artifacts even for tasks with no
   freshness/constraint dimension — false-blocking every legitimate high-risk deliverable. The promotion
   is now **verify-if-present**: re-executed and blocking on failure only when its artifacts are supplied;
-  a missing artifact never blocks. A contract-declared freshness window stays mandatory. New plan field
-  `finalize_verify_if_present`; regression suite `tests/tools/risk_promotion.test.ts`.
+	  a missing artifact never blocks. A contract-declared freshness window stays mandatory. New plan field
+	  `finalize_verify_if_present`; regression suite `tests/tools/risk_promotion.test.ts`.
+- **Tightened deliverable-gate soundness after adversarial review.** `verify_arithmetic` is mandatory for
+  rederived numeric deliverables and must be supplied as `arithmetic_checks`; mandatory no-executor checks
+  now block; grounding binds contract claim id/text/kind and blocks weak-kind downgrades; cited factual
+  finalize blocks unaccounted claim-like answer spans; numeric finalize blocks untraced answer numbers and
+  unanchored flattened inputs; host anti-swap hashing is exact text; host direct mode applies MCP input caps.
 - Tier-2 hardenings to `validate_confidence`: widened claimed-confidence extraction (returns max, polarity-
   guarded), confidence/hedge contradiction (warning by default; block under opt-in `strict`),
   falsification↔assumption binding, tautology/bare-negation guard. No new default BLOCK on existing tools.
@@ -38,7 +44,7 @@ these additions are new and **not yet benchmarked or independently validated**.
   `finalize_deliverable`, verifies the anti-swap `answer_text_hash` against the surfaced text, and returns a
   binding `RELEASE`/`REJECT` decision + `corrective_prompt`. New `ct-enforce` CLI (exit 0 RELEASE / 1 REJECT
   / 2 bad input) for pipeline/CI gating. Docs: `docs/designs/HOST_ENFORCEMENT.md`.
-- Shared `CONTEXT_PROPERTY` schema (deduped 7 copies). Tests: 158 → **287**.
+- Shared `CONTEXT_PROPERTY` schema (deduped 7 copies). Tests: 158 → **296**.
 - Design discipline: BLOCK only on unforgeable within-request signals (verbatim containment, re-derivation,
   interval/graph math); everything self-declared is WARNING; enforcement of "done" is host-side.
 

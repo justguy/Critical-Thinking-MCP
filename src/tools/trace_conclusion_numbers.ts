@@ -9,6 +9,7 @@
  *
  * v2.1 omission guard: auto-extract numbers from answer_text and flag any that were
  * not declared (WARNING, after stop-listing ordinals/section/version/figure markers).
+ * finalize_deliverable calls this in strict mode, where undeclared answer numbers BLOCK.
  *
  * BLOCK (unforgeable): a declared number that fails derivation, or an out-of-range ref.
  * WARNING: a number in answer_text that was never declared.
@@ -53,9 +54,10 @@ export interface TraceOutput {
 function validateInput(input: unknown): {
   inputs: number[];
   conclusion_numbers: ConclusionNumber[];
-  answer_text: string | null;
-  tolerance: number;
-} {
+	  answer_text: string | null;
+	  tolerance: number;
+	  strict_answer_numbers: boolean;
+	} {
   if (input === null || typeof input !== 'object') {
     throw new Error(
       'Input must be an object with "inputs" (number[]) and "conclusion_numbers" ' +
@@ -108,16 +110,18 @@ function validateInput(input: unknown): {
     }
   }
 
-  const tolerance = typeof obj.tolerance === 'number' && obj.tolerance >= 0 ? obj.tolerance : DEFAULT_TOL;
-  const answer_text = typeof obj.answer_text === 'string' ? obj.answer_text : null;
+	  const tolerance = typeof obj.tolerance === 'number' && obj.tolerance >= 0 ? obj.tolerance : DEFAULT_TOL;
+	  const answer_text = typeof obj.answer_text === 'string' ? obj.answer_text : null;
+	  const strict_answer_numbers = obj.strict_answer_numbers === true;
 
   return {
     inputs: obj.inputs as number[],
     conclusion_numbers: obj.conclusion_numbers as ConclusionNumber[],
-    answer_text,
-    tolerance,
-  };
-}
+	    answer_text,
+	    tolerance,
+	    strict_answer_numbers,
+	  };
+	}
 
 function relativeClose(a: number, b: number, tol: number): boolean {
   // True relative tolerance against the larger magnitude, plus a tiny absolute
@@ -174,7 +178,7 @@ export function handleTraceConclusionNumbers(
   engine: EnforcementEngine,
 ): TraceOutput {
   const context = (input as any)?.context as EnforcementContext | undefined;
-  const { inputs, conclusion_numbers, answer_text, tolerance } = validateInput(input);
+	  const { inputs, conclusion_numbers, answer_text, tolerance, strict_answer_numbers } = validateInput(input);
 
   const blockingIssues: BlockingIssue[] = [];
   const warnings: string[] = [];
@@ -226,14 +230,18 @@ export function handleTraceConclusionNumbers(
       const n = Number(s);
       return isFinite(n) && !declared.some(d => relativeClose(n, d, tolerance));
     });
-    if (untraced.length > 0) {
-      warnings.push(
-        `${untraced.length} number(s) appear in answer_text but were not declared/traced: ` +
-          untraced.slice(0, 8).join(', ') + (untraced.length > 8 ? ' …' : '') +
-          '. Declare and trace them, or confirm they are non-analytical.',
-      );
-    }
-  }
+	    if (untraced.length > 0) {
+	      const message =
+	        `${untraced.length} number(s) appear in answer_text but were not declared/traced: ` +
+	        untraced.slice(0, 8).join(', ') + (untraced.length > 8 ? ' …' : '') +
+	        '. Declare and trace them, or confirm they are non-analytical.';
+	      if (strict_answer_numbers) {
+	        blockingIssues.push({ mechanism: 'number_provenance', description: message, severity: 'blocking' });
+	      } else {
+	        warnings.push(message);
+	      }
+	    }
+	  }
 
   const tracedCount = results.filter(r => r.traced).length;
   const tracedRatio = results.length === 0 ? 1 : tracedCount / results.length;

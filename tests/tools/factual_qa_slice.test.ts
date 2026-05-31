@@ -188,6 +188,96 @@ describe('finalize_deliverable (re-executor)', () => {
     expect(out.enforcement?.blocking_issues.some(b => b.mechanism === 'finalize_grounding')).toBe(true);
   });
 
+  it('contract claim must bind to grounded claim_text, not just claim_id', () => {
+    const out = handleFinalizeDeliverable(
+      {
+        contract: {
+          contract_id: 'bind1',
+          contract_authority: 'host',
+          profile_source: 'host_supplied',
+          original_request_text: 'What is p99 latency?',
+          task_type: 'factual_qa',
+          evidence_level: 'cited',
+          risk_level: 'low',
+          claims: [{ id: 'n1', text: 'p99 latency is 50ms', claim_kind: 'numeric' }],
+        },
+        answer_text: 'p99 latency is 50ms.',
+        sources: [{ id: 's1', text: 'The p99 latency is 100ms under load.' }],
+        claims: [{
+          claim_id: 'n1',
+          claim_text: 'p99 latency is 100ms',
+          source_id: 's1',
+          quoted_span: 'The p99 latency is 100ms under load',
+          supporting_token: '100ms',
+          claim_kind: 'numeric',
+        }],
+      },
+      engine,
+    );
+    expect(out.finalize_verdict).toBe('BLOCK');
+    expect(out.enforcement?.blocking_issues.some(b => b.mechanism === 'finalize_claim_binding')).toBe(true);
+  });
+
+  it('contract claim_kind must bind; weak-kind downgrade cannot satisfy a factual claim', () => {
+    const out = handleFinalizeDeliverable(
+      {
+        contract: {
+          contract_id: 'kind1',
+          contract_authority: 'host',
+          profile_source: 'host_supplied',
+          original_request_text: 'Is Redis single-threaded?',
+          task_type: 'factual_qa',
+          evidence_level: 'cited',
+          risk_level: 'low',
+          claims: [{ id: 'n1', text: 'Redis executes commands single-threaded', claim_kind: 'status' }],
+        },
+        answer_text: 'Redis executes commands single-threaded.',
+        sources: [{ id: 's1', text: 'Redis executes commands single-threaded.' }],
+        claims: [{
+          claim_id: 'n1',
+          claim_text: 'Redis executes commands single-threaded',
+          source_id: 's1',
+          quoted_span: 'Redis executes commands single-threaded',
+          supporting_token: 'single-threaded',
+          claim_kind: 'recommendation',
+        }],
+      },
+      engine,
+    );
+    expect(out.finalize_verdict).toBe('BLOCK');
+    expect(out.enforcement?.blocking_issues.some(b => b.mechanism === 'finalize_claim_kind')).toBe(true);
+  });
+
+  it('unsupported answer claim omitted from artifacts is a coverage BLOCK for cited factual QA', () => {
+    const out = handleFinalizeDeliverable(
+      {
+        contract: {
+          contract_id: 'coverage1',
+          contract_authority: 'host',
+          profile_source: 'host_supplied',
+          original_request_text: 'What is the service rate limit, and how often does it reset?',
+          task_type: 'factual_qa',
+          evidence_level: 'cited',
+          risk_level: 'high',
+          claims: [{ id: 'c1', text: 'The service enforces a rate limit of 100 requests per minute.', claim_kind: 'numeric' }],
+        },
+        answer_text: 'The service enforces a rate limit of 100 requests per minute. The limit resets every minute.',
+        sources: [{ id: 's1', text: 'The service enforces a rate limit of 100 requests per minute.' }],
+        claims: [{
+          claim_id: 'c1',
+          claim_text: 'The service enforces a rate limit of 100 requests per minute.',
+          source_id: 's1',
+          quoted_span: 'The service enforces a rate limit of 100 requests per minute.',
+          supporting_token: '100',
+          claim_kind: 'numeric',
+        }],
+      },
+      engine,
+    );
+    expect(out.finalize_verdict).toBe('BLOCK');
+    expect(out.enforcement?.blocking_issues.some(b => b.mechanism === 'finalize_claim_coverage')).toBe(true);
+  });
+
   it('agent-authored contract → still re-executes, but warns weak_agent_declared', () => {
     const input = loadFinalizeInput();
     input.contract.contract_authority = 'agent';

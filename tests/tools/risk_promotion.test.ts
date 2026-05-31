@@ -7,7 +7,7 @@
  * even for tasks with no freshness/constraint dimension — so every legitimate high-risk
  * deliverable false-blocked. Fix: the promotion is now VERIFY-IF-PRESENT (re-executed and
  * blocking on failure only if its artifacts are supplied; absent artifacts never block),
- * while a CONTRACT-declared freshness obligation stays mandatory.
+ * while a CONTRACT-declared freshness obligation and rederived arithmetic stay mandatory.
  */
 
 import { describe, it, expect } from 'vitest';
@@ -63,6 +63,7 @@ describe('high-risk promotion is verify-if-present (false-block fix)', () => {
         answer_text: 'The total is 150.',
         inputs: [120, 30],
         conclusion_numbers: [{ value: 150, origin: 'derived', op: 'sum', input_refs: [0, 1] }],
+        arithmetic_checks: [{ claim_type: 'sum', values: [120, 30], claimed_result: 150 }],
       },
       engine,
     );
@@ -76,6 +77,7 @@ describe('high-risk promotion is verify-if-present (false-block fix)', () => {
         answer_text: 'The total is 150.',
         inputs: [120, 30],
         conclusion_numbers: [{ value: 150, origin: 'derived', op: 'sum', input_refs: [0, 1] }],
+        arithmetic_checks: [{ claim_type: 'sum', values: [120, 30], claimed_result: 150 }],
         constraints: [{ field: 'price', op: '<', value: 100, source_quote: 'price under 100' }],
         structured_answer: { price: 150 },
       },

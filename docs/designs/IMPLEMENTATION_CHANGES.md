@@ -3,7 +3,7 @@
 > **What this is:** a precise record of the **actual code changes** made (not the design intent — that's
 > in [`robustness-additions.md`](robustness-additions.md)). Everything below is in the working tree,
 > uncommitted, on top of `aa0fc93` (`ct-mcp@0.1.0-beta.3`). Verified: `tsc --noEmit` clean, `npm test` →
-> **281 passed**, stdio server lists **11 public tools** (the 9 analyzers + the `plan_checks` →
+> **296 passed**, stdio server lists **11 public tools** (the 9 analyzers + the `plan_checks` →
 > `finalize_deliverable` spine; the 7 leaf checks are internalized). Includes the post-review revisions
 > in §I and the surface consolidation + high-risk false-block fix (see CHANGELOG).
 
@@ -11,10 +11,10 @@
 
 | | Before | After | Δ |
 |---|---|---|---|
-| Public MCP tools | 9 | **18** | +9 |
-| Test cases (`it`) | 158 | **269** | +111 |
+| Public MCP tools | 9 | **11** | +2 public spine tools; 7 deterministic leaves internalized |
+| Test cases (`it`) | 158 | **296** | +138 |
 | Source files (`src/`) | 30 | **42** | +12 new, 10 modified |
-| `outputSchema` on tools | 0 | **18** | all tools |
+| `outputSchema` on tools | 0 | **11 public tools** | public surface |
 | `structuredContent` in responses | no | **yes** | both branches |
 | Input/output resource caps | none | **enforced** | dispatcher (`limits.ts`) |
 | Duplicated `context` schema | 7 copies | **1 shared constant** | consolidated |
@@ -26,7 +26,7 @@ trust tier) is **WARNING**. Enforcement that a non-cooperating agent can't skip 
 
 ---
 
-## A. New MCP tools (8)
+## A. New deliverable mechanisms (2 public tools + 7 internal leaves)
 
 All live in `src/tools/`, registered in `src/mcp/tool-call.ts` (`TOOL_HANDLERS`) and described in
 `src/mcp/tool-definitions.ts` (`TOOLS`, each with `inputSchema` **and** `outputSchema`).
@@ -43,7 +43,8 @@ All live in `src/tools/`, registered in `src/mcp/tool-call.ts` (`TOOL_HANDLERS`)
 | `check_case_partition` | 213 | any overlap / interior gap / leading-trailing gap (interval+set math) | — | requires explicit intervals/members, not prose |
 | `check_profile_downgrade` | 113 | *never blocks* (advisory) | declared `task_type` weaker than the request/answer shape implies | heuristic regexes; host strict mode may act |
 
-**Tool count:** 9 original + 9 = **18**.
+**Tool count:** 9 original analyzers + 2 public spine tools = **11 public MCP tools**. The 7 leaf
+checks remain internal mechanisms re-executed by `finalize_deliverable`.
 
 ## B. New internal modules (2)
 

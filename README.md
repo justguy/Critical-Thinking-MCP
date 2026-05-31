@@ -4,7 +4,7 @@
 
 > **BETA** — Under active development. Interfaces may change between versions.
 
-Nine deterministic MCP tools that make LLM answers prove themselves before you trust them.
+Eleven deterministic MCP tools that expose machine-checkable failures before you trust an LLM answer.
 
 Use it when a model sounds plausible but you need hard checks on the math, the assumptions, the plan, or the concurrency story. CT-MCP does not add another model opinion. It recomputes, validates, and names the exact failure mode.
 
@@ -107,7 +107,7 @@ Why CT-MCP mattered less here:
 - CT-MCP mostly cleaned up overconfidence and specificity instead of changing the core conclusion.
 - The saved review artifact marks this as a weak-fit case: [`weak_fit: yes`](benchmark/duckexperiments/results/codex_low/Q01/tool_review.md).
 
-## The Nine Tools
+## Public Tools
 
 **Reasoning & Structure**
 - **validate_reasoning_chain** — Directed graph analysis. Catches circular logic, grounded contradictions, orphaned conclusions, computes grounding score.
@@ -126,28 +126,29 @@ Why CT-MCP mattered less here:
 - **detect_concurrency_patterns** — Check-then-act, missing idempotency, lost updates, dual writes, explicit deadlock risk from structured resource-allocation graphs.
 - **detect_drift** — CUSUM trend analysis on numeric sequences.
 
-These nine are the benchmarked, published surface. A newer **deliverable-centric layer** (below) is in
-development on top of them.
+The first nine analyzers are the benchmarked surface. A newer **deliverable-centric layer** adds two
+public gate tools on top of them.
 
-## Deliverable-Centric Layer (in development — unreleased, not yet benchmarked)
+## Deliverable-Centric Layer (in development — directional pilot only)
 
 Two additional public tools form a **deliverable gate** on top of the nine analyzers (public surface
 9 → 11). They push an agent to expose verifiable structure and confirm its own work before an answer is
-releasable, and are **not part of the published package and have no benchmark evidence yet.** Same
+releasable. They have only small directional value-pilot evidence, not a definitive product-value
+benchmark. Same
 discipline as the core tools: a check may **block** only on an *unforgeable, within-request* signal
 (verbatim substring containment, numeric re-derivation, interval/set/graph math); everything self-declared
 is a *warning*; and because MCP tools are model-controlled, enforcing that an answer is "done" is
 ultimately host-side.
 
 - **plan_checks** — deterministic planner: maps a `deliverable_contract` (task type, evidence level, risk) to the obligations `finalize_deliverable` will enforce, so the agent knows which artifacts to prepare. Never blocks.
-- **finalize_deliverable** — the keystone gate: **re-executes** the contract's required checks inline (grounding, number tracing, constraints, freshness) and blocks on `must_include`/numeric-criterion substring failures; additionally verifies a *supplied* `case_partition` is MECE (blocks on overlap/gap) and emits a profile-downgrade **warning** when the declared task type understates the request/answer shape; returns an `answer_text_hash` binding token.
+- **finalize_deliverable** — the keystone gate: **re-executes** the contract's required checks inline (grounding with claim id/text/kind binding, strict number tracing, arithmetic checks, constraints, freshness) and blocks on `must_include`/numeric-criterion substring failures; additionally verifies a *supplied* `case_partition` is MECE (blocks on overlap/gap) and emits a profile-downgrade **warning** when the declared task type understates the request/answer shape; returns an exact-text `answer_text_hash` binding token.
 
 The individual checks `finalize_deliverable` runs are **internal primitives**, not separately
 agent-callable tools — the agent supplies the artifacts (`sources`+`claims`, `inputs`+`conclusion_numbers`,
-`constraints`, `eval_time`) and the gate re-runs them:
+`arithmetic_checks`, `constraints`, `eval_time`) and the gate re-runs them:
 
 - **check_quote_grounding** — every factual claim must quote a verbatim span of a supplied source and name the supporting token inside it.
-- **trace_conclusion_numbers** — every number in the conclusion must re-derive from a separately-supplied input array.
+- **trace_conclusion_numbers** — every declared number in the conclusion must re-derive from supplied inputs; `finalize_deliverable` also blocks undeclared answer numbers and unanchored flattened inputs.
 - **check_answer_against_constraints** — restate the question's hard constraints as `{field, op, value}` predicates and evaluate them against the structured answer.
 - **check_freshness** — staleness of dated sources by pure interval arithmetic against a caller-supplied evaluation time (no server clock).
 - **check_claim_coverage** *(advisory)* — which declared claims were grounded, plus unaccounted claim-like spans in the answer.
@@ -160,11 +161,11 @@ Details and rationale: [`docs/designs/robustness-additions.md`](docs/designs/rob
 
 ## Integration Envelopes
 
-The current beta line keeps the package centered on the nine deterministic tool primitives above. Integration-envelope work is aimed at making those tools easier to consume from stricter typed integrations without changing core tool semantics.
+The current beta line keeps the package centered on the 11 deterministic public tools above. Integration-envelope work is aimed at making those tools easier to consume from stricter typed integrations without changing core tool semantics.
 
 ## Experimental: Internal Orchestrator (v0)
 
-The public package remains centered on the nine deterministic MCP tools. Beta 2 also includes an experimental internal orchestrator under `src/orchestrator/` that locks prompt family before generation and then applies four additional guardrails on top of the tool surface.
+The public package remains centered on the deterministic MCP tools. Beta 2 also includes an experimental internal orchestrator under `src/orchestrator/` that locks prompt family before generation and then applies four additional guardrails on top of the tool surface.
 
 It remains experimental and repo-local.
 Not a workflow engine, control plane, or production orchestration platform.
@@ -279,7 +280,7 @@ What we are trying to get from the new benchmark work:
 
 ## Internal Orchestrator
 
-The Beta 2 internal orchestrator lives under `src/orchestrator/` and routes structured envelopes to the existing deterministic tools. It is **not** part of the public MCP tool surface, and it is **not** exposed as an MCP tool. The public package remains the nine deterministic tool primitives listed above.
+The Beta 2 internal orchestrator lives under `src/orchestrator/` and routes structured envelopes to the existing deterministic tools. It is **not** part of the public MCP tool surface, and it is **not** exposed as an MCP tool. The public package remains the deterministic public tools listed above.
 
 What it is:
 
@@ -330,7 +331,7 @@ What this is not:
 - Not a public MCP orchestration surface. This layer is still experimental and repo-local.
 - Not an LLM router — it does not call any provider SDK
 - Not a prose rescue layer — strict structured contracts only
-- Not a replacement for the nine-tool public surface, which is unchanged
+- Not a replacement for the public MCP tool surface
 
 ## Iterative Enforcement (No Hidden Memory)
 

@@ -90,6 +90,9 @@ function baseSeverity(check: string, evidence: EvidenceLevel): 'blocking' | 'war
   if (check === 'trace_conclusion_numbers') {
     return evidence === 'rederived' ? 'blocking' : 'warning';
   }
+  if (check === 'verify_arithmetic') {
+    return evidence === 'rederived' ? 'blocking' : 'warning';
+  }
   return 'warning';
 }
 
@@ -140,21 +143,22 @@ export function planChecks(contract: {
     optional = optional.filter(o => o.check !== 'check_freshness');
   }
 
-  // high risk pulls the first unforgeable optional check in for extra rigor — but as
-  // VERIFY-IF-PRESENT, not a mandatory artifact. finalize re-executes it (and BLOCKS on failure)
-  // only when the caller supplies its artifacts; a missing artifact is NOT a block, because a
-  // high-risk deliverable may legitimately have no freshness/constraint dimension. (Promoting it to
+  // high risk pulls unforgeable optional checks in for extra rigor — but as VERIFY-IF-PRESENT,
+  // not mandatory artifacts. finalize re-executes them (and BLOCKS on failure) only when the
+  // caller supplies their artifacts; missing artifacts are NOT a block, because a high-risk
+  // deliverable may legitimately have no freshness/constraint dimension. (Promoting them to
   // mandatory caused a systematic high-risk false-block on tasks with no such dimension.)
   if (contract.risk_level === 'high') {
-    const promote = profile.optional.find(c => UNFORGEABLE_CHECKS.has(c));
-    if (promote && !required.some(r => r.check === promote)) {
+    const promote = profile.optional.filter(c => UNFORGEABLE_CHECKS.has(c));
+    for (const check of promote) {
+      if (required.some(r => r.check === check)) continue;
       required.push({
-        check: promote,
+        check,
         severity_on_fail: 'verify_if_present',
         reason: `Verified-if-present because risk_level='high' — re-executed only if its artifacts are supplied; absence is not a block.`,
       });
-      optional = optional.filter(o => o.check !== promote);
     }
+    optional = optional.filter(o => !promote.includes(o.check));
   }
 
   const finalize_required = required

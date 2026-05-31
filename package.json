@@ -1,7 +1,7 @@
 {
   "name": "ct-mcp",
   "version": "0.1.0-beta.3",
-  "description": "Nine tools for deterministic MCP validation that catch confidence inflation, circular logic, fabricated numbers, arithmetic errors, and concurrency hazards before bad LLM output ships.",
+  "description": "Eleven deterministic MCP tools for validation and deliverable gating that catch confidence inflation, circular logic, fabricated numbers, arithmetic errors, grounding gaps, and concurrency hazards before bad LLM output ships.",
   "type": "module",
   "main": "dist/server.js",
   "bin": {

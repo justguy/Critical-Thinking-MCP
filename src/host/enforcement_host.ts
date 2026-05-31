@@ -20,7 +20,8 @@
 
 import { EnforcementEngine } from '../enforcement/index.js';
 import { handleFinalizeDeliverable, type FinalizeOutput } from '../tools/finalize_deliverable.js';
-import { normalizeWhitespace, sha256Hex } from '../enforcement/utils.js';
+import { sha256Hex } from '../enforcement/utils.js';
+import { enforceInputLimits } from '../enforcement/limits.js';
 import type {
   AcceptanceCriterion,
   BlockingIssue,
@@ -53,8 +54,9 @@ export interface DeliverableArtifacts {
   answer_text: string;
   sources?: SourceManifestEntry[];
   claims?: GroundingClaim[];
-  inputs?: number[];
+  inputs?: unknown[];
   conclusion_numbers?: unknown[];
+  arithmetic_checks?: unknown[];
   constraints?: unknown[];
   structured_answer?: Record<string, unknown>;
   case_partition?: Record<string, unknown>;
@@ -64,7 +66,7 @@ export interface EnforceOptions {
   /** Host-supplied evaluation time (authority:'host' is what lets check_freshness block). */
   eval_time?: { value: string; authority: 'host' | 'agent' };
   /** The exact text being shown to the user, if it differs from artifacts.answer_text. The host
-   *  releases only if its normalized hash matches the text finalize checked (closes the
+   *  releases only if its exact text hash matches the text finalize checked (closes the
    *  "checked one answer, shipped another" gap). Defaults to artifacts.answer_text. */
   surfaced_answer?: string;
   /** Inject a finalize implementation (e.g. an MCP-over-stdio client). Defaults to in-process. */
@@ -118,18 +120,22 @@ export function enforceDeliverable(
   const finalize =
     opts.finalize ?? ((input: unknown) => handleFinalizeDeliverable(input, new EnforcementEngine()));
 
-  const out = finalize({
+  const finalizeInput = {
     contract,
     answer_text: artifacts.answer_text,
     sources: artifacts.sources,
     claims: artifacts.claims,
     inputs: artifacts.inputs,
     conclusion_numbers: artifacts.conclusion_numbers,
+    arithmetic_checks: artifacts.arithmetic_checks,
     constraints: artifacts.constraints,
     structured_answer: artifacts.structured_answer,
     case_partition: artifacts.case_partition,
     eval_time: opts.eval_time,
-  });
+  };
+
+  if (!opts.finalize) enforceInputLimits(finalizeInput);
+  const out = finalize(finalizeInput);
 
   const blocking_issues = out.enforcement?.blocking_issues ?? [];
   const warnings = out.enforcement?.warnings ?? [];
@@ -156,7 +162,7 @@ export function enforceDeliverable(
 
   // 3. Anti-swap: the text being shipped must be the text that was checked.
   const surfaced = opts.surfaced_answer ?? artifacts.answer_text;
-  const surfaced_answer_hash = sha256Hex(normalizeWhitespace(surfaced));
+  const surfaced_answer_hash = sha256Hex(surfaced);
   if (surfaced_answer_hash !== out.answer_text_hash) {
     return {
       ...base,

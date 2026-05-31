@@ -217,6 +217,7 @@ export interface AcceptanceCriterion {
 export interface ContractClaim {
   id: string;
   text: string;
+  claim_kind?: ClaimKind;
 }
 
 export interface DeliverableContract {

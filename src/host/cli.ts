@@ -22,12 +22,22 @@ function main(): void {
     console.error(`ct-enforce: input is not valid JSON: ${e instanceof Error ? e.message : String(e)}`);
     process.exit(2);
   }
-  const { spec, artifacts, eval_time, surfaced_answer } = parsed as Record<string, any>;
-  if (!spec || !artifacts) {
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
     console.error('ct-enforce: input must be { "spec": ..., "artifacts": ... }');
     process.exit(2);
   }
-  const decision = enforceDeliverable(spec, artifacts, { eval_time, surfaced_answer });
+  const { spec, artifacts, eval_time, surfaced_answer } = parsed as Record<string, any>;
+  if (!spec || typeof spec !== 'object' || !artifacts || typeof artifacts !== 'object') {
+    console.error('ct-enforce: input must be { "spec": ..., "artifacts": ... }');
+    process.exit(2);
+  }
+  let decision;
+  try {
+    decision = enforceDeliverable(spec, artifacts, { eval_time, surfaced_answer });
+  } catch (e) {
+    console.error(`ct-enforce: invalid deliverable: ${e instanceof Error ? e.message : String(e)}`);
+    process.exit(2);
+  }
   console.log(JSON.stringify(decision, null, 2));
   process.exit(decision.decision === 'RELEASE' ? 0 : 1);
 }

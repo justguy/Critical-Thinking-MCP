@@ -621,10 +621,10 @@ REQUIRED INPUT FORMAT — copy this structure exactly:
   },
   {
     name: 'finalize_deliverable',
-    description: `Keystone gate. RE-EXECUTES the contract's finalize_required checks inline over the supplied artifacts and PASSES only on unforgeable within-request signals: grounding re-runs (every contract claim must ground), must_include strings present / must_not_include absent in answer_text, numeric criteria values present verbatim. A supplied optional case_partition {domain,cases} is re-verified MECE inline (BLOCKS on overlap/gap); a profile-downgrade WARNING flags a declared task_type weaker than the request/answer shape. Returns answer_text_hash as a binding token so the host can confirm the surfaced answer matches. Proves declared obligations were discharged — not that the answer is true.
+    description: `Keystone gate. RE-EXECUTES the contract's finalize_required checks inline over the supplied artifacts and PASSES only on unforgeable within-request signals: grounding re-runs with claim id/text/kind binding, numeric tracing runs in strict answer-number mode, required arithmetic checks re-run from arithmetic_checks, and must_include/must_not_include/numeric criteria are checked against answer_text. A supplied optional case_partition {domain,cases} is re-verified MECE inline (BLOCKS on overlap/gap); a profile-downgrade WARNING flags a declared task_type weaker than the request/answer shape. Returns answer_text_hash as an exact-text binding token so the host can confirm the surfaced answer matches. Proves declared machine-checkable obligations were discharged — not that the answer is true.
 
 REQUIRED INPUT FORMAT — copy this structure exactly:
-{"contract":{"contract_id":"q1","contract_authority":"host","profile_source":"host_supplied","original_request_text":"...","task_type":"factual_qa","evidence_level":"cited","risk_level":"low","claims":[{"id":"c1","text":"..."}],"must_include":["..."]},"answer_text":"...","sources":[{"id":"s1","text":"..."}],"claims":[{"claim_id":"c1","claim_text":"...","source_id":"s1","quoted_span":"...","supporting_token":"...","claim_kind":"status"}]}`,
+{"contract":{"contract_id":"q1","contract_authority":"host","profile_source":"host_supplied","original_request_text":"...","task_type":"factual_qa","evidence_level":"cited","risk_level":"low","claims":[{"id":"c1","text":"...","claim_kind":"status"}],"must_include":["..."]},"answer_text":"...","sources":[{"id":"s1","text":"..."}],"claims":[{"claim_id":"c1","claim_text":"...","source_id":"s1","quoted_span":"...","supporting_token":"...","claim_kind":"status"}]}`,
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -648,6 +648,11 @@ REQUIRED INPUT FORMAT — copy this structure exactly:
         answer_text: { type: 'string' as const, minLength: 1 },
         sources: { type: 'array' as const, items: { type: 'object' as const } },
         claims: { type: 'array' as const, items: { type: 'object' as const } },
+        inputs: { type: 'array' as const, items: { type: ['number', 'object'] as const } },
+        conclusion_numbers: { type: 'array' as const, items: { type: 'object' as const } },
+        arithmetic_checks: { type: 'array' as const, items: { type: 'object' as const } },
+        constraints: { type: 'array' as const, items: { type: 'object' as const } },
+        structured_answer: { type: 'object' as const },
       },
       required: ['contract', 'answer_text'],
     },
@@ -667,13 +672,13 @@ REQUIRED INPUT FORMAT — copy this structure exactly:
   },
   {
     name: 'trace_conclusion_numbers',
-    description: `Verify every number in a conclusion traces to a supplied input. Each conclusion number declares its derivation (literal/identity → equals an input; derived → recompute via sum/diff/product/ratio/pct_of/mean over input indices). The tool RE-DERIVES each and BLOCKS any that fails. Unforgeable: a fabricated number won't reconcile against the separately-supplied inputs.
+    description: `Verify every number in a conclusion traces to a supplied input. Each conclusion number declares its derivation (literal/identity → equals an input; derived → recompute via sum/diff/product/ratio/pct_of/mean over input indices). The tool RE-DERIVES each and BLOCKS any that fails. Unforgeable only relative to the supplied inputs; finalize_deliverable adds stricter answer-number and input-anchor checks.
 
 REQUIRED INPUT FORMAT — copy this structure exactly:
 {"inputs":[120,30],"conclusion_numbers":[{"value":150,"origin":"derived","op":"sum","input_refs":[0,1]}],"answer_text":"Total is 150/mo, a 25% saving."}
 
 origin: literal | identity | derived. op (for derived): sum | diff | product | ratio | pct_of | mean.
-Optional "answer_text" enables a WARNING for numbers present in the answer but not declared.`,
+Optional "answer_text" enables a WARNING for numbers present in the answer but not declared. Set strict_answer_numbers=true to make undeclared answer numbers BLOCK.`,
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -694,6 +699,7 @@ Optional "answer_text" enables a WARNING for numbers present in the answer but n
         },
         answer_text: { type: 'string' as const },
         tolerance: { type: 'number' as const, description: 'Relative tolerance (default 0.005).' },
+        strict_answer_numbers: { type: 'boolean' as const },
       },
       required: ['inputs', 'conclusion_numbers'],
     },

@@ -99,7 +99,7 @@ A deliverable gate added in the working tree (public surface 9 → 11) for forci
 verifiable structure and confirm their own work. The agent drives it through two public tools —
 `plan_checks` (planner) and `finalize_deliverable` (keystone gate); the other seven rows below are
 **internal check primitives** that `finalize_deliverable` re-executes inline, not separately
-agent-callable tools. **It has no benchmark evidence yet** — the table above is the benchmark-backed
+agent-callable tools. **It has only directional value-pilot evidence** — the table above is the benchmark-backed
 assessment; the rows below are design-stage capability claims to be validated. Full record:
 `docs/designs/IMPLEMENTATION_CHANGES.md`. Design discipline: BLOCK only on unforgeable within-request
 signals (verbatim containment, re-derivation, interval/graph math); everything self-declared is WARNING;

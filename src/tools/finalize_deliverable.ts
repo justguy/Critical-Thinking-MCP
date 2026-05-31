@@ -35,7 +35,9 @@ import type {
 } from '../enforcement/types.js';
 import { extractNumericTokens, normalizeWhitespace, sha256Hex } from '../enforcement/utils.js';
 import { handleCheckQuoteGrounding } from './check_quote_grounding.js';
+import { handleCheckClaimCoverage } from './check_claim_coverage.js';
 import { handleTraceConclusionNumbers } from './trace_conclusion_numbers.js';
+import { handleVerifyArithmetic } from './verify_arithmetic.js';
 import { handleCheckAnswerAgainstConstraints } from './check_answer_against_constraints.js';
 import { handleCheckFreshness } from './check_freshness.js';
 import { handleCheckCasePartition } from './check_case_partition.js';
@@ -47,6 +49,12 @@ const TASK_TYPES = new Set([
 ]);
 const EVIDENCE_LEVELS = new Set(['none', 'asserted', 'cited', 'rederived']);
 const RISK_LEVELS = new Set(['low', 'medium', 'high']);
+
+type NumericInput = number | {
+  value: number;
+  authority?: 'host' | 'source' | 'agent' | 'derived';
+  source_quote?: string;
+};
 
 export interface FinalizeOutput {
   status: 'PASS' | 'ENFORCEMENT_FAIL';
@@ -105,10 +113,11 @@ function validateInput(input: unknown): {
   answer_text: string;
   sources: SourceManifestEntry[];
   claims: GroundingClaim[];
-  inputs: number[] | null;
+  inputs: NumericInput[] | null;
   conclusion_numbers: unknown[] | null;
   constraints: unknown[] | null;
   structured_answer: Record<string, unknown> | null;
+  arithmetic_checks: unknown[] | null;
   eval_time: unknown;
   case_partition: Record<string, unknown> | null;
 } {
@@ -129,8 +138,9 @@ function validateInput(input: unknown): {
     answer_text: obj.answer_text,
     sources: Array.isArray(obj.sources) ? (obj.sources as SourceManifestEntry[]) : [],
     claims: Array.isArray(obj.claims) ? (obj.claims as GroundingClaim[]) : [],
-    inputs: Array.isArray(obj.inputs) ? (obj.inputs as number[]) : null,
+    inputs: Array.isArray(obj.inputs) ? (obj.inputs as NumericInput[]) : null,
     conclusion_numbers: Array.isArray(obj.conclusion_numbers) ? (obj.conclusion_numbers as unknown[]) : null,
+    arithmetic_checks: Array.isArray(obj.arithmetic_checks) ? (obj.arithmetic_checks as unknown[]) : null,
     constraints: Array.isArray(obj.constraints) ? (obj.constraints as unknown[]) : null,
     structured_answer:
       obj.structured_answer && typeof obj.structured_answer === 'object' && !Array.isArray(obj.structured_answer)
@@ -149,11 +159,143 @@ interface ReExecCtx {
   answer_text: string;
   sources: SourceManifestEntry[];
   claims: GroundingClaim[];
-  inputs: number[] | null;
+  inputs: NumericInput[] | null;
   conclusion_numbers: unknown[] | null;
   constraints: unknown[] | null;
   structured_answer: Record<string, unknown> | null;
+  arithmetic_checks: unknown[] | null;
   eval_time: unknown;
+}
+
+function numericKey(value: number): string {
+  return String(Number(value));
+}
+
+function numericKeysInText(text: string): Set<string> {
+  return new Set(extractNumericTokens(text).map(t => numericKey(Number(t))).filter(k => k !== 'NaN'));
+}
+
+function normalizeNumericInputs(inputs: NumericInput[]): { values: number[]; records: NumericInput[] } | null {
+  const values: number[] = [];
+  for (const input of inputs) {
+    const value = typeof input === 'number' ? input : input?.value;
+    if (typeof value !== 'number' || !isFinite(value)) return null;
+    values.push(value);
+  }
+  return { values, records: inputs };
+}
+
+function hasAnchoredQuote(quote: string, ctx: ReExecCtx): boolean {
+  const nQuote = normalizeWhitespace(quote);
+  if (nQuote.length === 0) return false;
+  if (normalizeWhitespace(ctx.contract.original_request_text).includes(nQuote)) return true;
+  return ctx.sources.some(source =>
+    source.origin !== 'agent_supplied' &&
+    typeof source.text === 'string' &&
+    normalizeWhitespace(source.text).includes(nQuote),
+  );
+}
+
+function valueAnchoredInText(value: number, text: string): boolean {
+  return numericKeysInText(text).has(numericKey(value));
+}
+
+function valueAnchoredInSources(value: number, ctx: ReExecCtx): boolean {
+  return ctx.sources.some(source =>
+    source.origin !== 'agent_supplied' &&
+    typeof source.text === 'string' &&
+    valueAnchoredInText(value, source.text),
+  );
+}
+
+function validateNumericInputAnchors(ctx: ReExecCtx, inputs: NumericInput[]): BlockingIssue[] {
+  const issues: BlockingIssue[] = [];
+  const requestNums = numericKeysInText(ctx.contract.original_request_text);
+  for (let i = 0; i < inputs.length; i++) {
+    const input = inputs[i];
+    const value = typeof input === 'number' ? input : input.value;
+    const key = numericKey(value);
+    if (requestNums.has(key)) continue;
+    if (valueAnchoredInSources(value, ctx)) continue;
+    if (
+      typeof input !== 'number' &&
+      input.source_quote &&
+      valueAnchoredInText(value, input.source_quote) &&
+      hasAnchoredQuote(input.source_quote, ctx)
+    ) continue;
+    issues.push({
+      mechanism: 'number_input_anchor',
+      description: `Numeric input ${i} (${value}) is not anchored in original_request_text or a host/source quote; do not flatten derived outputs into inputs.`,
+      severity: 'blocking',
+    });
+  }
+  return issues;
+}
+
+function validateDerivedConclusions(conclusionNumbers: unknown[]): BlockingIssue[] {
+  const issues: BlockingIssue[] = [];
+  for (let i = 0; i < conclusionNumbers.length; i++) {
+    const c = conclusionNumbers[i] as Record<string, unknown>;
+    if (c && typeof c === 'object' && c.origin !== 'derived') {
+      issues.push({
+        mechanism: 'number_conclusion_origin',
+        description: `Numeric conclusion ${i} uses origin "${String(c.origin)}"; computed numeric deliverables must declare derived conclusions, not literal/identity outputs.`,
+        severity: 'blocking',
+      });
+    }
+    if (
+      c &&
+      typeof c === 'object' &&
+      c.origin === 'derived' &&
+      Array.isArray(c.input_refs) &&
+      c.input_refs.length < 2
+    ) {
+      issues.push({
+        mechanism: 'number_derivation_arity',
+        description: `Numeric conclusion ${i} is marked derived but references fewer than 2 inputs.`,
+        severity: 'blocking',
+      });
+    }
+  }
+  return issues;
+}
+
+function validateArithmeticInputAnchors(ctx: ReExecCtx, arithmeticInput: unknown): BlockingIssue[] {
+  const issues: BlockingIssue[] = [];
+  if (!arithmeticInput || typeof arithmeticInput !== 'object' || Array.isArray(arithmeticInput)) return issues;
+  const obj = arithmeticInput as Record<string, unknown>;
+  const operands: Array<{ path: string; value: number }> = [];
+  if (Array.isArray(obj.values)) {
+    for (let i = 0; i < obj.values.length; i++) {
+      if (typeof obj.values[i] === 'number' && isFinite(obj.values[i] as number)) {
+        operands.push({ path: `values[${i}]`, value: obj.values[i] as number });
+      }
+    }
+  }
+  if (Array.isArray(obj.weights)) {
+    for (let i = 0; i < obj.weights.length; i++) {
+      if (typeof obj.weights[i] === 'number' && isFinite(obj.weights[i] as number)) {
+        operands.push({ path: `weights[${i}]`, value: obj.weights[i] as number });
+      }
+    }
+  }
+  for (const key of ['part', 'whole', 'rate', 'periods']) {
+    if (typeof obj[key] === 'number' && isFinite(obj[key] as number)) {
+      operands.push({ path: key, value: obj[key] as number });
+    }
+  }
+
+  const requestNums = numericKeysInText(ctx.contract.original_request_text);
+  for (const operand of operands) {
+    const key = numericKey(operand.value);
+    if (requestNums.has(key) || valueAnchoredInSources(operand.value, ctx)) continue;
+    issues.push({
+      mechanism: 'arithmetic_input_anchor',
+      description: `Arithmetic operand ${operand.path} (${operand.value}) is not anchored in original_request_text or supplied non-agent sources.`,
+      severity: 'blocking',
+    });
+  }
+  return issues;
 }
 
 /**
@@ -168,38 +310,128 @@ function reExecuteCheck(
   check: string,
   ctx: ReExecCtx,
   engine: EnforcementEngine,
-): { kind: 'ran' | 'missing' | 'no_executor'; issues: BlockingIssue[]; hint?: string } {
+): { kind: 'ran' | 'missing' | 'no_executor'; issues: BlockingIssue[]; warnings: string[]; hint?: string } {
   const issues: BlockingIssue[] = [];
+  const warnings: string[] = [];
   switch (check) {
     case 'check_quote_grounding': {
       if (ctx.sources.length === 0 || ctx.claims.length === 0) {
-        return { kind: 'missing', issues, hint: 'Required check_quote_grounding could not be re-executed: supply "sources" and "claims".' };
+        return { kind: 'missing', issues, warnings, hint: 'Required check_quote_grounding could not be re-executed: supply "sources" and "claims".' };
       }
       const grounding = handleCheckQuoteGrounding({ sources: ctx.sources, claims: ctx.claims }, engine);
-      const groundedIds = new Set(grounding.results.filter(r => r.grounded).map(r => r.claim_id));
+      const groundedClaims = ctx.claims
+        .map((groundingClaim, i) => ({ groundingClaim, result: grounding.results[i] }))
+        .filter(({ result }) => result?.grounded);
+      const contractIds = new Set<string>();
       for (const claim of ctx.contract.claims ?? []) {
-        if (!groundedIds.has(claim.id)) {
+        if (contractIds.has(claim.id)) {
+          issues.push({
+            mechanism: 'finalize_claim_binding',
+            description: `Duplicate contract claim id "${claim.id}" supplied; claim ids must be unique.`,
+            severity: 'blocking',
+          });
+          continue;
+        }
+        contractIds.add(claim.id);
+        const sameId = groundedClaims.filter(({ groundingClaim }) => groundingClaim.claim_id === claim.id);
+        if (sameId.length === 0) {
           issues.push({
             mechanism: 'finalize_grounding',
             description: `Contract claim "${claim.id}" has no passing grounding result on re-execution.`,
             severity: 'blocking',
           });
+          continue;
+        }
+        const sameText = sameId.filter(
+          ({ groundingClaim }) => normalizeWhitespace(groundingClaim.claim_text) === normalizeWhitespace(claim.text),
+        );
+        if (sameText.length === 0) {
+          issues.push({
+            mechanism: 'finalize_claim_binding',
+            description: `Contract claim "${claim.id}" has no passing grounding result bound to the same claim_text.`,
+            severity: 'blocking',
+          });
+          continue;
+        }
+        if (claim.claim_kind && !sameText.some(({ groundingClaim }) => groundingClaim.claim_kind === claim.claim_kind)) {
+          issues.push({
+            mechanism: 'finalize_claim_kind',
+            description: `Contract claim "${claim.id}" has no passing grounding result bound to claim_kind="${claim.claim_kind}".`,
+            severity: 'blocking',
+          });
+        }
+        if (sameText.every(({ result }) => result.support_strength === 'weak')) {
+          issues.push({
+            mechanism: 'finalize_claim_kind',
+            description: `Contract claim "${claim.id}" has only weak grounding support; causal/recommendation proximity is not enough for a factual gate.`,
+            severity: 'blocking',
+          });
         }
       }
       for (const issue of grounding.enforcement?.blocking_issues ?? []) issues.push(issue);
-      return { kind: 'ran', issues };
+      for (const warning of grounding.enforcement?.warnings ?? []) warnings.push(warning);
+      const coverage = handleCheckClaimCoverage({
+        claims: ctx.contract.claims ?? [],
+        grounding_results: grounding.results,
+        answer_text: ctx.answer_text,
+      });
+      for (const warning of coverage.enforcement?.warnings ?? []) warnings.push(warning);
+      if (
+        ctx.contract.task_type === 'factual_qa' &&
+        (ctx.contract.evidence_level === 'cited' || ctx.contract.evidence_level === 'rederived')
+      ) {
+        for (const unaccounted of coverage.auto_detected_unaccounted_claims) {
+          issues.push({
+            mechanism: 'finalize_claim_coverage',
+            description: `Answer contains claim-like span "${unaccounted.span}" (${unaccounted.reason}) not covered by a contract claim.`,
+            severity: 'blocking',
+          });
+        }
+      }
+      return { kind: 'ran', issues, warnings };
     }
     case 'trace_conclusion_numbers': {
       if (!ctx.inputs || !ctx.conclusion_numbers) {
-        return { kind: 'missing', issues, hint: 'Required trace_conclusion_numbers could not be re-executed: supply "inputs" and "conclusion_numbers".' };
+        return { kind: 'missing', issues, warnings, hint: 'Required trace_conclusion_numbers could not be re-executed: supply "inputs" and "conclusion_numbers".' };
       }
-      const trace = handleTraceConclusionNumbers({ inputs: ctx.inputs, conclusion_numbers: ctx.conclusion_numbers, answer_text: ctx.answer_text }, engine);
+      const normalizedInputs = normalizeNumericInputs(ctx.inputs);
+      if (!normalizedInputs) {
+        issues.push({
+          mechanism: 'number_provenance',
+          description: 'Numeric inputs must be finite numbers or objects with a finite numeric "value".',
+          severity: 'blocking',
+        });
+        return { kind: 'ran', issues, warnings };
+      }
+      if (ctx.contract.task_type === 'numeric_analysis') {
+        for (const issue of validateNumericInputAnchors(ctx, normalizedInputs.records)) issues.push(issue);
+        for (const issue of validateDerivedConclusions(ctx.conclusion_numbers)) issues.push(issue);
+      }
+      const trace = handleTraceConclusionNumbers({
+        inputs: normalizedInputs.values,
+        conclusion_numbers: ctx.conclusion_numbers,
+        answer_text: ctx.answer_text,
+        strict_answer_numbers: true,
+      }, engine);
       for (const issue of trace.enforcement?.blocking_issues ?? []) issues.push(issue);
-      return { kind: 'ran', issues };
+      for (const warning of trace.enforcement?.warnings ?? []) warnings.push(warning);
+      return { kind: 'ran', issues, warnings };
+    }
+    case 'verify_arithmetic': {
+      if (!ctx.arithmetic_checks || ctx.arithmetic_checks.length === 0) {
+        return { kind: 'missing', issues, warnings, hint: 'Required verify_arithmetic could not be re-executed: supply "arithmetic_checks".' };
+      }
+      for (const arithmeticInput of ctx.arithmetic_checks) {
+        for (const issue of validateArithmeticInputAnchors(ctx, arithmeticInput)) issues.push(issue);
+        const arithmetic = handleVerifyArithmetic(arithmeticInput, engine);
+        for (const issue of arithmetic.enforcement?.blocking_issues ?? []) issues.push(issue);
+        for (const warning of arithmetic.enforcement?.warnings ?? []) warnings.push(warning);
+      }
+      return { kind: 'ran', issues, warnings };
     }
     case 'check_answer_against_constraints': {
       if (!ctx.constraints || !ctx.structured_answer) {
-        return { kind: 'missing', issues, hint: 'Required check_answer_against_constraints could not be re-executed: supply "constraints" and "structured_answer".' };
+        return { kind: 'missing', issues, warnings, hint: 'Required check_answer_against_constraints could not be re-executed: supply "constraints" and "structured_answer".' };
       }
       const cc = handleCheckAnswerAgainstConstraints(
         {
@@ -211,11 +443,12 @@ function reExecuteCheck(
         engine,
       );
       for (const issue of cc.enforcement?.blocking_issues ?? []) issues.push(issue);
-      return { kind: 'ran', issues };
+      for (const warning of cc.enforcement?.warnings ?? []) warnings.push(warning);
+      return { kind: 'ran', issues, warnings };
     }
     case 'check_freshness': {
       if (!ctx.contract.freshness || !ctx.eval_time || ctx.sources.length === 0) {
-        return { kind: 'missing', issues, hint: 'Required check_freshness could not be re-executed: supply "eval_time" and dated "sources".' };
+        return { kind: 'missing', issues, warnings, hint: 'Required check_freshness could not be re-executed: supply "eval_time" and dated "sources".' };
       }
       const fresh = handleCheckFreshness(
         {
@@ -227,11 +460,12 @@ function reExecuteCheck(
         engine,
       );
       for (const issue of fresh.enforcement?.blocking_issues ?? []) issues.push(issue);
-      return { kind: 'ran', issues };
+      for (const warning of fresh.enforcement?.warnings ?? []) warnings.push(warning);
+      return { kind: 'ran', issues, warnings };
     }
     default:
       // A check this build cannot re-execute inline (e.g. verify_arithmetic).
-      return { kind: 'no_executor', issues };
+      return { kind: 'no_executor', issues, warnings };
   }
 }
 
@@ -240,7 +474,7 @@ export function handleFinalizeDeliverable(
   engine: EnforcementEngine,
 ): FinalizeOutput {
   const context = (input as any)?.context as EnforcementContext | undefined;
-  const { contract, answer_text, sources, claims, inputs, conclusion_numbers, constraints, structured_answer, eval_time, case_partition } =
+  const { contract, answer_text, sources, claims, inputs, conclusion_numbers, constraints, structured_answer, arithmetic_checks, eval_time, case_partition } =
     validateInput(input);
   const nAnswer = normalizeWhitespace(answer_text);
 
@@ -256,7 +490,7 @@ export function handleFinalizeDeliverable(
 
   // ── Re-execute the gate checks INLINE (the unforgeable gate) ───────────────
   const reExecuted: string[] = [];
-  const reExecCtx: ReExecCtx = { contract, answer_text, sources, claims, inputs, conclusion_numbers, constraints, structured_answer, eval_time };
+  const reExecCtx: ReExecCtx = { contract, answer_text, sources, claims, inputs, conclusion_numbers, constraints, structured_answer, arithmetic_checks, eval_time };
 
   // Mandatory (finalize_required): missing artifacts is itself a BLOCK — you cannot release a
   // deliverable whose core required check could not be re-verified this turn.
@@ -265,11 +499,14 @@ export function handleFinalizeDeliverable(
     if (r.kind === 'missing') {
       blockingIssues.push({ mechanism: 'finalize_missing_inputs', description: r.hint!, severity: 'blocking' });
     } else if (r.kind === 'no_executor') {
-      warnings.push(
-        `finalize_required check "${check}" was not re-executed (no inline re-executor in this build) — run it separately.`,
-      );
+      blockingIssues.push({
+        mechanism: 'finalize_no_executor',
+        description: `Required check "${check}" was not re-executed because this build has no inline executor.`,
+        severity: 'blocking',
+      });
     } else {
       for (const issue of r.issues) blockingIssues.push(issue);
+      for (const warning of r.warnings) warnings.push(warning);
       reExecuted.push(check);
     }
   }
@@ -282,6 +519,7 @@ export function handleFinalizeDeliverable(
     const r = reExecuteCheck(check, reExecCtx, engine);
     if (r.kind === 'ran') {
       for (const issue of r.issues) blockingIssues.push(issue);
+      for (const warning of r.warnings) warnings.push(warning);
       reExecuted.push(check);
     }
   }
@@ -384,7 +622,7 @@ export function handleFinalizeDeliverable(
   const output: FinalizeOutput = {
     status: hasFail ? 'ENFORCEMENT_FAIL' : 'PASS',
     finalize_verdict: hasFail ? 'BLOCK' : 'PASS',
-    answer_text_hash: sha256Hex(nAnswer),
+    answer_text_hash: sha256Hex(answer_text),
     answer_text_length: answer_text.length,
     required_checks: plan.finalize_required,
     re_executed: reExecuted,

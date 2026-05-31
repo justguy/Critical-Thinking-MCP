@@ -12,14 +12,14 @@ no network, no clock**. The agent stays outside; the host decides release.
 |---|---|
 | 1. Host authors the contract (not the agent) | `enforceDeliverable` always sets `contract_authority='host'`, `profile_source='host_supplied'` → `contract_strength: host_anchored`. |
 | 2. Host supplies `eval_time` with `authority:'host'` | `opts.eval_time` is passed straight through to `finalize` (only host authority lets `check_freshness` block). |
-| 3. Host verifies `answer_text_hash` | After PASS, the host recomputes `sha256(normalize(surfaced_answer))` and **REJECTs on mismatch** (anti-swap). |
+| 3. Host verifies `answer_text_hash` | After PASS, the host recomputes `sha256(surfaced_answer)` over exact text and **REJECTs on mismatch** (anti-swap). |
 | 4. Host gates release on PASS | Release happens **only** when `finalize_verdict==='PASS'` *and* the hash matches. |
 
 ## Enforcement order (short-circuits)
 1. Build the host-authored contract.
 2. Call `finalize_deliverable` (re-runs the contract's required unforgeable checks inline).
 3. `finalize_verdict !== 'PASS'` → **REJECT `gate_block`** (hands back `corrective_prompt`).
-4. `sha256(normalize(surfaced_answer)) !== answer_text_hash` → **REJECT `hash_mismatch`**.
+4. `sha256(surfaced_answer) !== answer_text_hash` → **REJECT `hash_mismatch`**.
 5. Otherwise → **RELEASE**.
 
 ## API
@@ -31,7 +31,7 @@ const decision = enforceDeliverable(spec, artifacts, { eval_time, surfaced_answe
 - `spec` (host-authored): `contract_id, original_request_text, task_type, evidence_level, risk_level`,
   plus optional `claims, must_include, must_not_include, required_fields, acceptance_criteria, freshness`.
 - `artifacts` (agent-produced, host only verifies): `answer_text` + any of
-  `sources, claims, inputs, conclusion_numbers, constraints, structured_answer, case_partition`.
+	  `sources, claims, inputs, conclusion_numbers, arithmetic_checks, constraints, structured_answer, case_partition`.
 - `opts.finalize`: inject an MCP-over-stdio client to enforce against a **live server**; the default
   calls the same deterministic handler the server runs (functionally identical, simpler to test).
 

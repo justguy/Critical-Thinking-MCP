@@ -69,7 +69,7 @@ function validateInput(input: unknown): {
 const STOPLISTED_NUMBER = /\b(?:step|section|sec|figure|fig|q|v|version|chapter|ch|page|p|no|note|item|part)\.?\s*\d/i;
 const ORDINAL = /\b\d+(?:st|nd|rd|th)\b/i;
 
-/** Conservative claim-like span extraction: real numbers + years + multi-word proper nouns. */
+/** Conservative claim-like span extraction: real numbers + time reset phrases + multi-word proper nouns. */
 function extractClaimLikeSpans(text: string): { span: string; reason: string }[] {
   const spans: { span: string; reason: string }[] = [];
 
@@ -80,6 +80,13 @@ function extractClaimLikeSpans(text: string): { span: string; reason: string }[]
     const window = text.slice(Math.max(0, idx - 12), idx + m.length);
     if (STOPLISTED_NUMBER.test(window) || ORDINAL.test(m)) continue;
     spans.push({ span: m.trim(), reason: 'number_or_percentage' });
+  }
+
+  // Time-frequency assertions are common grounding traps ("resets every minute")
+  // even when they contain no digit.
+  const timeish = text.match(/\b(?:resets?\s+)?(?:every|each|per|after|within)\s+(?:second|minute|hour|day|week|month|year)s?\b/gi) ?? [];
+  for (const m of timeish) {
+    spans.push({ span: m.trim(), reason: 'time_frequency' });
   }
 
   // Multi-word proper nouns (a weak entity signal).

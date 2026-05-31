@@ -45,6 +45,7 @@ const VALID_KINDS = new Set([
 ]);
 
 const COMPARATOR = /(?:[<>]=?|=|\b(?:more|less|greater|fewer|higher|lower|faster|slower)\b)/i;
+const DATE_WORD = /\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\b/i;
 
 export interface QuoteGroundingClaimResult {
   claim_id: string;
@@ -132,6 +133,14 @@ function yearTokens(text: string): string[] {
   return text.match(/\b(?:19|20)\d{2}\b/g) ?? [];
 }
 
+function hasNumericToken(text: string): boolean {
+  return extractNumericTokens(text).length > 0;
+}
+
+function hasDateToken(text: string): boolean {
+  return yearTokens(text).length > 0 || DATE_WORD.test(text);
+}
+
 export function handleCheckQuoteGrounding(
   input: unknown,
   engine: EnforcementEngine,
@@ -172,59 +181,75 @@ export function handleCheckQuoteGrounding(
     // (4) claim_kind support rules — only evaluated if the structural checks held
     let supportStrength: 'strong' | 'weak' = 'strong';
     if (failures.length === 0) {
-      switch (claim.claim_kind) {
-        case 'numeric': {
+      const effectiveKinds = new Set([claim.claim_kind]);
+      const dateLike = hasDateToken(nClaim);
+      if (hasNumericToken(nClaim) && !dateLike) effectiveKinds.add('numeric');
+      if (dateLike) effectiveKinds.add('date');
+
+      for (const kind of effectiveKinds) {
+        switch (kind) {
+          case 'numeric': {
           // Compare the cited supporting_token's number (already verified inside the span)
           // against the claim — NOT every number in the span, which can pick up noise like
           // "p99" and mask a real mismatch.
           const tokenNums = extractNumericTokens(nToken);
-          const claimNums = new Set(extractNumericTokens(nClaim));
-          const shared = tokenNums.length > 0 && tokenNums.some(n => claimNums.has(n));
-          if (!shared) {
+          const claimNums = extractNumericTokens(nClaim);
+          const spanNums = new Set(extractNumericTokens(nSpan));
+          const tokenShared = tokenNums.length > 0 && tokenNums.some(n => claimNums.includes(n));
+          const allClaimNumsInSpan = claimNums.length > 0 && claimNums.every(n => spanNums.has(n));
+          if (!tokenShared || !allClaimNumsInSpan) {
             failures.push(
-              'numeric_mismatch: the supporting_token number does not appear in claim_text',
+              'numeric_mismatch: the supporting_token number and all claim_text numbers must appear in the quoted_span',
             );
           }
           break;
-        }
-        case 'date': {
+          }
+          case 'date': {
           const spanYears = new Set(yearTokens(nSpan));
           const claimYears = yearTokens(nClaim);
-          const shared = claimYears.some(y => spanYears.has(y));
-          if (!shared) {
+          const sharedYear = claimYears.length === 0 || claimYears.some(y => spanYears.has(y));
+          const sharedMonth = !DATE_WORD.test(nClaim) || (nSpan.match(DATE_WORD)?.[0]?.toLowerCase() === nClaim.match(DATE_WORD)?.[0]?.toLowerCase());
+          if (!sharedYear || !sharedMonth) {
             failures.push('date_mismatch: no shared year between claim_text and quoted_span');
           }
           break;
-        }
-        case 'entity':
-        case 'status': {
+          }
+          case 'entity':
+          case 'status': {
           if (!nClaim.toLowerCase().includes(nToken.toLowerCase())) {
             failures.push(
-              `${claim.claim_kind}_not_in_claim: supporting_token does not appear in claim_text`,
+              `${kind}_not_in_claim: supporting_token does not appear in claim_text`,
             );
           }
           break;
-        }
-        case 'comparison': {
+          }
+          case 'comparison': {
           if (!(COMPARATOR.test(nClaim) && COMPARATOR.test(nSpan))) {
             warnings.push(
               `Claim "${claim.claim_id}" (comparison): comparator token missing from claim_text or span.`,
             );
           }
           break;
-        }
-        case 'causal':
-        case 'recommendation': {
+          }
+          case 'causal':
+          case 'recommendation': {
           // Containment can only establish source proximity for these — never block.
           supportStrength = 'weak';
           break;
+          }
         }
       }
     }
 
     const grounded = failures.length === 0;
     const witness = grounded
-      ? sha256Hex(canonicalJson({ claim_id: claim.claim_id, source_id: claim.source_id, span: nSpan }))
+      ? sha256Hex(canonicalJson({
+          claim_id: claim.claim_id,
+          claim_text: nClaim,
+          claim_kind: claim.claim_kind,
+          source_id: claim.source_id,
+          span: nSpan,
+        }))
       : null;
 
     results.push({

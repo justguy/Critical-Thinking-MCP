@@ -142,9 +142,9 @@ describe('package.json metadata', () => {
     }
   });
 
-  it('description mentions nine tools and key capabilities', () => {
+  it('description mentions tool count and key capabilities', () => {
     const desc = pkg.description.toLowerCase();
-    expect(desc).toMatch(/nine tools|9 tools/);
+    expect(desc).toMatch(/eleven.*tools|11 tools/);
     expect(desc).toMatch(/confidence inflation/);
     expect(desc).toMatch(/circular logic/);
   });

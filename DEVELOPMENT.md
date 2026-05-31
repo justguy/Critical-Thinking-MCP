@@ -6,10 +6,10 @@ A stateless MCP server that applies deterministic mathematical enforcement to LL
 
 ## Architecture
 
-- `src/server.ts` — MCP server, 9 tools registered, fresh engine per call
+- `src/server.ts` — MCP server, 11 public tools registered, fresh engine per call
 - `src/enforcement/index.ts` — `EnforcementEngine` class wrapping 15 mechanisms
 - `src/enforcement/*.ts` — individual mechanisms: confidence_product, specificity_scorer, consistency_checker, hedge_detector, falsifiability_checker, steelman_similarity, revision_contrast, loop_governor, numeric_analysis, arithmetic_verifier, concurrency_checker, claim_classifier, entity_grounding
-- `src/tools/*.ts` — 9 tool handlers: validate_reasoning_chain, check_numeric_claims, verify_arithmetic, detect_drift, evaluate_tradeoffs, check_plan_validity, score_response_quality, validate_confidence, detect_concurrency_patterns
+- `src/tools/*.ts` — 11 public tool handlers: 9 benchmarked analyzers plus plan_checks and finalize_deliverable; deliverable leaf checks are internalized behind finalize
 - `src/enforcement/types.ts` — all shared types including `EnforcementContext`
 
 ## Integration Boundary Work
@@ -27,7 +27,7 @@ Recent integration work adds a normalized adapter envelope over existing CT tool
 ## Current state
 
 - `npm run build` — clean
-- `npm test` — 129 tests pass
+- `npm test` — 296 tests pass
 - Benchmark V5: 42/42 vs baseline, 42/42 vs prompted, 0/14 false positives
 - Self-evaluation: honest confidence ceiling 19.9%
 - All publication gates pass

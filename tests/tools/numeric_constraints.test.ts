@@ -71,6 +71,20 @@ describe('trace_conclusion_numbers', () => {
     expect(out.untraced_answer_numbers).toContain('25');
     expect(out.enforcement?.warnings.length).toBeGreaterThan(0);
   });
+
+  it('strict answer number mode blocks untraced answer numbers', () => {
+    const out = handleTraceConclusionNumbers(
+      {
+        inputs: [120, 30],
+        conclusion_numbers: [{ value: 150, origin: 'derived', op: 'sum', input_refs: [0, 1] }],
+        answer_text: 'Total is 150/mo, a 25% saving.',
+        strict_answer_numbers: true,
+      },
+      engine,
+    );
+    expect(out.status).toBe('ENFORCEMENT_FAIL');
+    expect(out.enforcement?.blocking_issues.some(b => b.mechanism === 'number_provenance')).toBe(true);
+  });
 });
 
 describe('check_answer_against_constraints', () => {
@@ -244,9 +258,10 @@ describe('finalize_deliverable — numeric re-execution', () => {
     risk_level: 'low',
   };
 
-  it('plan puts trace_conclusion_numbers in finalize_required at rederived', () => {
+  it('plan puts trace_conclusion_numbers and verify_arithmetic in finalize_required at rederived', () => {
     const plan = handlePlanChecks({ contract: { task_type: 'numeric_analysis', evidence_level: 'rederived', risk_level: 'low' } });
     expect(plan.finalize_required).toContain('trace_conclusion_numbers');
+    expect(plan.finalize_required).toContain('verify_arithmetic');
   });
 
   it('re-runs number tracing inline → PASS when numbers reconcile', () => {
@@ -256,6 +271,7 @@ describe('finalize_deliverable — numeric re-execution', () => {
         answer_text: 'The monthly total is 150.',
         inputs: [120, 30],
         conclusion_numbers: [{ value: 150, origin: 'derived', op: 'sum', input_refs: [0, 1] }],
+        arithmetic_checks: [{ claim_type: 'sum', values: [120, 30], claimed_result: 150 }],
       },
       engine,
     );
@@ -272,6 +288,20 @@ describe('finalize_deliverable — numeric re-execution', () => {
     expect(out.enforcement?.blocking_issues.some(b => b.mechanism === 'finalize_missing_inputs')).toBe(true);
   });
 
+  it('BLOCKS when verify_arithmetic artifacts are missing', () => {
+    const out = handleFinalizeDeliverable(
+      {
+        contract: numericContract,
+        answer_text: 'The monthly total is 150.',
+        inputs: [120, 30],
+        conclusion_numbers: [{ value: 150, origin: 'derived', op: 'sum', input_refs: [0, 1] }],
+      },
+      engine,
+    );
+    expect(out.status).toBe('ENFORCEMENT_FAIL');
+    expect(out.enforcement?.blocking_issues.some(b => b.mechanism === 'finalize_missing_inputs')).toBe(true);
+  });
+
   it('BLOCKS when the re-derived number does not reconcile', () => {
     const out = handleFinalizeDeliverable(
       {
@@ -279,9 +309,55 @@ describe('finalize_deliverable — numeric re-execution', () => {
         answer_text: 'The total is 200.',
         inputs: [120, 30],
         conclusion_numbers: [{ value: 200, origin: 'derived', op: 'sum', input_refs: [0, 1] }],
+        arithmetic_checks: [{ claim_type: 'sum', values: [120, 30], claimed_result: 200 }],
       },
       engine,
     );
     expect(out.status).toBe('ENFORCEMENT_FAIL');
+  });
+
+  it('BLOCKS when arithmetic check fails even if trace is self-consistent', () => {
+    const out = handleFinalizeDeliverable(
+      {
+        contract: numericContract,
+        answer_text: 'The total is 200.',
+        inputs: [120, 30, { value: 200, authority: 'host' }],
+        conclusion_numbers: [{ value: 200, origin: 'derived', op: 'sum', input_refs: [2] }],
+        arithmetic_checks: [{ claim_type: 'sum', values: [120, 30], claimed_result: 200 }],
+      },
+      engine,
+    );
+    expect(out.status).toBe('ENFORCEMENT_FAIL');
+    expect(out.enforcement?.blocking_issues.some(b => b.mechanism === 'arithmetic_mismatch')).toBe(true);
+  });
+
+  it('BLOCKS flattened derived output inserted into numeric inputs', () => {
+    const out = handleFinalizeDeliverable(
+      {
+        contract: numericContract,
+        answer_text: '120 + 30 = 999.',
+        inputs: [120, 30, 999],
+        conclusion_numbers: [{ value: 999, origin: 'derived', op: 'sum', input_refs: [2] }],
+        arithmetic_checks: [{ claim_type: 'sum', values: [120, 30], claimed_result: 999 }],
+      },
+      engine,
+    );
+    expect(out.status).toBe('ENFORCEMENT_FAIL');
+    expect(out.enforcement?.blocking_issues.some(b => b.mechanism === 'number_input_anchor')).toBe(true);
+  });
+
+  it('BLOCKS untraced extra answer numbers at finalize', () => {
+    const out = handleFinalizeDeliverable(
+      {
+        contract: numericContract,
+        answer_text: 'The monthly total is 150 with 25% savings.',
+        inputs: [120, 30],
+        conclusion_numbers: [{ value: 150, origin: 'derived', op: 'sum', input_refs: [0, 1] }],
+        arithmetic_checks: [{ claim_type: 'sum', values: [120, 30], claimed_result: 150 }],
+      },
+      engine,
+    );
+    expect(out.status).toBe('ENFORCEMENT_FAIL');
+    expect(out.enforcement?.blocking_issues.some(b => b.mechanism === 'number_provenance')).toBe(true);
   });
 });

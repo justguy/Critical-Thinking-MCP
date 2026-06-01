@@ -36,9 +36,13 @@ Status as of 2026-06-01: three high-value interventions now have focused local p
 
 | Intervention | Prototype status | Focused evidence | Product-value status |
 |---|---|---|---|
-| Strict release integration | Implemented | Host/CLI tests cover strict host contract requirement, JSON errors, exit codes, gate blocks, and hash mismatch. | Not proven against live transport or real tagent runs. |
+| Strict release integration | Implemented | Host/CLI tests cover strict host contract requirement, JSON errors, exit codes, gate blocks, and hash mismatch. | Not proven against real tagent runs or a separate live stdio client path. |
 | Numeric derivation DAG | Implemented | Numeric tests cover percent change, two-step DAGs, weighted averages, final-answer binding, flattened input rejection, and wrong-method rejection. | Not proven to reduce real numeric false blocks or artifact friction. |
 | Predicate-aware grounding | Implemented | Factual tests cover clean paraphrase, wrong predicate, distractor/entity mismatch, temporal/date mismatch, and weak causal support. | Not proven to reduce real quote laundering without false blocks at corpus scale. |
+| Contract-strength guardrail | Implemented | Missing or agent-authored authority/profile is weak, not `host_anchored`; strict host release rejects weak finalize output. | Does not authenticate pure MCP callers; only the host boundary can authoritatively set contract provenance. |
+| Host-declared structured constraints | Implemented | Host contract `constraints` and `required_fields` force structured answer validation even if agent artifact constraints are omitted. | Constraint derivation still depends on host-authored predicates; no broad constraint corpus yet. |
+| Tier 4A artifact schemas | Implemented | Task, defect, backlog, and result JSONL schemas plus cross-link/provenance checks pass locally. | Seed corpus remains directional and far below the 150-task minimum. |
+| Live Streamable HTTP proof | Implemented | `tools/list` and `tools/call` round-trip over a live loopback Streamable HTTP server. | Separate live stdio proof and real client matrix are still missing. |
 
 These are implementation proofs, not ship-level value proof. The benchmark still needs representative real-failure tasks, clean controls, and feature ablations before external product-value claims are supportable.
 
@@ -77,7 +81,7 @@ Subagent codebase-explorer and test-designer passes were run on 2026-06-01. Both
 
 ### Implementation Risks
 
-1. Host-authored contracts are the highest-impact unmeasured path. Outside host mode, agent-authored contracts still let the agent omit obligations.
+1. Host-authored contracts are the highest-impact unmeasured path. Outside host mode, weak or missing contract provenance now reports `weak_agent_declared`, but agent-authored contracts can still omit obligations unless the host supplies them.
 2. Numeric derivation remains the clearest measured friction point. Flat `conclusion_numbers` cannot represent multi-step workflows without false blocks or unsafe flattened intermediates.
 3. Artifact UX is adoption-critical. The gate blocks missing required artifacts correctly, but agents need templates and autofill paths to produce valid sources, claims, numbers, constraints, and structured answers.
 4. Predicate-aware grounding is needed before factual QA value can be claimed beyond span containment.

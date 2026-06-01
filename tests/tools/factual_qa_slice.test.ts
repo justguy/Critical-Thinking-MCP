@@ -444,6 +444,17 @@ describe('finalize_deliverable (re-executor)', () => {
     expect(out.enforcement?.warnings.some(w => w.includes('weak_agent_declared'))).toBe(true);
   });
 
+  it('missing contract authority/profile cannot be reported as host_anchored', () => {
+    const input = loadFinalizeInput();
+    delete (input.contract as Record<string, unknown>).contract_authority;
+    delete (input.contract as Record<string, unknown>).profile_source;
+    const out = handleFinalizeDeliverable(input, engine);
+
+    expect(out.status).toBe('PASS');
+    expect(out.contract_strength).toBe('weak_agent_declared');
+    expect(out.enforcement?.warnings.some(w => w.includes('contract_authority=undefined'))).toBe(true);
+  });
+
   it('fabricated grounding span fails on re-execution (cannot be smuggled past finalize)', () => {
     const input = loadFinalizeInput();
     input.claims[0].quoted_span = 'Redis is fully multi-threaded';

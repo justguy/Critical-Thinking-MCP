@@ -23,18 +23,11 @@
  */
 
 import type { EnforcementEngine } from '../enforcement/index.js';
-import type { BlockingIssue, EnforcementContext } from '../enforcement/types.js';
+import type { AnswerConstraint, BlockingIssue, EnforcementContext } from '../enforcement/types.js';
 import { extractNumericTokens, normalizeWhitespace } from '../enforcement/utils.js';
 
 const COMPARISON_OPS = new Set(['<', '<=', '>', '>=']);
 const VALID_OPS = new Set(['<', '<=', '>', '>=', '==', '!=', 'in', 'not_in', 'subset_of']);
-
-interface Constraint {
-  field: string;
-  op: string;
-  value: unknown;
-  source_quote?: string;
-}
 
 export interface Violation {
   field: string;
@@ -60,7 +53,7 @@ export interface ConstraintsOutput {
 
 function validateInput(input: unknown): {
   answer: Record<string, unknown>;
-  constraints: Constraint[];
+  constraints: AnswerConstraint[];
   original_request_text: string | null;
   required_fields: string[];
 } {
@@ -74,11 +67,25 @@ function validateInput(input: unknown): {
   if (!obj.answer || typeof obj.answer !== 'object' || Array.isArray(obj.answer)) {
     throw new Error('Missing "answer" object (structured key→value data).');
   }
-  if (!Array.isArray(obj.constraints) || obj.constraints.length < 1) {
-    throw new Error('Missing "constraints" (array of at least 1 {field, op, value}).');
+
+  // required_fields may come from a contract or top-level.
+  const contract = (obj.contract && typeof obj.contract === 'object' ? obj.contract : {}) as Record<string, unknown>;
+  const requiredRaw = Array.isArray(obj.required_fields)
+    ? obj.required_fields
+    : Array.isArray(contract.required_fields)
+      ? contract.required_fields
+      : [];
+  const required_fields = (requiredRaw as unknown[]).filter((x): x is string => typeof x === 'string');
+
+  if ('constraints' in obj && !Array.isArray(obj.constraints)) {
+    throw new Error('"constraints" must be an array when supplied.');
   }
-  for (let i = 0; i < obj.constraints.length; i++) {
-    const c = obj.constraints[i] as Record<string, unknown>;
+  const constraints = Array.isArray(obj.constraints) ? obj.constraints : [];
+  if (constraints.length < 1 && required_fields.length < 1) {
+    throw new Error('Missing "constraints" (array of at least 1 {field, op, value}) or "required_fields".');
+  }
+  for (let i = 0; i < constraints.length; i++) {
+    const c = constraints[i] as Record<string, unknown>;
     if (!c || typeof c.field !== 'string' || c.field.length === 0) {
       throw new Error(`constraints[${i}].field must be a non-empty string.`);
     }
@@ -90,15 +97,6 @@ function validateInput(input: unknown): {
     }
   }
 
-  // required_fields may come from a contract or top-level.
-  const contract = (obj.contract && typeof obj.contract === 'object' ? obj.contract : {}) as Record<string, unknown>;
-  const requiredRaw = Array.isArray(obj.required_fields)
-    ? obj.required_fields
-    : Array.isArray(contract.required_fields)
-      ? contract.required_fields
-      : [];
-  const required_fields = (requiredRaw as unknown[]).filter((x): x is string => typeof x === 'string');
-
   const original_request_text =
     typeof obj.original_request_text === 'string'
       ? obj.original_request_text
@@ -108,7 +106,7 @@ function validateInput(input: unknown): {
 
   return {
     answer: obj.answer as Record<string, unknown>,
-    constraints: obj.constraints as Constraint[],
+    constraints: constraints as AnswerConstraint[],
     original_request_text,
     required_fields,
   };
@@ -129,7 +127,7 @@ function normScalar(v: unknown): string | number {
 }
 
 /** Evaluate one predicate. Returns null if satisfied, or a violation type if not. */
-function evaluate(c: Constraint, actual: unknown): Violation['type'] | null {
+function evaluate(c: AnswerConstraint, actual: unknown): Violation['type'] | null {
   if (COMPARISON_OPS.has(c.op)) {
     const a = toNumber(actual);
     const b = toNumber(c.value);

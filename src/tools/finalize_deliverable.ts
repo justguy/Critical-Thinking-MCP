@@ -24,6 +24,7 @@
 import type { EnforcementEngine } from '../enforcement/index.js';
 import { planChecks } from '../enforcement/check_planner.js';
 import type {
+  AnswerConstraint,
   BlockingIssue,
   DeliverableContract,
   EnforcementContext,
@@ -49,6 +50,9 @@ const TASK_TYPES = new Set([
 ]);
 const EVIDENCE_LEVELS = new Set(['none', 'asserted', 'cited', 'rederived']);
 const RISK_LEVELS = new Set(['low', 'medium', 'high']);
+const CONTRACT_AUTHORITIES = new Set(['host', 'user', 'derived', 'agent']);
+const PROFILE_SOURCES = new Set(['host_supplied', 'inferred', 'agent_declared']);
+const CONSTRAINT_OPS = new Set(['<', '<=', '>', '>=', '==', '!=', 'in', 'not_in', 'subset_of']);
 
 type NumericInput = number | {
   value: number;
@@ -90,6 +94,12 @@ function validateContract(raw: unknown): DeliverableContract {
   if (typeof c.risk_level !== 'string' || !RISK_LEVELS.has(c.risk_level)) {
     throw new Error(`contract.risk_level is invalid: "${String(c.risk_level)}".`);
   }
+  if ('contract_authority' in c && (typeof c.contract_authority !== 'string' || !CONTRACT_AUTHORITIES.has(c.contract_authority))) {
+    throw new Error(`contract.contract_authority is invalid: "${String(c.contract_authority)}".`);
+  }
+  if ('profile_source' in c && (typeof c.profile_source !== 'string' || !PROFILE_SOURCES.has(c.profile_source))) {
+    throw new Error(`contract.profile_source is invalid: "${String(c.profile_source)}".`);
+  }
   // Reject the disproven hash-as-proof model: 'tool_result' (and any unknown kind) is invalid.
   // finalize RE-EXECUTES checks inline; it never trusts a caller-supplied prior tool-result.
   const VALID_KINDS = new Set(['numeric', 'structural', 'coverage', 'inline_check']);
@@ -104,6 +114,22 @@ function validateContract(raw: unknown): DeliverableContract {
         );
       }
     }
+  }
+  if (Array.isArray(c.constraints)) {
+    for (let i = 0; i < c.constraints.length; i++) {
+      const constraint = c.constraints[i] as Record<string, unknown>;
+      if (!constraint || typeof constraint.field !== 'string' || constraint.field.length === 0) {
+        throw new Error(`contract.constraints[${i}].field must be a non-empty string.`);
+      }
+      if (typeof constraint.op !== 'string' || !CONSTRAINT_OPS.has(constraint.op)) {
+        throw new Error(`contract.constraints[${i}].op is invalid. Must be one of: ${[...CONSTRAINT_OPS].join(', ')}.`);
+      }
+      if (!('value' in constraint)) {
+        throw new Error(`contract.constraints[${i}] is missing "value".`);
+      }
+    }
+  } else if ('constraints' in c && c.constraints !== undefined) {
+    throw new Error('contract.constraints must be an array when supplied.');
   }
   return c as unknown as DeliverableContract;
 }
@@ -325,6 +351,24 @@ function validateArithmeticInputAnchors(ctx: ReExecCtx, arithmeticInput: unknown
   return issues;
 }
 
+function contractConstraints(ctx: ReExecCtx): AnswerConstraint[] | null {
+  return Array.isArray(ctx.contract.constraints) && ctx.contract.constraints.length > 0
+    ? ctx.contract.constraints
+    : null;
+}
+
+function constraintInputsForCheck(ctx: ReExecCtx): AnswerConstraint[] | unknown[] | null {
+  return contractConstraints(ctx) ?? ctx.constraints;
+}
+
+function hasStructuredObligation(ctx: ReExecCtx): boolean {
+  return (
+    (contractConstraints(ctx)?.length ?? 0) > 0 ||
+    (ctx.contract.required_fields?.length ?? 0) > 0 ||
+    (ctx.constraints?.length ?? 0) > 0
+  );
+}
+
 /**
  * Re-execute one gate check inline. Returns:
  *   - 'ran'         → executed; `issues` are its blocking results.
@@ -467,13 +511,14 @@ function reExecuteCheck(
       return { kind: 'ran', issues, warnings };
     }
     case 'check_answer_against_constraints': {
-      if (!ctx.constraints || !ctx.structured_answer) {
-        return { kind: 'missing', issues, warnings, hint: 'Required check_answer_against_constraints could not be re-executed: supply "constraints" and "structured_answer".' };
+      const constraintsForCheck = constraintInputsForCheck(ctx);
+      if (!ctx.structured_answer || !hasStructuredObligation(ctx)) {
+        return { kind: 'missing', issues, warnings, hint: 'Required check_answer_against_constraints could not be re-executed: supply "structured_answer" and either contract "constraints", artifact "constraints", or contract "required_fields".' };
       }
       const cc = handleCheckAnswerAgainstConstraints(
         {
           answer: ctx.structured_answer,
-          constraints: ctx.constraints,
+          constraints: constraintsForCheck ?? [],
           original_request_text: ctx.contract.original_request_text,
           required_fields: ctx.contract.required_fields,
         },
@@ -524,6 +569,13 @@ export function handleFinalizeDeliverable(
 
   const blockingIssues: BlockingIssue[] = [];
   const warnings: string[] = [];
+  const mandatoryChecks = [...plan.finalize_required];
+  if (
+    ((contract.constraints?.length ?? 0) > 0 || (contract.required_fields?.length ?? 0) > 0) &&
+    !mandatoryChecks.includes('check_answer_against_constraints')
+  ) {
+    mandatoryChecks.push('check_answer_against_constraints');
+  }
 
   // ── Re-execute the gate checks INLINE (the unforgeable gate) ───────────────
   const reExecuted: string[] = [];
@@ -531,7 +583,7 @@ export function handleFinalizeDeliverable(
 
   // Mandatory (finalize_required): missing artifacts is itself a BLOCK — you cannot release a
   // deliverable whose core required check could not be re-verified this turn.
-  for (const check of plan.finalize_required) {
+  for (const check of mandatoryChecks) {
     const r = reExecuteCheck(check, reExecCtx, engine);
     if (r.kind === 'missing') {
       blockingIssues.push({ mechanism: 'finalize_missing_inputs', description: r.hint!, severity: 'blocking' });
@@ -553,6 +605,7 @@ export function handleFinalizeDeliverable(
   // artifacts were supplied; a MISSING artifact is NOT a block — the deliverable may legitimately
   // have no such dimension. This is what prevents the high-risk false-block.
   for (const check of plan.finalize_verify_if_present) {
+    if (mandatoryChecks.includes(check)) continue;
     const r = reExecuteCheck(check, reExecCtx, engine);
     if (r.kind === 'ran') {
       for (const issue of r.issues) blockingIssues.push(issue);
@@ -642,11 +695,15 @@ export function handleFinalizeDeliverable(
   }
 
   // ── contract strength (WARNING; authority is unverifiable by a pure fn) ────
-  const weak =
-    contract.contract_authority === 'agent' || contract.profile_source === 'agent_declared';
+  const hostAnchored = (
+    (contract.contract_authority === 'host' || contract.contract_authority === 'user' || contract.contract_authority === 'derived') &&
+    (contract.profile_source === 'host_supplied' || contract.profile_source === 'inferred')
+  );
+  const weak = !hostAnchored;
   if (weak) {
     warnings.push(
-      'contract_strength=weak_agent_declared: PASS only proves the agent-declared contract was satisfied. ' +
+      `contract_strength=weak_agent_declared: PASS only proves the declared contract was satisfied; ` +
+        `contract_authority=${String(contract.contract_authority)} profile_source=${String(contract.profile_source)}. ` +
         'For stronger guarantees the host should supply or derive the contract.',
     );
   }
@@ -661,7 +718,7 @@ export function handleFinalizeDeliverable(
     finalize_verdict: hasFail ? 'BLOCK' : 'PASS',
     answer_text_hash: sha256Hex(answer_text),
     answer_text_length: answer_text.length,
-    required_checks: plan.finalize_required,
+    required_checks: mandatoryChecks,
     re_executed: reExecuted,
     contract_strength: weak ? 'weak_agent_declared' : 'host_anchored',
     context_used: !!context,

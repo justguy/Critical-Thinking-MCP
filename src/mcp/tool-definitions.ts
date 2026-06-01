@@ -655,6 +655,19 @@ REQUIRED INPUT FORMAT — copy this structure exactly:
             must_include: { type: 'array' as const, items: { type: 'string' as const } },
             must_not_include: { type: 'array' as const, items: { type: 'string' as const } },
             required_fields: { type: 'array' as const, items: { type: 'string' as const } },
+            constraints: {
+              type: 'array' as const,
+              items: {
+                type: 'object' as const,
+                properties: {
+                  field: { type: 'string' as const },
+                  op: { type: 'string' as const, enum: ['<', '<=', '>', '>=', '==', '!=', 'in', 'not_in', 'subset_of'] },
+                  value: {},
+                  source_quote: { type: 'string' as const },
+                },
+                required: ['field', 'op', 'value'],
+              },
+            },
             freshness: {
               type: 'object' as const,
               properties: {

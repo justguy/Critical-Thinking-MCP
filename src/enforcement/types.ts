@@ -258,6 +258,13 @@ export interface ContractClaim {
   claim_kind?: ClaimKind;
 }
 
+export interface AnswerConstraint {
+  field: string;
+  op: '<' | '<=' | '>' | '>=' | '==' | '!=' | 'in' | 'not_in' | 'subset_of';
+  value: unknown;
+  source_quote?: string;
+}
+
 export interface DeliverableContract {
   contract_id: string;
   /** Who authored the obligations. Only meaningful if the HOST populates it (unverifiable by a pure fn). */
@@ -278,6 +285,8 @@ export interface DeliverableContract {
   must_not_include?: string[];
   /** Field names that must appear in a structured answer (used by the constraint checker). */
   required_fields?: string[];
+  /** Host/user/derived structured predicates that must hold when present. */
+  constraints?: AnswerConstraint[];
 }
 
 export interface SourceManifestEntry {

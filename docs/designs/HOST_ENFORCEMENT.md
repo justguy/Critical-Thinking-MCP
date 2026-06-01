@@ -30,7 +30,8 @@ const decision = enforceDeliverable(spec, artifacts, { eval_time, surfaced_answe
 // decision.decision: 'RELEASE' | 'REJECT'; .reason; .corrective_prompt; .answer_text_hash; ...
 ```
 - `spec` (host-authored): `contract_id, original_request_text, task_type, evidence_level, risk_level`,
-  plus optional `claims, must_include, must_not_include, required_fields, acceptance_criteria, freshness`.
+  plus optional `claims, must_include, must_not_include, required_fields, constraints, acceptance_criteria, freshness`.
+  Host-authored `constraints` and `required_fields` make structured answer validation mandatory at finalize.
 - `artifacts` (agent-produced, host only verifies): `answer_text` + any of
 	  `sources, claims, inputs, conclusion_numbers, arithmetic_checks, constraints, structured_answer, case_partition`.
 - `opts.finalize`: inject an MCP-over-stdio client to enforce against a **live server**; the default
@@ -48,7 +49,8 @@ compatibility diagnostics. It prints JSON on every path and exits **0 on RELEASE
 ## Honest limits (unchanged by adding a host)
 - **It does not author the contract or the artifacts for you.** The host must supply the contract; the
   agent must supply the artifacts. PASS is only as strong as the declared contract (under-declare → PASS
-  asserts less). This is the documented anti-omission ceiling.
+  asserts less). Pure MCP calls with missing or agent-authored provenance are reported as
+  `weak_agent_declared`; only the host boundary can make `host_anchored` meaningful.
 - **PASS ≠ true.** It proves the declared machine-checkable obligations were discharged on the exact text
   surfaced — not that the answer is correct. Grounding proves containment, not truth.
 - **Determinism preserved.** No clock, no network, no model call anywhere in the host path.

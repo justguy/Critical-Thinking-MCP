@@ -4,7 +4,7 @@
 
 Verdict: PARTIAL.
 
-The update has clear correctness value: the public surface is reduced to the 11-tool facade, every public tool advertises an `outputSchema`, representative PASS and BLOCK calls emit schema-valid `structuredContent`, `finalize_deliverable` blocks the tested bypass attempts, host enforcement blocks gate failures and answer swaps, deterministic fuzz cases do not crash, and latency is well inside budget on this machine. Product-value evidence is narrower: a fixed no-LLM benchmark shows host-authored contracts reduce false done releases, but it is not a real agent benchmark and the earlier value pilot remains a null/toy result. As of 2026-06-01, strict release integration, numeric derivation DAGs, and predicate-aware grounding have focused local prototypes with tests. Biggest remaining risk: the proof still does not include mutation testing, a live stdio/http protocol transport round-trip, or the real tagent product-value benchmark, and PASS remains limited to supplied artifacts and host-authored obligations.
+The update has clear correctness value: the public surface is reduced to the 11-tool facade, every public tool advertises an `outputSchema`, representative PASS and BLOCK calls emit schema-valid `structuredContent`, `finalize_deliverable` blocks the tested bypass attempts, host enforcement blocks gate failures and answer swaps, deterministic fuzz cases do not crash, latency is well inside budget on this machine, and a live Streamable HTTP MCP round-trip now covers `tools/list` and `tools/call`. Product-value evidence is narrower: a fixed no-LLM benchmark shows host-authored contracts reduce false done releases, but it is not a real agent benchmark and the earlier value pilot remains a null/toy result. As of 2026-06-01, strict release integration, numeric derivation DAGs, predicate-aware grounding, contract-strength guardrails, host-declared structured constraints, and Tier 4A artifact schemas have focused local proof. Biggest remaining risk: the proof still does not include mutation testing, a separate live stdio transport proof, or the real tagent product-value benchmark, and PASS remains limited to supplied artifacts and host-authored obligations.
 
 ## 2026-06-01 Value Discovery Addendum
 
@@ -14,23 +14,27 @@ The update has clear correctness value: the public surface is reduced to the 11-
 | Strict release prototype | implemented: `strict_release`, JSON CLI errors, exit codes 0/1/2/3, host-contract rejection |
 | Numeric DAG prototype | implemented: `numeric_derivation`, raw/intermediate/final nodes, final-answer binding, percent change, weighted average, flattened-input and wrong-method tests |
 | Predicate grounding prototype | implemented: narrow deterministic predicate checks for wrong predicate, distractor/entity mismatch, date/temporal mismatch, and weak causal support |
-| Full local test suite | pass: 18 files, 378 tests |
+| Contract-strength guardrail | implemented: missing or agent-authored contract authority/profile can no longer report `host_anchored`; strict host release rejects weak finalize output |
+| Host-declared structured constraints | implemented: host contract `constraints` and `required_fields` make `check_answer_against_constraints` mandatory at release |
+| Tier 4A artifact schemas | implemented: executable JSON schemas validate task, defect, backlog, and result JSONL; seed-sized corpora are forced to remain directional |
+| Live Streamable HTTP proof | pass: live loopback `tools/list` and `tools/call` round-trip validates `structuredContent` over MCP transport |
+| Full local test suite | pass: 18 files, 387 tests |
 | Build | pass: `npm run build` |
-| Still unproven | mutation testing, live transport proof, real tagent benchmark, feature ablations on representative real-failure corpus |
+| Still unproven | mutation testing, separate live stdio transport proof, real tagent benchmark, feature ablations on representative real-failure corpus |
 
 ## Repo State
 
 | Field | Value |
 |---|---|
-| Commit hash | `0a5535fb08977ef4ebe3b81ba96c661ed9746c70` |
+| Commit hash | `ff5c1451a607569ae290ec4a9f2929fb4e7104df` |
 | Branch | `tool-surface-consolidation` |
-| Date/time | `2026-05-31T09:04:08Z` |
+| Date/time | `2026-06-01T13:42:59Z` |
 | Node | `v24.13.0` |
 | npm | `11.6.2` |
 | OS | `Darwin 24.6.0 x64` |
 | CPU | `Intel(R) Core(TM) i7-8850H CPU @ 2.60GHz` |
 | Relevant env vars | `TPF_LLM_TOOL=codex`; no `CT_MCP_*` env vars observed via filtered env probe |
-| Dirty worktree | yes: tracked edits plus pre-existing untracked `.claude/`, `.hoplon/`, `ct-mcp-0.1.0-beta.3.tgz`, `html/screenshots/` |
+| Dirty worktree | yes: this proof-gap change set; the worktree was clean at the start of the execution burst |
 
 ## Baseline
 
@@ -39,7 +43,7 @@ The update has clear correctness value: the public surface is reduced to the 11-
 | Typecheck | pass: `npm run build` |
 | Existing tests | pass |
 | Existing test count | 296 |
-| Full test count after proof additions | 378 |
+| Full test count after proof additions | 387 |
 | Public tools listed | 11 |
 | Internal leaf tools hidden | 7 hidden from public surface |
 | Tools with outputSchema | 11/11 public tools |
@@ -56,7 +60,7 @@ The update has clear correctness value: the public surface is reduced to the 11-
 | Fuzz crashes/hangs | 0 | 0/360 deterministic fuzz cases | yes |
 | Schema-invalid outputs | 0 | 0/12 representative structured outputs | yes |
 | Determinism mismatches | 0 | 0/5 repeatability probes | yes |
-| Protocol round-trip failures | 0 | 0/14 in-process `tools/call` handler probes | partial: live stdio/http not run |
+| Protocol round-trip failures | 0 | 0/14 in-process `tools/call` handler probes plus live Streamable HTTP `tools/list`/`tools/call` proof | partial: stdio live transport not separately run |
 | Mutation score | >=80% | not run | no |
 | BLOCK-path surviving mutants | 0 unresolved | not run | no |
 | p95 latency typical | <=50ms | 0.099ms over 150 cases | yes |
@@ -139,7 +143,7 @@ Regression test: `tests/proof/protocol_schema.test.ts` includes freshness-policy
 - `finalize_deliverable` cannot PASS missing required artifacts in tested cases, but verify-if-present artifacts may be absent by design.
 - Benchmark sample size is small and deterministic; it is useful for regression, not market/product lift.
 - Mutation testing was not run.
-- Live stdio/http transport round-trip was not run; protocol proof used the registered in-process MCP `tools/call` handler.
+- Live Streamable HTTP transport proof was run; live stdio transport was not separately run.
 
 ## Reproduction
 
@@ -152,6 +156,11 @@ TPF_LLM_TOOL=codex tpf npm test -- tests/proof/protocol_schema.test.ts
 TPF_LLM_TOOL=codex tpf npm test -- tests/proof/correctness_gates.test.ts
 TPF_LLM_TOOL=codex tpf npm test -- tests/proof/facade_value_benchmark.test.ts
 TPF_LLM_TOOL=codex tpf npm test -- tests/proof/fuzz_host_latency.test.ts
+TPF_LLM_TOOL=codex tpf npm test -- tests/host/enforcement_host.test.ts
+TPF_LLM_TOOL=codex tpf npm test -- tests/tools/factual_qa_slice.test.ts
+TPF_LLM_TOOL=codex tpf npm test -- tests/tools/numeric_constraints.test.ts tests/tools/risk_promotion.test.ts
+TPF_LLM_TOOL=codex tpf npm test -- tests/proof/value_discovery_artifacts.test.ts
+TPF_LLM_TOOL=codex tpf npm test -- tests/benchmark/publication.test.ts
 TPF_LLM_TOOL=codex tpf node --import tsx -e "import { runFacadeValueBenchmark } from './benchmark/proof/facade_value_benchmark.ts'; const r=runFacadeValueBenchmark({includeDebugRaw:true}); for (const mode of r.modes) { const m=r.metrics_by_mode[mode]; console.log([mode,m.task_success_rate,m.high_sev_defects_per_task,m.unsupported_claims_per_task,m.wrong_numbers_per_task,m.constraint_violations_per_task,m.false_done_rate,m.avg_latency_ms,m.avg_tool_calls,m.avg_tool_choice_confusions,m.exposed_tools_count].join('\t')); }"
 ```
 
@@ -159,11 +168,11 @@ Observed full-suite result:
 
 ```text
 Test Files  18 passed (18)
-Tests       378 passed (378)
+Tests       387 passed (387)
 ```
 
 ## Merge Recommendation
 
 Safe to merge behind experimental flag only.
 
-Rationale: the update is stronger and useful for beta hardening, and the deterministic proof suite now catches important schema, host-boundary, and finalize-bypass regressions. It is not a stable release candidate because mutation scoring and live transport round-trip proof have not run, and product-value evidence remains a small deterministic benchmark plus an earlier null toy pilot.
+Rationale: the update is stronger and useful for beta hardening, and the deterministic proof suite now catches important schema, host-boundary, transport, and finalize-bypass regressions. It is not a stable release candidate because mutation scoring and a real tagent product-value benchmark have not run, and product-value evidence remains a small deterministic benchmark plus an earlier null toy pilot.

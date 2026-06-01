@@ -1,5 +1,11 @@
 # Billing System Benchmark: Raw LLM vs Prompted LLM vs CT-MCP
 
+> Historical comparison template. This predates the current 11-tool facade,
+> host-enforcement proof suite, and Tier 4A value-discovery strategy. The
+> `42/42` and `0/14` figures below are legacy benchmark context, not current product-value proof.
+> Regenerate the objective benchmark pipeline before
+> making external value claims.
+
 ## Benchmark Prompt
 
 > We're building a usage-based billing system. The billing aggregation query computes totals at period boundaries. Concurrent usage events are processed by the pipeline. The payment gateway has a 99.9% uptime SLA. Here are our assumptions and confidence assessment:

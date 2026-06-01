@@ -102,6 +102,50 @@ describe('enforceDeliverable', () => {
     expect(d.reason).toBe('gate_block');
   });
 
+  it('REJECTS host-declared structured constraints even when the agent omits artifact constraints', () => {
+    const d = enforceDeliverable(
+      {
+        contract_id: 'h-constraints',
+        original_request_text: 'Return JSON only with status "ok" and price under 100.',
+        task_type: 'factual_qa',
+        evidence_level: 'none',
+        risk_level: 'high',
+        required_fields: ['status', 'price'],
+        constraints: [{ field: 'price', op: '<', value: 100, source_quote: 'price under 100' }],
+        must_include: ['"status":"ok"'],
+      },
+      {
+        answer_text: '{"status":"ok","price":120}',
+        structured_answer: { status: 'ok', price: 120 },
+      },
+    );
+
+    expect(d.decision).toBe('REJECT');
+    expect(d.reason).toBe('gate_block');
+    expect(d.required_checks).toContain('check_answer_against_constraints');
+    expect(d.blocking_issues.some(i => i.mechanism === 'constraint')).toBe(true);
+  });
+
+  it('REJECTS host-required structured fields when no structured answer is supplied', () => {
+    const d = enforceDeliverable(
+      {
+        contract_id: 'h-required-fields',
+        original_request_text: 'Return JSON only with status "ok".',
+        task_type: 'factual_qa',
+        evidence_level: 'none',
+        risk_level: 'high',
+        required_fields: ['status'],
+      },
+      {
+        answer_text: '{"status":"ok"}',
+      },
+    );
+
+    expect(d.decision).toBe('REJECT');
+    expect(d.reason).toBe('gate_block');
+    expect(d.blocking_issues.some(i => i.mechanism === 'finalize_missing_inputs')).toBe(true);
+  });
+
   it('REJECTS whitespace-significant surfaced swaps with exact anti-swap hash', () => {
     const d = enforceDeliverable(
       { contract_id: 'h4', original_request_text: 'Return exact Python snippet.', task_type: 'freeform', evidence_level: 'none', risk_level: 'low' },

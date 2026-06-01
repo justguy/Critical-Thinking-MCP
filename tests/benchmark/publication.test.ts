@@ -267,6 +267,22 @@ describe('Benchmark publication docs stay aligned with canonical results', () =>
   });
 });
 
+describe('Historical benchmark reports are not current product-value proof', () => {
+  const historicalReports = [
+    'benchmark/reports/BENCHMARK_REPORT.md',
+    'benchmark/reports/BILLING_REPORT.md',
+    'benchmark/reports/COMPARISON_REPORT_TEMPLATE.md',
+  ];
+
+  for (const reportPath of historicalReports) {
+    it(`${reportPath} carries a current-proof disclaimer`, () => {
+      const content = readFile(reportPath).slice(0, 600).toLowerCase();
+      expect(content).toContain('historical');
+      expect(content).toContain('current product-value proof');
+    });
+  }
+});
+
 describe('All 9 tools have examples', () => {
   const exampleFiles = [
     'examples/architecture_review.md',

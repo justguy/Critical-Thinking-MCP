@@ -1,11 +1,14 @@
 import Ajv, { type AnySchema } from 'ajv';
 import { describe, expect, it } from 'vitest';
 
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { ErrorCode, type CallToolRequest } from '@modelcontextprotocol/sdk/types.js';
 
 import { registerToolHandlers } from '../../src/mcp/tool-call.js';
 import { TOOLS } from '../../src/mcp/tool-definitions.js';
+import { startHttpServer } from '../../src/server-runtime.js';
 
 type ToolCallResult = {
   content: { type: string; text: string }[];
@@ -289,5 +292,46 @@ describe('MCP protocol/schema proof surface', () => {
     );
     expect(zonedFail.structuredContent?.status).toBe('ENFORCEMENT_FAIL');
     expect(zonedFail.isError).toBe(true);
+  });
+
+  it('round-trips tools/list and tools/call over live Streamable HTTP transport', async () => {
+    const running = await startHttpServer({ host: '127.0.0.1', port: 0, path: '/mcp' });
+    const client = new Client({ name: 'protocol-http-proof', version: '0.0.0-test' });
+    const transport = new StreamableHTTPClientTransport(new URL(running.url));
+
+    try {
+      await client.connect(transport);
+
+      const tools = await client.listTools();
+      expect(tools.tools.map(tool => tool.name)).toEqual(PUBLIC_TOOL_NAMES);
+
+      const pass = await client.callTool({
+        name: 'finalize_deliverable',
+        arguments: {
+          contract: {
+            contract_id: 'http-freeform',
+            contract_authority: 'host',
+            profile_source: 'host_supplied',
+            original_request_text: 'Write a short note.',
+            task_type: 'freeform',
+            evidence_level: 'none',
+            risk_level: 'low',
+          },
+          answer_text: 'A short note that needs no external evidence.',
+        },
+      });
+      expect(pass.structuredContent?.status).toBe('PASS');
+      expect(pass.isError).toBeUndefined();
+
+      const block = await client.callTool({
+        name: 'finalize_deliverable',
+        arguments: finalizeFreshnessArgs('2026-01-01T00:00:00Z', { maxAgeSeconds: 7 * DAY }),
+      });
+      expect(block.structuredContent?.status).toBe('ENFORCEMENT_FAIL');
+      expect(block.isError).toBe(true);
+    } finally {
+      await client.close();
+      await running.close();
+    }
   });
 });

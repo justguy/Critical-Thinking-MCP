@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 
+import Ajv, { type AnySchema } from 'ajv';
 import { describe, expect, it } from 'vitest';
 
 function readJsonl(file: string): Array<Record<string, unknown>> {
@@ -8,6 +9,24 @@ function readJsonl(file: string): Array<Record<string, unknown>> {
     .split(/\n+/)
     .filter(Boolean)
     .map(line => JSON.parse(line) as Record<string, unknown>);
+}
+
+function readJson(file: string): Record<string, unknown> {
+  return JSON.parse(readFileSync(file, 'utf8')) as Record<string, unknown>;
+}
+
+function validateRecords(
+  file: string,
+  records: Array<Record<string, unknown>>,
+  schemaPath: string,
+): Array<{ index: number; errors: unknown }> {
+  const ajv = new Ajv({ allErrors: true, strict: false });
+  const validate = ajv.compile(readJson(schemaPath) as AnySchema);
+  const failures: Array<{ index: number; errors: unknown }> = [];
+  records.forEach((record, index) => {
+    if (!validate(record)) failures.push({ index, errors: validate.errors });
+  });
+  return failures.map(failure => ({ ...failure, file }));
 }
 
 const REQUIRED_RESULT_FIELDS = [
@@ -64,10 +83,22 @@ describe('value discovery artifact contracts', () => {
   const defects = readJsonl('benchmark/defects/value_discovery_seed.jsonl');
   const backlog = readJsonl('VALUE_BACKLOG.jsonl');
   const results = readJsonl('benchmark/results/value_discovery_seed.jsonl');
+  const report = readFileSync('VALUE_GAP_REPORT.md', 'utf8');
+  const taskIds = new Set(tasks.map(task => task.task_id));
+  const defectsByTask = new Map<string, Array<Record<string, unknown>>>();
+  for (const defect of defects) {
+    const taskId = String(defect.task_id);
+    defectsByTask.set(taskId, [...(defectsByTask.get(taskId) ?? []), defect]);
+  }
+
+  it('validates all Tier 4A JSONL artifacts against executable schemas', () => {
+    expect(validateRecords('benchmark/tasks/value_discovery_seed.jsonl', tasks, 'benchmark/schemas/value-task.schema.json')).toEqual([]);
+    expect(validateRecords('benchmark/defects/value_discovery_seed.jsonl', defects, 'benchmark/schemas/value-defect.schema.json')).toEqual([]);
+    expect(validateRecords('VALUE_BACKLOG.jsonl', backlog, 'benchmark/schemas/value-backlog.schema.json')).toEqual([]);
+    expect(validateRecords('benchmark/results/value_discovery_seed.jsonl', results, 'benchmark/schemas/value-result.schema.json')).toEqual([]);
+  });
 
   it('keeps every seed defect linked to a task record', () => {
-    const taskIds = new Set(tasks.map(task => task.task_id));
-
     expect(tasks.length).toBeGreaterThanOrEqual(6);
     expect(defects.map(defect => defect.task_id).filter(taskId => !taskIds.has(taskId))).toEqual([]);
   });
@@ -81,9 +112,24 @@ describe('value discovery artifact contracts', () => {
       expect(Array.isArray(entry.failure_modes_addressed)).toBe(true);
       expect(Array.isArray(entry.affected_tasks)).toBe(true);
       expect(['build', 'prototype', 'defer', 'kill']).toContain(entry.recommended_action);
+      expect(typeof entry.value_score).toBe('number');
+      expect(Number.isFinite(entry.value_score as number)).toBe(true);
+      expect(entry.implementation_cost as number).toBeGreaterThan(0);
+      expect(entry.preventability as number).toBeGreaterThanOrEqual(0);
+      expect(entry.preventability as number).toBeLessThanOrEqual(1);
+      expect(entry.confidence as number).toBeGreaterThanOrEqual(0);
+      expect(entry.confidence as number).toBeLessThanOrEqual(1);
 
-      if ((entry.affected_tasks as unknown[]).length === 0) {
+      const affectedTasks = entry.affected_tasks as string[];
+      expect(affectedTasks.filter(taskId => !taskIds.has(taskId))).toEqual([]);
+
+      if (affectedTasks.length === 0) {
         expect(entry).toHaveProperty('score_basis');
+      } else {
+        const escapeReasons = new Set(
+          affectedTasks.flatMap(taskId => (defectsByTask.get(taskId) ?? []).map(defect => defect.escape_reason)),
+        );
+        expect((entry.failure_modes_addressed as string[]).some(mode => escapeReasons.has(mode))).toBe(true);
       }
     }
   });
@@ -97,6 +143,23 @@ describe('value discovery artifact contracts', () => {
       expect(result.ablation_id).toBe('enforced_current');
       expect(result.seed_or_directional).toBe(true);
       expect(typeof result.net_value).toBe('number');
+      expect(result.task_success as number).toBeLessThanOrEqual(result.task_count as number);
+      expect(result.high_severity_defects_avoided as number).toBeLessThanOrEqual(
+        (result.high_severity_defects as number) + (result.high_severity_defects_avoided as number),
+      );
+
+      if (result.average_latency_ms === null || result.average_tool_calls === null) {
+        expect(result.seed_or_directional).toBe(true);
+        expect(String(result.notes)).toMatch(/not captured/i);
+      }
+    }
+  });
+
+  it('does not let seed-sized corpora masquerade as product-value proof', () => {
+    if (tasks.length < 150) {
+      expect(results.every(result => result.seed_or_directional === true)).toBe(true);
+      expect(report).toContain('not the final product-value benchmark');
+      expect(report).toContain('should not be used to claim broad product value');
     }
   });
 });

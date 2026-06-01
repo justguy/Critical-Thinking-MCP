@@ -25,6 +25,7 @@ import { sha256Hex } from '../enforcement/utils.js';
 import { enforceInputLimits } from '../enforcement/limits.js';
 import type {
   AcceptanceCriterion,
+  AnswerConstraint,
   BlockingIssue,
   ContractClaim,
   DeliverableContract,
@@ -46,6 +47,7 @@ export interface ContractSpec {
   must_include?: string[];
   must_not_include?: string[];
   required_fields?: string[];
+  constraints?: AnswerConstraint[];
   acceptance_criteria?: AcceptanceCriterion[];
   freshness?: { max_age_seconds: number; requires_dated_sources: boolean };
 }
@@ -132,6 +134,7 @@ export function enforceDeliverable(
     must_include: spec.must_include,
     must_not_include: spec.must_not_include,
     required_fields: spec.required_fields,
+    constraints: spec.constraints,
   };
 
   const finalize =

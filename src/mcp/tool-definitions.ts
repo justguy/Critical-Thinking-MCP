@@ -387,7 +387,7 @@ Optionally pass "context" with prior iteration data for escalation and stall det
   },
   {
     name: 'verify_arithmetic',
-    description: `Verify that a claimed arithmetic result matches the actual computation. Supports: sum, weighted_average, percentage, growth, product.
+    description: `Verify that a claimed arithmetic result matches the actual computation. Supports: sum, weighted_average, percentage, growth, product, percent_change.
 
 REQUIRED INPUT FORMAT — copy this structure exactly:
 {"claim_type":"weighted_average","values":[100,80,60],"weights":[0.5,0.3,0.2],"claimed_result":84}
@@ -398,6 +398,7 @@ Claim types and required fields:
 - "percentage": part, whole, claimed_result
 - "growth": values[] (principal), rate, periods, claimed_result
 - "product": values[], claimed_result
+- "percent_change": values [old,new], claimed_result
 
 Strict by default — matches to 2 decimal places. Optional "tolerance" for relative tolerance.`,
     inputSchema: {
@@ -405,7 +406,7 @@ Strict by default — matches to 2 decimal places. Optional "tolerance" for rela
       properties: {
         claim_type: {
           type: 'string' as const,
-          enum: ['sum', 'weighted_average', 'percentage', 'growth', 'product'],
+          enum: ['sum', 'weighted_average', 'percentage', 'growth', 'product', 'percent_change'],
           description: 'Type of arithmetic claim to verify',
         },
         values: {
@@ -430,6 +431,7 @@ Strict by default — matches to 2 decimal places. Optional "tolerance" for rela
         periods: { type: 'number' as const, description: 'Number of periods for "growth" claim type' },
         part: { type: 'number' as const, description: 'Numerator for "percentage" claim type' },
         whole: { type: 'number' as const, description: 'Denominator for "percentage" claim type' },
+        numeric_derivation: { type: 'object' as const },
       },
       required: ['claim_type', 'claimed_result'],
     },
@@ -503,6 +505,14 @@ risk_level: low | medium | high`,
             task_type: { type: 'string' as const, enum: ['factual_qa', 'numeric_analysis', 'planning', 'decision', 'concurrency_design', 'reasoning', 'freeform'] },
             evidence_level: { type: 'string' as const, enum: ['none', 'asserted', 'cited', 'rederived'] },
             risk_level: { type: 'string' as const, enum: ['low', 'medium', 'high'] },
+            freshness: {
+              type: 'object' as const,
+              properties: {
+                max_age_seconds: { type: 'number' as const, minimum: 0 },
+                requires_dated_sources: { type: 'boolean' as const },
+              },
+              required: ['max_age_seconds', 'requires_dated_sources'],
+            },
           },
           required: ['task_type', 'evidence_level', 'risk_level'],
         },
@@ -518,8 +528,10 @@ risk_level: low | medium | high`,
         optional: { type: 'array' as const, items: { type: 'object' as const } },
         finalize_required: { type: 'array' as const, items: { type: 'string' as const } },
         finalize_verify_if_present: { type: 'array' as const, items: { type: 'string' as const } },
+        artifact_templates: { type: 'array' as const, items: { type: 'object' as const } },
+        finalize_checklist: { type: 'array' as const, items: { type: 'string' as const } },
       },
-      required: ['status', 'required', 'finalize_required'],
+      required: ['status', 'required', 'finalize_required', 'artifact_templates', 'finalize_checklist'],
     },
   },
   {
@@ -642,6 +654,15 @@ REQUIRED INPUT FORMAT — copy this structure exactly:
             acceptance_criteria: { type: 'array' as const, items: { type: 'object' as const } },
             must_include: { type: 'array' as const, items: { type: 'string' as const } },
             must_not_include: { type: 'array' as const, items: { type: 'string' as const } },
+            required_fields: { type: 'array' as const, items: { type: 'string' as const } },
+            freshness: {
+              type: 'object' as const,
+              properties: {
+                max_age_seconds: { type: 'number' as const, minimum: 0 },
+                requires_dated_sources: { type: 'boolean' as const },
+              },
+              required: ['max_age_seconds', 'requires_dated_sources'],
+            },
           },
           required: ['contract_id', 'original_request_text', 'task_type', 'evidence_level', 'risk_level'],
         },
@@ -650,9 +671,19 @@ REQUIRED INPUT FORMAT — copy this structure exactly:
         claims: { type: 'array' as const, items: { type: 'object' as const } },
         inputs: { type: 'array' as const, items: { type: ['number', 'object'] as const } },
         conclusion_numbers: { type: 'array' as const, items: { type: 'object' as const } },
+        numeric_derivation: { type: 'object' as const },
         arithmetic_checks: { type: 'array' as const, items: { type: 'object' as const } },
         constraints: { type: 'array' as const, items: { type: 'object' as const } },
         structured_answer: { type: 'object' as const },
+        eval_time: {
+          type: 'object' as const,
+          properties: {
+            value: { type: 'string' as const },
+            authority: { type: 'string' as const, enum: ['host', 'agent'] },
+          },
+          required: ['value', 'authority'],
+        },
+        case_partition: { type: 'object' as const },
       },
       required: ['contract', 'answer_text'],
     },
@@ -672,12 +703,12 @@ REQUIRED INPUT FORMAT — copy this structure exactly:
   },
   {
     name: 'trace_conclusion_numbers',
-    description: `Verify every number in a conclusion traces to a supplied input. Each conclusion number declares its derivation (literal/identity → equals an input; derived → recompute via sum/diff/product/ratio/pct_of/mean over input indices). The tool RE-DERIVES each and BLOCKS any that fails. Unforgeable only relative to the supplied inputs; finalize_deliverable adds stricter answer-number and input-anchor checks.
+    description: `Verify every number in a conclusion traces to supplied numeric inputs. Each flat conclusion number declares its derivation (literal/identity → equals an input; derived → recompute via sum/diff/product/ratio/pct_of/mean/percent_change over input indices). For multi-step work, supply numeric_derivation {nodes, final_refs} with raw input, intermediate, and final nodes. The tool RE-DERIVES each and BLOCKS any that fails. Unforgeable only relative to the supplied inputs; finalize_deliverable adds stricter answer-number and input-anchor checks.
 
 REQUIRED INPUT FORMAT — copy this structure exactly:
 {"inputs":[120,30],"conclusion_numbers":[{"value":150,"origin":"derived","op":"sum","input_refs":[0,1]}],"answer_text":"Total is 150/mo, a 25% saving."}
 
-origin: literal | identity | derived. op (for derived): sum | diff | product | ratio | pct_of | mean.
+origin: literal | identity | derived. op (for derived): sum | diff | product | ratio | pct_of | mean | percent_change.
 Optional "answer_text" enables a WARNING for numbers present in the answer but not declared. Set strict_answer_numbers=true to make undeclared answer numbers BLOCK.`,
     inputSchema: {
       type: 'object' as const,
@@ -691,17 +722,18 @@ Optional "answer_text" enables a WARNING for numbers present in the answer but n
             properties: {
               value: { type: 'number' as const },
               origin: { type: 'string' as const, enum: ['literal', 'identity', 'derived'] },
-              op: { type: 'string' as const, enum: ['sum', 'diff', 'product', 'ratio', 'pct_of', 'mean'] },
+              op: { type: 'string' as const, enum: ['sum', 'diff', 'product', 'ratio', 'pct_of', 'mean', 'percent_change'] },
               input_refs: { type: 'array' as const, items: { type: 'number' as const } },
             },
             required: ['value', 'origin', 'input_refs'],
           },
         },
+        numeric_derivation: { type: 'object' as const },
         answer_text: { type: 'string' as const },
         tolerance: { type: 'number' as const, description: 'Relative tolerance (default 0.005).' },
         strict_answer_numbers: { type: 'boolean' as const },
       },
-      required: ['inputs', 'conclusion_numbers'],
+      required: [],
     },
     outputSchema: {
       type: 'object' as const,
@@ -710,6 +742,7 @@ Optional "answer_text" enables a WARNING for numbers present in the answer but n
         traced_ratio: { type: 'number' as const },
         results: { type: 'array' as const, items: { type: 'object' as const } },
         untraced_answer_numbers: { type: 'array' as const, items: { type: 'string' as const } },
+        derivation_graph: { type: 'object' as const },
       },
       required: ['status', 'traced_ratio', 'results'],
     },

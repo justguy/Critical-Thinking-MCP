@@ -1,5 +1,10 @@
 # CT-MCP Benchmark Report — V5
 
+> Historical benchmark report. This predates the current 11-tool facade,
+> host-enforcement proof suite, and Tier 4A value-discovery strategy. Do not
+> use this report by itself as current product-value proof; regenerate the
+> objective benchmark pipeline before making external value claims.
+
 **Run Date:** 2026-03-31
 **Version:** 0.1.0-beta.1 (9 tools, 15 enforcement mechanisms)
 **Scenarios:** 56 (42 defect + 14 clean control)

@@ -46,6 +46,145 @@ const VALID_KINDS = new Set([
 
 const COMPARATOR = /(?:[<>]=?|=|\b(?:more|less|greater|fewer|higher|lower|faster|slower)\b)/i;
 const DATE_WORD = /\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\b/i;
+const NEGATION = String.raw`(?:not|never|no|without|cannot|can't|do\s+not|does\s+not|did\s+not|is\s+not|are\s+not|was\s+not|were\s+not)`;
+
+interface PredicateValue {
+  value: string;
+  phrases: string[];
+}
+
+interface PredicateClass {
+  label: string;
+  values: PredicateValue[];
+}
+
+const PREDICATE_CLASSES: PredicateClass[] = [
+  {
+    label: 'thread_model',
+    values: [
+      { value: 'single-threaded', phrases: ['single-threaded', 'single threaded'] },
+      { value: 'multi-threaded', phrases: ['multi-threaded', 'multi threaded', 'multithreaded'] },
+    ],
+  },
+  {
+    label: 'support_status',
+    values: [
+      { value: 'supported', phrases: ['supported'] },
+      { value: 'unsupported', phrases: ['unsupported', 'not supported'] },
+      { value: 'deprecated', phrases: ['deprecated'] },
+      { value: 'removed', phrases: ['removed', 'retired'] },
+    ],
+  },
+  {
+    label: 'enabled_state',
+    values: [
+      { value: 'enabled', phrases: ['enabled'] },
+      { value: 'disabled', phrases: ['disabled'] },
+    ],
+  },
+  {
+    label: 'availability',
+    values: [
+      { value: 'available', phrases: ['available'] },
+      { value: 'unavailable', phrases: ['unavailable', 'not available'] },
+    ],
+  },
+  {
+    label: 'result_status',
+    values: [
+      { value: 'passed', phrases: ['passed', 'passes', 'succeeded', 'success'] },
+      { value: 'failed', phrases: ['failed', 'fails', 'failure'] },
+    ],
+  },
+  {
+    label: 'direction',
+    values: [
+      { value: 'increased', phrases: ['increased', 'higher', 'more', 'rose', 'rises'] },
+      { value: 'decreased', phrases: ['decreased', 'lower', 'less', 'fell', 'falls'] },
+    ],
+  },
+  {
+    label: 'requirement',
+    values: [
+      { value: 'required', phrases: ['required'] },
+      { value: 'optional', phrases: ['optional'] },
+    ],
+  },
+];
+
+const TIME_UNIT_CLASSES: PredicateValue[] = [
+  { value: 'second', phrases: ['second', 'seconds', 'sec', 'secs'] },
+  { value: 'minute', phrases: ['minute', 'minutes', 'min', 'mins'] },
+  { value: 'hour', phrases: ['hour', 'hours', 'hr', 'hrs'] },
+  { value: 'day', phrases: ['day', 'days', 'daily'] },
+  { value: 'week', phrases: ['week', 'weeks', 'weekly'] },
+  { value: 'month', phrases: ['month', 'months', 'monthly'] },
+  { value: 'year', phrases: ['year', 'years', 'yearly', 'annual', 'annually'] },
+];
+
+const ENTITY_LEADING_STOPWORDS = new Set([
+  'a',
+  'an',
+  'and',
+  'as',
+  'for',
+  'in',
+  'it',
+  'on',
+  'or',
+  'source',
+  'that',
+  'the',
+  'these',
+  'this',
+  'those',
+]);
+const ENTITY_GENERIC_WORDS = new Set([
+  'api',
+  'app',
+  'client',
+  'database',
+  'endpoint',
+  'feature',
+  'flow',
+  'job',
+  'model',
+  'pipeline',
+  'plan',
+  'platform',
+  'process',
+  'product',
+  'project',
+  'release',
+  'service',
+  'server',
+  'system',
+  'task',
+  'team',
+  'tool',
+  'version',
+]);
+const ENTITY_DATE_WORDS = new Set([
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
+  'january',
+  'february',
+  'march',
+  'april',
+  'may',
+  'june',
+  'july',
+  'august',
+  'september',
+  'october',
+  'november',
+  'december',
+]);
 
 export interface QuoteGroundingClaimResult {
   claim_id: string;
@@ -139,6 +278,188 @@ function hasNumericToken(text: string): boolean {
 
 function hasDateToken(text: string): boolean {
   return yearTokens(text).length > 0 || DATE_WORD.test(text);
+}
+
+function escapeRegex(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function phrasePattern(phrase: string): RegExp {
+  const parts = phrase
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean)
+    .map(escapeRegex);
+  return new RegExp(String.raw`\b${parts.join(String.raw`[\s-]+`)}\b`, 'i');
+}
+
+function hasPhrase(text: string, phrase: string): boolean {
+  return phrasePattern(phrase).test(text);
+}
+
+function valuesPresent(text: string, values: PredicateValue[]): Set<string> {
+  const present = new Set<string>();
+  for (const value of values) {
+    if (value.phrases.some(phrase => hasPhrase(text, phrase))) {
+      present.add(value.value);
+    }
+  }
+  return present;
+}
+
+function hasOverlap(a: Set<string>, b: Set<string>): boolean {
+  for (const value of a) {
+    if (b.has(value)) return true;
+  }
+  return false;
+}
+
+function describeValues(values: Set<string>): string {
+  return [...values].sort().join(', ');
+}
+
+function predicateTerms(): string[] {
+  const terms = new Set<string>();
+  for (const cls of PREDICATE_CLASSES) {
+    for (const value of cls.values) {
+      for (const phrase of value.phrases) terms.add(phrase);
+    }
+  }
+  return [...terms].sort((a, b) => b.length - a.length);
+}
+
+const PREDICATE_TERMS = predicateTerms();
+
+function isNegatedNear(text: string, phrase: string): boolean {
+  const parts = phrase
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean)
+    .map(escapeRegex);
+  if (parts.length === 0) return false;
+  const phraseBody = parts.join(String.raw`[\s-]+`);
+  const before = new RegExp(String.raw`\b${NEGATION}\b(?:\W+\w+){0,3}\W+${phraseBody}\b`, 'i');
+  const after = new RegExp(String.raw`\b${phraseBody}\b(?:\W+\w+){0,3}\W+\b${NEGATION}\b`, 'i');
+  return before.test(text) || after.test(text);
+}
+
+function contrastFailures(claimText: string, spanText: string): string[] {
+  const failures: string[] = [];
+  for (const cls of PREDICATE_CLASSES) {
+    const claimValues = valuesPresent(claimText, cls.values);
+    const spanValues = valuesPresent(spanText, cls.values);
+    if (claimValues.size > 0 && spanValues.size > 0 && !hasOverlap(claimValues, spanValues)) {
+      failures.push(
+        `predicate_mismatch:${cls.label}: claim_text has "${describeValues(claimValues)}" but quoted_span has "${describeValues(spanValues)}"`,
+      );
+    }
+  }
+  return failures;
+}
+
+function negationFailures(claimText: string, spanText: string): string[] {
+  const failures: string[] = [];
+  for (const phrase of PREDICATE_TERMS) {
+    if (!hasPhrase(claimText, phrase) || !hasPhrase(spanText, phrase)) continue;
+    const claimNegated = isNegatedNear(claimText, phrase);
+    const spanNegated = isNegatedNear(spanText, phrase);
+    if (claimNegated !== spanNegated) {
+      failures.push(
+        `predicate_negation_mismatch: "${phrase}" is ${claimNegated ? '' : 'not '}negated in claim_text but ${spanNegated ? '' : 'not '}negated in quoted_span`,
+      );
+    }
+  }
+  return failures;
+}
+
+function temporalUnitFailures(claimText: string, spanText: string): string[] {
+  const claimUnits = valuesPresent(claimText, TIME_UNIT_CLASSES);
+  const spanUnits = valuesPresent(spanText, TIME_UNIT_CLASSES);
+  if (claimUnits.size === 0 || spanUnits.size === 0 || hasOverlap(claimUnits, spanUnits)) {
+    return [];
+  }
+  return [
+    `temporal_unit_mismatch: claim_text has "${describeValues(claimUnits)}" but quoted_span has "${describeValues(spanUnits)}"`,
+  ];
+}
+
+function normalizeEntityPhrase(raw: string): string | null {
+  const words = raw
+    .split(/\s+/)
+    .map(w => w.replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9.]+$/g, ''))
+    .filter(Boolean);
+  while (words.length > 0 && ENTITY_LEADING_STOPWORDS.has(words[0].toLowerCase())) {
+    words.shift();
+  }
+  if (words.length === 0) return null;
+  const lowered = words.map(w => w.toLowerCase());
+  if (lowered.every(w => ENTITY_LEADING_STOPWORDS.has(w) || ENTITY_GENERIC_WORDS.has(w) || ENTITY_DATE_WORDS.has(w))) {
+    return null;
+  }
+  if (lowered.length === 1 && lowered[0].length < 3) return null;
+  if (lowered.length === 1 && ENTITY_DATE_WORDS.has(lowered[0])) return null;
+  return lowered.join(' ');
+}
+
+function extractEntityPhrases(text: string): Set<string> {
+  const entities = new Set<string>();
+  const quoted = /[`"']([^`"']{2,80})[`"']/g;
+  let match: RegExpExecArray | null;
+  while ((match = quoted.exec(text)) !== null) {
+    const phrase = normalizeEntityPhrase(match[1]);
+    if (phrase) entities.add(phrase);
+  }
+
+  const capitalized = /\b(?:[A-Z][A-Za-z0-9]*(?:\.[A-Za-z0-9]+)?|[A-Z]{2,})(?:\s+(?:[A-Z][A-Za-z0-9]*(?:\.[A-Za-z0-9]+)?|[A-Z]{2,}))*\b/g;
+  while ((match = capitalized.exec(text)) !== null) {
+    const phrase = normalizeEntityPhrase(match[0]);
+    if (phrase) entities.add(phrase);
+  }
+  return entities;
+}
+
+function entityContentTokens(entity: string): Set<string> {
+  return new Set(
+    entity
+      .split(/\s+/)
+      .filter(token => !ENTITY_GENERIC_WORDS.has(token) && !ENTITY_LEADING_STOPWORDS.has(token) && !ENTITY_DATE_WORDS.has(token)),
+  );
+}
+
+function entitiesOverlap(a: string, b: string): boolean {
+  if (a === b || a.includes(b) || b.includes(a)) return true;
+  const aTokens = entityContentTokens(a);
+  const bTokens = entityContentTokens(b);
+  for (const token of aTokens) {
+    if (bTokens.has(token)) return true;
+  }
+  return false;
+}
+
+function entityFailures(claimText: string, spanText: string): string[] {
+  const claimEntities = extractEntityPhrases(claimText);
+  const spanEntities = extractEntityPhrases(spanText);
+  if (claimEntities.size === 0 || spanEntities.size === 0) return [];
+
+  for (const claimEntity of claimEntities) {
+    for (const spanEntity of spanEntities) {
+      if (entitiesOverlap(claimEntity, spanEntity)) return [];
+    }
+  }
+
+  return [
+    `entity_mismatch: claim_text entity "${describeValues(claimEntities)}" is not supported by quoted_span entity "${describeValues(spanEntities)}"`,
+  ];
+}
+
+function predicateGroundingFailures(claimText: string, spanText: string, claimKind: string): string[] {
+  if (claimKind === 'causal' || claimKind === 'recommendation') return [];
+  return [
+    ...entityFailures(claimText, spanText),
+    ...contrastFailures(claimText, spanText),
+    ...negationFailures(claimText, spanText),
+    ...temporalUnitFailures(claimText, spanText),
+  ];
 }
 
 export function handleCheckQuoteGrounding(
@@ -238,6 +559,10 @@ export function handleCheckQuoteGrounding(
           break;
           }
         }
+      }
+
+      for (const failure of predicateGroundingFailures(nClaim, nSpan, claim.claim_kind)) {
+        failures.push(failure);
       }
     }
 

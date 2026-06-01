@@ -18,9 +18,13 @@
 
 import type { EnforcementEngine } from '../enforcement/index.js';
 import type { BlockingIssue, EnforcementContext } from '../enforcement/types.js';
+import {
+  evaluateNumericDerivationArtifact,
+  type NumericDerivationEvaluation,
+} from '../enforcement/numeric_analysis.js';
 
 const VALID_ORIGINS = new Set(['literal', 'identity', 'derived']);
-const VALID_OPS = new Set(['sum', 'diff', 'product', 'ratio', 'pct_of', 'mean']);
+const VALID_OPS = new Set(['sum', 'diff', 'product', 'ratio', 'pct_of', 'mean', 'percent_change']);
 const DEFAULT_TOL = 0.005;
 
 interface ConclusionNumber {
@@ -43,6 +47,7 @@ export interface TraceOutput {
   traced_ratio: number;
   results: TraceResult[];
   untraced_answer_numbers: string[];
+  derivation_graph?: NumericDerivationEvaluation;
   context_used: boolean;
   enforcement?: {
     blocking_issues: BlockingIssue[];
@@ -54,31 +59,44 @@ export interface TraceOutput {
 function validateInput(input: unknown): {
   inputs: number[];
   conclusion_numbers: ConclusionNumber[];
-	  answer_text: string | null;
-	  tolerance: number;
-	  strict_answer_numbers: boolean;
-	} {
+  numeric_derivation: unknown | null;
+  answer_text: string | null;
+  tolerance: number;
+  strict_answer_numbers: boolean;
+} {
   if (input === null || typeof input !== 'object') {
     throw new Error(
       'Input must be an object with "inputs" (number[]) and "conclusion_numbers" ' +
-        '(array of {value, origin, op?, input_refs}).',
+        '(array of {value, origin, op?, input_refs}) or "numeric_derivation".',
     );
   }
   const obj = input as Record<string, unknown>;
+  const numeric_derivation = obj.numeric_derivation ?? null;
+  const hasGraph = numeric_derivation !== null;
+  const hasInputs = Array.isArray(obj.inputs);
+  const hasConclusions = Array.isArray(obj.conclusion_numbers);
 
-  if (!Array.isArray(obj.inputs) || obj.inputs.length < 1) {
+  if (!hasGraph && (!hasInputs || !hasConclusions)) {
+    throw new Error('Missing "inputs" and "conclusion_numbers" (or supply "numeric_derivation").');
+  }
+  if (hasConclusions && !hasInputs) {
+    throw new Error('"conclusion_numbers" requires "inputs".');
+  }
+  if (obj.inputs !== undefined && (!hasInputs || (obj.inputs as unknown[]).length < 1)) {
     throw new Error('Missing "inputs" (array of at least 1 number).');
   }
-  for (let i = 0; i < obj.inputs.length; i++) {
-    if (typeof obj.inputs[i] !== 'number' || !isFinite(obj.inputs[i] as number)) {
+  const inputs = hasInputs ? (obj.inputs as unknown[]) : [];
+  for (let i = 0; i < inputs.length; i++) {
+    if (typeof inputs[i] !== 'number' || !isFinite(inputs[i] as number)) {
       throw new Error(`inputs[${i}] is not a finite number.`);
     }
   }
-  if (!Array.isArray(obj.conclusion_numbers) || obj.conclusion_numbers.length < 1) {
+  if (obj.conclusion_numbers !== undefined && (!hasConclusions || (obj.conclusion_numbers as unknown[]).length < 1)) {
     throw new Error('Missing "conclusion_numbers" (array of at least 1 entry).');
   }
-  for (let i = 0; i < obj.conclusion_numbers.length; i++) {
-    const c = obj.conclusion_numbers[i] as Record<string, unknown>;
+  const conclusionNumbers = hasConclusions ? (obj.conclusion_numbers as unknown[]) : [];
+  for (let i = 0; i < conclusionNumbers.length; i++) {
+    const c = conclusionNumbers[i] as Record<string, unknown>;
     if (!c || typeof c !== 'object') throw new Error(`conclusion_numbers[${i}] is not an object.`);
     if (typeof c.value !== 'number' || !isFinite(c.value)) {
       throw new Error(`conclusion_numbers[${i}].value must be a finite number.`);
@@ -96,7 +114,7 @@ function validateInput(input: unknown): {
         );
       }
       // ratio/pct_of must reference exactly two inputs, else extra refs go unused (a laundering vector).
-      if ((c.op === 'ratio' || c.op === 'pct_of') && (c.input_refs as unknown[]).length !== 2) {
+      if ((c.op === 'ratio' || c.op === 'pct_of' || c.op === 'percent_change') && (c.input_refs as unknown[]).length !== 2) {
         throw new Error(`conclusion_numbers[${i}] op "${c.op}" requires exactly 2 input_refs.`);
       }
     } else {
@@ -110,18 +128,19 @@ function validateInput(input: unknown): {
     }
   }
 
-	  const tolerance = typeof obj.tolerance === 'number' && obj.tolerance >= 0 ? obj.tolerance : DEFAULT_TOL;
-	  const answer_text = typeof obj.answer_text === 'string' ? obj.answer_text : null;
-	  const strict_answer_numbers = obj.strict_answer_numbers === true;
+  const tolerance = typeof obj.tolerance === 'number' && obj.tolerance >= 0 ? obj.tolerance : DEFAULT_TOL;
+  const answer_text = typeof obj.answer_text === 'string' ? obj.answer_text : null;
+  const strict_answer_numbers = obj.strict_answer_numbers === true;
 
   return {
-    inputs: obj.inputs as number[],
-    conclusion_numbers: obj.conclusion_numbers as ConclusionNumber[],
-	    answer_text,
-	    tolerance,
-	    strict_answer_numbers,
-	  };
-	}
+    inputs: inputs as number[],
+    conclusion_numbers: conclusionNumbers as ConclusionNumber[],
+    numeric_derivation,
+    answer_text,
+    tolerance,
+    strict_answer_numbers,
+  };
+}
 
 function relativeClose(a: number, b: number, tol: number): boolean {
   // True relative tolerance against the larger magnitude, plus a tiny absolute
@@ -147,6 +166,8 @@ function recompute(op: string, vals: number[]): number | null {
       return vals.length >= 2 && vals[1] !== 0 ? vals[0] / vals[1] : null;
     case 'pct_of':
       return vals.length >= 2 && vals[1] !== 0 ? (vals[0] / vals[1]) * 100 : null;
+    case 'percent_change':
+      return vals.length >= 2 && vals[0] !== 0 ? ((vals[1] - vals[0]) / vals[0]) * 100 : null;
     default:
       return null;
   }
@@ -160,7 +181,7 @@ const ORDINALish = /\d(?:st|nd|rd|th)$/i;
 
 function extractAnswerNumbers(text: string): string[] {
   const out: string[] = [];
-  const re = /\d[\d,]*(?:\.\d+)?(?:st|nd|rd|th)?/g;
+  const re = /-?\d[\d,]*(?:\.\d+)?(?:st|nd|rd|th)?/g;
   let m: RegExpExecArray | null;
   while ((m = re.exec(text)) !== null) {
     const raw = m[0];
@@ -178,7 +199,7 @@ export function handleTraceConclusionNumbers(
   engine: EnforcementEngine,
 ): TraceOutput {
   const context = (input as any)?.context as EnforcementContext | undefined;
-	  const { inputs, conclusion_numbers, answer_text, tolerance, strict_answer_numbers } = validateInput(input);
+  const { inputs, conclusion_numbers, numeric_derivation, answer_text, tolerance, strict_answer_numbers } = validateInput(input);
 
   const blockingIssues: BlockingIssue[] = [];
   const warnings: string[] = [];
@@ -221,30 +242,43 @@ export function handleTraceConclusionNumbers(
     }
   }
 
+  const derivationGraph = numeric_derivation
+    ? evaluateNumericDerivationArtifact(numeric_derivation, { answerText: answer_text, tolerance })
+    : undefined;
+  if (derivationGraph) {
+    for (const issue of derivationGraph.blocking_issues) blockingIssues.push(issue);
+    for (const warning of derivationGraph.warnings) warnings.push(warning);
+  }
+
   // Omission guard (WARNING): numbers in the answer not among the declared conclusion numbers.
   let untraced: string[] = [];
   if (answer_text) {
     // Compare numerically so "150" / "150.0" / "150.00" don't false-warn against a declared 150.
-    const declared = conclusion_numbers.map(c => c.value);
+    const declared = [
+      ...conclusion_numbers.map(c => c.value),
+      ...(derivationGraph?.results.map(result => result.value) ?? []),
+    ];
     untraced = extractAnswerNumbers(answer_text).filter(s => {
       const n = Number(s);
       return isFinite(n) && !declared.some(d => relativeClose(n, d, tolerance));
     });
-	    if (untraced.length > 0) {
-	      const message =
-	        `${untraced.length} number(s) appear in answer_text but were not declared/traced: ` +
-	        untraced.slice(0, 8).join(', ') + (untraced.length > 8 ? ' …' : '') +
-	        '. Declare and trace them, or confirm they are non-analytical.';
-	      if (strict_answer_numbers) {
-	        blockingIssues.push({ mechanism: 'number_provenance', description: message, severity: 'blocking' });
-	      } else {
-	        warnings.push(message);
-	      }
-	    }
-	  }
+    if (untraced.length > 0) {
+      const message =
+        `${untraced.length} number(s) appear in answer_text but were not declared/traced: ` +
+        untraced.slice(0, 8).join(', ') + (untraced.length > 8 ? ' …' : '') +
+        '. Declare and trace them, or confirm they are non-analytical.';
+      if (strict_answer_numbers) {
+        blockingIssues.push({ mechanism: 'number_provenance', description: message, severity: 'blocking' });
+      } else {
+        warnings.push(message);
+      }
+    }
+  }
 
-  const tracedCount = results.filter(r => r.traced).length;
-  const tracedRatio = results.length === 0 ? 1 : tracedCount / results.length;
+  const graphResults = derivationGraph?.results ?? [];
+  const tracedCount = results.filter(r => r.traced).length + graphResults.filter(r => r.traced).length;
+  const resultCount = results.length + graphResults.length;
+  const tracedRatio = resultCount === 0 ? 1 : tracedCount / resultCount;
 
   const hasFail = blockingIssues.length > 0;
   const correctivePrompt = hasFail
@@ -256,6 +290,7 @@ export function handleTraceConclusionNumbers(
     traced_ratio: Math.round(tracedRatio * 1000) / 1000,
     results,
     untraced_answer_numbers: untraced,
+    ...(derivationGraph ? { derivation_graph: derivationGraph } : {}),
     context_used: !!context,
   };
 

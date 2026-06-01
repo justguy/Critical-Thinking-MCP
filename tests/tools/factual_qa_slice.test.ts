@@ -54,6 +54,39 @@ describe('plan_checks', () => {
     });
     expect(out.finalize_required).not.toContain('check_claim_coverage');
   });
+
+  it('emits a finalize-ready quote-grounding artifact template', () => {
+    const out = handlePlanChecks({
+      contract: { task_type: 'factual_qa', evidence_level: 'cited', risk_level: 'low' },
+    });
+    const template = out.artifact_templates.find(t => t.check === 'check_quote_grounding');
+
+    expect(template?.applies_when).toBe('finalize_required');
+    expect(template?.required_fields).toEqual(['sources', 'claims']);
+    expect(out.finalize_checklist).toContain('check_quote_grounding: provide sources, claims');
+
+    const example = template!.example as any;
+    const finalized = handleFinalizeDeliverable(
+      {
+        contract: {
+          contract_id: 'template-factual',
+          contract_authority: 'host',
+          profile_source: 'host_supplied',
+          original_request_text: 'Is Redis single-threaded?',
+          task_type: 'factual_qa',
+          evidence_level: 'cited',
+          risk_level: 'low',
+          claims: [{ id: 'c1', text: 'Redis executes commands single-threaded', claim_kind: 'status' }],
+        },
+        answer_text: 'Redis executes commands single-threaded.',
+        sources: example.sources,
+        claims: example.claims,
+      },
+      engine,
+    );
+
+    expect(finalized.finalize_verdict).toBe('PASS');
+  });
 });
 
 describe('check_quote_grounding', () => {
@@ -117,6 +150,99 @@ describe('check_quote_grounding', () => {
       ],
     };
     expect(handleCheckQuoteGrounding(input, engine).status).toBe('PASS');
+  });
+
+  it('clean status paraphrase with the same entity and predicate → PASS', () => {
+    const input = {
+      sources: [{ id: 's1', text: 'Alpha API is deprecated for new integrations.' }],
+      claims: [
+        {
+          claim_id: 's1',
+          claim_text: 'Alpha API remains deprecated for new integrations.',
+          source_id: 's1',
+          quoted_span: 'Alpha API is deprecated for new integrations',
+          supporting_token: 'deprecated',
+          claim_kind: 'status',
+        },
+      ],
+    };
+    expect(handleCheckQuoteGrounding(input, engine).status).toBe('PASS');
+  });
+
+  it('real span with wrong predicate → predicate_mismatch BLOCK', () => {
+    const input = {
+      sources: [{ id: 's1', text: 'Redis command execution is single-threaded in this deployment.' }],
+      claims: [
+        {
+          claim_id: 'p1',
+          claim_text: 'Redis command execution is multi-threaded in this deployment.',
+          source_id: 's1',
+          quoted_span: 'Redis command execution is single-threaded in this deployment',
+          supporting_token: 'Redis',
+          claim_kind: 'status',
+        },
+      ],
+    };
+    const out = handleCheckQuoteGrounding(input, engine);
+    expect(out.status).toBe('ENFORCEMENT_FAIL');
+    expect(out.enforcement?.blocking_issues.some(b => b.description.includes('predicate_mismatch:thread_model'))).toBe(true);
+  });
+
+  it('distractor source with same predicate but different entity → entity_mismatch BLOCK', () => {
+    const input = {
+      sources: [{ id: 's1', text: 'Beta API is deprecated for new integrations.' }],
+      claims: [
+        {
+          claim_id: 'e1',
+          claim_text: 'Alpha API is deprecated for new integrations.',
+          source_id: 's1',
+          quoted_span: 'Beta API is deprecated for new integrations',
+          supporting_token: 'deprecated',
+          claim_kind: 'status',
+        },
+      ],
+    };
+    const out = handleCheckQuoteGrounding(input, engine);
+    expect(out.status).toBe('ENFORCEMENT_FAIL');
+    expect(out.enforcement?.blocking_issues.some(b => b.description.includes('entity_mismatch'))).toBe(true);
+  });
+
+  it('status claim with mismatched temporal unit → temporal_unit_mismatch BLOCK', () => {
+    const input = {
+      sources: [{ id: 's1', text: 'The quota resets every minute.' }],
+      claims: [
+        {
+          claim_id: 't1',
+          claim_text: 'The quota resets every day.',
+          source_id: 's1',
+          quoted_span: 'The quota resets every minute',
+          supporting_token: 'resets',
+          claim_kind: 'status',
+        },
+      ],
+    };
+    const out = handleCheckQuoteGrounding(input, engine);
+    expect(out.status).toBe('ENFORCEMENT_FAIL');
+    expect(out.enforcement?.blocking_issues.some(b => b.description.includes('temporal_unit_mismatch'))).toBe(true);
+  });
+
+  it('status claim with mismatched year → date_mismatch BLOCK', () => {
+    const input = {
+      sources: [{ id: 's1', text: 'The release became generally available in 2024.' }],
+      claims: [
+        {
+          claim_id: 'd1',
+          claim_text: 'The release became generally available in 2025.',
+          source_id: 's1',
+          quoted_span: 'The release became generally available in 2024',
+          supporting_token: 'generally available',
+          claim_kind: 'status',
+        },
+      ],
+    };
+    const out = handleCheckQuoteGrounding(input, engine);
+    expect(out.status).toBe('ENFORCEMENT_FAIL');
+    expect(out.enforcement?.blocking_issues.some(b => b.description.includes('date_mismatch'))).toBe(true);
   });
 
   it('causal/recommendation claims are weak support and never block', () => {
@@ -276,6 +402,36 @@ describe('finalize_deliverable (re-executor)', () => {
     );
     expect(out.finalize_verdict).toBe('BLOCK');
     expect(out.enforcement?.blocking_issues.some(b => b.mechanism === 'finalize_claim_coverage')).toBe(true);
+  });
+
+  it('weak causal proximity cannot satisfy a cited factual contract claim', () => {
+    const out = handleFinalizeDeliverable(
+      {
+        contract: {
+          contract_id: 'causal1',
+          contract_authority: 'host',
+          profile_source: 'host_supplied',
+          original_request_text: 'Does memory pressure cause eviction?',
+          task_type: 'factual_qa',
+          evidence_level: 'cited',
+          risk_level: 'low',
+          claims: [{ id: 'c1', text: 'Memory pressure causes eviction.', claim_kind: 'causal' }],
+        },
+        answer_text: 'Memory pressure causes eviction.',
+        sources: [{ id: 's1', text: 'High memory pressure correlates with increased eviction.' }],
+        claims: [{
+          claim_id: 'c1',
+          claim_text: 'Memory pressure causes eviction.',
+          source_id: 's1',
+          quoted_span: 'High memory pressure correlates with increased eviction',
+          supporting_token: 'eviction',
+          claim_kind: 'causal',
+        }],
+      },
+      engine,
+    );
+    expect(out.finalize_verdict).toBe('BLOCK');
+    expect(out.enforcement?.blocking_issues.some(b => b.mechanism === 'finalize_claim_kind')).toBe(true);
   });
 
   it('agent-authored contract → still re-executes, but warns weak_agent_declared', () => {

@@ -10,6 +10,7 @@
  */
 
 import type {
+  ArtifactTemplate,
   DeliverableContract,
   EvidenceLevel,
   PlanResult,
@@ -61,6 +62,123 @@ const UNFORGEABLE_CHECKS = new Set<string>([
   'check_answer_against_constraints',
   'check_freshness',
 ]);
+
+function templateForCheck(
+  check: string,
+  applies_when: ArtifactTemplate['applies_when'],
+): ArtifactTemplate | null {
+  switch (check) {
+    case 'check_quote_grounding':
+      return {
+        check,
+        applies_when,
+        purpose: 'Prove each load-bearing factual claim against a quoted source span.',
+        required_fields: ['sources', 'claims'],
+        finalize_mapping: 'Copy sources[] and claims[] to finalize_deliverable.',
+        example: {
+          sources: [{
+            id: 's1',
+            text: 'Redis executes commands single-threaded.',
+            origin: 'host_supplied',
+            authority_tier: 'primary',
+          }],
+          claims: [{
+            claim_id: 'c1',
+            claim_text: 'Redis executes commands single-threaded',
+            source_id: 's1',
+            quoted_span: 'Redis executes commands single-threaded',
+            supporting_token: 'single-threaded',
+            claim_kind: 'status',
+          }],
+        },
+      };
+    case 'trace_conclusion_numbers':
+      return {
+        check,
+        applies_when,
+        purpose: 'Bind answer numbers to raw inputs or deterministic derivations.',
+        required_fields: ['inputs', 'conclusion_numbers'],
+        finalize_mapping: 'Copy inputs[] and conclusion_numbers[] to finalize_deliverable.',
+        example: {
+          inputs: [120, 30],
+          conclusion_numbers: [{
+            value: 150,
+            origin: 'derived',
+            op: 'sum',
+            input_refs: [0, 1],
+          }],
+          answer_text: 'The monthly total is 150.',
+        },
+      };
+    case 'verify_arithmetic':
+      return {
+        check,
+        applies_when,
+        purpose: 'Recompute arithmetic checks from supplied operands.',
+        required_fields: ['arithmetic_checks'],
+        finalize_mapping: 'Copy arithmetic_checks[] to finalize_deliverable.',
+        example: {
+          arithmetic_checks: [{
+            claim_type: 'sum',
+            values: [120, 30],
+            claimed_result: 150,
+          }],
+        },
+      };
+    case 'check_answer_against_constraints':
+      return {
+        check,
+        applies_when,
+        purpose: 'Evaluate hard constraints against the structured answer.',
+        required_fields: ['constraints', 'structured_answer'],
+        finalize_mapping: 'Copy constraints[] and structured_answer to finalize_deliverable.',
+        example: {
+          constraints: [{
+            field: 'price',
+            op: '<',
+            value: 100,
+            source_quote: 'price under 100',
+          }],
+          structured_answer: {
+            status: 'ok',
+            price: 80,
+          },
+        },
+      };
+    case 'check_freshness':
+      return {
+        check,
+        applies_when,
+        purpose: 'Evaluate source freshness at a host-supplied evaluation time.',
+        required_fields: ['eval_time', 'sources[].published_at|retrieved_at'],
+        finalize_mapping: 'Copy eval_time and dated sources[] to finalize_deliverable.',
+        example: {
+          eval_time: '2026-06-01T00:00:00Z',
+          sources: [{
+            id: 's1',
+            text: 'Current policy snapshot.',
+            retrieved_at: '2026-05-31T00:00:00Z',
+          }],
+        },
+      };
+    case 'check_case_partition':
+      return {
+        check,
+        applies_when,
+        purpose: 'Show that case partitions are mutually exclusive and cover the stated scope.',
+        required_fields: ['cases'],
+        finalize_mapping: 'Case partitions are advisory today; keep cases in supporting artifacts.',
+        example: {
+          cases: [
+            { id: 'success', condition: 'all required artifacts are valid' },
+            { id: 'blocked', condition: 'one or more mandatory artifacts are missing or invalid' },
+          ],
+        },
+      };
+    default:
+      return null;
+  }
+}
 
 /** Map a claim_classifier primary type to a deliverable task type. */
 export function inferTaskType(primaryType: string): TaskType {
@@ -169,5 +287,20 @@ export function planChecks(contract: {
     .filter(r => r.severity_on_fail === 'verify_if_present' && UNFORGEABLE_CHECKS.has(r.check))
     .map(r => r.check);
 
-  return { required, optional, finalize_required, finalize_verify_if_present };
+  const templateChecks = new Map<string, ArtifactTemplate['applies_when']>();
+  for (const check of finalize_required) templateChecks.set(check, 'finalize_required');
+  for (const check of finalize_verify_if_present) templateChecks.set(check, 'finalize_verify_if_present');
+  for (const check of optional.map(o => o.check)) {
+    if (!templateChecks.has(check)) templateChecks.set(check, 'optional');
+  }
+
+  const artifact_templates = [...templateChecks.entries()]
+    .map(([check, appliesWhen]) => templateForCheck(check, appliesWhen))
+    .filter((template): template is ArtifactTemplate => template !== null);
+
+  const finalize_checklist = artifact_templates
+    .filter(template => template.applies_when === 'finalize_required')
+    .map(template => `${template.check}: provide ${template.required_fields.join(', ')}`);
+
+  return { required, optional, finalize_required, finalize_verify_if_present, artifact_templates, finalize_checklist };
 }

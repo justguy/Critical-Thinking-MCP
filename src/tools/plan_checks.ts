@@ -96,6 +96,8 @@ export function handlePlanChecks(input: unknown): PlanChecksOutput {
     optional: plan.optional,
     finalize_required: plan.finalize_required,
     finalize_verify_if_present: plan.finalize_verify_if_present,
+    artifact_templates: plan.artifact_templates,
+    finalize_checklist: plan.finalize_checklist,
     context_used: !!context,
   };
 }

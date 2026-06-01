@@ -17,10 +17,14 @@
 
 import type { EnforcementEngine } from '../enforcement/index.js';
 import type { BlockingIssue, EnforcementContext } from '../enforcement/types.js';
+import {
+  evaluateNumericDerivationArtifact,
+  type NumericDerivationEvaluation,
+} from '../enforcement/numeric_analysis.js';
 
 // ====== Types ======
 
-export type ClaimType = 'sum' | 'weighted_average' | 'percentage' | 'growth' | 'product';
+export type ClaimType = 'sum' | 'weighted_average' | 'percentage' | 'growth' | 'product' | 'percent_change';
 
 export interface ArithmeticInput {
   claim_type: ClaimType;
@@ -43,6 +47,7 @@ export interface ArithmeticOutput {
   claimed_result: number;
   difference: number;
   within_tolerance: boolean;
+  derivation_graph?: NumericDerivationEvaluation;
   context_used: boolean;
   enforcement?: {
     blocking_issues: BlockingIssue[];
@@ -57,12 +62,12 @@ function validateInput(input: unknown): ArithmeticInput {
   if (input === null || typeof input !== 'object') {
     throw new Error(
       'Input must be an object with "claim_type", "values" (or "part"/"whole"), and "claimed_result". ' +
-      'Supported claim_type: "sum", "weighted_average", "percentage", "growth", "product".'
+      'Supported claim_type: "sum", "weighted_average", "percentage", "growth", "product", "percent_change".'
     );
   }
 
   const obj = input as Record<string, unknown>;
-  const validTypes: ClaimType[] = ['sum', 'weighted_average', 'percentage', 'growth', 'product'];
+  const validTypes: ClaimType[] = ['sum', 'weighted_average', 'percentage', 'growth', 'product', 'percent_change'];
 
   if (!validTypes.includes(obj.claim_type as ClaimType)) {
     throw new Error(
@@ -115,14 +120,28 @@ function validateInput(input: unknown): ArithmeticInput {
   }
 
   for (let i = 0; i < (obj.values as unknown[]).length; i++) {
-    if (typeof (obj.values as unknown[])[i] !== 'number') {
-      throw new Error(`values[${i}] is not a number.`);
+    if (typeof (obj.values as unknown[])[i] !== 'number' || !isFinite((obj.values as unknown[])[i] as number)) {
+      throw new Error(`values[${i}] is not a finite number.`);
+    }
+  }
+
+  if (claimType === 'percent_change') {
+    if ((obj.values as unknown[]).length !== 2) {
+      throw new Error('percent_change requires "values" array with exactly 2 numbers: [old, new].');
+    }
+    if ((obj.values as number[])[0] === 0) {
+      throw new Error('percent_change old value cannot be zero.');
     }
   }
 
   if (claimType === 'weighted_average') {
     if (!Array.isArray(obj.weights) || obj.weights.length !== (obj.values as unknown[]).length) {
       throw new Error('weighted_average requires "weights" array same length as "values".');
+    }
+    for (let i = 0; i < obj.weights.length; i++) {
+      if (typeof obj.weights[i] !== 'number' || !isFinite(obj.weights[i] as number)) {
+        throw new Error(`weights[${i}] is not a finite number.`);
+      }
     }
   }
 
@@ -157,6 +176,9 @@ function compute(input: ArithmeticInput): number {
 
     case 'product':
       return input.values.reduce((a, b) => a * b, 1);
+
+    case 'percent_change':
+      return ((input.values[1] - input.values[0]) / input.values[0]) * 100;
   }
 }
 
@@ -168,6 +190,7 @@ export function handleVerifyArithmetic(
 ): ArithmeticOutput {
   const enforcementContext = (input as Record<string, unknown>)?.context as EnforcementContext | undefined;
   const parsed = validateInput(input);
+  const rawInput = input as Record<string, unknown>;
 
   const computed = compute(parsed);
   const rounded = Math.round(computed * 1e9) / 1e9; // preserve precision
@@ -184,6 +207,11 @@ export function handleVerifyArithmetic(
 
   const blockingIssues: BlockingIssue[] = [];
   const warnings: string[] = [];
+  const derivationGraph = rawInput.numeric_derivation !== undefined
+    ? evaluateNumericDerivationArtifact(rawInput.numeric_derivation, {
+        tolerance: parsed.tolerance,
+      })
+    : undefined;
 
   if (!withinTolerance) {
     blockingIssues.push({
@@ -195,6 +223,10 @@ export function handleVerifyArithmetic(
         `Does not match to declared precision.`,
       severity: 'blocking',
     });
+  }
+  if (derivationGraph) {
+    for (const issue of derivationGraph.blocking_issues) blockingIssues.push(issue);
+    for (const warning of derivationGraph.warnings) warnings.push(warning);
   }
 
   const hasFail = blockingIssues.length > 0;
@@ -211,6 +243,7 @@ export function handleVerifyArithmetic(
     claimed_result: parsed.claimed_result,
     difference: Math.round(difference * 10000) / 10000,
     within_tolerance: withinTolerance,
+    ...(derivationGraph ? { derivation_graph: derivationGraph } : {}),
     context_used: !!enforcementContext,
     ...(hasFail || warnings.length > 0 ? {
       enforcement: {

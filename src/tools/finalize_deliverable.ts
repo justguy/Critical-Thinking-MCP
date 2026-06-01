@@ -115,6 +115,7 @@ function validateInput(input: unknown): {
   claims: GroundingClaim[];
   inputs: NumericInput[] | null;
   conclusion_numbers: unknown[] | null;
+  numeric_derivation: unknown | null;
   constraints: unknown[] | null;
   structured_answer: Record<string, unknown> | null;
   arithmetic_checks: unknown[] | null;
@@ -140,6 +141,7 @@ function validateInput(input: unknown): {
     claims: Array.isArray(obj.claims) ? (obj.claims as GroundingClaim[]) : [],
     inputs: Array.isArray(obj.inputs) ? (obj.inputs as NumericInput[]) : null,
     conclusion_numbers: Array.isArray(obj.conclusion_numbers) ? (obj.conclusion_numbers as unknown[]) : null,
+    numeric_derivation: obj.numeric_derivation ?? null,
     arithmetic_checks: Array.isArray(obj.arithmetic_checks) ? (obj.arithmetic_checks as unknown[]) : null,
     constraints: Array.isArray(obj.constraints) ? (obj.constraints as unknown[]) : null,
     structured_answer:
@@ -161,6 +163,7 @@ interface ReExecCtx {
   claims: GroundingClaim[];
   inputs: NumericInput[] | null;
   conclusion_numbers: unknown[] | null;
+  numeric_derivation: unknown | null;
   constraints: unknown[] | null;
   structured_answer: Record<string, unknown> | null;
   arithmetic_checks: unknown[] | null;
@@ -226,6 +229,30 @@ function validateNumericInputAnchors(ctx: ReExecCtx, inputs: NumericInput[]): Bl
     issues.push({
       mechanism: 'number_input_anchor',
       description: `Numeric input ${i} (${value}) is not anchored in original_request_text or a host/source quote; do not flatten derived outputs into inputs.`,
+      severity: 'blocking',
+    });
+  }
+  return issues;
+}
+
+function validateNumericDerivationInputAnchors(ctx: ReExecCtx): BlockingIssue[] {
+  const issues: BlockingIssue[] = [];
+  const artifact = ctx.numeric_derivation;
+  if (!artifact || typeof artifact !== 'object' || Array.isArray(artifact)) return issues;
+  const nodes = (artifact as Record<string, unknown>).nodes;
+  if (!Array.isArray(nodes)) return issues;
+
+  const requestNums = numericKeysInText(ctx.contract.original_request_text);
+  for (const node of nodes) {
+    if (!node || typeof node !== 'object' || Array.isArray(node)) continue;
+    const raw = node as Record<string, unknown>;
+    if (raw.role !== 'input' || typeof raw.value !== 'number' || !isFinite(raw.value)) continue;
+    const key = numericKey(raw.value);
+    if (requestNums.has(key)) continue;
+    if (valueAnchoredInSources(raw.value, ctx)) continue;
+    issues.push({
+      mechanism: 'number_input_anchor',
+      description: `Numeric DAG input "${String(raw.id ?? '?')}" (${raw.value}) is not anchored in original_request_text or a host/source quote; do not flatten derived outputs into raw input nodes.`,
       severity: 'blocking',
     });
   }
@@ -391,28 +418,38 @@ function reExecuteCheck(
       return { kind: 'ran', issues, warnings };
     }
     case 'trace_conclusion_numbers': {
-      if (!ctx.inputs || !ctx.conclusion_numbers) {
-        return { kind: 'missing', issues, warnings, hint: 'Required trace_conclusion_numbers could not be re-executed: supply "inputs" and "conclusion_numbers".' };
+      const hasFlatTrace = !!ctx.inputs && !!ctx.conclusion_numbers;
+      if (!hasFlatTrace && !ctx.numeric_derivation) {
+        return { kind: 'missing', issues, warnings, hint: 'Required trace_conclusion_numbers could not be re-executed: supply "inputs" and "conclusion_numbers", or "numeric_derivation".' };
       }
-      const normalizedInputs = normalizeNumericInputs(ctx.inputs);
-      if (!normalizedInputs) {
-        issues.push({
-          mechanism: 'number_provenance',
-          description: 'Numeric inputs must be finite numbers or objects with a finite numeric "value".',
-          severity: 'blocking',
-        });
-        return { kind: 'ran', issues, warnings };
-      }
-      if (ctx.contract.task_type === 'numeric_analysis') {
-        for (const issue of validateNumericInputAnchors(ctx, normalizedInputs.records)) issues.push(issue);
-        for (const issue of validateDerivedConclusions(ctx.conclusion_numbers)) issues.push(issue);
-      }
-      const trace = handleTraceConclusionNumbers({
-        inputs: normalizedInputs.values,
-        conclusion_numbers: ctx.conclusion_numbers,
+      const traceInput: Record<string, unknown> = {
         answer_text: ctx.answer_text,
         strict_answer_numbers: true,
-      }, engine);
+      };
+      if (hasFlatTrace) {
+        const normalizedInputs = normalizeNumericInputs(ctx.inputs!);
+        if (!normalizedInputs) {
+          issues.push({
+            mechanism: 'number_provenance',
+            description: 'Numeric inputs must be finite numbers or objects with a finite numeric "value".',
+            severity: 'blocking',
+          });
+          return { kind: 'ran', issues, warnings };
+        }
+        if (ctx.contract.task_type === 'numeric_analysis') {
+          for (const issue of validateNumericInputAnchors(ctx, normalizedInputs.records)) issues.push(issue);
+          for (const issue of validateDerivedConclusions(ctx.conclusion_numbers!)) issues.push(issue);
+        }
+        traceInput.inputs = normalizedInputs.values;
+        traceInput.conclusion_numbers = ctx.conclusion_numbers;
+      }
+      if (ctx.numeric_derivation) {
+        if (ctx.contract.task_type === 'numeric_analysis') {
+          for (const issue of validateNumericDerivationInputAnchors(ctx)) issues.push(issue);
+        }
+        traceInput.numeric_derivation = ctx.numeric_derivation;
+      }
+      const trace = handleTraceConclusionNumbers(traceInput, engine);
       for (const issue of trace.enforcement?.blocking_issues ?? []) issues.push(issue);
       for (const warning of trace.enforcement?.warnings ?? []) warnings.push(warning);
       return { kind: 'ran', issues, warnings };
@@ -474,7 +511,7 @@ export function handleFinalizeDeliverable(
   engine: EnforcementEngine,
 ): FinalizeOutput {
   const context = (input as any)?.context as EnforcementContext | undefined;
-  const { contract, answer_text, sources, claims, inputs, conclusion_numbers, constraints, structured_answer, arithmetic_checks, eval_time, case_partition } =
+  const { contract, answer_text, sources, claims, inputs, conclusion_numbers, numeric_derivation, constraints, structured_answer, arithmetic_checks, eval_time, case_partition } =
     validateInput(input);
   const nAnswer = normalizeWhitespace(answer_text);
 
@@ -490,7 +527,7 @@ export function handleFinalizeDeliverable(
 
   // ── Re-execute the gate checks INLINE (the unforgeable gate) ───────────────
   const reExecuted: string[] = [];
-  const reExecCtx: ReExecCtx = { contract, answer_text, sources, claims, inputs, conclusion_numbers, constraints, structured_answer, arithmetic_checks, eval_time };
+  const reExecCtx: ReExecCtx = { contract, answer_text, sources, claims, inputs, conclusion_numbers, numeric_derivation, constraints, structured_answer, arithmetic_checks, eval_time };
 
   // Mandatory (finalize_required): missing artifacts is itself a BLOCK — you cannot release a
   // deliverable whose core required check could not be re-verified this turn.

@@ -10,7 +10,8 @@
  * What it enforces, in order:
  *   1. The HOST authors the contract (contract_authority='host') — never the agent.
  *   2. finalize_deliverable must return PASS (re-runs the required unforgeable checks inline).
- *   3. Anti-swap: the text actually being surfaced must hash-match the text finalize checked.
+ *   3. In strict_release mode, finalize_deliverable must confirm a host-anchored contract.
+ *   4. Anti-swap: the text actually being surfaced must hash-match the text finalize checked.
  * Only then does it RELEASE. Otherwise it REJECTs and hands back the corrective_prompt.
  *
  * The agent stays OUTSIDE: it produces the answer + artifacts; this host decides release.
@@ -56,6 +57,7 @@ export interface DeliverableArtifacts {
   claims?: GroundingClaim[];
   inputs?: unknown[];
   conclusion_numbers?: unknown[];
+  numeric_derivation?: unknown;
   arithmetic_checks?: unknown[];
   constraints?: unknown[];
   structured_answer?: Record<string, unknown>;
@@ -71,9 +73,11 @@ export interface EnforceOptions {
   surfaced_answer?: string;
   /** Inject a finalize implementation (e.g. an MCP-over-stdio client). Defaults to in-process. */
   finalize?: (input: unknown) => FinalizeOutput;
+  /** Fail closed if finalize does not report a host-authored contract. */
+  strict_release?: boolean;
 }
 
-export type RejectReason = 'gate_block' | 'hash_mismatch';
+export type RejectReason = 'gate_block' | 'hash_mismatch' | 'contract_not_host_anchored';
 
 export interface ReleaseDecision {
   decision: 'RELEASE' | 'REJECT';
@@ -90,6 +94,19 @@ export interface ReleaseDecision {
   required_checks: string[];
   re_executed: string[];
   contract_strength: 'host_anchored' | 'weak_agent_declared';
+}
+
+function contractAuthorityIssue(contractStrength: unknown): BlockingIssue {
+  return {
+    mechanism: 'strict_host_contract_required',
+    description:
+      `Strict release requires finalize_deliverable to report contract_strength="host_anchored"; got "${String(contractStrength)}".`,
+    severity: 'blocking',
+  };
+}
+
+function strictReleasePrompt(issue: BlockingIssue): string {
+  return `${issue.description} Supply the contract at the host boundary and re-run ct-enforce on the exact answer to ship.`;
 }
 
 /**
@@ -127,6 +144,7 @@ export function enforceDeliverable(
     claims: artifacts.claims,
     inputs: artifacts.inputs,
     conclusion_numbers: artifacts.conclusion_numbers,
+    numeric_derivation: artifacts.numeric_derivation,
     arithmetic_checks: artifacts.arithmetic_checks,
     constraints: artifacts.constraints,
     structured_answer: artifacts.structured_answer,
@@ -160,7 +178,19 @@ export function enforceDeliverable(
     };
   }
 
-  // 3. Anti-swap: the text being shipped must be the text that was checked.
+  if (opts.strict_release && out.contract_strength !== 'host_anchored') {
+    const issue = contractAuthorityIssue(out.contract_strength);
+    return {
+      ...base,
+      decision: 'REJECT',
+      reason: 'contract_not_host_anchored',
+      surfaced_answer_hash: '',
+      blocking_issues: [...blocking_issues, issue],
+      corrective_prompt: strictReleasePrompt(issue),
+    };
+  }
+
+  // 4. Anti-swap: the text being shipped must be the text that was checked.
   const surfaced = opts.surfaced_answer ?? artifacts.answer_text;
   const surfaced_answer_hash = sha256Hex(surfaced);
   if (surfaced_answer_hash !== out.answer_text_hash) {

@@ -19,13 +19,14 @@ no network, no clock**. The agent stays outside; the host decides release.
 1. Build the host-authored contract.
 2. Call `finalize_deliverable` (re-runs the contract's required unforgeable checks inline).
 3. `finalize_verdict !== 'PASS'` → **REJECT `gate_block`** (hands back `corrective_prompt`).
-4. `sha256(surfaced_answer) !== answer_text_hash` → **REJECT `hash_mismatch`**.
-5. Otherwise → **RELEASE**.
+4. In `strict_release` mode, `contract_strength !== 'host_anchored'` → **REJECT `contract_not_host_anchored`**.
+5. `sha256(surfaced_answer) !== answer_text_hash` → **REJECT `hash_mismatch`**.
+6. Otherwise → **RELEASE**.
 
 ## API
 ```ts
 import { enforceDeliverable } from 'ct-mcp/dist/host/enforcement_host.js';
-const decision = enforceDeliverable(spec, artifacts, { eval_time, surfaced_answer });
+const decision = enforceDeliverable(spec, artifacts, { eval_time, surfaced_answer, strict_release: true });
 // decision.decision: 'RELEASE' | 'REJECT'; .reason; .corrective_prompt; .answer_text_hash; ...
 ```
 - `spec` (host-authored): `contract_id, original_request_text, task_type, evidence_level, risk_level`,
@@ -39,9 +40,10 @@ const decision = enforceDeliverable(spec, artifacts, { eval_time, surfaced_answe
 ```bash
 node dist/host/cli.js deliverable.json    # or:  ct-enforce < deliverable.json
 ```
-Input: `{ "spec": {...}, "artifacts": {...}, "eval_time"?: {...}, "surfaced_answer"?: "..." }`.
-Prints the `ReleaseDecision`; **exits 0 on RELEASE, 1 on REJECT, 2 on bad input** — so it drops straight
-into a shell/CI gate.
+Input: `{ "spec": {...}, "artifacts": {...}, "eval_time"?: {...}, "surfaced_answer"?: "...", "strict_release"?: boolean }`.
+`ct-enforce` defaults to strict release behavior; pass `"strict_release": false` or `--no-strict` only for
+compatibility diagnostics. It prints JSON on every path and exits **0 on RELEASE, 1 on gate/strict REJECT,
+2 on bad input, 3 on anti-swap hash mismatch** — so it drops straight into a shell/CI gate.
 
 ## Honest limits (unchanged by adding a host)
 - **It does not author the contract or the artifacts for you.** The host must supply the contract; the

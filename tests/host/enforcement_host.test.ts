@@ -5,6 +5,8 @@
 import { describe, it, expect } from 'vitest';
 
 import { enforceDeliverable, type ContractSpec, type DeliverableArtifacts } from '../../src/host/enforcement_host.js';
+import { sha256Hex } from '../../src/enforcement/utils.js';
+import type { FinalizeOutput } from '../../src/tools/finalize_deliverable.js';
 
 const factualSpec = (over: Partial<ContractSpec> = {}): ContractSpec => ({
   contract_id: 'h1',
@@ -22,6 +24,20 @@ const groundedArtifacts = (answer = 'Redis executes commands single-threaded.'):
   claims: [
     { claim_id: 'cl1', claim_text: 'Redis executes commands single-threaded', source_id: 's1', quoted_span: 'Redis is single-threaded for command execution', supporting_token: 'single-threaded', claim_kind: 'status' },
   ],
+});
+
+const passingFinalize = (
+  answerText: string,
+  contractStrength: FinalizeOutput['contract_strength'],
+): FinalizeOutput => ({
+  status: 'PASS',
+  finalize_verdict: 'PASS',
+  answer_text_hash: sha256Hex(answerText),
+  answer_text_length: answerText.length,
+  required_checks: [],
+  re_executed: [],
+  contract_strength: contractStrength,
+  context_used: false,
 });
 
 describe('enforceDeliverable', () => {
@@ -94,5 +110,36 @@ describe('enforceDeliverable', () => {
     );
     expect(d.decision).toBe('REJECT');
     expect(d.reason).toBe('hash_mismatch');
+  });
+
+  it('REJECTS weak agent-declared finalize output in strict_release mode', () => {
+    const answer = 'Weak contract answer.';
+    const d = enforceDeliverable(
+      factualSpec({ evidence_level: 'none', risk_level: 'low', claims: [] }),
+      { answer_text: answer },
+      { strict_release: true, finalize: () => passingFinalize(answer, 'weak_agent_declared') },
+    );
+
+    expect(d.decision).toBe('REJECT');
+    expect(d.reason).toBe('contract_not_host_anchored');
+    expect(d.finalize_verdict).toBe('PASS');
+    expect(d.blocking_issues.some(issue => issue.mechanism === 'strict_host_contract_required')).toBe(true);
+    expect(d.corrective_prompt).toContain('host boundary');
+  });
+
+  it('REJECTS missing finalize contract strength in strict_release mode', () => {
+    const answer = 'Missing contract strength answer.';
+    const weakOutput = passingFinalize(answer, 'host_anchored') as Partial<FinalizeOutput>;
+    delete weakOutput.contract_strength;
+
+    const d = enforceDeliverable(
+      factualSpec({ evidence_level: 'none', risk_level: 'low', claims: [] }),
+      { answer_text: answer },
+      { strict_release: true, finalize: () => weakOutput as FinalizeOutput },
+    );
+
+    expect(d.decision).toBe('REJECT');
+    expect(d.reason).toBe('contract_not_host_anchored');
+    expect(d.blocking_issues.some(issue => issue.description.includes('undefined'))).toBe(true);
   });
 });

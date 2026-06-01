@@ -86,12 +86,15 @@ export function registerToolHandlers(server: Server): void {
       const truncated = Object.keys(truncation).length > 0;
 
       if (typedResult.status === 'ENFORCEMENT_FAIL') {
+        const partial = truncated
+          ? { ...(result as Record<string, unknown>), truncation }
+          : (result as Record<string, unknown>);
         const failPayload = {
+          ...partial,
           status: 'ENFORCEMENT_FAIL' as const,
           blocking_issues: typedResult.enforcement?.blocking_issues ?? [],
           corrective_prompt: typedResult.enforcement?.corrective_prompt ?? '',
-          partial: result,
-          ...(truncated ? { truncation } : {}),
+          partial,
         };
         return {
           // Backward-compat text block (serialized JSON) + typed structuredContent (MCP 2025-06-18).

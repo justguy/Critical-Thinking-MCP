@@ -118,6 +118,44 @@ export interface OutlierResult {
   index: number;
 }
 
+// ====== Numeric Derivation DAG Types ======
+
+export type NumericDerivationOp =
+  | 'literal'
+  | 'identity'
+  | 'sum'
+  | 'diff'
+  | 'product'
+  | 'ratio'
+  | 'pct_of'
+  | 'mean'
+  | 'weighted_average'
+  | 'percent_change';
+
+export interface NumericDerivationNode {
+  /** Stable node id used by input_refs/final_refs. */
+  id: string;
+  /** raw input = external operand; intermediate/final = rederived from input_refs. */
+  role: 'input' | 'intermediate' | 'final';
+  value: number;
+  unit?: string;
+  op?: NumericDerivationOp;
+  input_refs?: string[];
+  /** Required for weighted_average; same order and length as input_refs. */
+  weights?: number[];
+  /** Human-readable formula string, carried through for audit/binding output. */
+  formula?: string;
+  /** Optional exact answer span that must contain this final value when answer_text is supplied. */
+  answer_text_quote?: string;
+}
+
+export interface NumericDerivationArtifact {
+  kind?: 'numeric_derivation_dag';
+  nodes: NumericDerivationNode[];
+  /** Optional explicit finals. If absent, nodes with role='final' are the final numbers. */
+  final_refs?: string[];
+}
+
 // ====== Caller-Supplied Context (optional, enables iterative behavior) ======
 
 export interface EnforcementContext {
@@ -285,6 +323,15 @@ export interface PlannedCheck {
   reason: string;
 }
 
+export interface ArtifactTemplate {
+  check: string;
+  applies_when: 'finalize_required' | 'finalize_verify_if_present' | 'optional';
+  purpose: string;
+  required_fields: string[];
+  finalize_mapping: string;
+  example: Record<string, unknown>;
+}
+
 export interface PlanResult {
   required: PlannedCheck[];
   optional: { check: string; reason: string }[];
@@ -294,4 +341,8 @@ export interface PlanResult {
   /** Unforgeable checks finalize re-runs only if their artifacts are supplied (block on failure,
    *  never on absence). */
   finalize_verify_if_present: string[];
+  /** Minimal artifact examples the agent can copy into finalize_deliverable inputs. */
+  artifact_templates: ArtifactTemplate[];
+  /** Human-readable checklist of artifacts required before finalize_deliverable can release. */
+  finalize_checklist: string[];
 }

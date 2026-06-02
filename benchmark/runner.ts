@@ -20,6 +20,7 @@ import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { EnforcementEngine } from '../src/enforcement/index.js';
+import { runRealOutput, type RealRow } from './real_output_runner.js';
 import { handleValidateReasoningChain } from '../src/tools/validate_reasoning_chain.js';
 import { handleCheckNumericClaims } from '../src/tools/check_numeric_claims.js';
 import { handleDetectDrift } from '../src/tools/detect_drift.js';
@@ -155,6 +156,12 @@ interface BenchmarkResults {
   total_scenarios: number;
   total_rows: number;
   rows: BenchmarkRow[];
+  /**
+   * REAL model outputs for the bare-model arms (baseline / prompted), graded by
+   * objective oracles. Empty unless BENCH_REAL_MODEL=1. These rows are never
+   * synthetic; placeholder rows are never written here.
+   */
+  real_model_rows: RealRow[];
   summary: {
     by_condition: Record<string, ConditionSummary>;
     clean_control_stats: CleanControlStats;
@@ -493,6 +500,9 @@ function main(): void {
   console.log('');
 
   const allRows: BenchmarkRow[] = [];
+  const realModelRows: RealRow[] = [];
+  const realModelEnabled = process.env.BENCH_REAL_MODEL === '1';
+  const realModelName = process.env.BENCH_MODEL ?? 'haiku';
   const engine = new EnforcementEngine();
 
   for (const condition of CONDITIONS) {
@@ -507,10 +517,32 @@ function main(): void {
     }
 
     if (!condition.tools) {
-      console.log(`  Generating placeholder rows for "${condition.id}" — requires LLM API calls.`);
-      for (const scenario of SCENARIOS) {
-        allRows.push(generatePlaceholderRow(scenario, condition));
+      // Bare-model conditions (baseline / prompted) now produce REAL outputs via
+      // the local CLI adapter, graded by objective oracles (plan §1a). They are
+      // NEVER inserted into the scored `rows` as synthetic placeholders. When the
+      // real-model arm is disabled we skip them entirely so no synthetic:true row
+      // can leak into scored stats.
+      if (condition.id !== 'baseline' && condition.id !== 'prompted') {
+        console.log(`  Skipping non-tool condition "${condition.id}".`);
+        continue;
       }
+      if (!realModelEnabled) {
+        console.log(
+          `  Skipping real-model condition "${condition.id}" — set BENCH_REAL_MODEL=1 ` +
+          `to drive the local CLI adapter. (No synthetic rows are emitted.)`,
+        );
+        continue;
+      }
+      console.log(`  Running REAL model "${realModelName}" via local CLI adapter for "${condition.id}"...`);
+      const condRows = runRealOutput({
+        model: realModelName,
+        conditions: [condition.id],
+        onRow: (r) => {
+          const status = r.adapter_error ? 'ERR ' : r.correct ? 'OK  ' : 'DEFCT';
+          console.log(`    [${status}] ${r.task_id} (${r.suite})`);
+        },
+      });
+      realModelRows.push(...condRows);
       continue;
     }
 
@@ -552,8 +584,18 @@ function main(): void {
     total_scenarios: SCENARIOS.length,
     total_rows: allRows.length,
     rows: allRows,
+    real_model_rows: realModelRows,
     summary: computeSummary(allRows),
   };
+
+  if (realModelRows.length > 0) {
+    const graded = realModelRows.filter(r => !r.adapter_error);
+    const defective = graded.filter(r => r.high_sev_defects > 0).length;
+    console.log(
+      `\nReal-model arm: ${realModelRows.length} rows, ${graded.length} graded, ` +
+      `${defective} defective (density ${(defective / Math.max(graded.length, 1) * 100).toFixed(1)}%).`,
+    );
+  }
 
   // Write results
   const resultsDir = resolve(__dirname, 'results');

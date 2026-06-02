@@ -9,7 +9,9 @@
  */
 
 import { planChecks } from '../enforcement/check_planner.js';
+import { computePlanToken } from '../enforcement/plan_token.js';
 import type {
+  DeliverableContract,
   EnforcementContext,
   EvidenceLevel,
   PlanResult,
@@ -33,6 +35,15 @@ export interface PlanChecksOutput extends PlanResult {
   status: 'PASS';
   task_type: TaskType;
   context_used: boolean;
+  /**
+   * Deterministic contract-identity token (§3.1). Issued ONLY when a full
+   * contract (with contract_id + original_request_text) is supplied. Copy it into
+   * finalize_deliverable.plan_token; finalize recomputes it from the contract it
+   * actually checks and BLOCKS if they disagree — binding the planned contract to
+   * the finalized one even for a raw MCP client. Absent for a bare
+   * task_type/evidence_level/risk_level probe (no contract to bind to).
+   */
+  plan_token?: string;
 }
 
 function validateInput(input: unknown): {
@@ -84,10 +95,48 @@ function validateInput(input: unknown): {
   };
 }
 
+/**
+ * Issue a plan_token ONLY when the caller supplied a full contract identity — a
+ * contract_id + original_request_text. A bare profile probe
+ * ({task_type, evidence_level, risk_level}) has no contract to bind to, so no token.
+ */
+function planTokenFor(input: unknown, profile: {
+  task_type: TaskType;
+  evidence_level: EvidenceLevel;
+  risk_level: RiskLevel;
+  freshness?: { max_age_seconds: number; requires_dated_sources: boolean };
+}): string | undefined {
+  if (input === null || typeof input !== 'object') return undefined;
+  const obj = input as Record<string, unknown>;
+  const c = (obj.contract && typeof obj.contract === 'object' ? obj.contract : obj) as Record<string, unknown>;
+  if (typeof c.contract_id !== 'string' || c.contract_id.length === 0) return undefined;
+  if (typeof c.original_request_text !== 'string' || c.original_request_text.length === 0) return undefined;
+
+  // Build the obligation-bearing identity from the SAME fields finalize will hash.
+  const contract = {
+    contract_id: c.contract_id,
+    contract_authority: c.contract_authority,
+    profile_source: c.profile_source,
+    original_request_text: c.original_request_text,
+    task_type: profile.task_type,
+    evidence_level: profile.evidence_level,
+    risk_level: profile.risk_level,
+    freshness: profile.freshness,
+    claims: c.claims,
+    must_include: c.must_include,
+    must_not_include: c.must_not_include,
+    required_fields: c.required_fields,
+    constraints: c.constraints,
+    acceptance_criteria: c.acceptance_criteria,
+  } as DeliverableContract;
+  return computePlanToken(contract);
+}
+
 export function handlePlanChecks(input: unknown): PlanChecksOutput {
   const context = (input as any)?.context as EnforcementContext | undefined;
   const { task_type, evidence_level, risk_level, freshness } = validateInput(input);
   const plan = planChecks({ task_type, evidence_level, risk_level, freshness });
+  const plan_token = planTokenFor(input, { task_type, evidence_level, risk_level, freshness });
 
   return {
     status: 'PASS',
@@ -99,5 +148,6 @@ export function handlePlanChecks(input: unknown): PlanChecksOutput {
     artifact_templates: plan.artifact_templates,
     finalize_checklist: plan.finalize_checklist,
     context_used: !!context,
+    ...(plan_token ? { plan_token } : {}),
   };
 }

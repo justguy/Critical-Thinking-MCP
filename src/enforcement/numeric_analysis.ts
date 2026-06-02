@@ -64,6 +64,8 @@ export interface NumericDerivationNodeResult {
   recomputed: number | null;
   reason: string | null;
   answer_bound?: boolean;
+  /** True when this final node bound to the unsigned magnitude of a signed value (§ magnitude_binding). */
+  magnitude_bound?: boolean;
 }
 
 export interface NumericDerivationEvaluation {
@@ -170,6 +172,12 @@ function validateNode(raw: unknown, index: number): NumericDerivationNode {
   if (node.answer_text_quote !== undefined && typeof node.answer_text_quote !== 'string') {
     throw new Error(`numeric_derivation.nodes[${index}].answer_text_quote must be a string when supplied.`);
   }
+  if (node.unit_constant !== undefined && typeof node.unit_constant !== 'boolean') {
+    throw new Error(`numeric_derivation.nodes[${index}].unit_constant must be a boolean when supplied.`);
+  }
+  if (node.magnitude_binding !== undefined && typeof node.magnitude_binding !== 'boolean') {
+    throw new Error(`numeric_derivation.nodes[${index}].magnitude_binding must be a boolean when supplied.`);
+  }
 
   return {
     id: node.id,
@@ -181,8 +189,14 @@ function validateNode(raw: unknown, index: number): NumericDerivationNode {
     weights: node.weights as number[] | undefined,
     formula: node.formula as string | undefined,
     answer_text_quote: node.answer_text_quote as string | undefined,
+    unit_constant: node.unit_constant as boolean | undefined,
+    magnitude_binding: node.magnitude_binding as boolean | undefined,
   };
 }
+
+// Direction words for magnitude_binding on signed percent_change finals.
+const DECREASE_WORDS = /\b(decrease|decreased|decline|declined|fell|fall|drop|dropped|down|lower|reduction|reduced|less)\b/i;
+const INCREASE_WORDS = /\b(increase|increased|rose|rise|grew|grow|growth|up|higher|gain|gained|more)\b/i;
 
 export function validateNumericDerivationArtifact(input: unknown): NumericDerivationArtifact {
   if (!input || typeof input !== 'object' || Array.isArray(input)) {
@@ -339,7 +353,22 @@ export function evaluateNumericDerivationArtifact(
       const node = byId.get(finalId)!;
       const result = resultById.get(finalId)!;
       let answerBound = false;
-      if (node.answer_text_quote) {
+      // Opt-in magnitude binding for a signed percent_change final: the answer may
+      // state the unsigned magnitude ("20% decrease") provided the bound quote
+      // carries a direction word agreeing with the sign. The magnitude itself must
+      // still match, so a wrong number (e.g. 25) does not bind.
+      const magnitudeOk =
+        node.magnitude_binding === true &&
+        node.op === 'percent_change' &&
+        typeof node.answer_text_quote === 'string' &&
+        answerText.includes(node.answer_text_quote) &&
+        textContainsNumber(node.answer_text_quote, Math.abs(node.value), tolerance) &&
+        ((node.value < 0 && DECREASE_WORDS.test(node.answer_text_quote)) ||
+          (node.value > 0 && INCREASE_WORDS.test(node.answer_text_quote)));
+      if (magnitudeOk) {
+        answerBound = true;
+        result.magnitude_bound = true;
+      } else if (node.answer_text_quote) {
         answerBound = answerText.includes(node.answer_text_quote) && textContainsNumber(node.answer_text_quote, node.value, tolerance);
       } else {
         answerBound = textContainsNumber(answerText, node.value, tolerance);

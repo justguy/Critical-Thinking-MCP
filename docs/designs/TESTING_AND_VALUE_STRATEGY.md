@@ -10,7 +10,7 @@ The current proof pass demonstrates meaningful deterministic correctness value:
 
 - `npm run build` passes.
 - `npm test` passes with 378 tests across 18 files as of 2026-06-01.
-- Public MCP surface is 11 facade tools.
+- Public MCP surface is an 11-tool spine (not a façade layer).
 - Internal deliverable leaf tools are hidden from the public surface.
 - Every public tool has an `outputSchema`.
 - Representative PASS and BLOCK calls emit schema-valid `structuredContent`.
@@ -600,10 +600,10 @@ Needed work:
   - case partitions.
 - Make `plan_checks` output directly usable as a finalize artifact checklist.
 - Add examples for common task types.
-- Prefer a two-tool facade:
+- Drive the layer through the two use-case entry tools of the spine (not a façade layer — see `PROOF_HANDOFF.md` "Surface discipline"):
   - `plan_checks`
   - `finalize_deliverable`
-- Keep leaf tools as internal/debug tools.
+- Keep leaf checks as internal primitives, re-executed inside `finalize_deliverable`.
 
 Expected quality impact:
 

@@ -23,9 +23,14 @@ import { EnforcementEngine } from '../enforcement/index.js';
 import { handleFinalizeDeliverable, type FinalizeOutput } from '../tools/finalize_deliverable.js';
 import { sha256Hex } from '../enforcement/utils.js';
 import { enforceInputLimits } from '../enforcement/limits.js';
+import { validateArtifactBundle } from '../enforcement/artifact_schema.js';
+import { renderAnswer } from '../enforcement/answer_renderer.js';
+import { evaluateHostGradeTrust, type HostAnchoredEvidence } from '../enforcement/host_grade_trust.js';
+import { stampTaxonomy } from '../enforcement/blocker_taxonomy.js';
 import type {
   AcceptanceCriterion,
   AnswerConstraint,
+  ArtifactBundle,
   BlockingIssue,
   ContractClaim,
   DeliverableContract,
@@ -64,6 +69,12 @@ export interface DeliverableArtifacts {
   constraints?: unknown[];
   structured_answer?: Record<string, unknown>;
   case_partition?: Record<string, unknown>;
+  /**
+   * The bound artifact ledger (§5). When supplied with host proof_grade_requirements,
+   * the host renders it and enforces the §3 host-grade trust rule. The agent
+   * authors the bundle; it does NOT decide which requirements are proof-grade.
+   */
+  artifact_bundle?: ArtifactBundle;
 }
 
 export interface EnforceOptions {
@@ -77,9 +88,30 @@ export interface EnforceOptions {
   finalize?: (input: unknown) => FinalizeOutput;
   /** Fail closed if finalize does not report a host-authored contract. */
   strict_release?: boolean;
+  /**
+   * Requirement ids the HOST declares MUST be backed by tier-1/2 (host-grade)
+   * strong-grounded evidence (§3). Authored host-side so the model cannot dodge by
+   * self-declaring a weaker profile. Enforced over artifacts.artifact_bundle; if no
+   * bundle is supplied while this is non-empty, release is REJECTed (the host-grade
+   * obligation could not be verified). Empty/omitted = no host-grade obligation.
+   */
+  proof_grade_requirements?: string[];
+  /**
+   * The HOST's authoritative evidence set (host-supplied sources / host-authored
+   * artifacts). This is the ROOT OF TRUST for proof-grade: an agent's provenance
+   * label (e.g. 'host_extracted') is a CLAIM verified against this, never a trusted
+   * fact. A proof-grade requirement is satisfied only if a binding's artifact is
+   * AUTHENTICATED here (quoted span verbatim-matches a host source, or the artifact
+   * is in the host-authored set). Authored host-side, NOT in the agent's bundle.
+   */
+  host_evidence?: HostAnchoredEvidence;
 }
 
-export type RejectReason = 'gate_block' | 'hash_mismatch' | 'contract_not_host_anchored';
+export type RejectReason =
+  | 'gate_block'
+  | 'hash_mismatch'
+  | 'contract_not_host_anchored'
+  | 'host_grade_proof_missing';
 
 export interface ReleaseDecision {
   decision: 'RELEASE' | 'REJECT';
@@ -191,6 +223,51 @@ export function enforceDeliverable(
       blocking_issues: [...blocking_issues, issue],
       corrective_prompt: strictReleasePrompt(issue),
     };
+  }
+
+  // 3b. Host-grade trust (§3): a PASS that asserts proof may rest ONLY on tier-1/2
+  // strong-grounded artifacts. The HOST owns proof_grade_requirements, so a model-
+  // authored bundle cannot self-declare a weaker profile to dodge — it can only
+  // fail to satisfy it (which BLOCKS). Runs over the agent-supplied artifact_bundle.
+  const proofGradeReqs = opts.proof_grade_requirements ?? [];
+  if (proofGradeReqs.length > 0) {
+    if (!artifacts.artifact_bundle) {
+      const issue: BlockingIssue = stampTaxonomy([
+        {
+          mechanism: 'host_grade_proof_required',
+          description:
+            `Host declared proof-grade requirements [${proofGradeReqs.join(', ')}] but no artifact_bundle was ` +
+            'supplied to verify their backing tier. Supply the bound artifact ledger (§5) to release.',
+          severity: 'blocking',
+        },
+      ])[0];
+      return {
+        ...base,
+        decision: 'REJECT',
+        reason: 'host_grade_proof_missing',
+        surfaced_answer_hash: '',
+        blocking_issues: [...blocking_issues, issue],
+        corrective_prompt: issue.description,
+      };
+    }
+    // Validate structure + referential integrity, then render and apply the §3 rule.
+    const bundle = validateArtifactBundle(artifacts.artifact_bundle);
+    renderAnswer(bundle); // §5 projection — the wiring point Phase 3.2 diffs for drift.
+    const trust = evaluateHostGradeTrust(bundle, {
+      proof_grade_requirements: proofGradeReqs,
+      host_evidence: opts.host_evidence,
+    });
+    if (!trust.proof_grade_satisfied) {
+      stampTaxonomy(trust.blocking_issues);
+      return {
+        ...base,
+        decision: 'REJECT',
+        reason: 'host_grade_proof_missing',
+        surfaced_answer_hash: '',
+        blocking_issues: [...blocking_issues, ...trust.blocking_issues],
+        corrective_prompt: trust.blocking_issues.map(i => i.description).join(' '),
+      };
+    }
   }
 
   // 4. Anti-swap: the text being shipped must be the text that was checked.

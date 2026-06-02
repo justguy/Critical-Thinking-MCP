@@ -71,7 +71,7 @@ First public beta.
 - 9 MCP tools: validate_reasoning_chain, check_numeric_claims, verify_arithmetic, detect_drift, evaluate_tradeoffs, check_plan_validity, score_response_quality, validate_confidence, detect_concurrency_patterns
 - 15 enforcement mechanisms, all deterministic and stateless
 - 56 benchmark scenarios (42 defect + 14 clean control)
-- Benchmark results: 42/42 vs baseline, 42/42 vs prompted, 0/14 false positives
+- Benchmark results: CT-MCP detected the planted defect in 42/42 defect scenarios, 0/14 false positives (the baseline/prompted comparison rows were synthetic placeholders, so a measured "42/42 vs baseline / vs prompted" head-to-head is not reproducible and is pending a real-model run)
 - MAD-based outlier detection for small samples
 - Geometric ratio fabrication detection
 - Arithmetic verification (sum, weighted average, percentage, compound growth, product)

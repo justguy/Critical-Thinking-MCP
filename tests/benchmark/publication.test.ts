@@ -259,9 +259,15 @@ describe('Benchmark publication docs stay aligned with canonical results', () =>
   });
 
   it('capability map uses current benchmark scope and release wording', () => {
-    expect(capabilityMap).toContain(`42/42 wins vs baseline`);
-    expect(capabilityMap).toContain(`42/42 wins vs prompted`);
+    // Phase 0 (dvp-p0) retired the unqualified "42/42 wins vs baseline/prompted"
+    // overclaim (the baseline/prompted rows are synthetic placeholders) in favor of
+    // honest detection-quality wording. Enforce the current framing and forbid the
+    // retired overclaim so it cannot silently return.
+    expect(capabilityMap).toContain(`42/42 defect scenarios`);
     expect(capabilityMap).toContain(`0/14 false positives`);
+    expect(capabilityMap.toLowerCase()).toContain('synthetic');
+    expect(capabilityMap).not.toContain('42/42 wins vs baseline');
+    expect(capabilityMap).not.toContain('42/42 wins vs prompted');
     expect(capabilityMap).not.toContain('0/6 false positives');
     expect(capabilityMap).not.toContain('v0.1.1');
   });

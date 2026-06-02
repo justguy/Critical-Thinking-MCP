@@ -38,6 +38,7 @@ const passingFinalize = (
   re_executed: [],
   contract_strength: contractStrength,
   context_used: false,
+  plan_token: 'ctmcp.plan_token.v1.test',
 });
 
 describe('enforceDeliverable', () => {

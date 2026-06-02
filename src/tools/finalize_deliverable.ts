@@ -35,6 +35,8 @@ import type {
   TaskType,
 } from '../enforcement/types.js';
 import { extractNumericTokens, normalizeWhitespace, sha256Hex } from '../enforcement/utils.js';
+import { stampTaxonomy } from '../enforcement/blocker_taxonomy.js';
+import { computePlanToken, verifyPlanToken } from '../enforcement/plan_token.js';
 import { handleCheckQuoteGrounding } from './check_quote_grounding.js';
 import { handleCheckClaimCoverage } from './check_claim_coverage.js';
 import { handleTraceConclusionNumbers } from './trace_conclusion_numbers.js';
@@ -69,6 +71,13 @@ export interface FinalizeOutput {
   re_executed: string[];
   contract_strength: 'host_anchored' | 'weak_agent_declared';
   context_used: boolean;
+  /**
+   * The plan_token finalize recomputed over the contract it actually checked
+   * (§3.1). Always returned so a raw MCP client can capture the contract→answer
+   * binding token. If the caller supplied a plan_token that did not match this,
+   * finalize already BLOCKED (plan_token_mismatch).
+   */
+  plan_token: string;
   enforcement?: {
     blocking_issues: BlockingIssue[];
     warnings: string[];
@@ -147,6 +156,7 @@ function validateInput(input: unknown): {
   arithmetic_checks: unknown[] | null;
   eval_time: unknown;
   case_partition: Record<string, unknown> | null;
+  plan_token: string | null;
 } {
   if (input === null || typeof input !== 'object') {
     throw new Error(
@@ -179,6 +189,7 @@ function validateInput(input: unknown): {
       obj.case_partition && typeof obj.case_partition === 'object' && !Array.isArray(obj.case_partition)
         ? (obj.case_partition as Record<string, unknown>)
         : null,
+    plan_token: typeof obj.plan_token === 'string' && obj.plan_token.length > 0 ? obj.plan_token : null,
   };
 }
 
@@ -268,6 +279,18 @@ function validateNumericDerivationInputAnchors(ctx: ReExecCtx): BlockingIssue[] 
   const nodes = (artifact as Record<string, unknown>).nodes;
   if (!Array.isArray(nodes)) return issues;
 
+  // Values produced by a derivation step (intermediate/final). A raw input may NOT
+  // claim to be a unit-conversion constant if it coincides with one of these — that
+  // is the flattened-output laundering signature the anchor rule exists to catch.
+  const derivedValues = new Set<string>();
+  for (const node of nodes) {
+    if (!node || typeof node !== 'object' || Array.isArray(node)) continue;
+    const raw = node as Record<string, unknown>;
+    if ((raw.role === 'intermediate' || raw.role === 'final') && typeof raw.value === 'number' && isFinite(raw.value)) {
+      derivedValues.add(numericKey(raw.value));
+    }
+  }
+
   const requestNums = numericKeysInText(ctx.contract.original_request_text);
   for (const node of nodes) {
     if (!node || typeof node !== 'object' || Array.isArray(node)) continue;
@@ -276,6 +299,10 @@ function validateNumericDerivationInputAnchors(ctx: ReExecCtx): BlockingIssue[] 
     const key = numericKey(raw.value);
     if (requestNums.has(key)) continue;
     if (valueAnchoredInSources(raw.value, ctx)) continue;
+    // A declared unit-conversion constant (12 months/year, 100 percent base, …) is a
+    // legitimately-introduced operand, NOT a laundered output — but only if it does
+    // not coincide with any derived value in this same DAG.
+    if (raw.unit_constant === true && !derivedValues.has(key)) continue;
     issues.push({
       mechanism: 'number_input_anchor',
       description: `Numeric DAG input "${String(raw.id ?? '?')}" (${raw.value}) is not anchored in original_request_text or a host/source quote; do not flatten derived outputs into raw input nodes.`,
@@ -338,10 +365,27 @@ function validateArithmeticInputAnchors(ctx: ReExecCtx, arithmeticInput: unknown
     }
   }
 
+  // Declared unit-conversion constants (e.g. 12 months/year). Honoured only when
+  // disjoint from claimed_result, so a fabricated result cannot self-anchor by
+  // being listed as its own "constant".
+  const claimedKey = typeof obj.claimed_result === 'number' && isFinite(obj.claimed_result)
+    ? numericKey(obj.claimed_result)
+    : null;
+  const unitConstants = new Set<string>();
+  if (Array.isArray(obj.unit_constants)) {
+    for (const candidate of obj.unit_constants) {
+      if (typeof candidate === 'number' && isFinite(candidate)) {
+        const key = numericKey(candidate);
+        if (key !== claimedKey) unitConstants.add(key);
+      }
+    }
+  }
+
   const requestNums = numericKeysInText(ctx.contract.original_request_text);
   for (const operand of operands) {
     const key = numericKey(operand.value);
     if (requestNums.has(key) || valueAnchoredInSources(operand.value, ctx)) continue;
+    if (unitConstants.has(key)) continue;
     issues.push({
       mechanism: 'arithmetic_input_anchor',
       description: `Arithmetic operand ${operand.path} (${operand.value}) is not anchored in original_request_text or supplied non-agent sources.`,
@@ -556,9 +600,16 @@ export function handleFinalizeDeliverable(
   engine: EnforcementEngine,
 ): FinalizeOutput {
   const context = (input as any)?.context as EnforcementContext | undefined;
-  const { contract, answer_text, sources, claims, inputs, conclusion_numbers, numeric_derivation, constraints, structured_answer, arithmetic_checks, eval_time, case_partition } =
+  const { contract, answer_text, sources, claims, inputs, conclusion_numbers, numeric_derivation, constraints, structured_answer, arithmetic_checks, eval_time, case_partition, plan_token } =
     validateInput(input);
   const nAnswer = normalizeWhitespace(answer_text);
+
+  // ── plan_token: bind the PLANNED contract to the FINALIZED one (§3.1) ──────
+  // Recompute the token over the contract finalize actually checked. If the caller
+  // supplied one (from plan_checks), it MUST match — otherwise the contract was
+  // quietly downgraded between planning and finalize (the raw-client profile dodge).
+  // Always returned so a raw MCP client can capture the contract→answer binding.
+  const recomputedPlanToken = computePlanToken(contract);
 
   const plan = planChecks({
     task_type: contract.task_type as TaskType,
@@ -569,6 +620,18 @@ export function handleFinalizeDeliverable(
 
   const blockingIssues: BlockingIssue[] = [];
   const warnings: string[] = [];
+
+  if (plan_token !== null && !verifyPlanToken(contract, plan_token)) {
+    blockingIssues.push({
+      mechanism: 'plan_token_mismatch',
+      description:
+        'Supplied plan_token does not match the contract finalize is checking; the obligation-bearing ' +
+        'contract was changed between plan_checks and finalize_deliverable (e.g. dropped claims/must_include, ' +
+        'lowered evidence_level). Re-plan on the exact contract you will finalize, or omit the token.',
+      severity: 'blocking',
+    });
+  }
+
   const mandatoryChecks = [...plan.finalize_required];
   if (
     ((contract.constraints?.length ?? 0) > 0 || (contract.required_fields?.length ?? 0) > 0) &&
@@ -708,6 +771,7 @@ export function handleFinalizeDeliverable(
     );
   }
 
+  stampTaxonomy(blockingIssues);
   const hasFail = blockingIssues.length > 0;
   const correctivePrompt = hasFail
     ? engine.buildCorrectivePrompt(blockingIssues, warnings, 'finalize_deliverable', undefined, context)
@@ -722,6 +786,7 @@ export function handleFinalizeDeliverable(
     re_executed: reExecuted,
     contract_strength: weak ? 'weak_agent_declared' : 'host_anchored',
     context_used: !!context,
+    plan_token: recomputedPlanToken,
   };
 
   if (hasFail || warnings.length > 0) {

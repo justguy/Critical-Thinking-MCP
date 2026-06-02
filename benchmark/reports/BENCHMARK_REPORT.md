@@ -1,6 +1,6 @@
 # CT-MCP Benchmark Report — V5
 
-> Historical benchmark report. This predates the current 11-tool facade,
+> Historical benchmark report. This predates the current 11-tool spine,
 > host-enforcement proof suite, and Tier 4A value-discovery strategy. Do not
 > use this report by itself as current product-value proof; regenerate the
 > objective benchmark pipeline before making external value claims.

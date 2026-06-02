@@ -28,7 +28,7 @@ Recent integration work adds a normalized adapter envelope over existing CT tool
 
 - `npm run build` — clean
 - `npm test` — 296 tests pass
-- Benchmark V5: 42/42 vs baseline, 42/42 vs prompted, 0/14 false positives
+- Benchmark V5: detected the planted defect in 42/42 defect scenarios, 0/14 false positives (baseline/prompted rows were synthetic placeholders; a measured head-to-head is pending a real-model run — Phase 1a)
 - Self-evaluation: honest confidence ceiling 19.9%
 - All publication gates pass
 

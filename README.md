@@ -179,14 +179,13 @@ That layer is internal and repo-local, not a new public MCP tool. The implementa
 
 ## Validation Results
 
-Tested on 56 scenarios (42 defect + 14 clean control) across 3 conditions (baseline LLM, prompted LLM, CT-MCP):
+Tested on 56 hand-crafted scenarios (42 defect + 14 clean control):
 
-- **CT-MCP outperformed baseline on 42/42** defect scenarios
-- **CT-MCP outperformed prompted LLM on 42/42** defect scenarios
+- **CT-MCP detected the planted defect in 42/42** defect scenarios (detection quality of each tool in isolation on the hand-crafted corpus)
 - **0 false positives** on 14 clean controls
 - Includes concurrency patterns, mutation tests, and adversarial wording
 
-Note: these baseline metrics reflect static analysis quality. In live Beta 2 agent workflows, CT-MCP deliberately trades raw acceptance rate for safer `HUMAN_REVIEW` halts when a model cannot be deterministically repaired.
+Note: the baseline-LLM and prompted-LLM rows in the historical V5 run were synthetic placeholders (`benchmark/runner.ts` emits them with `synthetic:true`, and they are filtered out of the stats), so a measured "42/42 vs baseline / vs prompted" head-to-head is **not reproducible** and is pending a real-model run (Phase 1a). The figures above reflect CT-MCP's own static-analysis detection quality. In live Beta 2 agent workflows, CT-MCP deliberately trades raw acceptance rate for safer `HUMAN_REVIEW` halts when a model cannot be deterministically repaired.
 
 ## Beta 2 Release-Gate Summary
 
@@ -477,7 +476,7 @@ I stated four assumptions behind "CT-MCP is ready for beta publication" and aske
 | Scenarios represent real-world failure classes | 0.70 | Real deployment finds uncovered failure class |
 | Self-assessed scores within 1 point of human scores | 0.60 | Independent scoring differs by >1 point on >10 scenarios |
 | Deterministic outputs are reproducible cross-platform | 0.95 | Same input, different result on different OS/Node version |
-| 42/42 win rate holds under independent evaluation | 0.50 | Independent scoring shows <31/42 wins |
+| 42/42 detection result holds under independent, real-model evaluation | 0.50 | Independent scoring shows <31/42 detections, or a real-model baseline closes the gap |
 
 ```
 validate_confidence:
@@ -486,7 +485,7 @@ validate_confidence:
   inflation_detected: false
 ```
 
-**Honest confidence ceiling: 19.9%.** I didn't claim a number, so no inflation was detected — but the tool is telling me: my confidence that the 42/42 result survives independent evaluation should be about 20%, not 100%. The weakest link is the 0.50 assumption that the win rate holds. That's the tool doing exactly what it's designed to do.
+**Honest confidence ceiling: 19.9%.** I didn't claim a number, so no inflation was detected — but the tool is telling me: my confidence that the 42/42 result survives independent, real-model evaluation should be about 20%, not 100%. The weakest link is the 0.50 assumption that the result holds (the historical baseline/prompted rows were synthetic placeholders, so the comparison is not yet real). That's the tool doing exactly what it's designed to do.
 
 ### Response quality — is the README any good?
 
@@ -514,7 +513,7 @@ verify_arithmetic:
 
 The tools find real issues in their own project's claims. The confidence ceiling (0.199) is the most important finding — it's an honest signal that the benchmark evidence, while strong, rests on assumptions I haven't independently validated.
 
-I'm publishing anyway because beta is for getting that independent validation. But the tool says: *don't treat 42/42 as proven until someone else scores the baseline.*
+I'm publishing anyway because beta is for getting that independent validation. But the tool says: *don't treat 42/42 as a proven win until a real-model baseline is scored — the historical baseline rows were synthetic placeholders.*
 
 ---
 

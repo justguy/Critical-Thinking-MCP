@@ -1,0 +1,546 @@
+{
+  "meta": {
+    "name": "CT-MCP",
+    "slug": "ct-mcp",
+    "scratchpad": "Board mirrors docs/designs/DETERMINISTIC_VALUE_PLAN.md (phases 0, 1a, 1b, 2, 3, 4, 5). DoD = each phase's binary exit gate. Locked sequence enforced via dependencies. Approval gates: dvp-p3-1 (architecture/surface), dvp-p4 (experiment pre-registration), dvp-p5 (publication). References point at the plan so executing agents do not invent requirements. Created 2026-06-02, review-first.",
+    "swimlanes": [
+      {
+        "id": "deterministic-value",
+        "label": "Deterministic Value Plan",
+        "description": "Execution of docs/designs/DETERMINISTIC_VALUE_PLAN.md"
+      }
+    ],
+    "priorities": [
+      {
+        "id": "p0",
+        "label": "Critical path"
+      },
+      {
+        "id": "p1",
+        "label": "High"
+      },
+      {
+        "id": "p2",
+        "label": "Normal"
+      }
+    ]
+  },
+  "tasks": [
+    {
+      "id": "dvp-p0",
+      "title": "Phase 0 — Claims hygiene + typed claims ledger",
+      "kind": "task",
+      "status": "not_started",
+      "goal": "Make docs and memory match code before any measurement. Reconcile stale surface/benchmark claims and stand up a dogfooded, typed claims ledger enforced in CI.",
+      "placement": {
+        "swimlaneId": "deterministic-value",
+        "priorityId": "p0"
+      },
+      "dependencies": [],
+      "effort": "s",
+      "definition_of_done": [
+        "Stale '2-tool facade' language reconciled to '11-tool spine' across PROOF_REPORT.md and docs/designs/TESTING_AND_VALUE_STRATEGY.md; non-reproducible '30/30 vs baseline' claim retired or re-scoped.",
+        "CLAIMS_LEDGER.jsonl carries typed entries {claim_id, claim_text, claim_type, source_file, evidence_fixture, last_verified_commit, status}; claim_type in {empirical, architecture, roadmap, scope, marketing}.",
+        "CI fails the build when a doc asserts a claim whose ledger status != proven (roadmap claims must be marked planned; marketing claims must cite >=1 proven empirical_claim id).",
+        "No surviving doc claim contradicts code or lacks a ledger entry."
+      ],
+      "constraints": [
+        "Do not invent results: an empirical claim reaches status=proven only with a fixture + result hash.",
+        "Surgical edits — change claim text, not unrelated prose."
+      ],
+      "expected_changes": [
+        "CLAIMS_LEDGER.jsonl",
+        "README.md",
+        "PROOF_REPORT.md",
+        "docs/designs/TESTING_AND_VALUE_STRATEGY.md",
+        "CI workflow"
+      ],
+      "allowed_paths": [
+        "README.md",
+        "PROOF_REPORT.md",
+        "CHANGELOG.md",
+        "CAPABILITY_MAP.md",
+        "ROADMAP.md",
+        "docs/",
+        "CLAIMS_LEDGER.jsonl",
+        "scripts/",
+        "benchmark/BENCHMARK.md",
+        ".github/workflows/"
+      ],
+      "approval_required_for": [
+        "public-doc-claims"
+      ],
+      "references": [
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:102-118",
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:22-39"
+      ],
+      "context": {
+        "execution_note": "Started 2026-06-02. Delegated to a subagent in the real working tree. Orchestrator (main loop) verifies the exit gate before marking complete.",
+        "execution_report": "DONE 2026-06-02. (1) Reconciled stale '2-tool facade' -> '11-tool spine' in PROOF_REPORT.md + TESTING_AND_VALUE_STRATEGY.md (kept benchmark-fixture meaning where correct). (2) Retired/re-scoped unqualified '42/42 (30/30) vs baseline/prompted' across README, CAPABILITY_MAP, CHANGELOG, DEVELOPMENT, ARCHITECTURE_JOURNEY, benchmark/BENCHMARK.md + 3 benchmark/reports. (3) CLAIMS_LEDGER.jsonl = 10 typed entries; honest statuses (30/30 = contradicted, marketing north-star = unproven). (4) scripts/check-claims-ledger.mjs (deterministic: ledger integrity + tracked-phrase scan over 14 docs) + .github/workflows/claims-ledger.yml; orchestrator-verified PASS clean, FAIL on injected contradicted phrase, PASS after revert. Residual: benchmark/BENCHMARK_RUNNER_PROMPT.md:1502 is a runner instruction ('count wins'), not a result assertion -> accepted, not a claim. DEVELOPMENT.md + benchmark/reports added to CI scan to prevent regression.",
+        "exit_gate": "MET — orchestrator-verified independently of the executing subagent."
+      }
+    },
+    {
+      "id": "dvp-p1a",
+      "title": "Phase 1a — Real-output harness (the unblocker)",
+      "kind": "task",
+      "status": "not_started",
+      "goal": "Wire a real model into the benchmark, kill synthetic baseline/prompted rows, and build four suites graded by objective oracles.",
+      "placement": {
+        "swimlaneId": "deterministic-value",
+        "priorityId": "p0"
+      },
+      "dependencies": [
+        "dvp-p0"
+      ],
+      "effort": "l",
+      "definition_of_done": [
+        "benchmark/runner.ts runs a real model via the claude CLI adapter for baseline+prompted; NO synthetic:true row enters scored stats (default-off via BENCH_REAL_MODEL=1).",
+        "Four suites scaffolded (failure-prone, clean-control, mutation, realistic-distribution), each task carrying an objective oracle.",
+        "Objective oracles (gold_answer / source_span / structured_constraint), not substring proxies; unit-tested (26 tests).",
+        "Live smoke run confirmed real CLI outputs flow and are graded."
+      ],
+      "constraints": [
+        "Reject synthetic results, not synthetic tasks (plan Phase 1a).",
+        "No proxy graders in scored paths."
+      ],
+      "expected_changes": [
+        "benchmark/runner.ts",
+        "benchmark/ corpora + oracles",
+        "tests/benchmark/"
+      ],
+      "allowed_paths": [
+        "benchmark/",
+        "tests/benchmark/"
+      ],
+      "references": [
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:119-132"
+      ],
+      "context": {
+        "execution_note": "Model adapter = claude CLI headless (claude -p --model haiku --output-format json), no billed API per user constraint. Building infra + smoke this pass; full powered corpus run is the remainder.",
+        "execution_report": "INFRA SLICE DONE 2026-06-02. CLI-only adapter benchmark/model_adapter.ts (claude -p, run from tmpdir, strict empty MCP, deletes ANTHROPIC_API_KEY, never imports SDK; codex fallback) + oracles.ts + suites/index.ts (4 suites) + real_output_runner.ts + smoke_real_output.ts; runner.ts wired (baseline/prompted real-or-skipped, no synthetic leak). 26 unit tests + live smoke verified. Independent verifier: specAligned+antiDriftPass, recommendation infra-done-remainder.",
+        "split_note": "Powered corpus run (original DoD item 4: non-ceiling defect density, n for CI, validation on shipped model class) SPLIT OUT to dvp-p1a-run. Reduced DoD above is fully met and orchestrator-verified (435/435 green)."
+      },
+      "outcome": "partial_slice_landed"
+    },
+    {
+      "id": "dvp-p1b",
+      "title": "Phase 1b — Thin contract/artifact schema",
+      "kind": "task",
+      "status": "not_started",
+      "goal": "Define the minimum artifact model (provenance tiers + grounding levels) needed to generate mutations and run drift checks.",
+      "placement": {
+        "swimlaneId": "deterministic-value",
+        "priorityId": "p1"
+      },
+      "dependencies": [
+        "dvp-p0"
+      ],
+      "effort": "m",
+      "definition_of_done": [
+        "Artifact schema defines task_contract -> requirement_ids -> artifact_ids -> final_answer_bindings; each artifact carries provenance in {host_authored, host_extracted, model_declared_assumption, model_generated_reasoning, model_generated_recommendation}.",
+        "Claims carry grounding_level in {strong, weak} per plan section 4.",
+        "Schema is thin: sufficient to author Phase-2 mutations and drift checks; full host-contract/plan-token machinery deferred to Phase 3.",
+        "Schema validated by tests; no blocking enforcement wired in this phase."
+      ],
+      "constraints": [
+        "A deterministic PASS may rest only on tier-1/2 artifacts + strong grounding (plan section 3).",
+        "Ship no blocking behavior in this phase."
+      ],
+      "expected_changes": [
+        "src/enforcement/types.ts",
+        "src/enforcement/",
+        "tests/"
+      ],
+      "allowed_paths": [
+        "src/enforcement/",
+        "src/tools/",
+        "src/mcp/",
+        "tests/"
+      ],
+      "references": [
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:133-138",
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:40-85"
+      ],
+      "context": {
+        "execution_note": "Thin artifact/provenance/grounding schema (plan sections 1b/3/4). Pure code, no blocking wired.",
+        "execution_report": "DONE 2026-06-02, gate orchestrator-verified. Thin artifact model in src/enforcement/: types.ts (+109 additive: ArtifactProvenance EXACT 5 tiers, ArtifactTrustTier 1..5, GroundingLevel strong|weak, Artifact, ContractRequirement, FinalAnswerBinding, ArtifactBundle chain) + new artifact_schema.ts (validateArtifactBundle structural+referential integrity, type-guards, advisory isProofGrade/isPassEligibleClaim NOT wired to block) + tests/enforcement/artifact_schema.test.ts (22 tests). Integrates with existing DeliverableContract/AcceptanceCriterion (no duplication). THIN confirmed: zero importers outside the 3 files; finalize_deliverable + public tool surface untouched. Independent verifier: specAligned+antiDriftPass, recommendation gate-met. Authoritative build (tsc) clean, 435/435 tests pass, check:claims clean."
+      }
+    },
+    {
+      "id": "dvp-p2",
+      "title": "Phase 2 — False-block repair + mutation-coverage preservation",
+      "kind": "task",
+      "status": "not_started",
+      "goal": "Prove the numeric_derivation DAG removes false-blocks on N1/N2/N4 WITHOUT weakening coverage.",
+      "placement": {
+        "swimlaneId": "deterministic-value",
+        "priorityId": "p0"
+      },
+      "dependencies": [
+        "dvp-p1a",
+        "dvp-p1b"
+      ],
+      "effort": "m",
+      "definition_of_done": [
+        "Regression: formerly false-blocked correct answers (N1/N2/N4) now PASS.",
+        "Coverage preservation: mutated-wrong variants of those same answers still BLOCK (output-level mutation suite).",
+        "Clean-control false-block rate <=2% (severity-weighted); known-defect block rate >= agreed threshold.",
+        "Every BLOCK maps to a section-7 taxonomy code; no coverage loss vs the pre-change mutation suite."
+      ],
+      "constraints": [
+        "Do not reduce false-blocks by making the gate permissive — mutation-suite coverage must not drop (plan sections 2 and 8).",
+        "Severity-weight false blocks."
+      ],
+      "expected_changes": [
+        "src/enforcement/numeric_analysis.ts",
+        "src/tools/finalize_deliverable.ts",
+        "benchmark/",
+        "tests/"
+      ],
+      "allowed_paths": [
+        "src/enforcement/numeric_analysis.ts",
+        "src/tools/trace_conclusion_numbers.ts",
+        "src/tools/finalize_deliverable.ts",
+        "benchmark/",
+        "tests/"
+      ],
+      "references": [
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:139-147",
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:202-212"
+      ],
+      "context": {
+        "execution_note": "Prove numeric_derivation DAG removes the N1/N2/N4 false-blocks WITHOUT weakening coverage (mutated-wrong must still block). Pure code, no CLI.",
+        "execution_report": "DONE 2026-06-02, gate orchestrator-verified (482/482 tests, tsc clean). Root-caused the pilot false-blocks: N1 (signed -20 vs rendered unsigned '20% decrease') and N2 (12 months/yr unit constant flagged as flattened output); N4 fine as weighted_average. Fixes are ADDITIVE/opt-in (magnitude_binding binds |value| only with a sign-matching direction word; unit_constant exempted ONLY when value is not a derived output) — verifier confirmed via DIFF that the recompute path is unchanged and no check was loosened. 5 historical false-blocks -> 0; 12 output-level mutants still BLOCK with correct §7 codes; laundering still blocked; clean-control severity-weighted false-block 0% (<=2%). New blocker_taxonomy.ts stamps a §7 code on every gate-path BLOCK (throw-on-unmapped). Independent verifier: specAligned+antiDriftPass, gate-met.",
+        "scope_boundaries": "(1) §7 taxonomy stamped at the finalize_deliverable/trace gate path (the aggregating gate), NOT on the ~12 standalone tools when called directly — acceptable for the gate but narrower than 'every BLOCK everywhere'; candidate Phase-3 follow-up. (2) Task-level mutation (§8 layer 2) deferred — needs the real-output harness. (3) §1 boundary holds: a WRONG METHOD that self-traces still PASSes (deterministic checks don't verify method-correctness)."
+      }
+    },
+    {
+      "id": "dvp-p3",
+      "title": "Phase 3 — Full binding spine + deterministic gates",
+      "kind": "group",
+      "status": "not_started",
+      "goal": "Thicken the schema into the proof-carrying spine and ship deterministic gates; decision/reasoning checks stay advisory until Phase 4.",
+      "placement": {
+        "swimlaneId": "deterministic-value",
+        "priorityId": "p1"
+      },
+      "dependencies": [],
+      "effort": "xl",
+      "definition_of_done": [
+        "All Phase 3 child tasks complete; the answer renderer + drift detection operate over bound artifacts; no Cat-2 check ships as blocking."
+      ],
+      "references": [
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:148-171"
+      ]
+    },
+    {
+      "id": "dvp-p3-1",
+      "title": "Phase 3.1 — Binding spine + host contracts + plan-token",
+      "kind": "task",
+      "parent_id": "dvp-p3",
+      "status": "not_started",
+      "goal": "Proof-carrying contract: the answer is a rendering of the bound artifact ledger; host-authored contracts; plan_token/contract-hash chain.",
+      "placement": {
+        "swimlaneId": "deterministic-value",
+        "priorityId": "p0"
+      },
+      "dependencies": [
+        "dvp-p2"
+      ],
+      "effort": "l",
+      "definition_of_done": [
+        "Final answer is rendered from the artifact ledger (not free-text extraction); free-text segments require explicit judgment/interpretation typing (plan section 5).",
+        "Host-authored contracts enforce provenance tiers; the model cannot self-declare a weaker profile to dodge.",
+        "plan_token / contract hash binds contract -> artifacts -> answer, extending answer_text_hash; the chain holds for raw MCP clients, not only host-wrapped ones.",
+        "Tests cover the render+bind happy path and tamper/skip rejection."
+      ],
+      "constraints": [
+        "A PASS may rest only on tier-1/2 artifacts + strong grounding.",
+        "Public tool-surface changes require approval."
+      ],
+      "expected_changes": [
+        "src/tools/finalize_deliverable.ts",
+        "src/enforcement/check_planner.ts",
+        "src/host/enforcement_host.ts",
+        "src/mcp/",
+        "tests/"
+      ],
+      "allowed_paths": [
+        "src/enforcement/",
+        "src/tools/",
+        "src/mcp/",
+        "src/host/",
+        "tests/"
+      ],
+      "approval_required_for": [
+        "architecture",
+        "public-tool-surface"
+      ],
+      "references": [
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:148-153",
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:40-85"
+      ],
+      "context": {
+        "execution_note": "Approved by user 2026-06-02 (architecture/public-tool-surface gate cleared). Binding INFRASTRUCTURE only: answer renderer (answer = projection of bound artifacts), host-grade trust enforcement (PASS rests only on tier-1/2 + strong grounding), plan_token/contract-hash chain. Builds on p1b artifact_schema + p2 working-tree changes. Does NOT implement p3-2 drift/grounding gates or p3-3 decision gates.",
+        "anti_drift_hole": "VERIFIER FOUND (antiDriftPass=false): renderer + plan_token are solid, but host-grade trust is FORGEABLE. isProofGrade() trusts artifact.provenance — an agent-written STRING. Exploit probe: a fabricated bundle self-labeled provenance='host_extracted', grounding_level='strong' RELEASED through enforceDeliverable. This is the plan's #1 residual risk (§3/§12 model-authored theater) made real. ROOT: nothing binds host_extracted/host_authored to an actual host-supplied source; ContractSpec carries no sources; the quote_grounding verbatim channel is never consulted by the proof-grade path. p3-1 NOT complete until fixed.",
+        "fix_plan": "Compute proof-grade tier from HOST-ANCHORED evidence, not the agent's label: host supplies an authoritative artifact/source set; a host_extracted claim is proof-grade ONLY if its quoted_span verbatim-matches a host-supplied source (reuse existing quote_grounding containment); host_authored artifacts must be present in the host's authored set (by content/id), not merely labeled. Agent provenance label is a claim to verify, not trust. Add a test replicating the exploit and prove it now REJECTS.",
+        "execution_report": "DONE 2026-06-02, gate orchestrator-verified (539/539 tests, tsc clean). Three pieces: (1) answer renderer (answer = projection of bound artifact ledger, per-field bindings + trust tier + judgment labels; drift wiring point exposed, comparison deferred to p3-2); (2) host-grade trust — INITIALLY FORGEABLE (provenance self-attested), caught by independent verification, then FIXED: proof-grade is now computed from HOST-ANCHORED evidence (host_extracted requires verbatim match to a host-supplied source; host_authored requires id/content-hash match), agent label treated as a claim-to-verify; exploit-replication test goes RELEASE->REJECT; verifier ran its own probe confirming closure (antiDriftPass=true, gate-met); (3) plan_token/contract-hash chain binding contract->artifacts->answer, verified by finalize even for raw MCP clients.",
+        "remainder": "Security hole is CLOSED (fail-closed). Remaining wiring: host call sites (ct-enforce CLI, benchmark runner, production host) don't yet POPULATE host_evidence, so any proof_grade_requirement currently BLOCKs until a host supplies host_sources/host_authored_artifacts. That end-to-end host wiring belongs to dvp-p5 (host adoption). plan_token proves contract-identity continuity, not authorship; host-grade auth proves a label is host-anchored, not that the host source is itself true — both documented as honest limits."
+      }
+    },
+    {
+      "id": "dvp-p3-2",
+      "title": "Phase 3.2 — Highest-confidence deterministic gates (Cat-1)",
+      "kind": "task",
+      "parent_id": "dvp-p3",
+      "status": "not_started",
+      "goal": "Ship numeric-DAG/answer-number match, strong source-span grounding, requirement coverage, final-answer<->artifact drift detection, and unit/currency/date consistency.",
+      "placement": {
+        "swimlaneId": "deterministic-value",
+        "priorityId": "p0"
+      },
+      "dependencies": [
+        "dvp-p3-1"
+      ],
+      "effort": "l",
+      "definition_of_done": [
+        "Numeric DAG: every leaf has source+unit+op; derived values recomputed; final-answer numbers must match the DAG or BLOCK (NUMERIC_MISMATCH / FINAL_ANSWER_ARTIFACT_DRIFT).",
+        "Strong grounding blocks exact quote/number/date/entity mismatch; weak (paraphrase/causal/interpretation) grounding is advisory/labeled, never blocking.",
+        "Requirement coverage and final-answer artifact-drift detection block per the section-9 matrix.",
+        "Each blocking check passes the No-Semantic-Miracle test with red + green + mutation tests."
+      ],
+      "constraints": [
+        "Every blocking check ships with a test that BLOCKs the defect, PASSes the clean control, and still BLOCKs the mutated-wrong variant.",
+        "Weak/semantic grounding never blocks."
+      ],
+      "expected_changes": [
+        "src/tools/",
+        "src/enforcement/",
+        "tests/"
+      ],
+      "allowed_paths": [
+        "src/tools/",
+        "src/enforcement/",
+        "tests/"
+      ],
+      "references": [
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:154-161",
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:195-201",
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:213-230"
+      ]
+    },
+    {
+      "id": "dvp-p3-3",
+      "title": "Phase 3.3 — Decision/reasoning gates (profile-scoped, advisory until proven)",
+      "kind": "task",
+      "parent_id": "dvp-p3",
+      "status": "not_started",
+      "goal": "Add status-quo-or-NA, option coverage, declared-scoring dominated-option flag, competing-hypothesis (diagnosis/causal only), and the rejected-option reversal condition — all advisory pending Phase 4.",
+      "placement": {
+        "swimlaneId": "deterministic-value",
+        "priorityId": "p1"
+      },
+      "dependencies": [
+        "dvp-p3-1"
+      ],
+      "effort": "m",
+      "definition_of_done": [
+        "evaluate_tradeoffs gains a blocking-capable path (status-quo-or-NA; dominated-under-declared-scoring; anchored probabilities) but ships ADVISORY until Phase 4.",
+        "validate_reasoning_chain supports competing-hypothesis for diagnosis/causal profiles only; the rejected-option reversal condition is a concrete predicate (not steelman-similarity).",
+        "Enforcement scoped by the section-9 profile matrix; no universal blockers; nothing ships as a hard block before the ablation."
+      ],
+      "constraints": [
+        "Cat-2 checks ship advisory; promotion to blocking requires Phase-4 evidence.",
+        "No 'steelman' as a named blocker — use the rejected-option reversal predicate (plan section 11)."
+      ],
+      "expected_changes": [
+        "src/tools/evaluate_tradeoffs.ts",
+        "src/tools/validate_reasoning_chain.ts",
+        "src/enforcement/check_planner.ts",
+        "tests/"
+      ],
+      "allowed_paths": [
+        "src/tools/evaluate_tradeoffs.ts",
+        "src/tools/validate_reasoning_chain.ts",
+        "src/tools/check_case_partition.ts",
+        "src/enforcement/check_planner.ts",
+        "tests/"
+      ],
+      "references": [
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:162-169",
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:213-230",
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:254-263"
+      ]
+    },
+    {
+      "id": "dvp-p3-4",
+      "title": "Phase 3.4 — Tool-description affordances (Cat-3)",
+      "kind": "task",
+      "parent_id": "dvp-p3",
+      "status": "not_started",
+      "goal": "Add 'Use this when…' clauses and a task_type recommender — guidance only, not counted as core value.",
+      "placement": {
+        "swimlaneId": "deterministic-value",
+        "priorityId": "p2"
+      },
+      "dependencies": [
+        "dvp-p3-1"
+      ],
+      "effort": "s",
+      "definition_of_done": [
+        "The 9 analyzer descriptions carry use-case affordance text in the MCP schema the model actually sees.",
+        "A task_type recommender surfaces inferTaskType; documented as deterministic only when paired with host enforcement.",
+        "No value is attributed to these affordances in docs or the ledger (Cat-3)."
+      ],
+      "constraints": [
+        "Affordances are prompt quality, not deterministic value — do not log them as value wins."
+      ],
+      "expected_changes": [
+        "src/mcp/tool-definitions.ts",
+        "src/enforcement/check_planner.ts"
+      ],
+      "allowed_paths": [
+        "src/mcp/tool-definitions.ts",
+        "src/enforcement/check_planner.ts"
+      ],
+      "references": [
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:170-171"
+      ]
+    },
+    {
+      "id": "dvp-p4",
+      "title": "Phase 4 — 4-arm ablation (the decisive experiment)",
+      "kind": "task",
+      "status": "not_started",
+      "goal": "Run the pre-registered A/B/C/D ablation under strict cost parity and decide whether binding (not prompting/blocking) is the active ingredient.",
+      "placement": {
+        "swimlaneId": "deterministic-value",
+        "priorityId": "p0"
+      },
+      "dependencies": [
+        "dvp-p3-1",
+        "dvp-p3-2",
+        "dvp-p3-3",
+        "dvp-p1a-run"
+      ],
+      "effort": "l",
+      "definition_of_done": [
+        "Arms A (answer-then-block), B (forced+binding), C (prompted checklist), D (forced w/o binding) run with strict parity: same model, task-order randomization, context window, sources, tools (except enforced artifact calls), output budget, retry policy, repair opportunity.",
+        "Hypotheses, metrics, and decision thresholds (incl. the C-approx-B kill condition) are pre-registered and hashed BEFORE any run.",
+        "Reports severity-weighted net_value plus block_precision/recall, false_block_rate, repair_success_rate (1- and 2-retry), new_defects_introduced_during_repair, and quality_per_1k_tokens.",
+        "Decision recorded: B beats A and D and C -> scale + proceed to Phase 5; else narrow the claim per plan sections 11/12."
+      ],
+      "constraints": [
+        "Pre-register before running; compare results only against pre-registered thresholds (no goalpost-moving).",
+        "Freeze oracles + graders; deterministic grading."
+      ],
+      "expected_changes": [
+        "benchmark/",
+        "tests/proof/",
+        "docs/designs/ pre-registration + results"
+      ],
+      "allowed_paths": [
+        "benchmark/",
+        "tests/proof/",
+        "docs/designs/"
+      ],
+      "approval_required_for": [
+        "experiment-preregistration"
+      ],
+      "references": [
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:172-187",
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:231-253"
+      ],
+      "context": {
+        "methodology_note": "Per B+C (2026-06-02): the 4-arm ablation (A/B/C/D) runs primarily on the Haiku-natural-error corpus + an injected/mutated-defect corpus (precision/recall/repair), NOT a forced hard-Sonnet set. Sonnet arm retained as a secondary honest 'helps-least' comparison."
+      }
+    },
+    {
+      "id": "dvp-p5",
+      "title": "Phase 5 — Live host-contract proof + adoption",
+      "kind": "task",
+      "status": "not_started",
+      "goal": "Prove on live agents that host-authored contracts block real underdeclaration; harden BLOCK paths; package ct-enforce; human scoring last.",
+      "placement": {
+        "swimlaneId": "deterministic-value",
+        "priorityId": "p1"
+      },
+      "dependencies": [
+        "dvp-p4"
+      ],
+      "effort": "l",
+      "definition_of_done": [
+        "A live-agent run shows a host-authored contract makes a real underdeclaration release-blocking (not just the no-LLM fixture).",
+        "Mutation testing on BLOCK paths >=80%.",
+        "ct-enforce packaged as the adoption vehicle; the plan_token chain is verified end-to-end.",
+        "Independent human scoring is scheduled only after deterministic oracles show movement."
+      ],
+      "constraints": [
+        "Human-eval spend only after deterministic value is demonstrated.",
+        "Outward-facing release steps require approval."
+      ],
+      "expected_changes": [
+        "src/host/",
+        "benchmark/",
+        "tests/proof/",
+        "docs/"
+      ],
+      "allowed_paths": [
+        "src/host/",
+        "benchmark/",
+        "tests/proof/",
+        "docs/"
+      ],
+      "approval_required_for": [
+        "publication",
+        "external-release"
+      ],
+      "references": [
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:188-194"
+      ]
+    },
+    {
+      "dependencies": [
+        "dvp-p1a"
+      ],
+      "id": "dvp-p1a-run",
+      "title": "Phase 1a (cont.) — Powered corpus run + invariants",
+      "kind": "task",
+      "status": "not_started",
+      "goal": "Run the real-output harness at scale to produce a measurable, non-ceiling baseline defect density with enough n for a confidence interval — the measurement Phase 4 depends on.",
+      "placement": {
+        "swimlaneId": "deterministic-value",
+        "priorityId": "p0"
+      },
+      "effort": "l",
+      "definition_of_done": [
+        "B: measure NATURAL defect density on Haiku (dev model) over the hard corpus; report per-suite density + committed transcript; reach a usable signal (ideally near the 30-60% band on failure-prone).",
+        "C: build an injected/mutated-defect corpus where defects are PLANTED into otherwise-correct answers, enabling gate precision/recall/repair-rate measurement independent of the model's natural base rate.",
+        "Keep a Sonnet arm as an honest 'CT-MCP helps least on strong models' data point.",
+        "n on the measured (Haiku/injected) arm large enough to support a confidence interval; objective oracles only; CLI-only (no billed API)."
+      ],
+      "constraints": [
+        "CLI-only model adapter (no billed API).",
+        "Objective oracles only; reject synthetic results, not synthetic tasks.",
+        "Mind CLI call volume — this is the high-volume step."
+      ],
+      "allowed_paths": [
+        "benchmark/",
+        "tests/benchmark/"
+      ],
+      "references": [
+        "docs/designs/DETERMINISTIC_VALUE_PLAN.md:119-132"
+      ],
+      "context": {
+        "model_decision": "Validate on Sonnet (shipped model class) per user 2026-06-02; Haiku may still serve as the cheap dev target while iterating on task difficulty. Corpus size: pending user choice.",
+        "corpus_decision": "Tier B (~150) approved 2026-06-02, validate on Sonnet. Calibration-first: author ~40 harder tasks across the 4 suites + run a Sonnet Tier-A calibration to confirm 30-60% baseline defect density BEFORE scaling to 150. This pass = calibration slice only.",
+        "calibration_finding": "CALIBRATION-FIRST PAID OFF. Authored 47 harder tasks across 4 suites + ran them on SONNET via the CLI adapter (47 calls, transcript committed-then-uncommitted, sha256-verified rows). RESULT: Sonnet scored 0% defect density on ALL suites (0/27 failure-prone, 0/8 clean-control false-trigger, 0/5 mutation, 0/7 realistic) even after a HARD tier. Verifier independently recomputed from transcript rows; confirmed CLI-only Sonnet, objective oracles, no silent full run; caught that the first run's 16.7% was a markdown grading artifact (fixed additively). RECOMMENDATION: do NOT scale to Tier-B 150 as-is. The task families (textbook method-choice math, labeled single-source RAG, well-specified constraints, false-certainty) are within Sonnet's competence. STRATEGIC FORK for the user: (A) iterate to genuinely adversarial difficulty (multi-hop planning, many unlabeled near-duplicate distractors, long context, harder fabrication lures) possibly beyond current oracle kinds; (B) use Haiku as the dev/measurement model (plan-sanctioned) where defects appear and validate gate mechanics there; (C) pivot Phase-4 methodology to INJECTED/mutated defects + adversarial tasks rather than relying on a strong model naturally erring. Echoes the original pilot: a frontier model rarely errs on cleanly-gradable tasks, so CT-MCP's preventive value concentrates on weaker models / genuinely hard / adversarial cases.",
+        "methodology_decision": "B+C approved by user 2026-06-02. Sonnet 0% calibration => do not chase a hard-Sonnet natural-error corpus (option A rejected). Instead: (B) measure natural errors on Haiku, (C) measure gate precision/recall/repair on injected/mutated/adversarial defects; Sonnet kept as the 'helps-least' honest data point. This redefines the powered run and feeds dvp-p4's arm design.",
+        "B_not_viable": "Haiku scored 0.0% defect density on ALL suites — IDENTICAL to Sonnet; both model classes at-ceiling on the 47-task hard corpus (verifier regraded, recomputed golds, 0 flips). Natural-error route (B) is empirically DEAD on this corpus for both classes. PIVOT FULLY TO C (injected-defect harness): deterministic mutators per oracle kind producing known-wrong variants; score block_recall / false_block_rate / block_precision / blocker_code_accuracy against the ACTUAL gate, plus repair_success_rate — all base-rate-independent. Guardrails: every mutant must be genuinely oracle-wrong, every base oracle-correct, mutators deterministic (no model authorship of defects). This is the only measurable path given 0% natural density.",
+        "c_harness_status": "C harness BUILT + verified 2026-06-02 (antiDriftPass=true): deterministic mutators (3 oracle kinds, 8 defect classes, §7-coded), 47 real correct bases from the calibration transcripts, 120 mutants all guardrail-proven genuinely oracle-wrong, base-rate-independent scorer (block_recall/false_block_rate/precision/blocker_code_accuracy), GateUnderTest interface with an oracle-stub (clearly NOT a measurement). REMAINING (next step, now unblocked since the gate is settled): wire realEnforcementGate -> {blocked, blocker_code} and run scoreGate against the REAL gate for actual precision/recall numbers. 5 of 9 §7 codes have mutators (NUMERIC_MISMATCH, UNSUPPORTED_CLAIM, SOURCE_SPAN_MISMATCH, CONSTRAINT_VIOLATION, MISSING_REQUIREMENT)."
+      },
+      "outcome": "partial_slice_landed"
+    }
+  ]
+}

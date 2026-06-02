@@ -22,6 +22,7 @@ import {
   evaluateNumericDerivationArtifact,
   type NumericDerivationEvaluation,
 } from '../enforcement/numeric_analysis.js';
+import { stampTaxonomy } from '../enforcement/blocker_taxonomy.js';
 
 const VALID_ORIGINS = new Set(['literal', 'identity', 'derived']);
 const VALID_OPS = new Set(['sum', 'diff', 'product', 'ratio', 'pct_of', 'mean', 'percent_change']);
@@ -257,6 +258,12 @@ export function handleTraceConclusionNumbers(
     const declared = [
       ...conclusion_numbers.map(c => c.value),
       ...(derivationGraph?.results.map(result => result.value) ?? []),
+      // A magnitude-bound signed final ("20% decrease" for value -20) renders the
+      // unsigned magnitude in the answer; account for it so the omission guard
+      // does not re-flag the very number that legitimately bound.
+      ...(derivationGraph?.results
+        .filter(result => result.magnitude_bound)
+        .map(result => Math.abs(result.value)) ?? []),
     ];
     untraced = extractAnswerNumbers(answer_text).filter(s => {
       const n = Number(s);
@@ -280,6 +287,7 @@ export function handleTraceConclusionNumbers(
   const resultCount = results.length + graphResults.length;
   const tracedRatio = resultCount === 0 ? 1 : tracedCount / resultCount;
 
+  stampTaxonomy(blockingIssues);
   const hasFail = blockingIssues.length > 0;
   const correctivePrompt = hasFail
     ? engine.buildCorrectivePrompt(blockingIssues, warnings, 'trace_conclusion_numbers', undefined, context)

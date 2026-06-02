@@ -10,9 +10,9 @@ The short version is:
 
 ## Starting Point: Static CT-MCP
 
-The repo started with the nine deterministic tools and the original static benchmark result: `42/42` defect wins with `0` false positives on the targeted clean controls.
+The repo started with the nine deterministic tools and the original static benchmark result: CT-MCP detected the planted defect in `42/42` defect scenarios with `0` false positives on the targeted clean controls. (The historical baseline/prompted comparison rows were synthetic placeholders, so a measured "42/42 vs baseline" head-to-head is not reproducible and is pending a real-model run.)
 
-That result is still real, but it measures a different thing than the Beta 2 control plane. Static CT-MCP asks whether deterministic checks can catch bad structure, bad math, and confidence inflation. Beta 2 asks whether those checks can be turned into a live accept-or-escalate boundary around a model that may fight the feedback.
+That result is still real as a detection-quality measurement, but it measures a different thing than the Beta 2 control plane. Static CT-MCP asks whether deterministic checks can catch bad structure, bad math, and confidence inflation. Beta 2 asks whether those checks can be turned into a live accept-or-escalate boundary around a model that may fight the feedback.
 
 ## Phase 1: Clean Live A/B
 

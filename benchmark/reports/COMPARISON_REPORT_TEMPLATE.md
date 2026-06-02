@@ -1,6 +1,6 @@
 # Billing System Benchmark: Raw LLM vs Prompted LLM vs CT-MCP
 
-> Historical comparison template. This predates the current 11-tool facade,
+> Historical comparison template. This predates the current 11-tool spine,
 > host-enforcement proof suite, and Tier 4A value-discovery strategy. The
 > `42/42` and `0/14` figures below are legacy benchmark context, not current product-value proof.
 > Regenerate the objective benchmark pipeline before

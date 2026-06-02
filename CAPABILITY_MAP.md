@@ -1,21 +1,23 @@
 # CT-MCP Capability Map
 
 Benchmark-backed assessment of what CT-MCP catches, partially catches, and does
-not catch. Based on the V5 benchmark: 56 scenarios total, 42 defect scenarios,
-14 clean controls, 3 conditions (baseline, prompted, ct_mcp). Current beta
-results: 42/42 wins vs baseline, 42/42 wins vs prompted, 0/14 false positives
-on targeted clean controls.
+not catch. Based on the V5 benchmark: 56 hand-crafted scenarios total, 42 defect
+scenarios, 14 clean controls. Current beta results: CT-MCP detected the planted
+defect in 42/42 defect scenarios with 0/14 false positives on targeted clean
+controls. The historical baseline/prompted comparison rows were synthetic
+placeholders (filtered from stats), so a measured "42/42 vs baseline / vs
+prompted" head-to-head is not reproducible and is pending a real-model run.
 
 ## Proven Strong
 
-These capabilities consistently outperform both baseline and prompted LLM.
+These capabilities reliably detect their target defect class on the benchmark scenarios (the baseline/prompted comparison is synthetic and not yet reproducible — see the caveat above).
 
 | Capability | Mechanism | Benchmark evidence | Honest claim |
 |---|---|---|---|
 | Circular reasoning detection | DFS cycle detection on DAGs | S3-C, S3-D, S5-C, L8 all block with explicit cycles | Strong when reasoning is supplied as a graph |
 | Confidence inflation enforcement | Dependency-weighted ceiling + falsification cap | S4-C, C4, CONF1, CONF2, billing_system all enforce lower honest ceilings | Reliable when assumptions and confidence claims are structured |
 | Tradeoff quantification | Expected utility computation + indeterminate threshold | S2-B, S4-A, S4-B, S4-D produce deterministic rankings or `INDETERMINATE` | Strong on explicitly quantified options |
-| Arithmetic mismatch detection | Strict recomputation in `verify_arithmetic` | A2 and A6 both flip from earlier misses to wins vs prompted | Strong on sums, weighted averages, percentages, growth, and products |
+| Arithmetic mismatch detection | Strict recomputation in `verify_arithmetic` | A2 and A6 both flip from earlier misses to detected | Strong on sums, weighted averages, percentages, growth, and products |
 | Concurrency hazard detection | Structured pattern matching over steps/resources/protections | P1, P4, CON1-CON5, MUT1-MUT3 all block known hazards | Strong when callers provide structured concurrency flow descriptions |
 | Fabrication and anomaly detection | Round-number ratio, spacing CV, precision CV, geometric regularity, MAD/Z-score | S1-B, S1-C, S5-A, S5-D, N8 all surface suspicious numeric structure | Strong on common statistical red flags, not all fabricated data |
 | False positive avoidance | Clean-control pass-through | 14/14 clean controls passed without false positives | Strong on the targeted calibration scenarios in the benchmark |

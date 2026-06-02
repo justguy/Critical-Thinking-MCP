@@ -4,7 +4,7 @@
 
 Verdict: PARTIAL.
 
-The update has clear correctness value: the public surface is reduced to the 11-tool facade, every public tool advertises an `outputSchema`, representative PASS and BLOCK calls emit schema-valid `structuredContent`, `finalize_deliverable` blocks the tested bypass attempts, host enforcement blocks gate failures and answer swaps, deterministic fuzz cases do not crash, latency is well inside budget on this machine, and a live Streamable HTTP MCP round-trip now covers `tools/list` and `tools/call`. Product-value evidence is narrower: a fixed no-LLM benchmark shows host-authored contracts reduce false done releases, but it is not a real agent benchmark and the earlier value pilot remains a null/toy result. As of 2026-06-01, strict release integration, numeric derivation DAGs, predicate-aware grounding, contract-strength guardrails, host-declared structured constraints, and Tier 4A artifact schemas have focused local proof. Biggest remaining risk: the proof still does not include mutation testing, a separate live stdio transport proof, or the real tagent product-value benchmark, and PASS remains limited to supplied artifacts and host-authored obligations.
+The update has clear correctness value: the public surface is reduced to the 11-tool spine, every public tool advertises an `outputSchema`, representative PASS and BLOCK calls emit schema-valid `structuredContent`, `finalize_deliverable` blocks the tested bypass attempts, host enforcement blocks gate failures and answer swaps, deterministic fuzz cases do not crash, latency is well inside budget on this machine, and a live Streamable HTTP MCP round-trip now covers `tools/list` and `tools/call`. Product-value evidence is narrower: a fixed no-LLM benchmark shows host-authored contracts reduce false done releases, but it is not a real agent benchmark and the earlier value pilot remains a null/toy result. As of 2026-06-01, strict release integration, numeric derivation DAGs, predicate-aware grounding, contract-strength guardrails, host-declared structured constraints, and Tier 4A artifact schemas have focused local proof. Biggest remaining risk: the proof still does not include mutation testing, a separate live stdio transport proof, or the real tagent product-value benchmark, and PASS remains limited to supplied artifacts and host-authored obligations.
 
 ## 2026-06-01 Value Discovery Addendum
 
@@ -70,7 +70,7 @@ Fuzz details: 120 valid-ish MECE partitions, 144 numeric tracing cases, 96 fresh
 
 ## Product-Value Benchmark
 
-This is a deterministic fixture benchmark, not an LLM/tagent field benchmark. Product modes expose only the facade tools: `plan_checks` and `finalize_deliverable`. The separate `debug_raw` diagnostic condition exposes 17 tools and is not counted as a product mode.
+This is a deterministic fixture benchmark, not an LLM/tagent field benchmark. In this benchmark fixture the product modes drive the layer through only the two use-case entry tools: `plan_checks` and `finalize_deliverable` (this is the benchmark's 2-tool entry, not the shipped public surface, which is the 11-tool spine). The separate `debug_raw` diagnostic condition exposes 17 tools and is not counted as a product mode.
 
 | Mode | Task success | High-sev defects/task | Unsupported claims/task | Wrong numbers/task | Constraint violations/task | False done rate | Avg latency | Avg tool calls |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -102,9 +102,9 @@ Did host-derived contracts matter?
 
 - Yes. Agent-declared/weak contracts can understate obligations and pass with warnings; host-authored contracts make the same omissions/replacements release-blocking.
 
-Did facade tools reduce agent confusion compared with raw 17-tool access?
+Did the 2-tool use-case entry reduce agent confusion compared with raw 17-tool access?
 
-- In the deterministic proxy only: product modes expose 2 facade tools, while the raw diagnostic condition exposes 17 and records 3.4 average tool-choice confusions. This is not a live-agent tool-selection proof.
+- In the deterministic proxy only: product modes drive the layer through the 2-tool use-case entry (`plan_checks` + `finalize_deliverable`), while the raw diagnostic condition exposes 17 and records 3.4 average tool-choice confusions. This is not a live-agent tool-selection proof.
 
 ## Bugs Found
 

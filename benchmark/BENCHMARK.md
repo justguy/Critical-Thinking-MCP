@@ -11,6 +11,8 @@ This benchmark evaluates CT-MCP against three publication-critical conditions an
 
 The first three conditions support the publication criteria comparison. The fourth condition demonstrates iterative value without hidden memory.
 
+> **Current-state caveat (Phase 1a).** `benchmark/runner.ts` now wires a real model into the `baseline` and `prompted` conditions via a CLI-only adapter (`benchmark/model_adapter.ts`, which drives the local `claude` CLI — no billed API) when `BENCH_REAL_MODEL=1`; by default those arms are skipped and **no** synthetic placeholder row enters the scored statistics. A full statistically-powered corpus run (enough n for a confidence interval, measured non-ceiling defect density) is still pending, so any "CT-MCP wins 42/42 (or 30/30) vs baseline / vs prompted" head-to-head is **not yet reproduced at scale**. What is measurable now is CT-MCP's own detection quality on the hand-crafted corpus (it detected the planted defect in 42/42 defect scenarios with 0/14 false positives).
+
 ---
 
 ## Benchmark design

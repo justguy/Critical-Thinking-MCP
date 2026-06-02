@@ -699,6 +699,16 @@ REQUIRED INPUT FORMAT — copy this structure exactly:
         },
         case_partition: { type: 'object' as const },
         plan_token: { type: 'string' as const, description: 'Optional contract-identity token from plan_checks. If supplied, finalize recomputes it over the contract it checks and BLOCKS on mismatch (binds the planned contract to the finalized one for raw MCP clients).' },
+        artifact_bundle: {
+          type: 'object' as const,
+          description: 'Optional proof-carrying binding spine {contract_id, requirements[], artifacts[], final_answer_bindings[]} (§5). When supplied, finalize renders it and runs the §9 Cat-1 gates for this task_type: final-answer↔artifact DRIFT (a rendered field must match its bound artifact — number/cadence/currency/option), requirement COVERAGE (every requirement discharged by a binding), and (for factual_qa/RAG) STRONG source-span grounding. Each BLOCKs on failure; weak/interpretation grounding is advisory only.',
+          properties: {
+            contract_id: { type: 'string' as const },
+            requirements: { type: 'array' as const, items: { type: 'object' as const } },
+            artifacts: { type: 'array' as const, items: { type: 'object' as const } },
+            final_answer_bindings: { type: 'array' as const, items: { type: 'object' as const } },
+          },
+        },
       },
       required: ['contract', 'answer_text'],
     },

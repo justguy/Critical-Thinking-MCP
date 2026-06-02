@@ -37,7 +37,10 @@ import type {
 import { extractNumericTokens, normalizeWhitespace, sha256Hex } from '../enforcement/utils.js';
 import { stampTaxonomy } from '../enforcement/blocker_taxonomy.js';
 import { computePlanToken, verifyPlanToken } from '../enforcement/plan_token.js';
-import { handleCheckQuoteGrounding } from './check_quote_grounding.js';
+import { validateArtifactBundle } from '../enforcement/artifact_schema.js';
+import { renderAnswer } from '../enforcement/answer_renderer.js';
+import { detectFinalAnswerDrift, checkRequirementCoverage } from '../enforcement/drift_detector.js';
+import { handleCheckQuoteGrounding, checkStrongGrounding, type LeveledGroundingClaim } from './check_quote_grounding.js';
 import { handleCheckClaimCoverage } from './check_claim_coverage.js';
 import { handleTraceConclusionNumbers } from './trace_conclusion_numbers.js';
 import { handleVerifyArithmetic } from './verify_arithmetic.js';
@@ -157,6 +160,7 @@ function validateInput(input: unknown): {
   eval_time: unknown;
   case_partition: Record<string, unknown> | null;
   plan_token: string | null;
+  artifact_bundle: unknown | null;
 } {
   if (input === null || typeof input !== 'object') {
     throw new Error(
@@ -190,6 +194,10 @@ function validateInput(input: unknown): {
         ? (obj.case_partition as Record<string, unknown>)
         : null,
     plan_token: typeof obj.plan_token === 'string' && obj.plan_token.length > 0 ? obj.plan_token : null,
+    artifact_bundle:
+      obj.artifact_bundle && typeof obj.artifact_bundle === 'object' && !Array.isArray(obj.artifact_bundle)
+        ? obj.artifact_bundle
+        : null,
   };
 }
 
@@ -595,12 +603,142 @@ function reExecuteCheck(
   }
 }
 
+// ─── §9 profile × check matrix for the binding-spine (artifact_bundle) gates ───
+//
+// The §9 matrix decides which Cat-1 bundle gates are REQUIRED (block) per task_type.
+// We map the §9 column names onto the existing TaskType enum (no `diagnosis` type
+// exists; `reasoning` is the diagnosis/investigation profile):
+//
+//   §9 column   → TaskType            drift  req-coverage  strong-grounding
+//   Math        → numeric_analysis    req    req           adv (off)
+//   RAG         → factual_qa          req    req           req
+//   Decision    → decision            req    req           adv (off)
+//   Diagnosis   → reasoning           req    req           adv (off)
+//   (others)    → planning/concurrency/freeform: bundle gates advisory-off.
+//
+// "req" here means: when an artifact_bundle is supplied, that gate runs and BLOCKS on
+// failure. An ABSENT bundle is not itself a block (the legacy claim/numeric path is the
+// mandatory one); the bundle is the opt-in to the proof-carrying binding spine.
+interface BundleGateProfile {
+  drift: boolean;
+  requirement_coverage: boolean;
+  strong_grounding: boolean;
+}
+
+function bundleGateProfile(taskType: TaskType): BundleGateProfile {
+  switch (taskType) {
+    case 'factual_qa': // RAG
+      return { drift: true, requirement_coverage: true, strong_grounding: true };
+    case 'numeric_analysis': // Math
+    case 'decision': // Decision
+    case 'reasoning': // Diagnosis
+      return { drift: true, requirement_coverage: true, strong_grounding: false };
+    default: // planning, concurrency_design, freeform — bundle gates advisory-off
+      return { drift: false, requirement_coverage: false, strong_grounding: false };
+  }
+}
+
+/**
+ * Build the §4 leveled grounding claims from the bundle's claim artifacts: pair each
+ * claim with the source_span artifact it cites so checkStrongGrounding can re-run the
+ * verbatim containment check, keyed by the claim's grounding_level. A claim with no
+ * cited source_span_id (or a span carrying no text) is skipped — there is nothing to
+ * verbatim-ground it against here.
+ */
+function leveledClaimsFromBundle(bundle: import('../enforcement/types.js').ArtifactBundle): {
+  sources: SourceManifestEntry[];
+  claims: LeveledGroundingClaim[];
+} {
+  const byId = new Map(bundle.artifacts.map(a => [a.id, a]));
+  const sources: SourceManifestEntry[] = [];
+  const claims: LeveledGroundingClaim[] = [];
+  const seenSource = new Set<string>();
+
+  for (const artifact of bundle.artifacts) {
+    if (artifact.kind !== 'claim' || !artifact.grounding_level) continue;
+    const spanArtifact = artifact.source_span_id ? byId.get(artifact.source_span_id) : undefined;
+    const spanText = spanArtifact?.text;
+    const quoted = artifact.quoted_span ?? artifact.text;
+    if (!spanArtifact || typeof spanText !== 'string' || spanText.length === 0) continue;
+    if (typeof quoted !== 'string' || quoted.length === 0) continue;
+    if (!seenSource.has(spanArtifact.id)) {
+      sources.push({ id: spanArtifact.id, text: spanText });
+      seenSource.add(spanArtifact.id);
+    }
+    claims.push({
+      claim_id: artifact.id,
+      claim_text: artifact.text ?? quoted,
+      source_id: spanArtifact.id,
+      quoted_span: quoted,
+      supporting_token: quoted,
+      claim_kind: artifact.grounding_level === 'strong' ? 'status' : 'recommendation',
+      grounding_level: artifact.grounding_level,
+    });
+  }
+  return { sources, claims };
+}
+
+/**
+ * Run the §9 binding-spine gates over a SUPPLIED artifact_bundle. A malformed bundle
+ * BLOCKs (you cannot release on an uncheckable bundle). Otherwise render it and run the
+ * profile-required Cat-1 gates: final-answer↔artifact drift, requirement coverage, and
+ * (RAG only) strong source-span grounding. Weak grounding is advisory → warnings only.
+ */
+function runBundleGates(
+  rawBundle: unknown,
+  taskType: TaskType,
+  engine: EnforcementEngine,
+): { blocking_issues: BlockingIssue[]; warnings: string[]; ran: string[] } {
+  const blocking_issues: BlockingIssue[] = [];
+  const warnings: string[] = [];
+  const ran: string[] = [];
+
+  let bundle;
+  try {
+    bundle = validateArtifactBundle(rawBundle);
+  } catch (err) {
+    blocking_issues.push({
+      mechanism: 'final_answer_artifact_drift',
+      description: `Supplied artifact_bundle is invalid and cannot be checked: ${err instanceof Error ? err.message : String(err)}.`,
+      severity: 'blocking',
+    });
+    return { blocking_issues, warnings, ran };
+  }
+
+  const profile = bundleGateProfile(taskType);
+
+  if (profile.requirement_coverage) {
+    const coverage = checkRequirementCoverage(bundle);
+    for (const issue of coverage.blocking_issues) blocking_issues.push(issue);
+    ran.push('requirement_coverage');
+  }
+
+  if (profile.drift) {
+    const rendered = renderAnswer(bundle);
+    const drift = detectFinalAnswerDrift(rendered.rendered_fields);
+    for (const issue of drift.blocking_issues) blocking_issues.push(issue);
+    ran.push('final_answer_artifact_drift');
+  }
+
+  if (profile.strong_grounding) {
+    const { sources, claims } = leveledClaimsFromBundle(bundle);
+    if (claims.length > 0) {
+      const grounding = checkStrongGrounding(sources, claims, engine);
+      for (const issue of grounding.blocking_issues) blocking_issues.push(issue);
+      for (const w of grounding.warnings) warnings.push(w);
+      ran.push('strong_source_span_grounding');
+    }
+  }
+
+  return { blocking_issues, warnings, ran };
+}
+
 export function handleFinalizeDeliverable(
   input: unknown,
   engine: EnforcementEngine,
 ): FinalizeOutput {
   const context = (input as any)?.context as EnforcementContext | undefined;
-  const { contract, answer_text, sources, claims, inputs, conclusion_numbers, numeric_derivation, constraints, structured_answer, arithmetic_checks, eval_time, case_partition, plan_token } =
+  const { contract, answer_text, sources, claims, inputs, conclusion_numbers, numeric_derivation, constraints, structured_answer, arithmetic_checks, eval_time, case_partition, plan_token, artifact_bundle } =
     validateInput(input);
   const nAnswer = normalizeWhitespace(answer_text);
 
@@ -755,6 +893,18 @@ export function handleFinalizeDeliverable(
       answer_text,
     });
     for (const w of downgrade.enforcement?.warnings ?? []) warnings.push(w);
+  }
+
+  // ── §9 binding-spine Cat-1 gates over a SUPPLIED artifact_bundle (§3.2) ────
+  // Opt-in: when the caller supplies an artifact_bundle, run the profile-required
+  // gates (final-answer↔artifact drift, requirement coverage, RAG strong grounding)
+  // and BLOCK on failure. An absent bundle is not a block — the legacy claim/numeric
+  // path remains mandatory. Weak grounding is advisory only (warnings), never blocks.
+  if (artifact_bundle !== null) {
+    const bundleGates = runBundleGates(artifact_bundle, contract.task_type as TaskType, engine);
+    for (const issue of bundleGates.blocking_issues) blockingIssues.push(issue);
+    for (const w of bundleGates.warnings) warnings.push(w);
+    for (const check of bundleGates.ran) reExecuted.push(check);
   }
 
   // ── contract strength (WARNING; authority is unverifiable by a pure fn) ────

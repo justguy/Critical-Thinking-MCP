@@ -25,6 +25,7 @@ import type {
   BlockingIssue,
   EnforcementContext,
   GroundingClaim,
+  GroundingLevel,
   SourceManifestEntry,
 } from '../enforcement/types.js';
 import {
@@ -619,4 +620,101 @@ export function handleCheckQuoteGrounding(
   }
 
   return output;
+}
+
+// ─── §4 strong-vs-weak source-span grounding gate ──────────────────────────────
+//
+// The plan (§4) splits grounding into two levels:
+//   strong_grounding (exact quote/number/date/entity/extractive fact) → deterministic
+//     proof → MAY BLOCK on a span mismatch.
+//   weak_grounding (paraphrase/synthesis/interpretation/causal/recommendation) →
+//     advisory or labeled → NEVER blocks.
+//
+// handleCheckQuoteGrounding already decides, per claim, whether the cited span
+// verbatim-supports the claim (the `failures`/`grounded` fields) — the unforgeable
+// substring/number/date/entity comparison. This gate REUSES that result and decides
+// block-vs-advisory purely by the artifact-schema `grounding_level` (§4) the caller
+// supplies per claim: a STRONG claim whose span fails to support it BLOCKS; a WEAK
+// claim's failures are downgraded to warnings, NEVER blocking.
+//
+// HARD CONSTRAINT (§4 / task): weak/semantic grounding can only warn/label. This gate
+// has no path that emits a blocking issue for a weak claim.
+
+/** A grounding claim annotated with its §4 grounding level (from the artifact schema). */
+export interface LeveledGroundingClaim extends GroundingClaim {
+  grounding_level: GroundingLevel;
+}
+
+export interface StrongGroundingResult {
+  /** True when every STRONG-grounded claim is verbatim-supported by its cited span. */
+  strong_grounding_satisfied: boolean;
+  blocking_issues: BlockingIssue[];
+  warnings: string[];
+  /** Per-claim audit: its level, whether the span supported it, and whether it blocked. */
+  evaluated: Array<{
+    claim_id: string;
+    grounding_level: GroundingLevel;
+    grounded: boolean;
+    blocked: boolean;
+  }>;
+}
+
+/**
+ * §4 gate: STRONG grounding BLOCKs on span mismatch; WEAK grounding is advisory.
+ *
+ * Runs handleCheckQuoteGrounding once, then partitions its per-claim results by the
+ * caller-supplied grounding_level. STRONG failures become blocking issues
+ * (SOURCE_SPAN_MISMATCH via the `quote_grounding` mechanism); WEAK failures become
+ * warnings only — there is structurally no way for this function to block a weak claim.
+ */
+export function checkStrongGrounding(
+  sources: SourceManifestEntry[],
+  claims: LeveledGroundingClaim[],
+  engine: EnforcementEngine,
+): StrongGroundingResult {
+  const grounding = handleCheckQuoteGrounding({ sources, claims }, engine);
+  const resultById = new Map(grounding.results.map(r => [r.claim_id, r]));
+
+  const blocking_issues: BlockingIssue[] = [];
+  const warnings: string[] = [];
+  const evaluated: StrongGroundingResult['evaluated'] = [];
+
+  for (const claim of claims) {
+    const result = resultById.get(claim.claim_id);
+    const grounded = result?.grounded ?? false;
+    const failures = result?.failures ?? [];
+
+    if (claim.grounding_level === 'weak') {
+      // §4 HARD CONSTRAINT: weak grounding NEVER blocks — failures are advisory only.
+      for (const f of failures) {
+        warnings.push(`Weak-grounded claim "${claim.claim_id}" (advisory, not blocking): ${f}`);
+      }
+      evaluated.push({ claim_id: claim.claim_id, grounding_level: 'weak', grounded, blocked: false });
+      continue;
+    }
+
+    // STRONG grounding: a span that fails to verbatim-support the claim BLOCKS.
+    if (!grounded) {
+      for (const f of failures) {
+        blocking_issues.push({
+          mechanism: 'quote_grounding',
+          description: `Strong-grounded claim "${claim.claim_id}": ${f}`,
+          severity: 'blocking',
+        });
+      }
+    }
+    evaluated.push({
+      claim_id: claim.claim_id,
+      grounding_level: 'strong',
+      grounded,
+      blocked: !grounded,
+    });
+  }
+
+  return {
+    strong_grounding_satisfied: blocking_issues.length === 0,
+    blocking_issues,
+    warnings,
+    evaluated,
+  };
 }

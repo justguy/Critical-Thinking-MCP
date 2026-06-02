@@ -58,6 +58,7 @@ const MECHANISM_TO_CODE: Readonly<Record<string, BlockerTaxonomyCode>> = {
   // ── rendered answer disagrees with its source artifact (§5) ──
   number_answer_binding: 'FINAL_ANSWER_ARTIFACT_DRIFT',
   numeric_not_shipped: 'FINAL_ANSWER_ARTIFACT_DRIFT',
+  final_answer_artifact_drift: 'FINAL_ANSWER_ARTIFACT_DRIFT',
 
   // ── grounding / claim support (UNSUPPORTED_CLAIM / SOURCE_SPAN_MISMATCH) ──
   finalize_grounding: 'UNSUPPORTED_CLAIM',
@@ -69,6 +70,7 @@ const MECHANISM_TO_CODE: Readonly<Record<string, BlockerTaxonomyCode>> = {
   // ── requirement coverage (MISSING_REQUIREMENT) ──
   finalize_missing_inputs: 'MISSING_REQUIREMENT',
   finalize_no_executor: 'MISSING_REQUIREMENT',
+  requirement_coverage: 'MISSING_REQUIREMENT',
   must_include: 'MISSING_REQUIREMENT',
   structural_criterion: 'MISSING_REQUIREMENT',
   required_field: 'MISSING_REQUIREMENT',

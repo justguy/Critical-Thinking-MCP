@@ -22,6 +22,31 @@ interface CycleInfo {
   path: string[];
 }
 
+/**
+ * Phase 3.3 (Cat-2) reasoning advisories. ADVISORY until Phase 4 proves them — they
+ * populate `warnings`, never `blocking_issues`, and never flip `status`. Both are OPT-IN
+ * and profile-scoped by the caller declaring the relevant input field:
+ *   - competing_hypothesis runs only when `require_competing_hypothesis: true`
+ *     (diagnosis/causal/investigation profiles per §9).
+ *   - reversal_condition runs only when a `decision` block with rejected finalists is
+ *     supplied (decision/diagnosis profiles per §9).
+ * Each advisory is present in the output only when it was evaluated.
+ */
+interface ReasoningAdvisories {
+  competing_hypothesis?: {
+    triggered: boolean;
+    has_contradicts_edge: boolean;
+    conclusion_count: number;
+    detail: string;
+  };
+  reversal_condition?: {
+    triggered: boolean;
+    rejected_option_ids: string[];
+    missing_reversal_for: string[];
+    detail: string;
+  };
+}
+
 export interface ReasoningChainOutput {
   status: 'PASS' | 'ENFORCEMENT_FAIL';
   cycles: CycleInfo[];
@@ -30,6 +55,8 @@ export interface ReasoningChainOutput {
   node_count: number;
   edge_count: number;
   context_used: boolean;
+  /** Phase 3.3 advisory signals; only the evaluated checks appear. Never blocks. */
+  reasoning_advisories?: ReasoningAdvisories;
   enforcement?: {
     blocking_issues: BlockingIssue[];
     warnings: string[];
@@ -590,6 +617,79 @@ export function handleValidateReasoningChain(
     }
   }
 
+  // ── Phase 3.3 reasoning advisories (Cat-2, ADVISORY — warnings only, never block) ──
+  const reasoningAdvisories: ReasoningAdvisories = {};
+
+  // (a) require_competing_hypothesis — OPT-IN, diagnosis/causal/investigation profiles only.
+  // A one-sided chain is one whose conclusions rest on no `contradicts` edge AND offers no
+  // alternative conclusion (a single conclusion node). Deterministic structural predicate.
+  if ((input as any)?.require_competing_hypothesis === true) {
+    const hasContradicts = edges.some(e => e.relation === 'contradicts');
+    const conclusionCount = nodes.filter(n => n.type === 'conclusion').length;
+    const oneSided = !hasContradicts && conclusionCount < 2;
+    reasoningAdvisories.competing_hypothesis = {
+      triggered: oneSided,
+      has_contradicts_edge: hasContradicts,
+      conclusion_count: conclusionCount,
+      detail: oneSided
+        ? 'One-sided chain: no contradicts edge and fewer than two conclusions (no alternative considered).'
+        : hasContradicts
+          ? 'Chain contains at least one contradicts edge (a competing consideration is modeled).'
+          : 'Chain offers at least two conclusions (alternatives are modeled).',
+    };
+    if (oneSided) {
+      warnings.push(
+        'ADVISORY (competing-hypothesis): this diagnosis/causal chain is one-sided — it has no ' +
+        "`contradicts` edge and only one conclusion. A sound diagnosis should model at least one " +
+        'competing hypothesis (an alternative conclusion or a contradicting consideration).'
+      );
+    }
+  }
+
+  // (b) Rejected-option reversal condition — OPT-IN, decision/diagnosis profiles only.
+  // STRUCTURAL predicate (NOT a similarity/steelman score): the caller declares a `decision`
+  // with rejected finalists and a list of reversal conditions. For each rejected finalist we
+  // count how many declared reversal conditions name it with non-empty condition text. The
+  // predicate flags any rejected finalist with ZERO such conditions. No text comparison, no
+  // scoring — pure presence-counting over declared structure.
+  const decision = (input as any)?.decision;
+  if (decision && typeof decision === 'object') {
+    const rejectedRaw = Array.isArray(decision.rejected_option_ids) ? decision.rejected_option_ids : [];
+    const rejectedIds = [...new Set(rejectedRaw.filter((x: unknown): x is string => typeof x === 'string'))] as string[];
+
+    if (rejectedIds.length > 0) {
+      const reversalEntries: unknown[] = Array.isArray((input as any)?.reversal_conditions)
+        ? (input as any).reversal_conditions
+        : [];
+      // Set of rejected option ids that have >=1 reversal condition with non-empty text.
+      const covered = new Set<string>();
+      for (const entry of reversalEntries) {
+        const e = entry as Record<string, unknown>;
+        const oid = e?.rejected_option_id;
+        const cond = e?.condition_text;
+        if (typeof oid === 'string' && typeof cond === 'string' && cond.trim().length > 0) {
+          covered.add(oid);
+        }
+      }
+      const missing = rejectedIds.filter(id => !covered.has(id));
+      reasoningAdvisories.reversal_condition = {
+        triggered: missing.length > 0,
+        rejected_option_ids: rejectedIds,
+        missing_reversal_for: missing,
+        detail: missing.length === 0
+          ? 'Every rejected finalist has at least one declared reversal condition.'
+          : `${missing.length} rejected finalist(s) have no declared reversal condition: ${missing.join(', ')}.`,
+      };
+      if (missing.length > 0) {
+        warnings.push(
+          `ADVISORY (rejected-option reversal condition): ${missing.length} rejected finalist(s) ` +
+          `[${missing.join(', ')}] have no stated condition under which they would become preferred. ` +
+          'For decision robustness, state >=1 condition that would flip each rejected finalist to the chosen option.'
+        );
+      }
+    }
+  }
+
   const hasFail = blockingIssues.length > 0;
   const correctivePrompt = hasFail
     ? engine.buildCorrectivePrompt(blockingIssues, warnings, 'validate_reasoning_chain', undefined, context)
@@ -604,6 +704,10 @@ export function handleValidateReasoningChain(
     edge_count: edges.length,
     context_used: !!context,
   };
+
+  if (reasoningAdvisories.competing_hypothesis || reasoningAdvisories.reversal_condition) {
+    result.reasoning_advisories = reasoningAdvisories;
+  }
 
   if (hasFail || warnings.length > 0) {
     result.enforcement = {

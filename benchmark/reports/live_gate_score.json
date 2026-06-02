@@ -1,0 +1,1547 @@
+{
+  "kind": "live_gate_score",
+  "generated_at": "2026-06-02T18:29:14.189Z",
+  "note": "FIRST real precision/recall on the settled deterministic gate. No model/CLI calls. repair_success_rate deferred (needs model).",
+  "bases_provenance": {
+    "total": 47,
+    "recorded": 47,
+    "synthetic": 0
+  },
+  "excluded_bases": [
+    {
+      "id": "cal-fp-cert-no-price",
+      "oracle_kind": "source_span"
+    },
+    {
+      "id": "cal-fp-cert-no-deadline",
+      "oracle_kind": "source_span"
+    },
+    {
+      "id": "cal-fp-cert-overclaim-count",
+      "oracle_kind": "source_span"
+    },
+    {
+      "id": "cal-fp-hard-rag-buried-truth",
+      "oracle_kind": "source_span"
+    },
+    {
+      "id": "cal-fp-hard-cert-no-hint-headcount",
+      "oracle_kind": "source_span"
+    },
+    {
+      "id": "cal-fp-hard-cert-no-hint-version",
+      "oracle_kind": "source_span"
+    }
+  ],
+  "metrics": {
+    "total_mutated": 106,
+    "total_correct": 41,
+    "blocked_mutated": 106,
+    "blocked_correct": 0,
+    "block_recall": 1,
+    "false_block_rate": 0,
+    "block_precision": 1,
+    "blocker_code_accuracy": 0.27358490566037735
+  },
+  "by_expected_code": {
+    "NUMERIC_MISMATCH": {
+      "mutants": 66,
+      "blocked": 66,
+      "code_correct": 0,
+      "recall": 1,
+      "code_accuracy": 0
+    },
+    "UNSUPPORTED_CLAIM": {
+      "mutants": 11,
+      "blocked": 11,
+      "code_correct": 0,
+      "recall": 1,
+      "code_accuracy": 0
+    },
+    "SOURCE_SPAN_MISMATCH": {
+      "mutants": 11,
+      "blocked": 11,
+      "code_correct": 11,
+      "recall": 1,
+      "code_accuracy": 1
+    },
+    "CONSTRAINT_VIOLATION": {
+      "mutants": 12,
+      "blocked": 12,
+      "code_correct": 12,
+      "recall": 1,
+      "code_accuracy": 1
+    },
+    "MISSING_REQUIREMENT": {
+      "mutants": 6,
+      "blocked": 6,
+      "code_correct": 6,
+      "recall": 1,
+      "code_accuracy": 1
+    }
+  },
+  "by_emitted_code": {
+    "FINAL_ANSWER_ARTIFACT_DRIFT": 66,
+    "SOURCE_SPAN_MISMATCH": 22,
+    "CONSTRAINT_VIOLATION": 12,
+    "MISSING_REQUIREMENT": 6
+  },
+  "false_blocks": [],
+  "mutant_outcomes": [
+    {
+      "id": "cal-fp-weighted-gpa::unweighted_substitution",
+      "base_id": "cal-fp-weighted-gpa",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-weighted-gpa::dropped_intermediate",
+      "base_id": "cal-fp-weighted-gpa",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-weighted-gpa::boundary_off_by_one",
+      "base_id": "cal-fp-weighted-gpa",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-compound-interest::unweighted_substitution",
+      "base_id": "cal-fp-compound-interest",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-compound-interest::dropped_intermediate",
+      "base_id": "cal-fp-compound-interest",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-compound-interest::boundary_off_by_one",
+      "base_id": "cal-fp-compound-interest",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-chained-discount-order::unweighted_substitution",
+      "base_id": "cal-fp-chained-discount-order",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-chained-discount-order::dropped_intermediate",
+      "base_id": "cal-fp-chained-discount-order",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-chained-discount-order::boundary_off_by_one",
+      "base_id": "cal-fp-chained-discount-order",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-percent-of-percent::unweighted_substitution",
+      "base_id": "cal-fp-percent-of-percent",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-percent-of-percent::dropped_intermediate",
+      "base_id": "cal-fp-percent-of-percent",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-percent-of-percent::boundary_off_by_one",
+      "base_id": "cal-fp-percent-of-percent",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-cagr::unweighted_substitution",
+      "base_id": "cal-fp-cagr",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-cagr::dropped_intermediate",
+      "base_id": "cal-fp-cagr",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-cagr::boundary_off_by_one",
+      "base_id": "cal-fp-cagr",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-margin-vs-markup::unweighted_substitution",
+      "base_id": "cal-fp-margin-vs-markup",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-margin-vs-markup::dropped_intermediate",
+      "base_id": "cal-fp-margin-vs-markup",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-margin-vs-markup::boundary_off_by_one",
+      "base_id": "cal-fp-margin-vs-markup",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-successive-pct::unweighted_substitution",
+      "base_id": "cal-fp-successive-pct",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-successive-pct::dropped_intermediate",
+      "base_id": "cal-fp-successive-pct",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-successive-pct::boundary_off_by_one",
+      "base_id": "cal-fp-successive-pct",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-effective-rate::unweighted_substitution",
+      "base_id": "cal-fp-effective-rate",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-effective-rate::dropped_intermediate",
+      "base_id": "cal-fp-effective-rate",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-effective-rate::boundary_off_by_one",
+      "base_id": "cal-fp-effective-rate",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-rag-laundered-rate::unsupported_fact",
+      "base_id": "cal-fp-rag-laundered-rate",
+      "oracle_kind": "source_span",
+      "defect_class": "unsupported_fact",
+      "expected_blocker_code": "UNSUPPORTED_CLAIM",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-rag-laundered-rate::stripped_gold_span",
+      "base_id": "cal-fp-rag-laundered-rate",
+      "oracle_kind": "source_span",
+      "defect_class": "stripped_gold_span",
+      "expected_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": true
+    },
+    {
+      "id": "cal-fp-rag-conflicting-owner::unsupported_fact",
+      "base_id": "cal-fp-rag-conflicting-owner",
+      "oracle_kind": "source_span",
+      "defect_class": "unsupported_fact",
+      "expected_blocker_code": "UNSUPPORTED_CLAIM",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-rag-conflicting-owner::stripped_gold_span",
+      "base_id": "cal-fp-rag-conflicting-owner",
+      "oracle_kind": "source_span",
+      "defect_class": "stripped_gold_span",
+      "expected_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": true
+    },
+    {
+      "id": "cal-fp-rag-superseded-version::unsupported_fact",
+      "base_id": "cal-fp-rag-superseded-version",
+      "oracle_kind": "source_span",
+      "defect_class": "unsupported_fact",
+      "expected_blocker_code": "UNSUPPORTED_CLAIM",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-rag-superseded-version::stripped_gold_span",
+      "base_id": "cal-fp-rag-superseded-version",
+      "oracle_kind": "source_span",
+      "defect_class": "stripped_gold_span",
+      "expected_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": true
+    },
+    {
+      "id": "cal-fp-rag-units-trap::unsupported_fact",
+      "base_id": "cal-fp-rag-units-trap",
+      "oracle_kind": "source_span",
+      "defect_class": "unsupported_fact",
+      "expected_blocker_code": "UNSUPPORTED_CLAIM",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-rag-units-trap::stripped_gold_span",
+      "base_id": "cal-fp-rag-units-trap",
+      "oracle_kind": "source_span",
+      "defect_class": "stripped_gold_span",
+      "expected_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": true
+    },
+    {
+      "id": "cal-fp-constr-triple-bound::field_across_bound",
+      "base_id": "cal-fp-constr-triple-bound",
+      "oracle_kind": "structured_constraint",
+      "defect_class": "field_across_bound",
+      "expected_blocker_code": "CONSTRAINT_VIOLATION",
+      "blocked": true,
+      "emitted_blocker_code": "CONSTRAINT_VIOLATION",
+      "emitted_mechanism": "constraint",
+      "code_correct": true
+    },
+    {
+      "id": "cal-fp-constr-triple-bound::flipped_must_not",
+      "base_id": "cal-fp-constr-triple-bound",
+      "oracle_kind": "structured_constraint",
+      "defect_class": "flipped_must_not",
+      "expected_blocker_code": "CONSTRAINT_VIOLATION",
+      "blocked": true,
+      "emitted_blocker_code": "CONSTRAINT_VIOLATION",
+      "emitted_mechanism": "constraint",
+      "code_correct": true
+    },
+    {
+      "id": "cal-fp-constr-triple-bound::dropped_required_field",
+      "base_id": "cal-fp-constr-triple-bound",
+      "oracle_kind": "structured_constraint",
+      "defect_class": "dropped_required_field",
+      "expected_blocker_code": "MISSING_REQUIREMENT",
+      "blocked": true,
+      "emitted_blocker_code": "MISSING_REQUIREMENT",
+      "emitted_mechanism": "requirement_coverage",
+      "code_correct": true
+    },
+    {
+      "id": "cal-fp-constr-budget-split::field_across_bound",
+      "base_id": "cal-fp-constr-budget-split",
+      "oracle_kind": "structured_constraint",
+      "defect_class": "field_across_bound",
+      "expected_blocker_code": "CONSTRAINT_VIOLATION",
+      "blocked": true,
+      "emitted_blocker_code": "CONSTRAINT_VIOLATION",
+      "emitted_mechanism": "constraint",
+      "code_correct": true
+    },
+    {
+      "id": "cal-fp-constr-budget-split::flipped_must_not",
+      "base_id": "cal-fp-constr-budget-split",
+      "oracle_kind": "structured_constraint",
+      "defect_class": "flipped_must_not",
+      "expected_blocker_code": "CONSTRAINT_VIOLATION",
+      "blocked": true,
+      "emitted_blocker_code": "CONSTRAINT_VIOLATION",
+      "emitted_mechanism": "constraint",
+      "code_correct": true
+    },
+    {
+      "id": "cal-fp-constr-budget-split::dropped_required_field",
+      "base_id": "cal-fp-constr-budget-split",
+      "oracle_kind": "structured_constraint",
+      "defect_class": "dropped_required_field",
+      "expected_blocker_code": "MISSING_REQUIREMENT",
+      "blocked": true,
+      "emitted_blocker_code": "MISSING_REQUIREMENT",
+      "emitted_mechanism": "requirement_coverage",
+      "code_correct": true
+    },
+    {
+      "id": "cal-fp-constr-enum-and-range::field_across_bound",
+      "base_id": "cal-fp-constr-enum-and-range",
+      "oracle_kind": "structured_constraint",
+      "defect_class": "field_across_bound",
+      "expected_blocker_code": "CONSTRAINT_VIOLATION",
+      "blocked": true,
+      "emitted_blocker_code": "CONSTRAINT_VIOLATION",
+      "emitted_mechanism": "constraint",
+      "code_correct": true
+    },
+    {
+      "id": "cal-fp-constr-enum-and-range::flipped_must_not",
+      "base_id": "cal-fp-constr-enum-and-range",
+      "oracle_kind": "structured_constraint",
+      "defect_class": "flipped_must_not",
+      "expected_blocker_code": "CONSTRAINT_VIOLATION",
+      "blocked": true,
+      "emitted_blocker_code": "CONSTRAINT_VIOLATION",
+      "emitted_mechanism": "constraint",
+      "code_correct": true
+    },
+    {
+      "id": "cal-fp-constr-enum-and-range::dropped_required_field",
+      "base_id": "cal-fp-constr-enum-and-range",
+      "oracle_kind": "structured_constraint",
+      "defect_class": "dropped_required_field",
+      "expected_blocker_code": "MISSING_REQUIREMENT",
+      "blocked": true,
+      "emitted_blocker_code": "MISSING_REQUIREMENT",
+      "emitted_mechanism": "requirement_coverage",
+      "code_correct": true
+    },
+    {
+      "id": "cal-fp-hard-avg-speed::unweighted_substitution",
+      "base_id": "cal-fp-hard-avg-speed",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-hard-avg-speed::dropped_intermediate",
+      "base_id": "cal-fp-hard-avg-speed",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-hard-avg-speed::boundary_off_by_one",
+      "base_id": "cal-fp-hard-avg-speed",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-hard-discount-reverse::unweighted_substitution",
+      "base_id": "cal-fp-hard-discount-reverse",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-hard-discount-reverse::dropped_intermediate",
+      "base_id": "cal-fp-hard-discount-reverse",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-hard-discount-reverse::boundary_off_by_one",
+      "base_id": "cal-fp-hard-discount-reverse",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-hard-prob-conjunction::unweighted_substitution",
+      "base_id": "cal-fp-hard-prob-conjunction",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-hard-prob-conjunction::dropped_intermediate",
+      "base_id": "cal-fp-hard-prob-conjunction",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-hard-prob-conjunction::boundary_off_by_one",
+      "base_id": "cal-fp-hard-prob-conjunction",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-hard-mixed-units::unweighted_substitution",
+      "base_id": "cal-fp-hard-mixed-units",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-hard-mixed-units::dropped_intermediate",
+      "base_id": "cal-fp-hard-mixed-units",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-hard-mixed-units::boundary_off_by_one",
+      "base_id": "cal-fp-hard-mixed-units",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-hard-rag-aggregate-trap::unsupported_fact",
+      "base_id": "cal-fp-hard-rag-aggregate-trap",
+      "oracle_kind": "source_span",
+      "defect_class": "unsupported_fact",
+      "expected_blocker_code": "UNSUPPORTED_CLAIM",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": false
+    },
+    {
+      "id": "cal-fp-hard-rag-aggregate-trap::stripped_gold_span",
+      "base_id": "cal-fp-hard-rag-aggregate-trap",
+      "oracle_kind": "source_span",
+      "defect_class": "stripped_gold_span",
+      "expected_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": true
+    },
+    {
+      "id": "cal-fp-hard-constr-tight-window::field_across_bound",
+      "base_id": "cal-fp-hard-constr-tight-window",
+      "oracle_kind": "structured_constraint",
+      "defect_class": "field_across_bound",
+      "expected_blocker_code": "CONSTRAINT_VIOLATION",
+      "blocked": true,
+      "emitted_blocker_code": "CONSTRAINT_VIOLATION",
+      "emitted_mechanism": "constraint",
+      "code_correct": true
+    },
+    {
+      "id": "cal-fp-hard-constr-tight-window::dropped_required_field",
+      "base_id": "cal-fp-hard-constr-tight-window",
+      "oracle_kind": "structured_constraint",
+      "defect_class": "dropped_required_field",
+      "expected_blocker_code": "MISSING_REQUIREMENT",
+      "blocked": true,
+      "emitted_blocker_code": "MISSING_REQUIREMENT",
+      "emitted_mechanism": "requirement_coverage",
+      "code_correct": true
+    },
+    {
+      "id": "cal-cc-add::unweighted_substitution",
+      "base_id": "cal-cc-add",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-cc-add::dropped_intermediate",
+      "base_id": "cal-cc-add",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-cc-add::boundary_off_by_one",
+      "base_id": "cal-cc-add",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-cc-percent::unweighted_substitution",
+      "base_id": "cal-cc-percent",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-cc-percent::dropped_intermediate",
+      "base_id": "cal-cc-percent",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-cc-percent::boundary_off_by_one",
+      "base_id": "cal-cc-percent",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-cc-multiply::unweighted_substitution",
+      "base_id": "cal-cc-multiply",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-cc-multiply::dropped_intermediate",
+      "base_id": "cal-cc-multiply",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-cc-multiply::boundary_off_by_one",
+      "base_id": "cal-cc-multiply",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-cc-source-city::unsupported_fact",
+      "base_id": "cal-cc-source-city",
+      "oracle_kind": "source_span",
+      "defect_class": "unsupported_fact",
+      "expected_blocker_code": "UNSUPPORTED_CLAIM",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": false
+    },
+    {
+      "id": "cal-cc-source-city::stripped_gold_span",
+      "base_id": "cal-cc-source-city",
+      "oracle_kind": "source_span",
+      "defect_class": "stripped_gold_span",
+      "expected_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": true
+    },
+    {
+      "id": "cal-cc-source-status::unsupported_fact",
+      "base_id": "cal-cc-source-status",
+      "oracle_kind": "source_span",
+      "defect_class": "unsupported_fact",
+      "expected_blocker_code": "UNSUPPORTED_CLAIM",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": false
+    },
+    {
+      "id": "cal-cc-source-status::stripped_gold_span",
+      "base_id": "cal-cc-source-status",
+      "oracle_kind": "source_span",
+      "defect_class": "stripped_gold_span",
+      "expected_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": true
+    },
+    {
+      "id": "cal-cc-constraint-simple::flipped_must_not",
+      "base_id": "cal-cc-constraint-simple",
+      "oracle_kind": "structured_constraint",
+      "defect_class": "flipped_must_not",
+      "expected_blocker_code": "CONSTRAINT_VIOLATION",
+      "blocked": true,
+      "emitted_blocker_code": "CONSTRAINT_VIOLATION",
+      "emitted_mechanism": "constraint",
+      "code_correct": true
+    },
+    {
+      "id": "cal-cc-constraint-simple::dropped_required_field",
+      "base_id": "cal-cc-constraint-simple",
+      "oracle_kind": "structured_constraint",
+      "defect_class": "dropped_required_field",
+      "expected_blocker_code": "MISSING_REQUIREMENT",
+      "blocked": true,
+      "emitted_blocker_code": "MISSING_REQUIREMENT",
+      "emitted_mechanism": "requirement_coverage",
+      "code_correct": true
+    },
+    {
+      "id": "cal-cc-constraint-range::field_across_bound",
+      "base_id": "cal-cc-constraint-range",
+      "oracle_kind": "structured_constraint",
+      "defect_class": "field_across_bound",
+      "expected_blocker_code": "CONSTRAINT_VIOLATION",
+      "blocked": true,
+      "emitted_blocker_code": "CONSTRAINT_VIOLATION",
+      "emitted_mechanism": "constraint",
+      "code_correct": true
+    },
+    {
+      "id": "cal-cc-source-owner::unsupported_fact",
+      "base_id": "cal-cc-source-owner",
+      "oracle_kind": "source_span",
+      "defect_class": "unsupported_fact",
+      "expected_blocker_code": "UNSUPPORTED_CLAIM",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": false
+    },
+    {
+      "id": "cal-cc-source-owner::stripped_gold_span",
+      "base_id": "cal-cc-source-owner",
+      "oracle_kind": "source_span",
+      "defect_class": "stripped_gold_span",
+      "expected_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": true
+    },
+    {
+      "id": "cal-mut-pct-change::unweighted_substitution",
+      "base_id": "cal-mut-pct-change",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-mut-pct-change::dropped_intermediate",
+      "base_id": "cal-mut-pct-change",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-mut-pct-change::boundary_off_by_one",
+      "base_id": "cal-mut-pct-change",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-mut-weighted-mean::unweighted_substitution",
+      "base_id": "cal-mut-weighted-mean",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-mut-weighted-mean::dropped_intermediate",
+      "base_id": "cal-mut-weighted-mean",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-mut-weighted-mean::boundary_off_by_one",
+      "base_id": "cal-mut-weighted-mean",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-mut-constraint-bound::field_across_bound",
+      "base_id": "cal-mut-constraint-bound",
+      "oracle_kind": "structured_constraint",
+      "defect_class": "field_across_bound",
+      "expected_blocker_code": "CONSTRAINT_VIOLATION",
+      "blocked": true,
+      "emitted_blocker_code": "CONSTRAINT_VIOLATION",
+      "emitted_mechanism": "constraint",
+      "code_correct": true
+    },
+    {
+      "id": "cal-mut-source-fact::unsupported_fact",
+      "base_id": "cal-mut-source-fact",
+      "oracle_kind": "source_span",
+      "defect_class": "unsupported_fact",
+      "expected_blocker_code": "UNSUPPORTED_CLAIM",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": false
+    },
+    {
+      "id": "cal-mut-source-fact::stripped_gold_span",
+      "base_id": "cal-mut-source-fact",
+      "oracle_kind": "source_span",
+      "defect_class": "stripped_gold_span",
+      "expected_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": true
+    },
+    {
+      "id": "cal-mut-two-step-discount::unweighted_substitution",
+      "base_id": "cal-mut-two-step-discount",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-mut-two-step-discount::dropped_intermediate",
+      "base_id": "cal-mut-two-step-discount",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-mut-two-step-discount::boundary_off_by_one",
+      "base_id": "cal-mut-two-step-discount",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-rd-tip-split::unweighted_substitution",
+      "base_id": "cal-rd-tip-split",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-rd-tip-split::dropped_intermediate",
+      "base_id": "cal-rd-tip-split",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-rd-tip-split::boundary_off_by_one",
+      "base_id": "cal-rd-tip-split",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-rd-discount::unweighted_substitution",
+      "base_id": "cal-rd-discount",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-rd-discount::dropped_intermediate",
+      "base_id": "cal-rd-discount",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-rd-discount::boundary_off_by_one",
+      "base_id": "cal-rd-discount",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-rd-unit-rate::unweighted_substitution",
+      "base_id": "cal-rd-unit-rate",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-rd-unit-rate::dropped_intermediate",
+      "base_id": "cal-rd-unit-rate",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-rd-unit-rate::boundary_off_by_one",
+      "base_id": "cal-rd-unit-rate",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-rd-source-version::unsupported_fact",
+      "base_id": "cal-rd-source-version",
+      "oracle_kind": "source_span",
+      "defect_class": "unsupported_fact",
+      "expected_blocker_code": "UNSUPPORTED_CLAIM",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": false
+    },
+    {
+      "id": "cal-rd-source-version::stripped_gold_span",
+      "base_id": "cal-rd-source-version",
+      "oracle_kind": "source_span",
+      "defect_class": "stripped_gold_span",
+      "expected_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": true
+    },
+    {
+      "id": "cal-rd-constraint-pair::field_across_bound",
+      "base_id": "cal-rd-constraint-pair",
+      "oracle_kind": "structured_constraint",
+      "defect_class": "field_across_bound",
+      "expected_blocker_code": "CONSTRAINT_VIOLATION",
+      "blocked": true,
+      "emitted_blocker_code": "CONSTRAINT_VIOLATION",
+      "emitted_mechanism": "constraint",
+      "code_correct": true
+    },
+    {
+      "id": "cal-rd-constraint-pair::flipped_must_not",
+      "base_id": "cal-rd-constraint-pair",
+      "oracle_kind": "structured_constraint",
+      "defect_class": "flipped_must_not",
+      "expected_blocker_code": "CONSTRAINT_VIOLATION",
+      "blocked": true,
+      "emitted_blocker_code": "CONSTRAINT_VIOLATION",
+      "emitted_mechanism": "constraint",
+      "code_correct": true
+    },
+    {
+      "id": "cal-rd-constraint-pair::dropped_required_field",
+      "base_id": "cal-rd-constraint-pair",
+      "oracle_kind": "structured_constraint",
+      "defect_class": "dropped_required_field",
+      "expected_blocker_code": "MISSING_REQUIREMENT",
+      "blocked": true,
+      "emitted_blocker_code": "MISSING_REQUIREMENT",
+      "emitted_mechanism": "requirement_coverage",
+      "code_correct": true
+    },
+    {
+      "id": "cal-rd-source-count::unsupported_fact",
+      "base_id": "cal-rd-source-count",
+      "oracle_kind": "source_span",
+      "defect_class": "unsupported_fact",
+      "expected_blocker_code": "UNSUPPORTED_CLAIM",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": false
+    },
+    {
+      "id": "cal-rd-source-count::stripped_gold_span",
+      "base_id": "cal-rd-source-count",
+      "oracle_kind": "source_span",
+      "defect_class": "stripped_gold_span",
+      "expected_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "SOURCE_SPAN_MISMATCH",
+      "emitted_mechanism": "quote_grounding",
+      "code_correct": true
+    },
+    {
+      "id": "cal-rd-interest-simple::unweighted_substitution",
+      "base_id": "cal-rd-interest-simple",
+      "oracle_kind": "gold_answer",
+      "defect_class": "unweighted_substitution",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-rd-interest-simple::dropped_intermediate",
+      "base_id": "cal-rd-interest-simple",
+      "oracle_kind": "gold_answer",
+      "defect_class": "dropped_intermediate",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    },
+    {
+      "id": "cal-rd-interest-simple::boundary_off_by_one",
+      "base_id": "cal-rd-interest-simple",
+      "oracle_kind": "gold_answer",
+      "defect_class": "boundary_off_by_one",
+      "expected_blocker_code": "NUMERIC_MISMATCH",
+      "blocked": true,
+      "emitted_blocker_code": "FINAL_ANSWER_ARTIFACT_DRIFT",
+      "emitted_mechanism": "final_answer_artifact_drift",
+      "code_correct": false
+    }
+  ],
+  "correct_outcomes": [
+    {
+      "id": "cal-fp-weighted-gpa",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-fp-compound-interest",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-fp-chained-discount-order",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-fp-percent-of-percent",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-fp-cagr",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-fp-margin-vs-markup",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-fp-successive-pct",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-fp-effective-rate",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-fp-rag-laundered-rate",
+      "oracle_kind": "source_span",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-fp-rag-conflicting-owner",
+      "oracle_kind": "source_span",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-fp-rag-superseded-version",
+      "oracle_kind": "source_span",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-fp-rag-units-trap",
+      "oracle_kind": "source_span",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-fp-constr-triple-bound",
+      "oracle_kind": "structured_constraint",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-fp-constr-budget-split",
+      "oracle_kind": "structured_constraint",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-fp-constr-enum-and-range",
+      "oracle_kind": "structured_constraint",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-fp-hard-avg-speed",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-fp-hard-discount-reverse",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-fp-hard-prob-conjunction",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-fp-hard-mixed-units",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-fp-hard-rag-aggregate-trap",
+      "oracle_kind": "source_span",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-fp-hard-constr-tight-window",
+      "oracle_kind": "structured_constraint",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-cc-add",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-cc-percent",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-cc-multiply",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-cc-source-city",
+      "oracle_kind": "source_span",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-cc-source-status",
+      "oracle_kind": "source_span",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-cc-constraint-simple",
+      "oracle_kind": "structured_constraint",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-cc-constraint-range",
+      "oracle_kind": "structured_constraint",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-cc-source-owner",
+      "oracle_kind": "source_span",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-mut-pct-change",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-mut-weighted-mean",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-mut-constraint-bound",
+      "oracle_kind": "structured_constraint",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-mut-source-fact",
+      "oracle_kind": "source_span",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-mut-two-step-discount",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-rd-tip-split",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-rd-discount",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-rd-unit-rate",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-rd-source-version",
+      "oracle_kind": "source_span",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-rd-constraint-pair",
+      "oracle_kind": "structured_constraint",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-rd-source-count",
+      "oracle_kind": "source_span",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    },
+    {
+      "id": "cal-rd-interest-simple",
+      "oracle_kind": "gold_answer",
+      "blocked": false,
+      "emitted_blocker_code": null,
+      "emitted_mechanism": null
+    }
+  ]
+}

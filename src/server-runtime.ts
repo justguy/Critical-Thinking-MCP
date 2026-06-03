@@ -21,6 +21,24 @@ export const SERVER_INFO = {
 
 export type ServerTransportMode = 'stdio' | 'http';
 
+/**
+ * Assemble the advertised tool list. When CT_DISABLE_FINALIZE is truthy
+ * (Phase-4 arm-D "no-finalize" variant), `finalize_deliverable` is filtered
+ * out of the advertised surface so its schema never enters the client's
+ * context — B advertises 11 tools, D advertises 10. Pure helper (env passed
+ * in) so it is unit-testable without launching a transport. ADDITIVE: it
+ * changes only the advertised list, never any tool's behavior or schema, and
+ * never the call handler.
+ */
+export function listAdvertisedTools(
+  env: NodeJS.ProcessEnv = process.env,
+): typeof TOOLS {
+  if (env.CT_DISABLE_FINALIZE) {
+    return TOOLS.filter(tool => tool.name !== 'finalize_deliverable');
+  }
+  return TOOLS;
+}
+
 export interface RuntimeConfig {
   transport: ServerTransportMode;
   host: string;
@@ -52,7 +70,7 @@ function createMcpServer(): Server {
   );
 
   server.setRequestHandler(ListToolsRequestSchema, async () => {
-    return { tools: TOOLS };
+    return { tools: listAdvertisedTools() };
   });
 
   registerResourceHandlers(server);

@@ -134,15 +134,41 @@ function stem(token: string): string {
 }
 
 /**
+ * Strip currency symbols and any non-alphanumeric noise glued to a token's EDGES
+ * (e.g. "$50" → "50", "(42)" → "42", "b12." → "b12"), and drop thousands-separator
+ * commas INSIDE a number ("1,294.50" → "1294.50"). This makes the span matcher
+ * robust to currency/punctuation ADJACENCY so the gold fact "50 per month" is
+ * found in "$50 per month".
+ *
+ * It is deliberately EDGE-ONLY and does NOT alter the token's interior, so it
+ * cannot turn a partial match into a hit: "5" still does not equal "50", a
+ * distractor like "40" is still distinct from "50", and a token that shares no
+ * core characters still fails. (norm() has already removed standalone
+ * punctuation; this additionally peels currency/symbols fused to a token.)
+ */
+function spanCore(token: string): string {
+  return token
+    .replace(/,(?=\d)/g, '') // thousands separators inside a number
+    .replace(/^[^a-z0-9]+/i, '') // leading currency/symbol noise ($, (, etc.)
+    .replace(/[^a-z0-9]+$/i, ''); // trailing symbol noise
+}
+
+/**
  * Objective gold-span containment: every significant token of the gold span
- * (lemmatized by light stemming) must appear in the answer. This grades whether
- * the extractive FACT is conveyed, while tolerating morphology like
- * "manually revoked" vs "manually revokes" — without degrading to a loose
- * substring proxy (a partial-token match still fails).
+ * (lemmatized by light stemming, currency/punctuation-edge-normalized) must
+ * appear in the answer. This grades whether the extractive FACT is conveyed,
+ * while tolerating morphology ("revoked" vs "revokes") and currency adjacency
+ * ("50 per month" in "$50 per month") — without degrading to a loose substring
+ * proxy (a partial-token match still fails: "5" never matches "50").
  */
 function conveysGoldSpan(answerNorm: string, goldSpan: string): boolean {
-  const answerStems = new Set(answerNorm.split(' ').map(stem).filter(Boolean));
-  const goldTokens = norm(goldSpan).split(' ').map(stem).filter(t => t.length > 1);
+  const answerStems = new Set(
+    answerNorm.split(' ').map(t => stem(spanCore(t))).filter(Boolean),
+  );
+  const goldTokens = norm(goldSpan)
+    .split(' ')
+    .map(t => stem(spanCore(t)))
+    .filter(t => t.length > 1);
   if (goldTokens.length === 0) return false;
   return goldTokens.every(t => answerStems.has(t));
 }

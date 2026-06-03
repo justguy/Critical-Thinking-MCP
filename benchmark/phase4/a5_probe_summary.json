@@ -1,0 +1,36 @@
+{
+  "a5_question": "Can Haiku reach a finalize RELEASE on a correct answer within budget, given the worked-example BIND_SYS?",
+  "verdict": "PASS",
+  "released_AND_correct": "2/2",
+  "median_turns_to_release": 3,
+  "reports": [
+    {
+      "id": "wavg-1",
+      "gold": "80.63",
+      "RELEASE_reached": true,
+      "verdicts": [
+        "PASS"
+      ],
+      "num_turns": 3,
+      "sentinel": "80.63",
+      "sentinel_correct": true,
+      "billed_tokens": 75411,
+      "total_cost_usd": 0.0824791,
+      "permission_denials": []
+    },
+    {
+      "id": "wavg-2",
+      "gold": "87.30",
+      "RELEASE_reached": true,
+      "verdicts": [
+        "PASS"
+      ],
+      "num_turns": 3,
+      "sentinel": "87.30",
+      "sentinel_correct": true,
+      "billed_tokens": 28672,
+      "total_cost_usd": 0.036219799999999996,
+      "permission_denials": []
+    }
+  ]
+}

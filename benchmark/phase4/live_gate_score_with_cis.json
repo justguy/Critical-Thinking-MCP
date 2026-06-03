@@ -1,0 +1,36 @@
+{
+  "kind": "live_gate_score_with_cis",
+  "generated_at": "2026-06-02T21:46:44.453Z",
+  "label": "gate-mechanics sanity (injected corpus; NOT fabrication-catching)",
+  "source": "benchmark/reports/live_gate_score.json",
+  "ci_method": "Wilson score interval, z=1.96 (95%)",
+  "metrics": {
+    "block_recall": {
+      "successes": 106,
+      "n": 106,
+      "rate": 1,
+      "ci": [
+        0.9650260010779157,
+        0.9999999999999998
+      ]
+    },
+    "false_block_rate": {
+      "successes": 0,
+      "n": 41,
+      "rate": 0,
+      "ci": [
+        6.938893903907228e-18,
+        0.08567044886890743
+      ]
+    },
+    "block_precision": {
+      "successes": 106,
+      "n": 106,
+      "rate": 1,
+      "ci": [
+        0.9650260010779157,
+        0.9999999999999998
+      ]
+    }
+  }
+}

@@ -65,6 +65,8 @@ Edge relations: "supports" | "implies" | "contradicts" | "requires"
 
 Returns: cycles found, orphaned conclusions, grounding_score (evidence-to-conclusion reachability), and enforcement results.
 
+Use this when an argument's conclusions are asserted but you are unsure each one is actually reached from stated evidence — to catch circular justification, conclusions with no supporting path, and dangling claims before you rely on them.
+
 Optionally pass "context" with prior iteration data for escalation and stall detection.`,
     inputSchema: {
       type: 'object' as const,
@@ -141,6 +143,8 @@ Three analysis layers:
 
 Optional field: "context" (string) — describes the data. Enables compound growth detection when it mentions interest/growth/rate.
 
+Use this when a set of figures may be fabricated, mistyped, or internally inconsistent — to flag suspiciously round/evenly-spaced values, statistical outliers, and sums/growth/averages that do not actually add up before you cite them.
+
 Optionally pass "context" with prior iteration data for escalation and stall detection.`,
     inputSchema: {
       type: 'object' as const,
@@ -172,6 +176,8 @@ Also reports monotonic progress: is_improving, is_stalling, is_declining.
 
 Optional field: "drift_sensitivity" (number, default 0.5).
 
+Use this when you have a metric tracked over time (e.g. iteration scores, latency samples, accuracy) and need to tell genuine improvement from a stall or a regression — to catch a trend that has quietly shifted before you declare progress.
+
 Optionally pass "context" with prior iteration data for escalation and stall detection.`,
     inputSchema: {
       type: 'object' as const,
@@ -200,6 +206,8 @@ REQUIRED INPUT FORMAT — copy this structure exactly:
 
 Each option's outcome probabilities must sum to 1.0 (within +/-0.01). Minimum 2 options.
 Returns INDETERMINATE (recommended=null) when top-2 EU scores differ by < 0.05.
+
+Use this when you are about to recommend one option over others and want the choice grounded in explicit probabilities and utilities — to catch a pick that is not actually EU-superior, or a near-tie you should report as indeterminate rather than assert.
 
 Optionally pass "context" with prior iteration data for escalation and stall detection.`,
     inputSchema: {
@@ -246,6 +254,8 @@ REQUIRED INPUT FORMAT — copy this structure exactly:
 Each step requires: id, description, dependencies (string[] of step IDs, use [] if none).
 Optional: resources (string[]) — detects conflicts when multiple unordered steps use the same resource.
 Returns: circular_dependencies, missing_prerequisites, resource_conflicts, completeness_score, critical_path.
+
+Use this when you are proposing a multi-step plan with ordering or dependencies — to catch steps that depend on each other in a cycle, steps that reference a prerequisite that never appears, and unordered steps contending for the same resource before the plan ships.
 
 Optionally pass "context" with prior iteration data for escalation and stall detection.`,
     inputSchema: {
@@ -310,6 +320,8 @@ Dimensions:
 
 Returns the weakest dimension with targeted improvement advice.
 
+Use this when a drafted response may be vague, hedge-heavy, or unstructured — to surface its weakest dimension (low specificity, excessive hedging, missing claim->evidence->conclusion structure) before you treat the draft as final.
+
 Optionally pass "context" with prior iteration data for escalation and stall detection.`,
     inputSchema: {
       type: 'object' as const,
@@ -344,6 +356,8 @@ REQUIRED INPUT FORMAT — copy this structure exactly:
 Each assumption needs: description, confidence (0.0-1.0), falsification_condition. If you cannot state a falsification_condition, set confidence to 0.3 or below.
 
 Computes dependency-weighted honest confidence ceiling. Flags inflation when claimed confidence exceeds ceiling by >0.15. Checks falsifiability of stated conditions.
+
+Use this when you are about to state a high confidence level that rests on shakier assumptions — to catch confidence inflated above what those assumptions support and assumptions stated with no falsification condition before you commit to the claim.
 
 Optionally pass "context" with prior iteration data for escalation and stall detection.`,
     inputSchema: {
@@ -400,7 +414,9 @@ Claim types and required fields:
 - "product": values[], claimed_result
 - "percent_change": values [old,new], claimed_result
 
-Strict by default — matches to 2 decimal places. Optional "tolerance" for relative tolerance.`,
+Strict by default — matches to 2 decimal places. Optional "tolerance" for relative tolerance.
+
+Use this when your answer states a specific computed number (a total, percentage, weighted average, or growth figure) — to recompute it from the operands and catch a result that does not match the inputs before you publish it.`,
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -449,7 +465,9 @@ Optional fields:
 - "shared_resources" (string[]) — named shared state
 - "protections" (string[]) — locks, transactions, idempotency keys, etc.
 - "delivery_model" — "at_least_once" | "at_most_once" | "exactly_once"
-- "retry_behavior" — "none" | "automatic" | "manual"`,
+- "retry_behavior" — "none" | "automatic" | "manual"
+
+Use this when you are designing an operation that touches shared state across steps (balances, counters, inventory) or relies on retries/delivery guarantees — to flag check-then-act, read-modify-write, missing idempotency, and ordering assumptions before they become a race in production.`,
     inputSchema: {
       type: 'object' as const,
       properties: {

@@ -180,7 +180,18 @@ function templateForCheck(
   }
 }
 
-/** Map a claim_classifier primary type to a deliverable task type. */
+/**
+ * task_type recommender. Maps a claim_classifier primary type to a deliverable
+ * task_type — a SUGGESTION for which check profile (PROFILE_MAP) likely fits.
+ *
+ * Trust tier (§3): the recommendation is ADVISORY on its own. A model self-declaring
+ * (or having inferred for it) a task_type is Tier 3–5 — it can be wrong or weakened,
+ * so it is surfaced, never trusted. The mapping becomes DETERMINISTIC ONLY WHEN PAIRED
+ * WITH HOST ENFORCEMENT: a host-authored contract that pins task_type makes the profile
+ * binding; an agent-side recommendation does not. This is a Cat-3 prompt affordance — it
+ * narrows the model toward the right profile, but enforcement strength comes from the host
+ * contract, not from this function.
+ */
 export function inferTaskType(primaryType: string): TaskType {
   switch (primaryType) {
     case 'arithmetic':

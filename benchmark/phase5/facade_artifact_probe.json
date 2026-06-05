@@ -1,0 +1,34 @@
+{
+  "question": "With the corrected gate-compatible facade research template, can the model produce a parseable + RELEASE-able grounded deliverable single-shot?",
+  "parseable": "3/3",
+  "released": "0/3",
+  "reports": [
+    {
+      "id": "rag_refund_window",
+      "parseable": true,
+      "decision": "REJECT",
+      "reason": "gate_block",
+      "released": false,
+      "model_error": false,
+      "raw_tail": "ys from purchase\",\n      \"source_id\": \"policy\",\n      \"quoted_span\": \"within 30 days of purchase\",\n      \"supporting_token\": \"30 days\",\n      \"claim_kind\": \"status\"\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "rag_sla_uptime",
+      "parseable": true,
+      "decision": "REJECT",
+      "reason": "gate_block",
+      "released": false,
+      "model_error": false,
+      "raw_tail": "nthly uptime\",\n      \"source_id\": \"sla\",\n      \"quoted_span\": \"99.95% monthly uptime\",\n      \"supporting_token\": \"sla_enterprise_tier\",\n      \"claim_kind\": \"status\"\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "rag_pricing_grounded",
+      "parseable": true,
+      "decision": "REJECT",
+      "reason": "gate_block",
+      "released": false,
+      "model_error": false,
+      "raw_tail": "ase is 5 seats\",\n      \"source_id\": \"pricing\",\n      \"quoted_span\": \"Minimum purchase is 5 seats\",\n      \"supporting_token\": \"minimum\",\n      \"claim_kind\": \"status\"\n    }\n  ]\n}\n```"
+    }
+  ]
+}

@@ -41,8 +41,15 @@ After re-authoring the one anti-pattern contract per the guide (`fin_numeric_dag
 The re-framed `fin_numeric_dag` now RELEASEs spine-free; the friction arm cleared end-to-end with **no gate change** — the fix was entirely contract authoring.
 
 ## Honest caveats
-- **Small n + a real limitation:** the corrected live arm had **6/14 `unparseable` deliverables** — for the grounding-heavy RAG/freshness/compliance scenarios the model could not emit a valid `{claims:[{quoted_span,…}]}` JSON in one shot (the stricter JSON-only prompt did not fix this). So the clean `0/7` false-block rests on the simpler structured/constraint deliverables; gradeable n is 8. **Producing a grounded single-shot deliverable is itself the friction here** — an *agent/prompt* limitation that the `review_before_final` façade's `artifact` mode (handing the agent the claim/source template) is designed to address — **not** a gate defect.
+- **Small n:** the corrected live arm had 8 gradeable deliverables + **6/14 `unparseable`** (the model couldn't emit valid grounded-claim JSON single-shot). The clean `0/7` false-block rests on the simpler structured/constraint deliverables.
 - This is host-contract **false-release** reduction, distinct from (and not evidence for) reasoning/repair improvement (Phase 4 closed those).
+
+## Façade `artifact`-mode validation (follow-up — `facade_artifact_probe.json`)
+
+Investigating the 6 unparseable deliverables surfaced a real bug **and** a clean result:
+- **Bug (fixed):** `review_before_final`'s `artifact` templates were non-gate-compatible *placeholders* — the research template used the wrong field names (`text` vs `claim_text`, no `claim_id`/`supporting_token`/`claim_kind`) and the numeric template pushed the **heavy `numeric_derivation` DAG** the authoring guide says to avoid. Filling them could not produce a releasable deliverable. The templates were rewritten to mirror the real gate schemas (grounded-citation `GroundingClaim` shape; numeric defaults to the light `{answer_text, structured_answer}` constraint shape) and **proven**: a valid fill RELEASEs through the real gate, a mutated fill REJECTs (`tests/tools/review_before_final.gate_compat.test.ts`).
+- **Parseability solved:** with the *corrected* template, Haiku produced **parseable, well-structured grounded deliverables single-shot — 3/3** (was 0/3). The façade `artifact` mode does fix the "can't produce the structure" friction.
+- **The gate then does its job:** those 3 still REJECTed — because the model made *real grounding errors* (e.g. `supporting_token: "sla_enterprise_tier"`, a made-up id not inside the quoted span → `SOURCE_SPAN_MISMATCH` / `UNSUPPORTED_CLAIM`). An **ideal fill of the same template RELEASEs**. So the remaining non-release is **the gate correctly catching mis-grounded claims (false-release reduction working), not friction.** Net: the façade scaffolds the structure; the gate enforces grounding accuracy; only accurate grounded deliverables release — exactly the intended division.
 
 ## What Phase 5 supports
 - **Proven (deterministic):** the host gate gives perfect separation on the curated set (16/16 violations blocked, 0/14 good deliverables blocked), and real agents produce host-contract violations ~⅓ of the time — so there is a real false-release opportunity the gate catches.

@@ -65,19 +65,35 @@ describe('review_before_final facade', () => {
     }
   });
 
-  it('numeric artifact_template carries the number-tracing skeleton', () => {
+  it('numeric artifact_template DEFAULTS to the light value/constraint shape, NOT a DAG', () => {
     const out = run({ task_type: 'numeric', mode: 'artifact' });
-    expect(out.artifact_template).toMatchObject({
-      inputs: [],
-      numeric_derivation: { nodes: [], final_refs: [] },
-      arithmetic_checks: [],
-    });
+    const tpl = out.artifact_template as Record<string, unknown>;
+    // Per HOST_CONTRACT_AUTHORING.md: the value is pinned as a host constraint and the
+    // deliverable just states it — { answer_text, structured_answer }, spine-free.
+    expect(tpl).toMatchObject({ answer_text: '', structured_answer: {} });
+    // It must NOT steer toward the heavy numeric_derivation DAG / arithmetic_checks spine.
+    expect(tpl.numeric_derivation).toBeUndefined();
+    expect(tpl.arithmetic_checks).toBeUndefined();
+    expect(tpl.inputs).toBeUndefined();
   });
 
-  it('research artifact_template carries the source/claims skeleton', () => {
+  it('research artifact_template carries the grounded-citation skeleton (correct field names)', () => {
     const out = run({ task_type: 'research', mode: 'artifact' });
-    expect(out.artifact_template?.sources).toEqual([]);
-    expect(Array.isArray(out.artifact_template?.claims)).toBe(true);
+    const tpl = out.artifact_template as Record<string, unknown>;
+    expect(typeof tpl.answer_text).toBe('string');
+    // sources: [{ id, text, origin }]
+    expect(Array.isArray(tpl.sources)).toBe(true);
+    expect((tpl.sources as unknown[])[0]).toMatchObject({ id: '', text: '', origin: 'host_supplied' });
+    // claims carry the GroundingClaim field names the gate checks (not {text, ...}).
+    expect(Array.isArray(tpl.claims)).toBe(true);
+    expect((tpl.claims as unknown[])[0]).toMatchObject({
+      claim_id: '',
+      claim_text: '',
+      source_id: '',
+      quoted_span: '',
+      supporting_token: '',
+      claim_kind: 'status',
+    });
   });
 
   it('enforce mode sets enforce_required + corrective_prompt + artifact_template', () => {

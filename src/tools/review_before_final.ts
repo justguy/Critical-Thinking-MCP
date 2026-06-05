@@ -43,41 +43,75 @@ export interface ReviewBeforeFinalOutput {
   corrective_prompt?: string;
 }
 
-// Compact evidence/number/constraint skeletons per task type — the shape the
-// agent would fill in to drive finalize_deliverable.
+// Compact evidence/constraint skeletons per task type — the shape the agent fills
+// in to drive finalize_deliverable. These are GATE-COMPATIBLE: filling a template
+// with valid content yields a deliverable the real host gate (enforceDeliverable)
+// RELEASEs (see tests/tools/review_before_final.gate_compat.test.ts), and the shapes
+// follow HOST_CONTRACT_AUTHORING.md — check the host's REQUIREMENT (a constraint /
+// value / cited span), not force the agent's derivation.
 function artifactTemplateFor(taskType: ReviewTaskType): Record<string, unknown> {
   switch (taskType) {
     case 'numeric':
+      // LIGHT constraint/value shape (the HOST_CONTRACT_AUTHORING.md default): the host
+      // pins the value as a `==`/`>=`/… constraint, the deliverable just STATES it in a
+      // structured field. This RELEASEs spine-free. Do NOT default to the numeric_derivation
+      // DAG + arithmetic_checks — that heavy 're-derive' spine is only for evidence_level
+      // 'rederived' (a regulated independent re-derivation), never the default here.
       return {
-        inputs: [],
-        numeric_derivation: { nodes: [], final_refs: [] },
-        arithmetic_checks: [],
+        answer_text: '',
+        // Fill with the field(s) the host constraint checks, e.g. { total_expenses: 22600 }.
+        structured_answer: {},
       };
     case 'research':
+      // Grounded-citation shape (evidence_level 'cited'). Every claim must quote a VERBATIM
+      // substring of its source.text — quoted_span is checked char-for-char against the host
+      // source, so paraphrases REJECT. Fill the skeleton below; ids must cross-reference.
       return {
-        sources: [],
-        claims: [{ text: '', quoted_span: '', source_id: '' }],
+        answer_text: '',
+        // Host-supplied evidence the claims cite. origin stays 'host_supplied'.
+        sources: [{ id: '', text: '', origin: 'host_supplied' }],
+        claims: [
+          {
+            claim_id: '',
+            claim_text: '',
+            source_id: '', // must equal a sources[].id above
+            quoted_span: '', // MUST be a verbatim substring of that source's text
+            supporting_token: '', // the load-bearing token within quoted_span (e.g. '30 days')
+            claim_kind: 'status', // one of: numeric | date | entity | status | comparison | causal | recommendation
+          },
+        ],
       };
     case 'decision':
+      // Advisory: decision is NOT gate-blocking (the checklist/critique carry the value).
+      // Where a host DOES pin a structured requirement, fill structured_answer with the
+      // fields its constraints check; otherwise this is a scaffold only.
       return {
-        options: [],
-        scoring_dimensions: [],
+        answer_text: '',
+        structured_answer: {},
       };
     case 'plan':
+      // Light structured skeleton. If a host pins required fields/constraints, mirror them
+      // into structured_answer (that is the gate-checked surface); steps stay descriptive.
       return {
+        answer_text: '',
+        structured_answer: {},
         steps: [{ id: '', description: '', dependencies: [], on_failure: { action: '' } }],
       };
     case 'architecture':
       return {
+        answer_text: '',
+        structured_answer: {},
         failure_modes: [],
         shared_state: [],
         scaling_limits: [],
       };
     case 'general':
     default:
+      // Light value/constraint shape: state the answer + the fields any host constraint
+      // checks (must_include / must_not_include gate over answer_text directly).
       return {
-        claims: [],
-        constraints: [],
+        answer_text: '',
+        structured_answer: {},
       };
   }
 }

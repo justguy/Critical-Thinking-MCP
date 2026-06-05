@@ -746,6 +746,58 @@ REQUIRED INPUT FORMAT — copy this structure exactly:
     },
   },
   {
+    name: 'review_before_final',
+    description: `Lightweight self-review FACADE. Returns the reusable reasoning CHECKLIST + critique questions for a task type (plan/architecture/decision/research/numeric/general) so you can review your own draft before shipping — the cheap scaffold that, in Phase-4, matched the heavy multi-turn gate on repair with fewer turns. DETERMINISTIC and NON-BLOCKING: it never calls a model or analyzer and never returns a verdict/decision — it scaffolds. mode 'checklist' (default) returns checklist + critique only; 'artifact' adds a compact artifact_template (the evidence/number/constraint skeleton to fill in); 'enforce' adds enforce_required + a corrective_prompt telling you to run ct-enforce / finalize_deliverable on the artifact bundle. enforce_required defaults true for mode='enforce', risk_level='high', or machine-checkable task types (numeric/research).
+
+Use this when you have a draft answer/plan/design and want a structured self-review pass before you treat it as final — and, for machine-checkable claims, a pointer to the unforgeable finalize_deliverable gate. It does NOT verify your work; it structures the review.
+
+REQUIRED INPUT FORMAT — copy this structure exactly:
+{"task_type":"numeric","original_request":"What is the 3-year total at 5% growth?","draft_answer":"The 3-year total is $33,101.","mode":"artifact","risk_level":"high"}`,
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        task_type: {
+          type: 'string' as const,
+          enum: ['plan', 'architecture', 'decision', 'research', 'numeric', 'general'],
+          description: 'Which curated checklist + critique set to return.',
+        },
+        original_request: {
+          type: 'string' as const,
+          description: 'The original task/question the draft is meant to answer.',
+        },
+        draft_answer: {
+          type: 'string' as const,
+          description: 'The current draft answer/plan/design to review.',
+        },
+        mode: {
+          type: 'string' as const,
+          enum: ['checklist', 'artifact', 'enforce'],
+          description: "checklist (default) = checklist + critique only; artifact = + artifact_template; enforce = + enforce_required + corrective_prompt.",
+        },
+        risk_level: {
+          type: 'string' as const,
+          enum: ['low', 'medium', 'high'],
+          description: 'Optional. high forces enforce_required when an artifact_template is returned.',
+        },
+      },
+      required: ['task_type', 'original_request', 'draft_answer'],
+    },
+    outputSchema: {
+      type: 'object' as const,
+      properties: {
+        status: { type: 'string' as const },
+        task_type: { type: 'string' as const },
+        mode: { type: 'string' as const },
+        checklist: { type: 'array' as const, items: { type: 'string' as const } },
+        critique_questions: { type: 'array' as const, items: { type: 'string' as const } },
+        artifact_template: { type: 'object' as const },
+        enforce_required: { type: 'boolean' as const },
+        corrective_prompt: { type: 'string' as const },
+      },
+      required: ['status', 'task_type', 'mode', 'checklist', 'critique_questions'],
+    },
+  },
+  {
     name: 'trace_conclusion_numbers',
     description: `Verify every number in a conclusion traces to supplied numeric inputs. Each flat conclusion number declares its derivation (literal/identity → equals an input; derived → recompute via sum/diff/product/ratio/pct_of/mean/percent_change over input indices). For multi-step work, supply numeric_derivation {nodes, final_refs} with raw input, intermediate, and final nodes. The tool RE-DERIVES each and BLOCKS any that fails. Unforgeable only relative to the supplied inputs; finalize_deliverable adds stricter answer-number and input-anchor checks.
 
@@ -1026,7 +1078,8 @@ for (const tool of ALL_TOOLS) {
 // number tracing, constraints, freshness) inline; the advisory ones
 // (claim_coverage, profile_downgrade) and case_partition remain available to the
 // engine but are not separately agent-callable. Public surface = 9 benchmarked
-// analyzers + the plan_checks → finalize_deliverable spine = 11 tools.
+// analyzers + the plan_checks → finalize_deliverable spine (11-tool spine) + the
+// review_before_final facade = 12 tools.
 const INTERNAL_TOOL_NAMES = new Set<string>([
   'check_quote_grounding',
   'check_claim_coverage',

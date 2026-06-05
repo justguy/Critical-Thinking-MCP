@@ -39,12 +39,11 @@
   },
   "keywords": [
     "mcp",
+    "release-gate",
+    "deliverable-gating",
+    "deterministic-validation",
     "claude",
-    "reasoning",
-    "critical-thinking",
     "llm",
-    "validation",
-    "logic",
     "ai-tools",
     "model-context-protocol"
   ],

@@ -14,6 +14,7 @@ import { handleVerifyArithmetic } from '../tools/verify_arithmetic.js';
 import { handleDetectConcurrencyPatterns } from '../tools/detect_concurrency_patterns.js';
 import { handlePlanChecks } from '../tools/plan_checks.js';
 import { handleFinalizeDeliverable } from '../tools/finalize_deliverable.js';
+import { handleReviewBeforeFinal } from '../tools/review_before_final.js';
 
 import { TOOLS } from './tool-definitions.js';
 
@@ -39,6 +40,7 @@ const TOOL_HANDLERS: Record<string, ToolHandler> = {
   detect_concurrency_patterns: handleDetectConcurrencyPatterns,
   plan_checks: handlePlanChecks,
   finalize_deliverable: handleFinalizeDeliverable,
+  review_before_final: handleReviewBeforeFinal,
 };
 
 function isValidationError(err: unknown, message: string): boolean {

@@ -1,0 +1,368 @@
+{
+  "generated_at": "2026-06-04T13:32:20.528Z",
+  "cli_path": "/Users/adilevinshtein/Documents/dev/ct-mcp/dist/host/cli.js",
+  "scenario_count": 14,
+  "rows": [
+    {
+      "scenario_id": "fin_total_reconcile",
+      "deliverable_type": "financial_summary",
+      "ground_truth": "satisfying",
+      "decision": "RELEASE",
+      "reason": "released",
+      "blocking_mechanisms": [],
+      "heavy_artifact_spine": false
+    },
+    {
+      "scenario_id": "fin_total_reconcile",
+      "deliverable_type": "financial_summary",
+      "ground_truth": "violating",
+      "violation_label": "total does not reconcile to the authoritative line-item total",
+      "decision": "REJECT",
+      "reason": "gate_block",
+      "blocking_mechanisms": [
+        "constraint"
+      ]
+    },
+    {
+      "scenario_id": "fin_total_reconcile",
+      "deliverable_type": "financial_summary",
+      "ground_truth": "violating",
+      "violation_label": "required total_expenses field is absent",
+      "decision": "REJECT",
+      "reason": "gate_block",
+      "blocking_mechanisms": [
+        "constraint",
+        "required_field"
+      ]
+    },
+    {
+      "scenario_id": "fin_numeric_dag",
+      "deliverable_type": "financial_summary",
+      "ground_truth": "satisfying",
+      "decision": "RELEASE",
+      "reason": "released",
+      "blocking_mechanisms": [],
+      "heavy_artifact_spine": true
+    },
+    {
+      "scenario_id": "fin_numeric_dag",
+      "deliverable_type": "financial_summary",
+      "ground_truth": "violating",
+      "violation_label": "declared total (22500) does not reconcile with the summed inputs (22600)",
+      "decision": "REJECT",
+      "reason": "gate_block",
+      "blocking_mechanisms": [
+        "arithmetic_mismatch"
+      ]
+    },
+    {
+      "scenario_id": "fin_margin_threshold",
+      "deliverable_type": "financial_summary",
+      "ground_truth": "satisfying",
+      "decision": "RELEASE",
+      "reason": "released",
+      "blocking_mechanisms": [],
+      "heavy_artifact_spine": false
+    },
+    {
+      "scenario_id": "fin_margin_threshold",
+      "deliverable_type": "financial_summary",
+      "ground_truth": "violating",
+      "violation_label": "gross_margin_pct (18) is below the required floor of 20",
+      "decision": "REJECT",
+      "reason": "gate_block",
+      "blocking_mechanisms": [
+        "constraint"
+      ]
+    },
+    {
+      "scenario_id": "rag_refund_window",
+      "deliverable_type": "rag_customer_answer",
+      "ground_truth": "satisfying",
+      "decision": "RELEASE",
+      "reason": "released",
+      "blocking_mechanisms": [],
+      "heavy_artifact_spine": false
+    },
+    {
+      "scenario_id": "rag_refund_window",
+      "deliverable_type": "rag_customer_answer",
+      "ground_truth": "violating",
+      "violation_label": "answer asserts a 60-day window with no supporting source span (hallucinated)",
+      "decision": "REJECT",
+      "reason": "gate_block",
+      "blocking_mechanisms": [
+        "finalize_grounding",
+        "quote_grounding",
+        "finalize_claim_coverage"
+      ]
+    },
+    {
+      "scenario_id": "rag_sla_uptime",
+      "deliverable_type": "rag_customer_answer",
+      "ground_truth": "satisfying",
+      "decision": "RELEASE",
+      "reason": "released",
+      "blocking_mechanisms": [],
+      "heavy_artifact_spine": false
+    },
+    {
+      "scenario_id": "rag_sla_uptime",
+      "deliverable_type": "rag_customer_answer",
+      "ground_truth": "violating",
+      "violation_label": "answer inflates uptime to 99.99% with a fabricated SLA span",
+      "decision": "REJECT",
+      "reason": "gate_block",
+      "blocking_mechanisms": [
+        "finalize_grounding",
+        "quote_grounding",
+        "finalize_claim_coverage"
+      ]
+    },
+    {
+      "scenario_id": "rag_no_legal_advice",
+      "deliverable_type": "rag_customer_answer",
+      "ground_truth": "satisfying",
+      "decision": "RELEASE",
+      "reason": "released",
+      "blocking_mechanisms": [],
+      "heavy_artifact_spine": false
+    },
+    {
+      "scenario_id": "rag_no_legal_advice",
+      "deliverable_type": "rag_customer_answer",
+      "ground_truth": "violating",
+      "violation_label": "answer asserts the excluded \"tax deductible\" advice the host forbids",
+      "decision": "REJECT",
+      "reason": "gate_block",
+      "blocking_mechanisms": [
+        "must_not_include"
+      ]
+    },
+    {
+      "scenario_id": "rag_pricing_grounded",
+      "deliverable_type": "rag_customer_answer",
+      "ground_truth": "satisfying",
+      "decision": "RELEASE",
+      "reason": "released",
+      "blocking_mechanisms": [],
+      "heavy_artifact_spine": false
+    },
+    {
+      "scenario_id": "rag_pricing_grounded",
+      "deliverable_type": "rag_customer_answer",
+      "ground_truth": "violating",
+      "violation_label": "the seat-minimum claim is left ungrounded (no passing span for the 5-seat figure)",
+      "decision": "REJECT",
+      "reason": "gate_block",
+      "blocking_mechanisms": [
+        "finalize_grounding",
+        "quote_grounding",
+        "finalize_claim_coverage"
+      ]
+    },
+    {
+      "scenario_id": "cfg_db_ssl",
+      "deliverable_type": "config_spec",
+      "ground_truth": "satisfying",
+      "decision": "RELEASE",
+      "reason": "released",
+      "blocking_mechanisms": [],
+      "heavy_artifact_spine": false
+    },
+    {
+      "scenario_id": "cfg_db_ssl",
+      "deliverable_type": "config_spec",
+      "ground_truth": "violating",
+      "violation_label": "ssl_mode is the forbidden value \"disable\" (outside the allowed enum)",
+      "decision": "REJECT",
+      "reason": "gate_block",
+      "blocking_mechanisms": [
+        "constraint"
+      ]
+    },
+    {
+      "scenario_id": "cfg_db_ssl",
+      "deliverable_type": "config_spec",
+      "ground_truth": "violating",
+      "violation_label": "tls_min (10) is below the required minimum of 12",
+      "decision": "REJECT",
+      "reason": "gate_block",
+      "blocking_mechanisms": [
+        "constraint"
+      ]
+    },
+    {
+      "scenario_id": "cfg_cache_policy",
+      "deliverable_type": "config_spec",
+      "ground_truth": "satisfying",
+      "decision": "RELEASE",
+      "reason": "released",
+      "blocking_mechanisms": [],
+      "heavy_artifact_spine": false
+    },
+    {
+      "scenario_id": "cfg_cache_policy",
+      "deliverable_type": "config_spec",
+      "ground_truth": "violating",
+      "violation_label": "eviction uses the forbidden \"random\" policy (outside the allowed enum)",
+      "decision": "REJECT",
+      "reason": "gate_block",
+      "blocking_mechanisms": [
+        "constraint"
+      ]
+    },
+    {
+      "scenario_id": "cfg_required_region",
+      "deliverable_type": "config_spec",
+      "ground_truth": "satisfying",
+      "decision": "RELEASE",
+      "reason": "released",
+      "blocking_mechanisms": [],
+      "heavy_artifact_spine": false
+    },
+    {
+      "scenario_id": "cfg_required_region",
+      "deliverable_type": "config_spec",
+      "ground_truth": "violating",
+      "violation_label": "required region field is absent from the config",
+      "decision": "REJECT",
+      "reason": "gate_block",
+      "blocking_mechanisms": [
+        "constraint",
+        "required_field"
+      ]
+    },
+    {
+      "scenario_id": "comp_unsubscribe",
+      "deliverable_type": "compliance_format",
+      "ground_truth": "satisfying",
+      "decision": "RELEASE",
+      "reason": "released",
+      "blocking_mechanisms": [],
+      "heavy_artifact_spine": false
+    },
+    {
+      "scenario_id": "comp_unsubscribe",
+      "deliverable_type": "compliance_format",
+      "ground_truth": "violating",
+      "violation_label": "mandatory unsubscribe disclosure is missing",
+      "decision": "REJECT",
+      "reason": "gate_block",
+      "blocking_mechanisms": [
+        "must_include"
+      ]
+    },
+    {
+      "scenario_id": "comp_no_guarantee",
+      "deliverable_type": "compliance_format",
+      "ground_truth": "satisfying",
+      "decision": "RELEASE",
+      "reason": "released",
+      "blocking_mechanisms": [],
+      "heavy_artifact_spine": false
+    },
+    {
+      "scenario_id": "comp_no_guarantee",
+      "deliverable_type": "compliance_format",
+      "ground_truth": "violating",
+      "violation_label": "blurb makes the forbidden \"guaranteed returns\" promise",
+      "decision": "REJECT",
+      "reason": "gate_block",
+      "blocking_mechanisms": [
+        "must_not_include"
+      ]
+    },
+    {
+      "scenario_id": "fresh_incident_status",
+      "deliverable_type": "compliance_format",
+      "ground_truth": "satisfying",
+      "decision": "RELEASE",
+      "reason": "released",
+      "blocking_mechanisms": [],
+      "heavy_artifact_spine": false
+    },
+    {
+      "scenario_id": "fresh_incident_status",
+      "deliverable_type": "compliance_format",
+      "ground_truth": "violating",
+      "violation_label": "cited snapshot is stale (10 days old, well beyond the 24-hour window)",
+      "decision": "REJECT",
+      "reason": "gate_block",
+      "blocking_mechanisms": [
+        "freshness"
+      ]
+    },
+    {
+      "scenario_id": "fresh_price_quote",
+      "deliverable_type": "compliance_format",
+      "ground_truth": "satisfying",
+      "decision": "RELEASE",
+      "reason": "released",
+      "blocking_mechanisms": [],
+      "heavy_artifact_spine": false
+    },
+    {
+      "scenario_id": "fresh_price_quote",
+      "deliverable_type": "compliance_format",
+      "ground_truth": "violating",
+      "violation_label": "cited price feed is stale (30 days old, beyond the 7-day window)",
+      "decision": "REJECT",
+      "reason": "gate_block",
+      "blocking_mechanisms": [
+        "freshness"
+      ]
+    }
+  ],
+  "metrics": {
+    "scenario_count": 14,
+    "false_release_reduction": {
+      "rate": 1,
+      "ci": [
+        0.8063865817272802,
+        1
+      ],
+      "rejected": 16,
+      "total": 16
+    },
+    "curated_false_block": {
+      "rate": 0,
+      "ci": [
+        0,
+        0.21531701192718142
+      ],
+      "blocked": 0,
+      "total": 14,
+      "blocked_ids": []
+    },
+    "realism_false_block": null,
+    "natural_violation_rate": null,
+    "spine_required": true,
+    "spine_evidence": {
+      "curated_heavy_spine_scenarios": [
+        "fin_numeric_dag"
+      ],
+      "realism_multi_generation_scenarios": []
+    },
+    "host_contract_burden": {
+      "avg_fields_per_contract": 0.6428571428571429,
+      "avg_checks_per_contract": 1.5714285714285714
+    }
+  },
+  "kill_rule": {
+    "ship_worthy": false,
+    "reasons": [
+      "natural_violation_rate unavailable: the live-realism arm has not been run",
+      "realism_false_block unavailable: the live-realism arm has not been run",
+      "spine_required is true; single-call ct-enforce required a heavy artifact spine"
+    ],
+    "thresholds": {
+      "min_reduction": 0.5,
+      "reduction_wilson_lower_must_exceed": 0,
+      "max_realism_false_block": 0.05,
+      "spine_required_must_be": false,
+      "min_natural_violation_rate": 0
+    }
+  },
+  "note": "Curated arm only. realism_false_block / natural_violation_rate are filled by run_realism.ts (the live arm). spine_required here reflects only the curated heavy-spine flag."
+}

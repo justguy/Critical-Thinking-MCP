@@ -1,14 +1,16 @@
 # ct-mcp
 
-**CT-MCP — a structured-rethinking layer for LLMs.**
+**CT-MCP — a deterministic release gate for structured agent deliverables.**
 
 > **BETA** — Under active development. Interfaces may change between versions.
 
-Eleven deterministic MCP tools that expose machine-checkable failures before you trust an LLM answer.
+A host-authored, single-call gate (`ct-enforce`) backed by eleven deterministic MCP tools. A host pins the objective requirements a deliverable must satisfy; ct-mcp **blocks release** on any unforgeable violation — arithmetic that doesn't reconcile, a claim with no supporting source span, a missing required field, a stale source, a broken constraint.
 
-Use it when a model sounds plausible but you need hard checks on the math, the assumptions, the plan, or the concurrency story. CT-MCP does not add another model opinion. It recomputes, validates, and names the exact failure mode.
+It does not add another model opinion and it does not make the model reason better. It recomputes, validates, and names the exact failure mode at the gate.
 
 No LLM calls in enforcement logic. No configuration. No API keys. Runs locally.
+
+> **What it is — and isn't (honest scope).** ct-mcp is a *deterministic linter + release gate*, **not** a reasoning amplifier. On a strong model it *provenly* **catches** planted / contract-violating defects (perfect separation on 147 structured bundles: 106/106 blocked, 0/41 false-block) but shows **no** measurable improvement to the model's reasoning or repair — see [`docs/PHASE4_RESULTS.md`](docs/PHASE4_RESULTS.md). Its product-value hypothesis is **host-authored contracts gating real deliverables to reduce false releases**, with a single low-friction `ct-enforce` call — the experiment in [`docs/designs/PHASE5_PREREGISTRATION.md`](docs/designs/PHASE5_PREREGISTRATION.md).
 
 ## What It Does
 
@@ -142,6 +144,27 @@ ultimately host-side.
 
 - **plan_checks** — deterministic planner: maps a `deliverable_contract` (task type, evidence level, risk) to the obligations `finalize_deliverable` will enforce, so the agent knows which artifacts to prepare. Never blocks.
 - **finalize_deliverable** — the keystone gate: **re-executes** the contract's required checks inline (grounding with claim id/text/kind binding, strict number tracing, arithmetic checks, constraints, freshness) and blocks on `must_include`/numeric-criterion substring failures; additionally verifies a *supplied* `case_partition` is MECE (blocks on overlap/gap) and emits a profile-downgrade **warning** when the declared task type understates the request/answer shape; returns an exact-text `answer_text_hash` binding token.
+
+On top of the 11-tool spine (9 analyzers + `plan_checks` → `finalize_deliverable`) sits one more public
+tool — a **`review_before_final` facade** — so the public surface is an **11-tool spine + a
+`review_before_final` facade = 12 tools**. The facade is the *lightweight* counterpart to the heavy gate:
+a Phase-4 finding was that a cheap checklist scaffold matched/beat the multi-turn artifact gate on repair
+with fewer turns, so `review_before_final` returns the reusable per-task-type **checklist + critique
+questions** (and, on request, a compact artifact template plus a pointer to run `ct-enforce` /
+`finalize_deliverable`). It is **deterministic and never blocks** — it scaffolds self-review; it does not
+verify the answer. The same checklists are also exposed as reusable **MCP prompts** (`prompts/list` +
+`prompts/get`): `review_plan`, `stress_architecture`, `review_decision`, `verify_research_answer`,
+`audit_numeric_analysis`, `review_before_final`.
+
+**Default discovery surface (small by design).** By default `tools/list` advertises **only the
+`review_before_final` facade** (plus the 6 prompts) — a single small entry point, so a normal agent
+isn't asked to pick from many low-level analyzers. The full **11-tool spine** is still there and still
+**callable**; it is just hidden from discovery. Set **`CT_EXPOSE_ALL=1`** to advertise the full 12-tool
+surface for expert/host use (`CT_DISABLE_FINALIZE` then composes on top to drop `finalize_deliverable`,
+leaving 11). Hiding is **discovery-only**: `tools/call` always dispatches all 12 handlers, so the
+facade's enforce-mode corrective prompt (which points at `finalize_deliverable` / `ct-enforce`), expert
+clients, and the host CLI can always name a hidden tool and have it run. `ct-enforce` remains the
+host-side CLI for the single-call release gate.
 
 The individual checks `finalize_deliverable` runs are **internal primitives**, not separately
 agent-callable tools — the agent supplies the artifacts (`sources`+`claims`, `inputs`+`conclusion_numbers`,

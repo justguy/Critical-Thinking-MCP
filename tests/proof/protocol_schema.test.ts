@@ -30,6 +30,7 @@ const PUBLIC_TOOL_NAMES = [
   'detect_concurrency_patterns',
   'plan_checks',
   'finalize_deliverable',
+  'review_before_final',
 ];
 
 const INTERNAL_LEAF_TOOL_NAMES = [
@@ -206,13 +207,23 @@ const REPRESENTATIVE_CALLS: { name: string; args: Record<string, unknown> }[] = 
     name: 'finalize_deliverable',
     args: finalizeFreshnessArgs('2026-01-01T00:00:00Z', { maxAgeSeconds: 7 * DAY }),
   },
+  {
+    name: 'review_before_final',
+    args: {
+      task_type: 'numeric',
+      original_request: 'What is the 3-year total at 5% growth on $10,000?',
+      draft_answer: 'The 3-year total is $11,576.25.',
+      mode: 'artifact',
+      risk_level: 'high',
+    },
+  },
 ];
 
 describe('MCP protocol/schema proof surface', () => {
   it('lists exactly the public tools and hides internal leaf tools', () => {
     const actualNames = TOOLS.map(tool => tool.name);
 
-    expect(actualNames).toHaveLength(11);
+    expect(actualNames).toHaveLength(12);
     expect(actualNames).toEqual(PUBLIC_TOOL_NAMES);
     for (const internalName of INTERNAL_LEAF_TOOL_NAMES) {
       expect(actualNames).not.toContain(internalName);
@@ -295,6 +306,10 @@ describe('MCP protocol/schema proof surface', () => {
   });
 
   it('round-trips tools/list and tools/call over live Streamable HTTP transport', async () => {
+    // The discovery surface is narrowed by default to the review_before_final
+    // facade; CT_EXPOSE_ALL opts into the full 12-tool surface validated here.
+    const priorExposeAll = process.env.CT_EXPOSE_ALL;
+    process.env.CT_EXPOSE_ALL = '1';
     const running = await startHttpServer({ host: '127.0.0.1', port: 0, path: '/mcp' });
     const client = new Client({ name: 'protocol-http-proof', version: '0.0.0-test' });
     const transport = new StreamableHTTPClientTransport(new URL(running.url));
@@ -332,6 +347,69 @@ describe('MCP protocol/schema proof surface', () => {
     } finally {
       await client.close();
       await running.close();
+      if (priorExposeAll === undefined) {
+        delete process.env.CT_EXPOSE_ALL;
+      } else {
+        process.env.CT_EXPOSE_ALL = priorExposeAll;
+      }
+    }
+  });
+
+  it('default surface advertises ONLY review_before_final, yet hidden tools stay CALLABLE', async () => {
+    // No CT_EXPOSE_ALL: discovery is narrowed to the single facade. Hiding is
+    // discovery-only — a client that NAMES a hidden tool still gets it handled,
+    // which is what keeps enforce-mode corrective prompts (finalize/analyzers)
+    // working.
+    const priorExposeAll = process.env.CT_EXPOSE_ALL;
+    delete process.env.CT_EXPOSE_ALL;
+    const running = await startHttpServer({ host: '127.0.0.1', port: 0, path: '/mcp' });
+    const client = new Client({ name: 'protocol-http-default-surface', version: '0.0.0-test' });
+    const transport = new StreamableHTTPClientTransport(new URL(running.url));
+
+    try {
+      await client.connect(transport);
+
+      const tools = await client.listTools();
+      const advertised = tools.tools.map(tool => tool.name);
+      expect(advertised).toEqual(['review_before_final']);
+      // The spine is hidden from discovery, not removed.
+      expect(advertised).not.toContain('finalize_deliverable');
+      expect(advertised).not.toContain('check_numeric_claims');
+
+      // Hidden finalize_deliverable is still dispatchable (discovery-only hiding).
+      const hiddenFinalize = await client.callTool({
+        name: 'finalize_deliverable',
+        arguments: {
+          contract: {
+            contract_id: 'http-hidden-callable',
+            contract_authority: 'host',
+            profile_source: 'host_supplied',
+            original_request_text: 'Write a short note.',
+            task_type: 'freeform',
+            evidence_level: 'none',
+            risk_level: 'low',
+          },
+          answer_text: 'A short note that needs no external evidence.',
+        },
+      });
+      expect(hiddenFinalize.structuredContent?.status).toBe('PASS');
+      expect(hiddenFinalize.isError).toBeUndefined();
+
+      // Hidden analyzer (check_numeric_claims) is still dispatchable too.
+      const hiddenAnalyzer = await client.callTool({
+        name: 'check_numeric_claims',
+        arguments: { numbers: [12.5, 15.3, 14.8, 13.2], description: 'Quarterly revenue figures in millions' },
+      });
+      expect(hiddenAnalyzer.structuredContent).toBeDefined();
+      expect(hiddenAnalyzer.isError).toBeUndefined();
+    } finally {
+      await client.close();
+      await running.close();
+      if (priorExposeAll === undefined) {
+        delete process.env.CT_EXPOSE_ALL;
+      } else {
+        process.env.CT_EXPOSE_ALL = priorExposeAll;
+      }
     }
   });
 });

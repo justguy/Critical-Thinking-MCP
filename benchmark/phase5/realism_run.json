@@ -1,0 +1,316 @@
+{
+  "generated_at": "2026-06-05T02:55:57.135Z",
+  "model": "haiku",
+  "scenario_count": 14,
+  "realism_rows": [
+    {
+      "scenario_id": "fin_total_reconcile",
+      "deliverable_type": "financial_summary",
+      "ground_truth": "satisfies_intent",
+      "decision": "RELEASE",
+      "reason": "released",
+      "generations_to_release": 1
+    },
+    {
+      "scenario_id": "fin_numeric_dag",
+      "deliverable_type": "financial_summary",
+      "ground_truth": "satisfies_intent",
+      "decision": "RELEASE",
+      "reason": "released",
+      "generations_to_release": 1
+    },
+    {
+      "scenario_id": "fin_margin_threshold",
+      "deliverable_type": "financial_summary",
+      "ground_truth": "satisfies_intent",
+      "decision": "RELEASE",
+      "reason": "released",
+      "generations_to_release": 1
+    },
+    {
+      "scenario_id": "rag_refund_window",
+      "deliverable_type": "rag_customer_answer",
+      "ground_truth": "violates",
+      "decision": "REJECT",
+      "reason": "gate_block"
+    },
+    {
+      "scenario_id": "rag_sla_uptime",
+      "deliverable_type": "rag_customer_answer",
+      "ground_truth": "no_answer",
+      "decision": "ERROR",
+      "reason": "unparseable_deliverable"
+    },
+    {
+      "scenario_id": "rag_no_legal_advice",
+      "deliverable_type": "rag_customer_answer",
+      "ground_truth": "no_answer",
+      "decision": "ERROR",
+      "reason": "unparseable_deliverable"
+    },
+    {
+      "scenario_id": "rag_pricing_grounded",
+      "deliverable_type": "rag_customer_answer",
+      "ground_truth": "no_answer",
+      "decision": "ERROR",
+      "reason": "unparseable_deliverable"
+    },
+    {
+      "scenario_id": "cfg_db_ssl",
+      "deliverable_type": "config_spec",
+      "ground_truth": "satisfies_intent",
+      "decision": "RELEASE",
+      "reason": "released",
+      "generations_to_release": 1
+    },
+    {
+      "scenario_id": "cfg_cache_policy",
+      "deliverable_type": "config_spec",
+      "ground_truth": "satisfies_intent",
+      "decision": "RELEASE",
+      "reason": "released",
+      "generations_to_release": 1
+    },
+    {
+      "scenario_id": "cfg_required_region",
+      "deliverable_type": "config_spec",
+      "ground_truth": "satisfies_intent",
+      "decision": "RELEASE",
+      "reason": "released",
+      "generations_to_release": 1
+    },
+    {
+      "scenario_id": "comp_unsubscribe",
+      "deliverable_type": "compliance_format",
+      "ground_truth": "no_answer",
+      "decision": "ERROR",
+      "reason": "unparseable_deliverable"
+    },
+    {
+      "scenario_id": "comp_no_guarantee",
+      "deliverable_type": "compliance_format",
+      "ground_truth": "satisfies_intent",
+      "decision": "RELEASE",
+      "reason": "released",
+      "generations_to_release": 1
+    },
+    {
+      "scenario_id": "fresh_incident_status",
+      "deliverable_type": "compliance_format",
+      "ground_truth": "no_answer",
+      "decision": "ERROR",
+      "reason": "unparseable_deliverable"
+    },
+    {
+      "scenario_id": "fresh_price_quote",
+      "deliverable_type": "compliance_format",
+      "ground_truth": "no_answer",
+      "decision": "ERROR",
+      "reason": "unparseable_deliverable"
+    }
+  ],
+  "details": [
+    {
+      "scenario_id": "fin_total_reconcile",
+      "deliverable_type": "financial_summary",
+      "model_error": false,
+      "parsed": true,
+      "ground_truth": "satisfies_intent",
+      "ground_truth_failures": [],
+      "gate_decision": "RELEASE",
+      "gate_reason": "released"
+    },
+    {
+      "scenario_id": "fin_numeric_dag",
+      "deliverable_type": "financial_summary",
+      "model_error": false,
+      "parsed": true,
+      "ground_truth": "satisfies_intent",
+      "ground_truth_failures": [],
+      "gate_decision": "RELEASE",
+      "gate_reason": "released"
+    },
+    {
+      "scenario_id": "fin_margin_threshold",
+      "deliverable_type": "financial_summary",
+      "model_error": false,
+      "parsed": true,
+      "ground_truth": "satisfies_intent",
+      "ground_truth_failures": [],
+      "gate_decision": "RELEASE",
+      "gate_reason": "released"
+    },
+    {
+      "scenario_id": "rag_refund_window",
+      "deliverable_type": "rag_customer_answer",
+      "model_error": false,
+      "parsed": true,
+      "ground_truth": "violates",
+      "ground_truth_failures": [
+        "ungrounded_claim:c1"
+      ],
+      "gate_decision": "REJECT",
+      "gate_reason": "gate_block"
+    },
+    {
+      "scenario_id": "rag_sla_uptime",
+      "deliverable_type": "rag_customer_answer",
+      "model_error": false,
+      "parsed": false,
+      "ground_truth": "no_answer",
+      "ground_truth_failures": [],
+      "gate_decision": "ERROR",
+      "gate_reason": "unparseable_deliverable"
+    },
+    {
+      "scenario_id": "rag_no_legal_advice",
+      "deliverable_type": "rag_customer_answer",
+      "model_error": false,
+      "parsed": false,
+      "ground_truth": "no_answer",
+      "ground_truth_failures": [],
+      "gate_decision": "ERROR",
+      "gate_reason": "unparseable_deliverable"
+    },
+    {
+      "scenario_id": "rag_pricing_grounded",
+      "deliverable_type": "rag_customer_answer",
+      "model_error": false,
+      "parsed": false,
+      "ground_truth": "no_answer",
+      "ground_truth_failures": [],
+      "gate_decision": "ERROR",
+      "gate_reason": "unparseable_deliverable"
+    },
+    {
+      "scenario_id": "cfg_db_ssl",
+      "deliverable_type": "config_spec",
+      "model_error": false,
+      "parsed": true,
+      "ground_truth": "satisfies_intent",
+      "ground_truth_failures": [],
+      "gate_decision": "RELEASE",
+      "gate_reason": "released"
+    },
+    {
+      "scenario_id": "cfg_cache_policy",
+      "deliverable_type": "config_spec",
+      "model_error": false,
+      "parsed": true,
+      "ground_truth": "satisfies_intent",
+      "ground_truth_failures": [],
+      "gate_decision": "RELEASE",
+      "gate_reason": "released"
+    },
+    {
+      "scenario_id": "cfg_required_region",
+      "deliverable_type": "config_spec",
+      "model_error": false,
+      "parsed": true,
+      "ground_truth": "satisfies_intent",
+      "ground_truth_failures": [],
+      "gate_decision": "RELEASE",
+      "gate_reason": "released"
+    },
+    {
+      "scenario_id": "comp_unsubscribe",
+      "deliverable_type": "compliance_format",
+      "model_error": false,
+      "parsed": false,
+      "ground_truth": "no_answer",
+      "ground_truth_failures": [],
+      "gate_decision": "ERROR",
+      "gate_reason": "unparseable_deliverable"
+    },
+    {
+      "scenario_id": "comp_no_guarantee",
+      "deliverable_type": "compliance_format",
+      "model_error": false,
+      "parsed": true,
+      "ground_truth": "satisfies_intent",
+      "ground_truth_failures": [],
+      "gate_decision": "RELEASE",
+      "gate_reason": "released"
+    },
+    {
+      "scenario_id": "fresh_incident_status",
+      "deliverable_type": "compliance_format",
+      "model_error": false,
+      "parsed": false,
+      "ground_truth": "no_answer",
+      "ground_truth_failures": [],
+      "gate_decision": "ERROR",
+      "gate_reason": "unparseable_deliverable"
+    },
+    {
+      "scenario_id": "fresh_price_quote",
+      "deliverable_type": "compliance_format",
+      "model_error": false,
+      "parsed": false,
+      "ground_truth": "no_answer",
+      "ground_truth_failures": [],
+      "gate_decision": "ERROR",
+      "gate_reason": "unparseable_deliverable"
+    }
+  ],
+  "metrics": {
+    "scenario_count": 14,
+    "false_release_reduction": {
+      "rate": 1,
+      "ci": [
+        0.8063865817272802,
+        1
+      ],
+      "rejected": 16,
+      "total": 16
+    },
+    "curated_false_block": {
+      "rate": 0,
+      "ci": [
+        0,
+        0.21531701192718142
+      ],
+      "blocked": 0,
+      "total": 14,
+      "blocked_ids": []
+    },
+    "realism_false_block": {
+      "rate": 0,
+      "ci": [
+        0,
+        0.35433884297520657
+      ],
+      "blocked": 0,
+      "total_satisfies_intent": 7
+    },
+    "natural_violation_rate": {
+      "rate": 0.125,
+      "ci": [
+        0.022416908863296142,
+        0.47089480576986154
+      ],
+      "violations": 1,
+      "total": 8
+    },
+    "spine_required": false,
+    "spine_evidence": {
+      "curated_heavy_spine_scenarios": [],
+      "realism_multi_generation_scenarios": []
+    },
+    "host_contract_burden": {
+      "avg_fields_per_contract": 0.7142857142857143,
+      "avg_checks_per_contract": 1.6428571428571428
+    }
+  },
+  "kill_rule": {
+    "ship_worthy": true,
+    "reasons": [],
+    "thresholds": {
+      "min_reduction": 0.5,
+      "reduction_wilson_lower_must_exceed": 0,
+      "max_realism_false_block": 0.05,
+      "spine_required_must_be": false,
+      "min_natural_violation_rate": 0
+    }
+  }
+}

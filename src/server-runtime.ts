@@ -5,11 +5,16 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {
+  ErrorCode,
+  GetPromptRequestSchema,
   isInitializeRequest,
+  ListPromptsRequestSchema,
   ListToolsRequestSchema,
+  McpError,
   type JSONRPCMessage,
 } from '@modelcontextprotocol/sdk/types.js';
 
+import { getPrompt, listPromptDescriptors } from './mcp/prompts.js';
 import { registerResourceHandlers } from './mcp/resources.js';
 import { registerToolHandlers } from './mcp/tool-call.js';
 import { TOOLS } from './mcp/tool-definitions.js';
@@ -22,17 +27,40 @@ export const SERVER_INFO = {
 export type ServerTransportMode = 'stdio' | 'http';
 
 /**
- * Assemble the advertised tool list. When CT_DISABLE_FINALIZE is truthy
- * (Phase-4 arm-D "no-finalize" variant), `finalize_deliverable` is filtered
- * out of the advertised surface so its schema never enters the client's
- * context — B advertises 11 tools, D advertises 10. Pure helper (env passed
- * in) so it is unit-testable without launching a transport. ADDITIVE: it
- * changes only the advertised list, never any tool's behavior or schema, and
- * never the call handler.
+ * Assemble the DISCOVERY (tools/list) surface. This is the only place the
+ * advertised surface is narrowed — it is DISCOVERY-ONLY: CallTool dispatch
+ * (tool-call.ts) is untouched and still handles ALL 12 public tools regardless
+ * of what was advertised, so enforce-mode corrective prompts, expert clients,
+ * and the ct-enforce host CLI can always name a hidden tool and have it run.
+ *
+ * Surface composition (pure function of TOOLS + env):
+ *   - DEFAULT (no flags): advertise ONLY the `review_before_final` facade, so a
+ *     normal agent sees a single small entry point instead of choosing among
+ *     many low-level analyzers. The full spine stays callable, just hidden.
+ *   - CT_EXPOSE_ALL truthy: advertise the FULL public surface (all 12 tools)
+ *     for expert / host use.
+ *   - CT_DISABLE_FINALIZE composes on TOP of the full surface (Phase-4 arm-D
+ *     "no-finalize" variant): when CT_EXPOSE_ALL exposes the full surface,
+ *     CT_DISABLE_FINALIZE removes `finalize_deliverable` from it. So
+ *     CT_EXPOSE_ALL alone -> 12 advertised; CT_EXPOSE_ALL + CT_DISABLE_FINALIZE
+ *     -> 11 (finalize removed, every other tool untouched). Without
+ *     CT_EXPOSE_ALL the default surface is already just the facade, so
+ *     CT_DISABLE_FINALIZE has nothing to remove.
+ *
+ * Pure helper (env passed in) so it is unit-testable without launching a
+ * transport. It changes only the advertised list, never any tool's behavior or
+ * schema, and never the call handler.
  */
 export function listAdvertisedTools(
   env: NodeJS.ProcessEnv = process.env,
 ): typeof TOOLS {
+  if (!env.CT_EXPOSE_ALL) {
+    // Default-minimal discovery surface: the single facade entry point.
+    return TOOLS.filter(tool => tool.name === 'review_before_final');
+  }
+
+  // Expert/host surface: full spine + facade, with the finalize gate optionally
+  // removed for the arm-D variant.
   if (env.CT_DISABLE_FINALIZE) {
     return TOOLS.filter(tool => tool.name !== 'finalize_deliverable');
   }
@@ -65,12 +93,29 @@ function createMcpServer(): Server {
       capabilities: {
         tools: {},
         resources: {},
+        prompts: {},
       },
     },
   );
 
   server.setRequestHandler(ListToolsRequestSchema, async () => {
     return { tools: listAdvertisedTools() };
+  });
+
+  server.setRequestHandler(ListPromptsRequestSchema, async () => {
+    return { prompts: listPromptDescriptors() };
+  });
+
+  server.setRequestHandler(GetPromptRequestSchema, async (request) => {
+    const { name, arguments: args } = request.params;
+    try {
+      return getPrompt(name, (args as Record<string, string> | undefined) ?? {});
+    } catch (err) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        err instanceof Error ? err.message : String(err),
+      );
+    }
   });
 
   registerResourceHandlers(server);

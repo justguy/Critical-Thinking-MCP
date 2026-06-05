@@ -135,8 +135,11 @@ describe('package.json metadata', () => {
   const pkg = JSON.parse(readFile('package.json'));
 
   it('has required npm keywords', () => {
-    const required = ['mcp', 'claude', 'reasoning', 'critical-thinking', 'llm',
-      'validation', 'logic', 'ai-tools', 'model-context-protocol'];
+    // Repositioned product: a deterministic release gate for structured agent
+    // deliverables (not a "critical-thinking / reasoning" tool).
+    const required = ['mcp', 'release-gate', 'deliverable-gating',
+      'deterministic-validation', 'claude', 'llm', 'ai-tools',
+      'model-context-protocol'];
     for (const kw of required) {
       expect(pkg.keywords).toContain(kw);
     }

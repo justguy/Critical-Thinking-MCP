@@ -101,7 +101,18 @@ A deliverable gate added in the working tree (public surface 9 → 11) for forci
 verifiable structure and confirm their own work. The agent drives it through two public tools —
 `plan_checks` (planner) and `finalize_deliverable` (keystone gate); the other seven rows below are
 **internal check primitives** that `finalize_deliverable` re-executes inline, not separately
-agent-callable tools. **It has only directional value-pilot evidence** — the table above is the benchmark-backed
+agent-callable tools. A twelfth public tool, the **`review_before_final` facade**, sits on top of this
+**11-tool spine** (so the public surface is an *11-tool spine + a `review_before_final` facade = 12
+tools*): it returns the reusable per-task-type checklist + critique questions (the cheap scaffold that
+matched the heavy gate on repair in Phase-4), is **deterministic and never blocks**, and at most points
+the agent to run `finalize_deliverable` / `ct-enforce`. The same checklists are also exposed as reusable
+**MCP prompts** (`prompts/list` + `prompts/get`). **By default the discovery surface is shrunk to that
+single `review_before_final` facade** (+ the 6 prompts): `tools/list` advertises only the facade so an
+agent sees one small entry point, not many low-level tools. **`CT_EXPOSE_ALL=1`** opts into advertising
+the full 12-tool spine for expert/host use (`CT_DISABLE_FINALIZE` then composes to drop
+`finalize_deliverable` → 11). Hiding is **discovery-only** — `tools/call` still dispatches all 12
+handlers, so hidden tools named by the facade's enforce prompt, expert clients, or the `ct-enforce` host
+CLI still run. **It has only directional value-pilot evidence** — the table above is the benchmark-backed
 assessment; the rows below are design-stage capability claims to be validated. Full record:
 `docs/designs/IMPLEMENTATION_CHANGES.md`. Design discipline: BLOCK only on unforgeable within-request
 signals (verbatim containment, re-derivation, interval/graph math); everything self-declared is WARNING;

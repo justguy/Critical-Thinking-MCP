@@ -1,12 +1,16 @@
 # CT-MCP Capability Map
 
-Benchmark-backed assessment of what CT-MCP catches, partially catches, and does
-not catch. Based on the V5 benchmark: 56 hand-crafted scenarios total, 42 defect
-scenarios, 14 clean controls. Current beta results: CT-MCP detected the planted
-defect in 42/42 defect scenarios with 0/14 false positives on targeted clean
-controls. The historical baseline/prompted comparison rows were synthetic
-placeholders (filtered from stats), so a measured "42/42 vs baseline / vs
-prompted" head-to-head is not reproducible and is pending a real-model run.
+CT-MCP is positioned as a **deterministic release gate for structured agent deliverables**, not a
+reasoning-improvement tool (Phase 4 — `docs/PHASE4_RESULTS.md`). This map is a benchmark-backed assessment
+of what its deterministic checks catch, partially catch, and do not catch.
+
+Based on the V5 benchmark: 56 hand-crafted scenarios total, 42 defect scenarios, 14 clean controls. CT-MCP
+detected the planted defect in 42/42 defect scenarios with 0/14 false positives on targeted clean
+controls. This is the **detection quality of the tools in isolation on a hand-crafted corpus — not a
+vs-baseline win**: the historical baseline/prompted comparison rows were synthetic placeholders (filtered
+from stats), so a measured "42/42 vs baseline / vs prompted" head-to-head is not reproducible. For the
+release-gate evidence (deterministic catching of injected/contract-violating defects, and the honest
+no-reasoning-improvement result), see the Deliverable-Centric Layer section below and `docs/GAPS.md`.
 
 ## Proven Strong
 
@@ -95,28 +99,40 @@ logic.
 | `check_plan_validity` | Cycle detection, missing prerequisites, resource conflicts, critical path | Assess plan feasibility or business desirability |
 | `detect_drift` | CUSUM drift detection, monotonic progress tracking | Predict future trends |
 
-## Deliverable-Centric Layer (new — NOT yet benchmarked)
+## Deliverable-Centric Layer + Release Gate (Phase 4/5 evaluated)
 
-A deliverable gate added in the working tree (public surface 9 → 11) for forcing agents to expose
-verifiable structure and confirm their own work. The agent drives it through two public tools —
-`plan_checks` (planner) and `finalize_deliverable` (keystone gate); the other seven rows below are
-**internal check primitives** that `finalize_deliverable` re-executes inline, not separately
-agent-callable tools. A twelfth public tool, the **`review_before_final` facade**, sits on top of this
-**11-tool spine** (so the public surface is an *11-tool spine + a `review_before_final` facade = 12
-tools*): it returns the reusable per-task-type checklist + critique questions (the cheap scaffold that
-matched the heavy gate on repair in Phase-4), is **deterministic and never blocks**, and at most points
-the agent to run `finalize_deliverable` / `ct-enforce`. The same checklists are also exposed as reusable
-**MCP prompts** (`prompts/list` + `prompts/get`). **By default the discovery surface is shrunk to that
-single `review_before_final` facade** (+ the 6 prompts): `tools/list` advertises only the facade so an
-agent sees one small entry point, not many low-level tools. **`CT_EXPOSE_ALL=1`** opts into advertising
-the full 12-tool spine for expert/host use (`CT_DISABLE_FINALIZE` then composes to drop
-`finalize_deliverable` → 11). Hiding is **discovery-only** — `tools/call` still dispatches all 12
-handlers, so hidden tools named by the facade's enforce prompt, expert clients, or the `ct-enforce` host
-CLI still run. **It has only directional value-pilot evidence** — the table above is the benchmark-backed
-assessment; the rows below are design-stage capability claims to be validated. Full record:
-`docs/designs/IMPLEMENTATION_CHANGES.md`. Design discipline: BLOCK only on unforgeable within-request
-signals (verbatim containment, re-derivation, interval/graph math); everything self-declared is WARNING;
-"done" is enforced host-side.
+A deliverable gate added in the working tree for forcing agents to expose verifiable structure and confirm
+their own work. The agent drives it through two public tools — `plan_checks` (planner) and
+`finalize_deliverable` (keystone gate); the other seven rows below are **internal check primitives** that
+`finalize_deliverable` re-executes inline, not separately agent-callable tools. A twelfth public tool, the
+**`review_before_final` facade**, sits on top of this **11-tool spine** (so the public surface is an
+*11-tool spine + a `review_before_final` facade = 12 tools*): given
+`{task_type, original_request, draft_answer, mode, risk_level?}` it returns
+`{checklist[], critique_questions[], artifact_template?, enforce_required?, corrective_prompt?}`, is
+**deterministic and never blocks**, and at most points the agent to run `finalize_deliverable` /
+`ct-enforce`. Its `artifact_template` is **gate-compatible** (grounded `GroundingClaim` shape; numeric
+defaults to the light `{answer_text, structured_answer}` constraint shape, not a `numeric_derivation` DAG).
+Enforce mode only **signals** (`enforce_required` + `corrective_prompt`) — it is advisory; it does not run
+the gate or block. The same checklists are exposed as **6 reusable MCP prompts** (`prompts/list` +
+`prompts/get`). **By default the discovery surface is shrunk to that single `review_before_final` facade**
+(+ the 6 prompts): `tools/list` advertises only the facade so an agent sees one small entry point, not many
+low-level tools. **`CT_EXPOSE_ALL=1`** opts into advertising the full 12-tool surface for expert/host use
+(`CT_DISABLE_FINALIZE` then composes to drop `finalize_deliverable` → 11). Hiding is **discovery-only** —
+`tools/call` still dispatches all 12 handlers, so hidden tools named by the facade's enforce prompt, expert
+clients, or the `ct-enforce` host CLI still run.
+
+**What Phase 4/5 established (honest scope).** On a strong model the gate does **not** improve reasoning or
+repair (the cheap checklist scaffold matched/beat it; natural defect density 0.000) — the marketing claim
+*"reduces high-severity defects"* stays **unproven**. What is **proven** is deterministic *catching* of
+planted/contract-violating defects: 106/106 injected mutants blocked, 0/41 false-block on 147 hand-edited
+bundles (CI-backed, gate-mechanics scope — not evidence of catching live model fabrication), and Phase-5
+curated 16/16 violations blocked / 0/14 good blocked. `ct-enforce` is a low-friction host release gate
+**when contracts are authored per** `docs/designs/HOST_CONTRACT_AUTHORING.md`. Repair/binding nulls are
+directional (n=6, no CI; binding inert, B≈D). Full outcomes: `docs/PHASE4_RESULTS.md`,
+`docs/PHASE5_RESULTS.md`; honest gaps: `docs/GAPS.md`. The capability rows below are deterministic
+mechanics, not a vs-baseline win. Full record: `docs/designs/IMPLEMENTATION_CHANGES.md`. Design discipline:
+BLOCK only on unforgeable within-request signals (verbatim containment, re-derivation, interval/graph
+math); everything self-declared is WARNING; "done" is enforced host-side.
 
 | Tool | Does (BLOCK signal) | Does Not |
 |---|---|---|

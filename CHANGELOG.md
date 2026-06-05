@@ -1,5 +1,59 @@
 # Changelog
 
+## Unreleased — repositioned as a deterministic release gate (Phase 4/5)
+
+Working-tree changes, not yet published. ct-mcp is now positioned as a **deterministic release gate for
+structured agent deliverables**, **not** a critical-thinking / reasoning-improvement tool. Authoritative
+records: [`docs/PHASE4_RESULTS.md`](docs/PHASE4_RESULTS.md),
+[`docs/PHASE5_RESULTS.md`](docs/PHASE5_RESULTS.md),
+[`docs/designs/HOST_CONTRACT_AUTHORING.md`](docs/designs/HOST_CONTRACT_AUTHORING.md), and the
+claims ledger (`CLAIMS_LEDGER.jsonl`). No tracked-phrase head-to-head wins are claimed.
+
+- **Repositioning (Phase 4, concluded).** On a strong, shipping-class model (Haiku 4.5) the heavy
+  multi-turn gate does **not** improve reasoning or repair — the cheap checklist scaffold and self-review
+  arms repaired 6/6 vs the gate arm's 4/6, at 3–11× the turns; natural high-severity defect density was
+  0.000. What is **proven** is deterministic *catching* of planted/contract-violating defects: on 147
+  hand-edited structured bundles the gate gave perfect separation (106/106 mutants blocked, 0/41 correct
+  bases false-blocked, CI-backed). The marketing claim *"reduces high-severity defects"* stays
+  **unproven** (ledger `mkt-reduces-high-sev-defects`). The repair/binding nulls are **directional**
+  pilots (n=6, no CI); binding showed no measured benefit (B≈D). Scope: the 100%/0% result is gate
+  mechanics on hand-edited bundles, not evidence of catching live model fabrication.
+- **Product reshape — cheap scaffold + a gate for the high-risk tail.** Added **6 reusable MCP prompts**
+  (`review_plan`, `stress_architecture`, `review_decision`, `verify_research_answer`,
+  `audit_numeric_analysis`, `review_before_final`) discoverable via `prompts/list` + `prompts/get`, and one
+  **`review_before_final` facade** tool: deterministic, **never blocks**. Input
+  `{task_type, original_request, draft_answer, mode, risk_level?}`; output
+  `{checklist[], critique_questions[], artifact_template?, enforce_required?, corrective_prompt?}`. Modes:
+  `checklist` (default) / `artifact` / `enforce`; `enforce_required` only for high-risk or
+  numeric/research. Its enforce mode **signals** (sets `enforce_required` + `corrective_prompt` pointing at
+  `finalize_deliverable` / `ct-enforce`) but does **not** itself run the gate or block — the decision
+  family is advisory.
+- **Gate-compatible artifact templates (bug fixed).** The façade `artifact` templates were
+  non-gate-compatible placeholders (research used `text` instead of `claim_text`/`claim_id`/
+  `supporting_token`/`claim_kind`; numeric pushed the heavy `numeric_derivation` DAG). They were rewritten
+  to mirror the real gate schemas — grounded-citation `GroundingClaim` shape; **numeric now defaults to
+  the light `{answer_text, structured_answer}` constraint shape**, not a `numeric_derivation` DAG. Proven:
+  a valid fill RELEASEs through the real gate, a mutated fill REJECTs
+  (`tests/tools/review_before_final.gate_compat.test.ts`). Single-shot parseability went 0/3 → 3/3.
+- **Default-minimal discovery surface (breaking).** By default `tools/list` advertises **only the
+  `review_before_final` facade** (+ the 6 prompts). The **11-tool spine** (9 analyzers + `plan_checks` +
+  `finalize_deliverable`) is **hidden from discovery but still callable** via `tools/call`. Opt in with
+  **`CT_EXPOSE_ALL=1`** (→ all 12; `CT_DISABLE_FINALIZE` then composes to drop `finalize_deliverable` →
+  11). Hiding is **discovery-only**. Total public surface = **12 tools** (11-tool spine + the facade).
+  Breaking for integrations that relied on the analyzers/`finalize` being advertised; bare
+  `CT_DISABLE_FINALIZE` now yields the facade-only surface.
+- **Phase 5 (host-contract release gate, concluded).** `ct-enforce` (host-side single call) **reduces
+  false releases at low friction when contracts are authored per**
+  [`HOST_CONTRACT_AUTHORING.md`](docs/designs/HOST_CONTRACT_AUTHORING.md) (value/field/format requirements
+  as `constraints`/`must_include`; `evidence_level: rederived` reserved for genuine independent
+  re-derivation). Curated arm: 16/16 violations blocked, 0/14 good deliverables blocked; real agents ship
+  host-contract violations ~⅓ of the time. As-run, the frozen kill rule fired on friction from **one
+  over-specified contract** (`fin_numeric_dag`); a corrected re-run (re-authored as a `==` constraint, gate
+  **unchanged**) demonstrated `ship_worthy=true` (realism_false_block 0/7, no spine,
+  false_release_reduction 1.0). Caveat: the live realism arm is small (8 gradeable + 6 unparseable
+  single-shot); the façade `artifact` mode addresses the parseability friction, and the gate still
+  correctly REJECTs genuine grounding errors (an ideal fill RELEASEs).
+
 ## Unreleased — deliverable-centric robustness layer
 
 Working-tree changes, not yet published. Full record: `docs/designs/IMPLEMENTATION_CHANGES.md`;

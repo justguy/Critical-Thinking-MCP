@@ -207,3 +207,21 @@ It is now a deterministic policy layer that can:
 - escalate when the context is too poisoned to trust
 
 That is the Beta 2 transition: from static critique primitives to a context-aware control plane.
+
+## What Happened Next (post-Beta-2 pointer)
+
+This document is the historical Beta 2 narrative; the project's positioning has since changed. After Beta 2,
+two pre-registered experiments concluded:
+
+- **Phase 4** tested whether the heavy multi-turn gate improves a strong model's reasoning and repair. It
+  does **not** — a cheap checklist scaffold and self-review repaired as well or better at a fraction of the
+  tokens; natural high-severity defect density was 0.000. What is proven is deterministic *catching* of
+  planted/injected defects (CI-backed on hand-edited bundles). Record: [`PHASE4_RESULTS.md`](PHASE4_RESULTS.md).
+- **Phase 5** tested `ct-enforce` as a host-contract release gate: it reduces false releases at low friction
+  when contracts are authored per [`designs/HOST_CONTRACT_AUTHORING.md`](designs/HOST_CONTRACT_AUTHORING.md).
+  Record: [`PHASE5_RESULTS.md`](PHASE5_RESULTS.md).
+
+Consequently ct-mcp is now positioned as a **deterministic release gate for structured agent deliverables**,
+not a reasoning amplifier, and the surface was reshaped around a cheap `review_before_final` facade + 6 MCP
+prompts (default discovery), with the analyzer/gate spine hidden-but-callable behind `CT_EXPOSE_ALL`. Honest
+limitations are consolidated in `GAPS.md`.

@@ -10,21 +10,28 @@ It does not add another model opinion and it does not make the model reason bett
 
 No LLM calls in enforcement logic. No configuration. No API keys. Runs locally.
 
-> **What it is — and isn't (honest scope).** ct-mcp is a *deterministic linter + release gate*, **not** a reasoning amplifier. On a strong model it *provenly* **catches** planted / contract-violating defects (perfect separation on 147 structured bundles: 106/106 blocked, 0/41 false-block) but shows **no** measurable improvement to the model's reasoning or repair — see [`docs/PHASE4_RESULTS.md`](docs/PHASE4_RESULTS.md). Its product-value hypothesis is **host-authored contracts gating real deliverables to reduce false releases**, with a single low-friction `ct-enforce` call — the experiment in [`docs/designs/PHASE5_PREREGISTRATION.md`](docs/designs/PHASE5_PREREGISTRATION.md).
+> **What it is — and isn't (honest scope).** ct-mcp is a *deterministic linter + release gate*, **not** a reasoning amplifier. On a strong model it *provenly* **catches** planted / contract-violating defects (perfect separation on 147 hand-edited structured bundles: 106/106 blocked, 0/41 false-block) but shows **no** measurable improvement to the model's reasoning or repair — see [`docs/PHASE4_RESULTS.md`](docs/PHASE4_RESULTS.md). The proven product value is **host-authored contracts gating real deliverables to reduce false releases** with a single low-friction `ct-enforce` call: on the Phase-5 curated set the gate blocks 16/16 violating deliverables and 0/14 contract-satisfying ones, staying spine-free when contracts are authored per [`docs/designs/HOST_CONTRACT_AUTHORING.md`](docs/designs/HOST_CONTRACT_AUTHORING.md) — see [`docs/PHASE5_RESULTS.md`](docs/PHASE5_RESULTS.md). The marketing claim *"reduces high-severity defects"* stays **unproven** (that is the reasoning claim Phase 4 closed). The full set of boundaries is in [`docs/GAPS.md`](docs/GAPS.md).
 
 ## What It Does
 
-- Recomputes arithmetic and flags fabricated or suspicious numbers
-- Caps unsupported confidence and forces falsification conditions
-- Finds circular reasoning, broken plans, and concurrency hazards
-- Returns concrete metrics plus corrective guidance when an answer is not safe enough
+At the gate (`ct-enforce` / `finalize_deliverable`), on the contract the **host** pins:
+
+- Re-derives every declared conclusion number from supplied inputs and blocks unforgeable arithmetic mismatches
+- Requires every factual claim to quote a verbatim span of a supplied source; blocks ungrounded or laundered claims
+- Evaluates the question's hard constraints (`must_include` / `==` / `<=` …) against the structured answer
+- Checks source freshness and a declared case split's MECE-ness
+- Names the exact failure mode and returns a tamper-evident `answer_text_hash` binding token
+
+It does **not** add another model opinion and it does **not** make the model reason better. It recomputes and validates against host-pinned requirements.
 
 ## How It Works
 
-1. Your client sends structured input to one or more CT-MCP tools.
-2. Each tool runs deterministic checks over that structure.
-3. CT-MCP returns a machine-readable result with metrics, warnings, or blocking issues.
-4. Your agent can then revise the answer, ask for missing evidence, or escalate to a human.
+1. The host authors a `deliverable_contract` — the objective requirements a deliverable must satisfy (see [`docs/designs/HOST_CONTRACT_AUTHORING.md`](docs/designs/HOST_CONTRACT_AUTHORING.md)).
+2. The agent supplies the deliverable plus its artifacts (sources + claims, inputs + conclusion numbers, constraints).
+3. `ct-enforce` re-executes the contract's required checks deterministically — no LLM in the enforcement path.
+4. It returns RELEASE or a blocking result that names the exact violation, so the agent can revise, fetch missing evidence, or escalate.
+
+For everyday self-review, the cheap **`review_before_final` facade** (and the 6 reusable prompts) scaffolds the same discipline without ever blocking; `ct-enforce` is reserved for the high-risk / machine-checkable tail.
 
 ## Install
 
@@ -109,7 +116,37 @@ Why CT-MCP mattered less here:
 - CT-MCP mostly cleaned up overconfidence and specificity instead of changing the core conclusion.
 - The saved review artifact marks this as a weak-fit case: [`weak_fit: yes`](benchmark/duckexperiments/results/codex_low/Q01/tool_review.md).
 
-## Public Tools
+## Default surface + tool discovery
+
+By default `tools/list` advertises **only the `review_before_final` facade** (plus the 6 prompts below) —
+a single small entry point, so a normal agent isn't asked to pick from many low-level analyzers. The full
+**11-tool spine** (9 analyzers + `plan_checks` → `finalize_deliverable`) is still there and still
+**callable**; it is just hidden from discovery.
+
+- **Default:** `review_before_final` only.
+- **`CT_EXPOSE_ALL=1`:** advertise the full **12-tool** surface (11-tool spine + the facade) for expert / host use.
+- **`CT_EXPOSE_ALL=1` + `CT_DISABLE_FINALIZE`:** drops `finalize_deliverable` → 11 advertised (the Phase-4 arm-D "no-finalize" variant).
+
+Hiding is **discovery-only**: `tools/call` always dispatches all 12 handlers, so the facade's enforce-mode
+corrective prompt (which points at `finalize_deliverable` / `ct-enforce`), expert clients, and the host CLI
+can always name a hidden tool and have it run. `ct-enforce` remains the host-side CLI for the single-call
+release gate. (Default-minimal is a **breaking change** for integrations that relied on the analyzers being
+*advertised* — see [`docs/GAPS.md`](docs/GAPS.md).)
+
+## Reusable prompts
+
+The per-task-type checklists are also exposed as **6 reusable MCP prompts** discoverable via `prompts/list`
++ `prompts/get`, so a client can pull the self-review scaffold without any tool call:
+`review_plan`, `stress_architecture`, `review_decision`, `verify_research_answer`,
+`audit_numeric_analysis`, `review_before_final`.
+
+## Public Tools (the opt-in spine, `CT_EXPOSE_ALL`)
+
+The 9 analyzers below are the historical benchmarked surface; `plan_checks` and `finalize_deliverable`
+form the deliverable gate on top of them. They are deterministic: a check may **block** only on an
+*unforgeable, within-request* signal (verbatim substring containment, numeric re-derivation,
+interval/set/graph math); everything self-declared is a *warning*. Because MCP tools are model-controlled,
+enforcing that an answer is "done" is ultimately host-side (that is what `ct-enforce` is for).
 
 **Reasoning & Structure**
 - **validate_reasoning_chain** — Directed graph analysis. Catches circular logic, grounded contradictions, orphaned conclusions, computes grounding score.
@@ -128,43 +165,35 @@ Why CT-MCP mattered less here:
 - **detect_concurrency_patterns** — Check-then-act, missing idempotency, lost updates, dual writes, explicit deadlock risk from structured resource-allocation graphs.
 - **detect_drift** — CUSUM trend analysis on numeric sequences.
 
-The first nine analyzers are the benchmarked surface. A newer **deliverable-centric layer** adds two
-public gate tools on top of them.
+## Deliverable gate (the spine keystone)
 
-## Deliverable-Centric Layer (in development — directional pilot only)
-
-Two additional public tools form a **deliverable gate** on top of the nine analyzers (public surface
-9 → 11). They push an agent to expose verifiable structure and confirm its own work before an answer is
-releasable. They have only small directional value-pilot evidence, not a definitive product-value
-benchmark. Same
-discipline as the core tools: a check may **block** only on an *unforgeable, within-request* signal
-(verbatim substring containment, numeric re-derivation, interval/set/graph math); everything self-declared
-is a *warning*; and because MCP tools are model-controlled, enforcing that an answer is "done" is
-ultimately host-side.
+Two of the spine tools form the **deliverable gate** the host drives through `ct-enforce`. Phase 5 proved
+this gate **reduces false releases** (16/16 curated violations blocked, 0/14 contract-satisfying blocked)
+and stays **low-friction** when contracts are authored per
+[`docs/designs/HOST_CONTRACT_AUTHORING.md`](docs/designs/HOST_CONTRACT_AUTHORING.md); Phase 4 showed it does
+**not** improve a strong model's reasoning or repair (see [`docs/PHASE4_RESULTS.md`](docs/PHASE4_RESULTS.md)).
 
 - **plan_checks** — deterministic planner: maps a `deliverable_contract` (task type, evidence level, risk) to the obligations `finalize_deliverable` will enforce, so the agent knows which artifacts to prepare. Never blocks.
 - **finalize_deliverable** — the keystone gate: **re-executes** the contract's required checks inline (grounding with claim id/text/kind binding, strict number tracing, arithmetic checks, constraints, freshness) and blocks on `must_include`/numeric-criterion substring failures; additionally verifies a *supplied* `case_partition` is MECE (blocks on overlap/gap) and emits a profile-downgrade **warning** when the declared task type understates the request/answer shape; returns an exact-text `answer_text_hash` binding token.
 
-On top of the 11-tool spine (9 analyzers + `plan_checks` → `finalize_deliverable`) sits one more public
-tool — a **`review_before_final` facade** — so the public surface is an **11-tool spine + a
-`review_before_final` facade = 12 tools**. The facade is the *lightweight* counterpart to the heavy gate:
-a Phase-4 finding was that a cheap checklist scaffold matched/beat the multi-turn artifact gate on repair
-with fewer turns, so `review_before_final` returns the reusable per-task-type **checklist + critique
-questions** (and, on request, a compact artifact template plus a pointer to run `ct-enforce` /
-`finalize_deliverable`). It is **deterministic and never blocks** — it scaffolds self-review; it does not
-verify the answer. The same checklists are also exposed as reusable **MCP prompts** (`prompts/list` +
-`prompts/get`): `review_plan`, `stress_architecture`, `review_decision`, `verify_research_answer`,
-`audit_numeric_analysis`, `review_before_final`.
+## The `review_before_final` facade (the default surface)
 
-**Default discovery surface (small by design).** By default `tools/list` advertises **only the
-`review_before_final` facade** (plus the 6 prompts) — a single small entry point, so a normal agent
-isn't asked to pick from many low-level analyzers. The full **11-tool spine** is still there and still
-**callable**; it is just hidden from discovery. Set **`CT_EXPOSE_ALL=1`** to advertise the full 12-tool
-surface for expert/host use (`CT_DISABLE_FINALIZE` then composes on top to drop `finalize_deliverable`,
-leaving 11). Hiding is **discovery-only**: `tools/call` always dispatches all 12 handlers, so the
-facade's enforce-mode corrective prompt (which points at `finalize_deliverable` / `ct-enforce`), expert
-clients, and the host CLI can always name a hidden tool and have it run. `ct-enforce` remains the
-host-side CLI for the single-call release gate.
+On top of the 11-tool spine sits one more public tool — the **`review_before_final` facade** — so the
+total public surface is an **11-tool spine + the facade = 12 tools**. It is the *cheap* counterpart to the
+heavy gate: a Phase-4 finding was that a low-cost checklist scaffold matched/beat the multi-turn artifact
+gate on repair at a fraction of the tokens, so the facade exposes that **process** without the gate.
+
+- **Input:** `{task_type, original_request, draft_answer, mode, risk_level?}`.
+- **Output:** `{checklist[], critique_questions[], artifact_template?, enforce_required?, corrective_prompt?}`.
+- **Modes:** `checklist` (**default**) returns the per-task-type checklist + critique questions only;
+  `artifact` additionally returns a **gate-compatible** `artifact_template` (grounded-citation
+  `GroundingClaim` shape; numeric defaults to the **light** `{answer_text, structured_answer}` constraint
+  shape, *not* a `numeric_derivation` DAG); `enforce` additionally sets `enforce_required` + a
+  `corrective_prompt` pointing at `ct-enforce` / `finalize_deliverable`.
+- It is **deterministic and NEVER blocks.** `enforce` mode only **signals** (`enforce_required` +
+  `corrective_prompt`) — it does **not** itself run the gate or verify the answer; the decision family is
+  advisory (see [`docs/GAPS.md`](docs/GAPS.md)). `enforce_required` defaults true only for high-risk or
+  numeric/research task types.
 
 The individual checks `finalize_deliverable` runs are **internal primitives**, not separately
 agent-callable tools — the agent supplies the artifacts (`sources`+`claims`, `inputs`+`conclusion_numbers`,
@@ -202,13 +231,33 @@ That layer is internal and repo-local, not a new public MCP tool. The implementa
 
 ## Validation Results
 
-Tested on 56 hand-crafted scenarios (42 defect + 14 clean control):
+The defensible, measured value is **deterministic catching at the gate** and **host-contract false-release
+reduction** — not reasoning improvement. The evidence is uneven in strength; here is what each track proves.
 
-- **CT-MCP detected the planted defect in 42/42** defect scenarios (detection quality of each tool in isolation on the hand-crafted corpus)
-- **0 false positives** on 14 clean controls
-- Includes concurrency patterns, mutation tests, and adversarial wording
+**Injected-defect gate mechanics (fully powered, CI-backed).** On 147 hand-edited structured bundles the
+gate separates defects from clean work perfectly: **106/106 mutants blocked, 0/41 correct bases
+false-blocked** (recall 1.0 [0.965,1], false-block 0 [0,0.086]). This is the gate as a deterministic
+validator of *hand-edited structured defects* (renderer-unit-test scope) — **not** evidence it catches a
+live model *producing* fabrication. See [`docs/PHASE4_RESULTS.md`](docs/PHASE4_RESULTS.md).
 
-Note: the baseline-LLM and prompted-LLM rows in the historical V5 run were synthetic placeholders (`benchmark/runner.ts` emits them with `synthetic:true`, and they are filtered out of the stats), so a measured "42/42 vs baseline / vs prompted" head-to-head is **not reproducible** and is pending a real-model run (Phase 1a). The figures above reflect CT-MCP's own static-analysis detection quality. In live Beta 2 agent workflows, CT-MCP deliberately trades raw acceptance rate for safer `HUMAN_REVIEW` halts when a model cannot be deterministically repaired.
+**Host-contract release gate (Phase 5, deterministic curated arm).** `ct-enforce` gives perfect separation
+on the curated set — **16/16 violating deliverables blocked, 0/14 contract-satisfying blocked
+(false_release_reduction 1.0)** — and real agents ship host-contract violations ~⅓ of the time, so the
+false-release opportunity is real. With contracts authored per
+[`docs/designs/HOST_CONTRACT_AUTHORING.md`](docs/designs/HOST_CONTRACT_AUTHORING.md) it stays **low-friction**
+(good-faith single-shot deliverables RELEASE spine-free). See [`docs/PHASE5_RESULTS.md`](docs/PHASE5_RESULTS.md).
+
+**Static detection-quality corpus (tools in isolation).** On 56 hand-crafted scenarios (42 defect + 14
+clean control), CT-MCP **detected the planted defect in 42/42** defect scenarios with **0 false positives**
+on the 14 clean controls. This is the detection quality of each tool *in isolation* on a hand-crafted
+corpus — **not** a vs-baseline / vs-prompted win: the historical baseline-LLM and prompted-LLM rows were
+synthetic placeholders (`benchmark/runner.ts` emits them with `synthetic:true`, filtered out of the stats),
+so a measured head-to-head is **not reproducible** and is pending a real-model run.
+
+**What is NOT proven.** Phase 4 showed the heavy gate does **not** improve a strong model's reasoning or
+repair (checklist arm repaired 6/6 vs gate arm 4/6, at 3–11× the turns; natural defect density 0.000), and
+binding is inert on a strong model. The marketing claim *"reduces high-severity defects"* stays
+**unproven**. Full boundaries: [`docs/GAPS.md`](docs/GAPS.md).
 
 ## Beta 2 Release-Gate Summary
 
@@ -411,9 +460,15 @@ This is different from evaluator pipelines that call another LLM judge on every 
 
 ## Why This Works Differently
 
-Most AI evaluation checks outputs after they're produced. These tools intervene during reasoning. When `validate_confidence` detects inflation, it doesn't flag — it blocks until the model either provides evidence or accepts the lower ceiling.
+Most AI evaluation asks *another model* to grade the output — and inherits the same blind spots. CT-MCP
+does not add another model opinion. At the gate it **recomputes**: it re-derives the conclusion numbers,
+re-checks every claim against a verbatim source span, and evaluates the host's hard constraints —
+deterministically, with no LLM in the enforcement path. A failure is not a probabilistic flag; it is a
+named, reproducible violation that **blocks release**.
 
-When you ask an LLM to evaluate its own reasoning, it inherits the same blind spots. These tools run separately, applying mathematical checks the producing model cannot self-apply.
+The honest boundary (Phase 4): this does **not** make the model reason better. The value is the
+deterministic *catch* of an unforgeable violation at the gate, on the contract the host pins — not a
+reasoning amplifier. See [`docs/PHASE4_RESULTS.md`](docs/PHASE4_RESULTS.md) and [`docs/GAPS.md`](docs/GAPS.md).
 
 ## What CT-MCP Can And Cannot Force
 
